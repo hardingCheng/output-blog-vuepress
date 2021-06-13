@@ -1,0 +1,19 @@
+{
+  "name": "output-blog",
+  "version": "1.0.0",
+  "description": "我的vuepress的Blog",
+  "main": "index.js",
+  "scripts": {
+    "docs:dev": "vuepress dev docs",
+    "docs:build": "vuepress build docs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "技术、分享、经验。"
+  ],
+  "author": "hardingcheng",
+  "license": "ISC",
+  "devDependencies": {
+    "vuepress": "^1.8.2"
+  }
+}
