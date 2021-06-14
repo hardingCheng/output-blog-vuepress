@@ -12,11 +12,11 @@ module.exports = {
   },
   themeConfig: {
     nav: [
-        { text: 'Home', link: '/' },                     
+        { text: 'Home', link: '/' },
         { text: 'JavaScript', link: '/javascript/index' },
-        { text: 'HTMLCSS', link: '/htmlcss/index' }, 
-        { text: 'Vue', link: '/vue/index' }, 
-        { text: 'React', link: '/react/index' }, 
+        { text: 'HTMLCSS', link: '/htmlcss/index' },
+        { text: 'Vue', link: '/vue/index' },
+        { text: 'React', link: '/react/index' },
         {
           text: 'Node',
           items: [
@@ -29,31 +29,32 @@ module.exports = {
         {
           text: '算法',
           items: [
-            { 
-              text: 'LeetCode', 
+            {
+              text: 'LeetCode',
               items: [
                 { text: '初级', link: '/algorithm/leetcode/primary' },
                 { text: '中级', link: '/algorithm/leetcode/intermediate' },
                 { text: '高级', link: '/algorithm/leetcode/senior' }
-              ] 
+              ]
             },
-            { 
-              text: '设计模式', 
+            {
+              text: '设计模式',
               items: [
                 { text: '工厂', link: '/algorithm/design-pattern/single-case' },
                 { text: '单例', link: '/algorithm/design-pattern/factory'},
-              ] 
+              ]
             },
           ]
         },
-        { text: '面试', link: '/interview/index' }, 
-        { text: '工具技巧', link: '/tool-skills/index' }, 
+        { text: '面试', link: '/interview/index' },
+        { text: '工具技巧', link: '/tool-skills/index' },
       ],
     sidebar: 'auto',// 侧边栏配置
-    sidebarDepth: 3, // 侧边栏显示2级
+    sidebarDepth: 2, // 侧边栏显示2级
     logo: '/logo.png',
     searchMaxSuggestions: 10,
     lastUpdated: 'Last Updated', // string | boolean
+    displayAllHeaders: true // 默认值：false
   },
   configureWebpack: {
     resolve: {
