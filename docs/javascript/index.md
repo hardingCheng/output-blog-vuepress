@@ -222,7 +222,7 @@ console.log(p1.__proto__.constructor)
 改变函数内部this主席昂，常用的方法：`bind()、call()、apply()`
 call()方法：调用一个对象，即调用函数的方式，改变函数的this指向。主要作用实现继承。
 ```javascript
-foo.call(thisArg, arg1,arg2,....)
+foo.call(thisArg, arg1,arg2,...)
 ```
 apply()方法：调用一个函数，`即调用函数的方式`，改变函数的this指向。
 ```javascript
@@ -526,7 +526,535 @@ const throttle = (fn,waiting=1000,option)=>{
     return _throttle
 }
 ```
+## javascript语法简明手册
+### Chrome控制台
+1. copy()函数
+    + 将已有对象的JSON表达式复制到缓冲区
+2. console.dir() 
+    + 查看所有对象的属性和方法
+3.  console.error()
+    + 提供栈追踪
+4. console.time()和console.timeEnd()
+    + 可以跟踪函数所消耗的时间，对代码优化很有帮助
+```js
+console.time()
+let arr = new Array(10000)
+for (let i = 0; i<arr.length; i++) {
+    arr[i] = new Object()
+}
+console.timeEnd()
+```
+5. console.clear()
+
+### javascript基础
+#### DOMContentLoaded
+为了等待DOM事件，添加事件监听器。该事件监听器。DOMContentLoaded。
+```html
+<html>
+    <head>
+        <title>DOM Loaded.</title>
+        <script type="text/javascript">
+            function load(){
+                console.log('DOM Loaded.')
+            }
+            document.addEventListener("DOMContentLoaded",load)
+        </script>
+    </head>
+</html>
+```
+该入口点需要保证所有DOM元素都已经加载到内存中，而且在使用javascript来访问他们时不会发生错误。
+请根据是仅需要等待DOM还是需要等待其他媒介，来决定程序入口是DOMContentLoaded、readyState还是本地的window.onload方法。
+1. readyState
+在绑定DOMContentLoaded事件之前，需要检查readyState
+```js
+<html>
+    <head>
+        <title>DOM Loaded.</title>
+        <script type="text/javascript">
+            function load(){
+                console.log('DOM Loaded.')
+            }
+            if(document.readyState == 'loading') {
+                document.addEventListener("DOMContentLoaded",load)
+            }else {
+            load()
+        }
+        </script>
+    </head>
+</html>
+```
+2. window.onload
+使用window。onload方法，一直等到所有图像和相关媒介都下载完成。
+   
+```js
+<html>
+    <head>
+        <title>DOM Loaded.</title>
+        <script type="text/javascript">
+            window.onload = function() {
+            // 等待各种东西加载完毕
+        }
+        </script>
+    </head>
+</html> 
+```
+#### export、export default和module.exports的用法及区别
+##### Node应用由模块组成，采用CommonJS模块规范。module.exports。
+CommonJS规范规定，每个模块内部，module变量代表当前模块。这个变量是一个对象，它的exports属性（即module.exports）是对外的接口。加载某个模块，其实是加载该模块的module.exports属性。
+```js
+// 导出
+var x = 5;
+var addX = function (value) {
+  return value + x;
+};
+module.exports.x = x;
+module.exports.addX = addX;
 
 
+// 导入
+// require方法用于加载模块。
+var example = require('./example.js');
+
+console.log(example.x); // 5
+console.log(example.addX(1)); // 6
+```
+##### ES6使用export和import来导出、导入模块
+在一个文件或模块中，export、import可以有多个，export default仅有一个。通过export方式导出，在导入时要加{ }，export default则不需要。
+export命令规定是对外的接口，必须与模块内部的变量建立一一对应关系.
+```js
+// test-es6.js
+const name = 'linda'
+const age = 20
+function add(x,y) {
+    return x+y
+}
+export {name,age,add}
 
 
+import {name,age,add} from "./test-es6.js"
+```
+```js
+//a.js
+export const str = "blablabla~";
+export function log(sth) { 
+  return sth;
+}
+
+//b.js
+import { str, log } from 'a'; //也可以分开写两次，导入的时候带花括号
+```
+
+export default 命令，为模块指定默认输出，import时可以自己起名字。使用export default命令，为模块指定默认输出，这样就不需要知道所要加载模块的变量名。
+```js
+//a.js
+const str = "blablabla~";
+export default str;
+
+//b.js
+import str from 'a'; //导入的时候没有花括号
+```
+##### ES10动态导入
+ES10 可以将导入赋值给一个变量。
+```js
+element.addEventListener('click',async() => {
+    const module = await import('./api/click.js')
+    module.clickEvent()
+})
+```
+
+#### 字面量与构造函数
+值|类型(typeof x)|构造函数
+:---:|:---:|:---:
+1|"number"|Number()
+3.14|"number"|Number()
+some text .|"string"|String()
+[]|"object"|Array()
+{}|"object"|Object()
+true|"boolean"|Boolean()
+f f(){}|"function"|Function()
+
+#### 引用传递
+:::tip 提示
+常将数据从一处复制到另一处。人们很自然地会想到将当前值从一个变量赋给另一个变量时，会生成一个副本。javascript是通过引用进行赋值，实际上并不会生成原始变量的副本。
+:::
+
+```js
+let x = { p:1 }  // 创建新变量x
+let y = x // y是x的引用
+x.p = 2 // 修改x的原始值
+console.log(y.p) // 2
+```
+引用链
+```js
+let a = { p:1 }
+let b = a
+let c = b
+let d = c
+let e = d
+let f = e
+let g = f
+
+a.p = 5
+console.log(g.p)
+```
+
+#### 作用域的怪癖
+##### 怪癖1：函数内的let和const与全局变量
+```js
+let a = "global a"
+let b = "global b"
+
+function x(){
+    console.log("x(): global b = " + b)  //"global b"
+    console.log("x(): global a = " + a)  // ReferenceError
+    let a = 1 // 不提升
+}
+
+x()
+```
+::: danger 重点
+如果函数内部已经存在变量a（并且是使用let或const定义的），那么在函数内部的变量a的定义之前使用a，就会发生ReferenceError错误，即使存在全局变量a，也是如此！
+这在语法上称为“暂时性死区”（英temporal dead zone，简 TDZ），即代码块开始到变量声明语句完成之间的区域。
+:::
+##### 怪癖2：var依附于window/this对象，而let和const不会
+::: danger 重点
+在全局作用域中，this引用指向window对象或全局语境的实例。当使用var关键字定义变量时，这些变量就依附于window对象，而使用let和const定义的变量不会这样。
+:::
+```js
+console.log(this === window) // window
+
+var c = 'c' // 依附于window（全局作用域中的this）
+let d = 'd' // 独立于this
+
+console.log(c) // c
+console.log(this.c) // c
+console.log(window.c) // c 
+
+console.log(d) // d
+console.log(this.d) // 未定义
+console.log(window.d) // 未定义
+```
+### javascript语句
+#### 求值语句
+```js
+let a = 1       // underfined
+a;              // 1
+```
+一些语句的求值结果是undefined
+语句|求值结果
+:---:|:---:
+;|undefined
+1;|1
+"text";|"text"
+[];|[]
+{};|undefined
+let a = 1;|undefined
+let b = [];|undefined
+let c = {};|undefined
+let d = new String("text");|undefined
+let e = new Number(123);|undefined
+new String("text");|"text"
+new Number(125);|125
+let f = function() {return 1};|undefined
+f()|1
+let o = (a,b) => a+b;|undefined
+o(1,2)|3
+function name() {}|undefined
+::: tip 重点
+尽管一些求值规则容易理解，但是特殊的规则可能需要死记硬背。
+:::
+
+### javascript基本类型
+#### 基本类型
+JavaScript包含7种类型：`boolean`、`null`、`undefined`、`number`、`bigint`、`string`和`symbol`。
+
+类型|值|构造函数|typeof
+:---:|:---:|:---:|:---:
+null|null|无|"object"
+undefined|undefined|无|"object"
+number|123 3.14|Number()|"number"
+bigint|123n 256n|Bigint()|"bigint"
+string|"hello"|String()|"string"
+boolean|true false|Boolean()|"boolean"
+symbol||无|"symbol"
+
+#### Symbol特别注意
+```js
+// 不能使用new初始化symbol
+let sym = new Symbol('sym'); // TypeError
+// 正确创建方式
+let sym = Symbol('sym');
+// 创建唯一的symbol
+Symbol('sym') === Symbol('sym')  // false
+// 每当调用Symbol('sym')时，就会创建唯一的symbol。symbol可以用来定义私有对象的属性。
+```
+利用symbol定义对象属性
+```js
+let sym = Symbol('unique')
+let bol = Symbol('distinct')
+let one = Symbol('only-one')
+let obj = { property: "regular property",[sym]:1,[bol]:2 }
+ogj[one] = 3
+```
+同时显示私有属性和公开属性
+```js
+console.log(obj)
+/*
+{
+  property: 'regular property',
+  [Symbol(unique)]: 1,
+  [Symbol(distinct)]: 2,
+  [Symbol(only-one)]: 3
+}
+ */
+```
+基于symbol的私有属性对Object.entries、Object.keys、Object.values以及其他迭代器（如for...in...循环）,JSON.stringify是不可见的。
+```js
+for(let prop in obj) {
+    console.log(prop + ": " + obj[prop])
+}
+console.log(Object.entries(obj))
+console.log(JSON.stringify(obj))
+/*
+property: regular property
+[ [ 'property', 'regular property' ] ]
+{"property":"regular property"}
+
+ */
+```
+symbol属性可以通过Object.getOwnPropertySymbols方法公开symbol属性。
+```js
+console.log(Object.getOwnPropertySymbols(obj))
+[ Symbol(unique), Symbol(distinct), Symbol(only-one) ]
+```
+全局symbol注册表
+有一种创建字符串键的方法可以覆盖使用相同的名字创建的symbol,这就是symbol的全局注册表。可以使用Symbol.for和Symbol.keyFor进行访问。
+```js
+let sym = Symbol.from('age')
+let bol = Symbol.from('age')
+obj[sym] = 20
+obj[bol] = 25
+
+console.log(obj[sym])  // 25
+```
+### 强制类型转换
+```js
+// 数值与字符串相加时候，数值总会先执行加法。
+1 + 1 + 1 + 2 + "" => "5"
+```
+
+```js
+// 数值与其他类型比较，都会讲其他类型转化为数值。
+```
+### 作用域
+作用域包含3中类型：全局作用域、块级作用域和函数作用域。
+#### 变量定义
+1. 区分大小写
+2. 定义变量（var,let,const）
+#### 变量提升
+全局作用域中定义的变量基本上可以面向全局语境中定义的全部其他作用域，包括`块级作用域`、`for-loop作用域`、`函数作用域`、`事件回调函数`
+```js
+console.log(apple) // undefined
+{
+    var apple = 1
+}
+
+var apple
+console.log(apple) // undefined
+{
+    apple = 1
+}
+```
+#### 函数提升
+```js
+fun()  // Hello from fun() function.
+function fun() {
+    console.log("Hello from fun() function.")
+}
+
+function fun() {
+    console.log("Hello from fun() function.")
+}
+fun()  // Hello from fun() function.
+```
+#### 在函数作用域中定义变量
+在自己的块级作用域找不到var定义时，它就会在父级作用域中查找。如果在自己的块级作用域找到该变量，那么它就会继承变量的值。在函数作用域中定义的变量基本上只接受单向访问。
+函数支持闭包模式。在该模式下，它们的变量对全局作用域是不可见的，但是可以被它们内部的其他函数作用域访问。
+#### 作用域可见性的区别
+全局作用域中
+当变量定义在全局作用域中时，var、let和const在作用域可见性方面没有区别。它们对内部的块级作用域、函数作用域和时间回调函数作用域都是有效的。
+关键字let和const限制变量，使用变量仅在其定义的作用域内有效。
+#### 在函数作用域中
+在函数内，包括var在内的所有变量类型都仅适用于其他作用域。无论你使用哪一个关键字，都无法在变量定义的函数作用域外部访问该变量。
+#### 闭包
+函数闭包就是一个函数位于另一个函数的内部。
+```js
+var plus = (function() {
+    var counter = 0
+    return function() {
+        counter += 1
+        return counter
+    }
+})()
+plus()  // 1
+plus()  // 2
+plus()  // 3
+```
+在plus的作用域内，另一个匿名函数被创建，它能使私有变量counter自增1，并将结果的返回值传给全局作用域。在全局作用域不可以直接访问counter变量，也不可以修改该变量。
+至于闭包内的代码才允许其内部函数来修改该变量，并保持该变量不被泄露到全局作用域。
+#### 在块级作用域中
+let和const隐蔽变量的可见性，使其仅对变量定义所在的作用域及其内部作用可见。
+在类中
+```js
+class Cat{
+    constructor() {
+        let property = 1   // 局部变量
+        this.something = 2  // 对象属性
+    }
+    method() {
+        console.log(this.property)  //undefined
+        console.log(this.something) //2
+    }
+    
+}
+```
+const和数组
+const数组的值是可以修改的，只是不可以再将新的对象赋给初始变量名。
+```js
+const A = []
+A[0] = 'a'
+A = [] // 类型错误，赋值给常量
+```
+const和对象字面量与数组相似。
+
+### 运算符
+### 位运算符
+运算符|名称|实例|结果
+:----:|:----:|:----:|:----:
+&|按位与|a&b|1
+`|`|按位或|`a|b`|13
+^|按位异或|a^b|12
+~|按位非|~a|-6
+>>|按位右移|a>>1|2
+<<|按位左移|a<<2|10
+#### typeof
+运算符|结果
+:----:|:----:
+typeof 125|"number"
+typeof 100n|"bigint"
+typeof '125'|"string"
+typeof NaN|"number"
+typeof true|"boolean"
+typeof []|"object"
+typeof {}|"object"
+typeof Object|"object"
+typeof new Object()|"object"
+typeof null|"object"
+#### delete
+delete关键字删除对象属性
+```js
+let bird = {
+    name:'raven',
+    speed:'30mpg'
+}
+delete bird.speed
+```
+#### in
+in运算符可以用来检查属性名是否存在于对象中。
+```js
+"c" in { "a" : 1,"b" : 2,"c" :3}  //true
+```
+检查是否存在索引值
+```js
+"c" in ["a","b","c"] //false
+0 in ["a","b","c"]  // true
+```
+检查length属性
+```js
+"length" in [] //true
+```
+### ...rest和...spread
+#### rest属性
+...rest语法可以帮助你从函数的单个参数名中提取多项，并应用它们。单个rest参数包含传递给函数的一个或者多个参数。
+```js
+// 
+let f = (...items) => items.map(item => console.log(item))
+let f = (...i) => i.map(v => console.log(v))
+f(1,2,3,4,5,6)   -> [1,2,3,4,5,6]
+```
+#### spread属性
+spread和rest相反，它可以帮助你从对象中提取组成部分。
+```js
+let {鸡腿,空心菜,土豆} = 购物车
+```
+#### ...rest和...spread
+- ...rest:将所有剩余的参数（"其余的参数"）收集到一个数组中。
+- ...spread:将迭代器展开为一个或多个参数
+#### 语法详解
+rest餐宿可以为函数书籍任意数量的参数，并将它们存储到一个数组中。
+rest必须是唯一的参数标识或是参数列表中的最后一个。
+```js
+function sum(...args) {
+    console.log(args) // [1,2,3]
+}
+sum(1,2,3)
+function sum(a,...args) {
+    console.log(args) // [2,3]
+}
+sum(1,2,3)
+```
+...spread和...rest相反,他从一个数组中取出值。
+```js
+function print(a,...args) {
+    console.log(a);
+    console.log(args)
+}
+print(...[1,2,3],4,5) //在这里是...spread   => print(1,2,3,4,5)
+// a = 1
+// args = [2,3,4,5]
+```
+#### spread来扁平化数组
+```js
+let names = ['felix','luna']
+const cats = [...names,'daisy']
+console.log(cats)  // ['felix','luna','daisy']
+```
+#### 解构赋值
+解构赋值可用于从数组和对象中提取多项，并将它们赋给变量。
+解构不是隐式递归的，不会扫描到二级对象。
+如果未在对象中找到变量，得到的结果就是undefined
+```js
+[a,b] = [10,20]
+console.log(a,b)
+
+[a,b,...rest] = [30,40,50,60,70]
+console.log(a,b) // 30,40
+console.log(rest) //[50,60,70]
+
+// 提取匹配名称的对象属性
+let { oranges } = { organes:1 }
+console.log(organes)  // 1
+
+let fruit_basket = {
+    apples : 0,
+    grapes : 1,
+    mangos : 3
+}
+let { grapes } = fruit_basket
+console.log(grapes)
+
+// 解构与重命名同时进行
+let { automobile:car } = { automobile:"Tesla" }
+console.log(car)
+```
+#### 合并对象和数组
+```js
+let a = { p:1,q:2,m:() => {}}
+let b = { r:3,s:4,n:() => {}}
+let c  = {...a,...b}
+
+
+let a = [1,2]
+let b = [3,4]
+let c = [...a,...b]  //[1,2,3,4]
+```

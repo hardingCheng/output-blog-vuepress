@@ -30,6 +30,12 @@ module.exports = {
           text: '算法',
           items: [
             {
+              text: 'js数据结构',
+              items: [
+                { text: '基础数据结构', link: '/algorithm/js-data-structure/index' },
+              ]
+            },
+            {
               text: 'LeetCode',
               items: [
                 { text: '初级', link: '/algorithm/leetcode/primary' },
