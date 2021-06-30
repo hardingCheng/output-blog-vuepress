@@ -5,6 +5,7 @@ module.exports = {
   dest: './dist',  // 设置输出目录
   head: [ // 注入到当前页面的 HTML <head> 中的标签
     ['link', { rel: 'icon', href: './logo.png' }], // 增加一个自定义的 favicon(网页标签的图标)
+    ['meta', { name: 'baidu-site-verification', content: 'code-8TFGBSAqmw' }]
   ],
   port: 8099,
   markdown: {
@@ -13,7 +14,13 @@ module.exports = {
   themeConfig: {
     nav: [
         { text: 'Home', link: '/' },
-        { text: 'JavaScript', link: '/javascript/index' },
+        { text: 'JavaScript',
+          items: [
+            { text: 'javaScript日常总结', link: '/javascript/index' },
+            { text: 'javaScript内置对象', link: '/javascript/built-in-objects' },
+            { text: 'javaScript技巧', link: '/javascript/js-skill.md' },
+          ]
+        },
         { text: 'HTMLCSS', link: '/htmlcss/index' },
         { text: 'Vue', link: '/vue/index' },
         { text: 'React', link: '/react/index' },
