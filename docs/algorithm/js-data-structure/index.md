@@ -5008,10 +5008,612 @@ function shuffle(array) {
 
 ### 分为治之
 
+归并和排序算法。两者都是分为治之算法。两者的共同点在于它们都是分而治之。分而治之是算法设计中的一种方法。它将一个问题分成多个问题和原问题相似的小问题，递归解决小问题，再将解决方式合并以解决原来的问题。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210701125931.png)
+
+#### 二分搜索
+
+前面的方式是迭代来实现二分搜索。现在是分而治之的方式实现这个方法。
+
+- **分解**：计算mid并搜索数组较小或较大的一半。
+- **解决**：在较小或较大的一半中搜索值。
+- **合并**：这不需要，因为我们直接返回了索引值。
+
+```js
+const Compare = {
+  LESS_THAN: -1,
+  BIGGER_THAN: 1,
+  EQUALS: 0
+};
+
+const DOES_NOT_EXIST = -1;
+
+function defaultCompare(a, b) {
+  if (a === b) {
+    return Compare.EQUALS;
+  }
+  return a < b ? Compare.LESS_THAN : Compare.BIGGER_THAN;
+}
+
+function binarySearchRecursive(array, value, low, high, compareFn = defaultCompare) {
+  if (low <= high) {
+    //找中间中间值
+    const mid = Math.floor((low + high) / 2);
+    const element = array[mid];
+    if (compareFn(element, value) === Compare.LESS_THAN) {
+      return binarySearchRecursive(array, value, mid + 1, high, compareFn);
+    }
+    if (compareFn(element, value) === Compare.BIGGER_THAN) {
+      return binarySearchRecursive(array, value, low, mid - 1, compareFn);
+    }
+    return mid;
+  }
+  return DOES_NOT_EXIST;
+}
+
+function binarySearch(array, value, compareFn = defaultCompare) {
+  //快速排序先排成有序
+  const sortedArray = quickSort(array);
+  const low = 0;
+  const high = sortedArray.length - 1;
+  return binarySearchRecursive(array, value, low, high, compareFn);
+}
+```
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210701154342.png" style="zoom:50%;" />
+
 ### 动态规划
+
+动态规划是一种将复杂问题分解成更小的子问题来解决的优化技术。
+
+:::tip 注意
+
+动态规划和分而治之是不同的方法。分而治之方法是把问题分解成相互独立的子问题，然后组合它们的答案，而动态规划是将问题分解成互相依赖的子问题。
+
+:::
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210701154914.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210701155137.png)
+
+#### 最少硬币找零问题
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210701160535.png)
+
+```js
+//coins硬笔面额[1,5,10,25]  //amount花钱的总数
+function minCoinChange(coins, amount) {
+  const cache = [];//记忆化 
+  //递归函数  解决问题
+  //内部函数也可以 访问到cache
+  const makeChange = (value) => {
+    //amount不为正，就返回空数组
+    if (!value) {
+      return [];//包含用来找零的各个面额的硬币数量（最小硬币数）
+    }
+    //若结果已缓存，则直接返回结果，否则，执行算法
+    if (cache[value]) {
+      return cache[value];
+    }
+    let min = [];
+    let newMin;
+    //对每个面额我们都计算有个新的值，它的值会一直减小，直到能找零的最小钱数
+    let newAmount;
+    for (let i = 0; i < coins.length; i++) {
+      const coin = coins[i];
+      newAmount = value - coin;
+      if (newAmount >= 0) {
+        newMin = makeChange(newAmount);
+      }
+      if (newAmount >= 0 && (newMin.length < min.length - 1 || !min.length) && (newMin.length || !newAmount) ) {
+        min = [coin].concat(newMin);
+        // console.log('new Min ' + min + ' for ' + amount);
+      }
+    }
+    return (cache[value] = min);
+  };
+  return makeChange(amount);
+}
+```
+
+#### ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210703082357.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210703082442.png)
+
+#### 0-1背包问题（每个物品只可使用一次）
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210702215917.png)
+
+```js
+//通过背包携带物品价值的最大值，而不列出实际的物品
+function findValues(n, capacity,weight, values,kS) {
+  let i = n;
+  let k = capacity;
+  while (i > 0 && k > 0) {
+    if (kS[i][k] !== kS[i - 1][k]) {
+      // console.log(
+      //  item ' + i + ' can be part of solution w,v: ' + weights[i - 1] + ',' + values[i - 1]
+      //  );
+      i--;
+      k -= kS[i][k];
+    } else {
+      i--;
+    }
+  }
+}
+
+//ks[i][w]  对于当前i个物品，当背包容量为w时，可以装的最大价值是ks[i][w]
+export function knapSack(capacity, weights, values, n) {
+  const kS = [];
+  //初始化将用于寻找解决方案的矩阵。
+  for (let i = 0; i <= n; i++) {
+    kS[i] = [];
+  }
+  //矩阵为ks[n+1][capacity+1]
+  for (let i = 0; i <= n; i++) {
+    for (let w = 0; w <= capacity; w++) {
+      //忽略矩阵的第一行和第一列，只处理索引不为0的列和行。
+      if (i === 0 || w === 0) {
+        kS[i][w] = 0;
+        //物品i的重量必须小于约束，才有可能成为解决方案的一部分。否则总重量就会超出背包能够携带的重量，这是不可能发生的。
+      } else if (weights[i - 1] <= w) {
+        //装入i 
+        //放入第i个还剩的w - weights[i - 1]
+        const a = values[i - 1] + kS[i - 1][w - weights[i - 1]];
+        //不装入i
+        const b = kS[i - 1][w];
+        //当找到可以构成解决方案的物品时，选择价值最大的那个。
+        kS[i][w] = a > b ? a : b; // max(a,b)
+      } else {
+        //在w的约束下不把物品i装入背包的最大价值是多少，就是i-1个物品的最大价值
+        kS[i][w] = kS[i - 1][w];
+      }
+    }
+    console.log(kS[i].join());
+  }
+  findValues(n, capacity,weight, values, kS);
+  return kS[n][capacity];
+}
+```
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210703082531.png)
+
+- 列代表当前背包可以存放的物品的重量。
+- 行代表当前物品  
+- 表内是存放物品的价值
+
+```js
+//递归版本
+function knapSack(capacity, weights, values, n) {
+  if (n === 0 || capacity === 0) {
+    return 0;
+  }
+  if (weights[n - 1] > capacity) {
+    return knapSack(capacity, weights, values, n - 1);
+  }
+  const a = values[n - 1] + knapSack(capacity - weights[n - 1], weights, values, n - 1);
+  const b = knapSack(capacity, weights, values, n - 1);
+  return a > b ? a : b;
+}
+```
+
+#### 最长公共子序列
+
+<img src="/Users/cr/Library/Application Support/typora-user-images/image-20210703103111188.png" alt="image-20210703103111188" style="zoom:50%;" />
+
+```js
+export function lcs(wordX, wordY) {
+  const m = wordX.length;
+  const n = wordY.length;
+  const l = [];
+  //初始化数组
+  for (let i = 0; i <= m; i++) {
+    l[i] = [];
+    //第一行第一列第一个都是0
+    for (let j = 0; j <= n; j++) {
+      l[i][j] = 0;
+    }
+  }
+  //开始循环遍历
+  for (let i = 0; i <= m; i++) {
+    for (let j = 0; j <= n; j++) {
+      //第一行第一列直接为0
+      if (i === 0 || j === 0) {
+        l[i][j] = 0;
+      } else if (wordX[i - 1] === wordY[j - 1]) {
+        //如果相等的话  当前位置左斜上角的值加1
+        l[i][j] = l[i - 1][j - 1] + 1;
+      } else {
+        //如果wordX[i - 1] === wordY[j - 1]不相等话，计算当前位置的上面和左面的最大值
+        const a = l[i - 1][j];
+        const b = l[i][j - 1];
+        l[i][j] = a > b ? a : b; // max(a,b)
+      }
+    }
+    // console.log(l[i].join());
+  }
+  return l[m][n];
+}
+```
+
+```js
+function printSolution(solution, wordX, m, n) {
+  let a = m;
+  let b = n;
+  let x = solution[a][b];
+  let answer = '';
+  while (x !== '0') {
+    if (solution[a][b] === 'diagonal') {
+      answer = wordX[a - 1] + answer;
+      a--;
+      b--;
+    } else if (solution[a][b] === 'left') {
+      b--;
+    } else if (solution[a][b] === 'top') {
+      a--;
+    }
+    x = solution[a][b];
+  }
+  // console.log('lcs: ' + answer);
+}
+export function lcs(wordX, wordY) {
+  const m = wordX.length;
+  const n = wordY.length;
+  const l = [];
+  const solution = [];
+  for (let i = 0; i <= m; i++) {
+    l[i] = [];
+    solution[i] = [];
+    for (let j = 0; j <= n; j++) {
+      l[i][j] = 0;
+      solution[i][j] = '0';
+    }
+  }
+  for (let i = 0; i <= m; i++) {
+    for (let j = 0; j <= n; j++) {
+      if (i === 0 || j === 0) {
+        l[i][j] = 0;
+      } else if (wordX[i - 1] === wordY[j - 1]) {
+        l[i][j] = l[i - 1][j - 1] + 1;
+        solution[i][j] = 'diagonal';
+      } else {
+        const a = l[i - 1][j];
+        const b = l[i][j - 1];
+        l[i][j] = a > b ? a : b; // max(a,b)
+        solution[i][j] = l[i][j] === l[i - 1][j] ? 'top' : 'left';
+      }
+    }
+    // console.log(l[i].join());
+    // console.log(solution[i].join());
+  }
+  printSolution(solution, wordX, m, n);
+  return l[m][n];
+}
+
+
+```
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210703143200.png" style="zoom:33%;" />
+
+```js
+//递归算法
+function lcs(wordX, wordY, m = wordX.length, n = wordY.length) {
+  if (m === 0 || n === 0) {
+    return 0;
+  }
+  if (wordX[m - 1] === wordY[n - 1]) {
+    return 1 + lcs(wordX, wordY, m - 1, n - 1);
+  }
+  const a = lcs(wordX, wordY, m, n - 1);
+  const b = lcs(wordX, wordY, m - 1, n);
+  return a > b ? a : b;
+}
+```
+
+#### 矩阵链相乘
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210703154258.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210703154344.png)
+
+```js
+function printOptimalParenthesis(s, i, j) {
+  if (i === j) {
+    // console.log('A[' + i + ']');
+  } else {
+    // console.log('(');
+    printOptimalParenthesis(s, i, s[i][j]);
+    printOptimalParenthesis(s, s[i][j] + 1, j);
+    // console.log(')');
+  }
+}
+
+function matrixChainOrder(p) {
+  const n = p.length;
+  const m = [];
+  const s = [];
+  for (let i = 1; i <= n; i++) {
+    m[i] = [];
+    m[i][i] = 0;
+  }
+  for (let i = 0; i <= n; i++) {
+    // to help printing the optimal solution
+    s[i] = []; // auxiliary
+    for (let j = 0; j <= n; j++) {
+      s[i][j] = 0;
+    }
+  }
+  //l: 2~p.length
+  for (let l = 2; l < n; l++) {
+    //i: 1~p.length-l+1
+    for (let i = 1; i <= (n - l) + 1; i++) {
+      const j = (i + l) - 1;	
+      m[i][j] = Number.MAX_SAFE_INTEGER;
+      for (let k = i; k <= j - 1; k++) {
+        // q = cost/scalar multiplications
+        const q = m[i][k] + m[k + 1][j] + ((p[i - 1] * p[k]) * p[j]);
+        if (q < m[i][j]) {
+          m[i][j] = q;
+          s[i][j] = k; // s[i,j] = Second auxiliary table that stores k
+        }
+      }
+    }
+  }
+  // console.log(m);
+  // console.log(s);
+  printOptimalParenthesis(s, 1, n - 1);
+  return m[1][n - 1];
+}
+```
 
 ### 贪心算法
 
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210703193334.png)
+
+#### 最少找找零问题
+
+```js
+function minCoinChange(coins, amount) {
+  const change = [];
+  let total = 0;
+  // 从大到小开始试
+  for (let i = coins.length; i >= 0; i--) {
+    const coin = coins[i];
+    // 把它的值的total相加后，total需要小于amount
+    while (total + coin <= amount) {
+      //面额结果插入到结果中
+      change.push(coin);
+      //将total相加
+      total += coin;
+    }
+  }
+  return change;
+}
+```
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210703194508.png" style="zoom:33%;" />
+
+#### 分数背包问题
+
+在0-1背包问题中，只能向背包里装入完整的物品，而在分数背包问题中，可以装入分数的物品。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210703194905.png)
+
+```js
+function knapSack(capacity, weights, values) {
+  const n = values.length;
+  let load = 0;
+  let val = 0;
+  //总重量少于背包重量（不能带超过容量的东西），会迭代物品。
+  for (let i = 0; i < n && load < capacity; i++) {
+    //如果物品可以完整地装入背包
+    if (weights[i] <= capacity - load) {
+      //将重量和价值分别计入背包已装入物品的总价值和总重量、
+      val += values[i];
+      load += weights[i];
+      //如果物品不能完整地装入背包，计算能够装入部分的比例
+    } else {
+      const r = (capacity - load) / weights[i];
+      val += r * values[i];
+      load += weights[i];
+      // console.log('using ratio of ' + r + ' for item ' + (i + 1) + ' for the solution');
+    }
+  }
+  return val;
+}
+```
+
 ### 回溯算法
 
-### 著名算法问题
+回溯是一种渐进式寻找构建问题解决方式的策略。我们从一个可能动作开始并试着用这个动作解决问题。如果不能解决问题，就回溯并选择另一个动作指导将问题解决。根据这种行为，回溯算法会尝试所有的动作。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210703201044.png)
+
+#### 迷宫老鼠问题
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210703201218.png)
+
+```js
+function isSafe(maze, x, y) {
+  const n = maze.length;
+  if (x >= 0 && y >= 0 && x < n && y < n && maze[x][y] !== 0) {
+    return true;
+  }
+  return false;
+}
+
+function findPath(maze, x, y, solution) {
+  const n = maze.length;
+  //老鼠已经到达了终点。如果到了，就将最后一个位置标记为路径的一部分并返回true，表示移动成功结束。
+  if (x === n - 1 && y === n - 1) {
+    solution[x][y] = 1;
+    return true;
+  }
+  //验证老鼠是否可以安全移动到该位置。
+  if (isSafe(maze, x, y) === true) {
+    solution[x][y] = 1;
+    //向当前位置的右边走
+    if (findPath(maze, x + 1, y, solution)) {
+      return true;
+    }
+    //向当前位置的下面走
+    if (findPath(maze, x, y + 1, solution)) {
+      return true;
+    }
+    //如果水平和垂直都无法走吗，那么将这步从路径中移除并且回溯。
+    solution[x][y] = 0;
+    return false;
+  }
+  return false;
+}
+
+function ratInAMaze(maze) {
+  const solution = [];
+  //初始化每个位置为0
+  for (let i = 0; i < maze.length; i++) {
+    solution[i] = [];
+    for (let j = 0; j < maze[i].length; j++) {
+      solution[i][j] = 0;
+    }
+  }
+  if (findPath(maze, 0, 0, solution) === true) {
+    return solution;
+  }
+  return 'NO PATH FOUND';
+}
+
+```
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210703202318.png)
+
+#### 数独解题器
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210703202410.png)
+
+```js
+const UNASSIGNED = 0;
+
+function usedInRow(matrix, row, num) {
+  for (let col = 0; col < matrix.length; col++) {
+    if (matrix[row][col] === num) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function usedInCol(matrix, col, num) {
+  for (let row = 0; row < matrix.length; row++) {
+    if (matrix[row][col] === num) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function usedInBox(matrix, boxStartRow, boxStartCol, num) {
+  for (let row = 0; row < 3; row++) {
+    for (let col = 0; col < 3; col++) {
+      if (matrix[row + boxStartRow][col + boxStartCol] === num) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+function isSafe(matrix, row, col, num) {
+  return (
+    !usedInRow(matrix, row, num) &&
+    !usedInCol(matrix, col, num) &&
+    //是否在当前的小数独内   一个小技巧
+    !usedInBox(matrix, row - (row % 3), col - (col % 3), num)
+  );
+}
+function solveSudoku(matrix) {
+  let row = 0;
+  let col = 0;
+  let checkBlankSpaces = false;
+
+  for (row = 0; row < matrix.length; row++) {
+    for (col = 0; col < matrix[row].length; col++) {
+      if (matrix[row][col] === UNASSIGNED) {
+        //如果有空白位置
+        checkBlankSpaces = true;
+        break;
+      }
+    }
+    //如果有空白位置从两个循环跳出
+    if (checkBlankSpaces === true) {
+      break;
+    }
+  }
+   //如果没有空白位置（值为0的位置），表示谜题已被完成。
+  if (checkBlankSpaces === false) {
+    return true;
+  }
+	//遇到空白并且col和row变量会表示需要用1-9填写空白的位置。
+  for (let num = 1; num <= 9; num++) {
+    //检查填入数字是否符合
+    if (isSafe(matrix, row, col, num)) {
+      //符合就填入这数字
+      matrix[row][col] = num;
+      //填入之后继续执行solveSudoku函数来尝试填写下一个位置
+      if (solveSudoku(matrix)) {
+        return true;
+      }
+      //如果一个数字填在了不正确的位置，我们就在将这个位置标记为空，并且算法会回溯在尝试一个其他数字。
+      matrix[row][col] = UNASSIGNED;
+    }
+  }
+  return false;
+}
+
+function sudokuSolver(matrix) {
+  if (solveSudoku(matrix) === true) {
+    return matrix;
+  }
+  return 'NO SOLUTION EXISTS!';
+}
+
+```
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210703204813.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210703204846.png)
+
+## 算法复杂度为
+
+### 大O表示法
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210704064118.png)
+
+#### 理解大O表示法
+
+大O表示法，一般考虑的是CPU（时间）占用。
+
+#### 时间复杂度比较
+
+![image-20210704064452387](/Users/cr/Library/Application Support/typora-user-images/image-20210704064452387.png)
+
+1. 数据结构
+
+下表是常用数据结构的时间复杂度。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210704064643.png)
+
+2. 图
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210704064856.png)
+
+3. 排序算法
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210704064942.png)
+
+4. 搜索算法
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210704065146.png)
+
+#### NP完全理论概述
+
