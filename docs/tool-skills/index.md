@@ -1,6 +1,6 @@
 # 工具与技巧
 
-## nginx
+## Nginx
 
 ### Nginx 常用配置清单
 
@@ -139,4 +139,32 @@ server
 先来看看它都支持什么功能的配置：反向代理、HTTPS、HTTP/2、IPv6, 缓存、WordPress、CDN、Node.js 支持、 Python (Django) 服务器等等。
 
 如果你想在线进行配置，只需要打开网站：https://nginxconfig.io/，按照自己的需求进行操作就行了。
+
+## 网站如何屏蔽开发者工具
+
+```js
+// chrome72
+var im = new Image();
+    Object.defineProperty(im, 'id', {
+        get: function() {
+            window.location.href = "http://106.53.103.200:8082/error.html"
+            blast();
+        }
+    });
+    console.log(im); //谷歌最新版失效
+
+//新版
+let num = 0; //谷歌最新版有效
+    var devtools = new Date();
+    devtools.toString = function() {
+        num++;
+        if (num > 1) {
+            window.location.href = "http://106.53.103.200:8082/error.html"
+            blast();
+        }
+    }
+    console.log('', devtools);
+```
+
+
 

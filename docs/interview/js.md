@@ -1302,3 +1302,290 @@ async function f() {
     f. webStorage(`webstorage是本地存储，存储在客户端，包括localStorage和sessionStorage`)支持事件通知机制，可以将数据更新的通知发送给监听者
 
     h. webStorage的api接口使用更方便
+
+### JavaScript的Proxy代理对象
+
+#### 什么Proxy代理
+
+```js
+// pOjb就是通过new Proxy创建的代理对象
+var pObj = new Proxy(obj, handlers)
+```
+
+#### 为什么需要代理对象
+
+举个记账的例子：
+
+```js
+// obj代表我们，wallet属性指我们钱包，现在我们钱包里有100元
+// consume指消费次数，每次消费加1， 记一笔账
+var obj = {wallet: 100}
+var consume = 0
+
+// 这个月，我们喝了五次肥宅快乐水，每次消费我们都记一笔
+
+// 今天消费3元
+consume++
+obj.wallet = 97
+
+// 今天消费3元
+consume++
+obj.wallet = 94
+
+// 今天消费3元
+consume++
+obj.wallet = 91
+
+// 今天消费3元
+consume++
+obj.wallet = 88
+
+// 今天消费3元
+consume++
+obj.wallet = 85
+```
+
+每次我们修改钱包剩余金额时，都要执行一次consume++去执行一次记账的操作。有没有更简单的方式，不需要每次都写上一行代码去增加消费次数呢？
+
+答案当然有，它就是Proxy代理对象！使用代理对象，你想对目标对象的属性操作全部改为对代理对象相同属性的操作，代理对象提供了对属性获取 [[get]] 修改 [[set]] 等操作的拦截，js将这种拦截称为trap（捕捉器）。
+
+通过捕捉器，我们就可以捕获到 代码中对属性的操作时机，让我们能够先执行我们自定义的业务逻辑代码。
+
+因为我们对目标对象的属性操作改为了对代理对象相同的属性操作，所以我们在最后需要通过Reflact执行目标对象的原始操作。
+
+```js
+
+var consume = 0
+// 目标对象
+var obj = {wallet: 100}
+// 捕获器trap
+var handlers = {
+  set(target, key, val) {
+    // target 目标对象
+    // key 代理对象要修改的属性
+    
+    // 记录一笔消费
+    consume++
+    // 通过Reflact对象触发原始目标对象的属性操作
+    // 相当于执行 target[key] = val
+    Reflect.set(target, key, val)
+  }
+}
+// 代理对象
+var pObj = new Proxy(obj, handlers)
+// 将对目标对象obj的属性wallet操作改为代理对象相同属性wallet的操作
+pObj.wallet = 97
+pObj.wallet = 94
+pObj.wallet = 91
+pObj.wallet = 88
+pObj.wallet = 85
+
+console.log(obj.wallet) // 85
+console.log(consume) // 5
+```
+
+#### 取消代理
+
+假如某一天，你实现了财务自由，不需要再精打细算记录每一笔消费了，你可能就需要取消此前的代理，代码很简单，往下看：
+
+```js
+
+var consume = 0
+var obj = {wallet:  100}
+var handlers = {
+  set(target, key, val) {
+    consume++
+    Reflect.set(target, key, val)
+  }
+}
+
+// 使用Proxy.revocable创建代理
+var tmpObj = Proxy.revocable(obj, handlers)
+var pObj = tmpObj.proxy
+var prevoke = tmpObj.revoke
+
+// 使用代理对象进行消费记账
+pObj.wallet = 97
+pObj.wallet = 94
+pObj.wallet = 91
+
+// 某一天，我们实现了一个小目标
+pObj.wallet = 100000000
+// 我们不需要记账了，我们需要取消创建的代理
+prevoke() // 执行prevoke即可，就是这么简单 哦耶~
+
+pObj.wallet = 99999997 // TypeError 报错啦 （代理取消之后就不能使用了哟！）
+```
+
+#### 代理在后模式
+
+前面的示例都是先执行代理捕获器中的业务逻辑，最后再通过Reflect执行目标对象的属性操作，这种捕获代码操作在前，目标对象操作在后的模式称为“代理在先”模式，有在先，当然就有在后模式。
+
+当然这里的“代理在后”模式并不是先使用Reflect对象触发目标对象属性操作，在执行捕获器中的其他操作代码。
+
+而是指代理作为目标对象的一种补充，我们仍然操作的是目标对象，只是当某些操作在目标对象上无法实现时，才使用代理对象。
+
+等会，当某些操作目标对象无法提供时，js会向目标对象的原型prototype上进行查找，所以“代理在后”模式是对目标对象的原型进行代理！
+
+```js
+
+var handlers = {
+  get(target, key, context) {
+    return function () {
+      context.speak(key + '!')
+    }
+  }
+}
+
+var catchall = new Proxy({}, handlers)
+
+var greeter = {
+  speak(who = 'someone') {
+    console.log('hello ', who)
+  }
+}
+
+// 将catchall设置为greeter的原型
+Object.setPrototypeOf(greeter, catchall)
+
+greeter.speak() // hello someone
+greeter.speak('world') // hello world
+
+// 执行greater上不存在的方法
+greeter.everyone() // hello everyone!
+```
+
+#### **Reflect**
+
+Reflect对象用来触发目标对象执行相应的操作,就是这么简单！
+
+```js
+Reflect.get(target, key, context) // 等价于  target[key]
+Reflect.set(target, key, val) // 等价于 target[key] = val
+```
+
+### 函数柯里化？？？？？？？
+
+- 当一个函数有多个参数的时候，先传递一部分参数调用它（这部分参数以后永远不变）
+- 然后返回一个新的函数接受剩余的参数，返回结果
+- 讲人话，就是将一个有n个参数函数，转变为可以(n ~ 1)次连续调用的函数，即`fn(x,y,z)`转变为`curriedFn(x)(y)(z)`或`curriedFn(x,y)(z)`或`curriedFn(x)(y,z)`或`curriedFn(x,y,z)`
+
+```js
+const _ = require('lodash');
+// 要柯里化的函数
+function getSum(a,b,c){
+    return a + b + c;
+}
+// 柯里化后的函数
+let curried = _.curry(getSum)
+// 测试
+curried(1,2,3);
+curried(1)(2)(3);
+curried(1,2)(3);
+
+
+function curry(fn){
+    return function curriedFn(...args){
+        if(fn.arguments.length > args.length){
+            // 递归调用，直到参数个数相等
+            return curriedFn(...args.concat(Array.from(arguments)))
+        }
+        // 实参和形参个数相同，调用fn，返回结果
+        return fn(...args);
+        
+    }
+}
+
+```
+
+- 柯里化可以我们给一个函数传递较少的参数得到一个已经记住了某些固定参数的函数，这是一种对函数参数的缓存
+- 让函数变得更灵活，颗粒度更小
+- 可以把多元函数转换为一元函数，可以组合使用函数产生强大的功能
+
+### 函数式编程？？？？？？？？
+
+函数式编程：把事物之间的一系列复杂的**联系**抽象到程序的事件（对运算过程进行抽象）。
+
+#### 函数式编程的好处（Why study FP(Functional Programming)）
+
+- react的流行，使函数式编程受到越来越多的关注
+
+- Vue3也开始大量使用函数式编程
+
+- 函数式编程可以抛弃this。即使用过程中，不用关注this指向问题
+
+- 项目打包过程中，可以更好的利用tree shaking过滤无用代码（vue3的改进点）
+
+- 方便测试、方便并行处理
+
+- 有很多库（lodash、underscore、ramda），可以帮助我们进行函数是的开发。
+
+#### 什么是高阶函数
+
+- 可以把函数作为参数传递给另一个函数
+
+```js
+function forEach(array,fn){
+	for(let i = 0; i < array.length; i++){
+        fn(array[i])
+    }
+}
+```
+
+- 可以把函数作为另一个函数的返回值
+
+```js
+function makeFn(){
+	let msg = "hello world!"
+    return function(){
+        console.log(msg)
+    }
+}
+
+const fn = makeFn();
+fn()
+```
+
+#### 使用高阶函数的意义
+
+- 抽象细节，即不需要关注内部执行细节，只需要关注想要实现的目标即可
+- 高阶函数是用来抽象通用问题的，精简代码，实现代码的复用
+
+```js
+// 面向过程的方式
+let array = [1,2,3,4];
+for (let i = 0; i< array.length; i++){
+    console.log(array[i])
+}
+
+// 高阶函数的方式
+let array = [1,2,3,4];
+forEach(array,item => {
+    console.log(item);
+    ... // something you want
+})
+
+//常用的高阶函数
+forEach
+map
+filter
+every
+some
+find/findIndex
+reduce
+sort
+```
+
+#### 纯函数
+
+**相同的输入永远都会得到相同的输出**，而且没有任何可观察的副作用。
+
+- 数组的slice和splice分别是：纯函数、不纯的函数
+  - `slice`返回数组中指定的部分，不会改变原有函数
+  - `splice`对数组进行操作并返回该数组，会改变原有数组
+- 函数式编程不会保留计算中间的结果，所以变量是不可变的（无状态的）
+
+
+
+### 闭包？？？？？
+

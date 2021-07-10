@@ -2179,6 +2179,33 @@ HashTable 类，也叫 HashMap 类，它是 Dictionary 类的一种散列表实�
 `散列`算法的作用是`尽可能快地在数据结构找到一个值`。
 使用散列函数，就知道值的具体位置，因此能顾快速检索到该值。散列函数的作用是给定一个键值，然后返回值在表中的地址。
 
+#### 常见的散列函数
+
+- 直接寻址法：取关键字或关键字的某个线性函数值为散列地址。
+- 数字分析法：通过对数据的分析，发现数据中冲突较少的部分，并构造散列地址。例如同学们的学号，通常同一届学生的学号，其中前面的部分差别不太大，所以用后面的部分来构造散列地址。
+- 平方取中法：当无法确定关键字里哪几位的分布相对比较均匀时，可以先求出关键字的平方值，然后按需要取平方值的中间几位作为散列地址。这是因为：计算平方之后的中间几位和关键字中的每一位都相关，所以不同的关键字会以较高的概率产生不同的散列地址。
+- 取随机数法：使用一个随机函数，取关键字的随机值作为散列地址，这种方式通常用于关键字长度不同的场合。
+- 除留取余法：取关键字被某个不大于散列表的表长 n 的数 m 除后所得的余数 p 为散列地址。这种方式也可以在用过其他方法后再使用。该函数对 m 的选择很重要，一般取素数或者直接用 n。
+
+常见的解决冲突方法有几个：
+
+- **开放地址法（也叫开放寻址法）**：实际上就是当需要存储值时，对Key哈希之后，发现这个地址已经有值了，这时该怎么办？不能放在这个地址，不然之前的映射会被覆盖。这时对计算出来的地址进行一个探测再哈希，比如往后移动一个地址，如果没人占用，就用这个地址。如果超过最大长度，则可以对总长度取余。这里移动的地址是产生冲突时的增列序量。
+- **链地址法**：链地址法其实就是对Key通过哈希之后落在同一个地址上的值，做一个链表。其实在很多高级语言的实现当中，也是使用这种方式处理冲突的，我们会在后面着重学习这种方式。
+- **再哈希法**：在产生冲突之后，使用关键字的其他部分继续计算地址，如果还是有冲突，则继续使用其他部分再计算地址。这种方式的缺点是时间增加了。
+- **建立一个公共溢出区**：这种方式是建立一个公共溢出区，当地址存在冲突时，把新的地址放在公共溢出区里。
+
+
+
+- **腾讯&leetcode349：给定两个数组，编写一个函数来计算它们的交集**
+
+- **字节&leetcode1：两数之和**
+
+- **腾讯&leetcode15：三数之和**
+
+- **leetcode380：常数时间插入、删除和获取随机元素**
+
+  
+
 #### 创建散列表
 
 ```js
@@ -2819,8 +2846,8 @@ function fibonacci(n, n1, n2) {
 - 没有子元素的节点称为外部节点或叶节点。
 - 一个节点可以有祖先和后代。
 - 子树：子树由节点和它的后代构成。
-- 深度：节点的深度取决于它的祖先节点的数量。
-- 高度：树的高度取决于多有节点深度的最大值。
+- 深度：从根节点到该节点所经历的边的个数
+- 高度：节点到叶节点的最长路径
 ### 二叉树和二叉搜索树
 **二叉树**中的节点最多能有两个子节点：一个是左侧子节点，另一个是右侧子节点。
 **二叉搜索树**是二叉树的一种，但是只允许你在左侧节点存储（比父节点）小的值。在右侧节点存储（比父节点）大的值。
@@ -3047,7 +3074,151 @@ class BinarySearchTree {
 	}
 }
 ```
+#### 前中后序遍历迭代
+
+先序遍历
+
+```js
+// 前序遍历
+const preorderTraversal = (root) => {
+    let result = []
+    var preOrderTraverseNode = (node) => {
+        if(node) {
+            // 先根节点
+            result.push(node.val)
+            // 然后遍历左子树
+            preOrderTraverseNode(node.left)
+            // 再遍历右子树
+            preOrderTraverseNode(node.right)
+        }
+    }
+    preOrderTraverseNode(root)
+    return result
+};
+
+
+// 前序遍历
+const preorderTraversal = (root) => {
+    const list = [];
+    const stack = [];
+    
+    // 当根节点不为空的时候，将根节点入栈
+    if(root) stack.push(root)
+    while(stack.length > 0) {
+        const curNode = stack.pop()
+        // 第一步的时候，先访问的是根节点
+        list.push(curNode.val)
+        
+        // 我们先打印左子树，然后右子树
+        // 所以先加入栈的是右子树，然后左子树
+        if(curNode.right !== null) {
+            stack.push(curNode.right)
+        }
+        if(curNode.left !== null) {
+            stack.push(curNode.left)
+        }
+    }
+    return list
+}
+```
+
+中序遍历
+
+```js
+// 中序遍历
+const inorderTraversal = (root) => {
+    let result = []
+    var inorderTraversal = (node) => {
+        if(node) {
+            // 先遍历左子树
+            inorderTraversal(node.left)
+           // 再根节点
+            result.push(node.val)
+            // 最后遍历右子树
+            inorderTraversal(node.right)
+        }
+    }
+    inorderTraversal(root)
+    return result
+};
+
+
+// 中序遍历
+const inorderTraversal = (root) => {
+    let list = []
+    let stack = []
+    let node = root
+    
+    while(node || stack.length) {
+    // 遍历左子树
+      while(node) {
+       stack.push(node)
+        node = node.left
+      }
+      
+      node = stack.pop()
+      list.push(node.val)
+      node = node.right
+    }
+    return list
+}
+```
+
+后序遍历
+
+```js
+// 后序遍历
+const postorderTraversal = function(root) {
+    let result = []
+    var postorderTraversalNode = (node) => {
+        if(node) {
+            // 先遍历左子树
+            postorderTraversalNode(node.left)
+            // 再遍历右子树
+            postorderTraversalNode(node.right)
+            // 最后根节点
+            result.push(node.val)
+        }
+    }
+    postorderTraversalNode(root)
+    return result
+};
+
+
+
+
+// 后序遍历
+const postorderTraversal = (root) => {
+    const list = [];
+    const stack = [];
+    
+    // 当根节点不为空的时候，将根节点入栈
+    if(root) stack.push(root)
+    while(stack.length > 0) {
+        const node = stack.pop()
+        // 根左右=>右左根
+        list.unshift(node.val)
+        
+        // 先进栈左子树后右子树
+        // 出栈的顺序就变更为先右后左
+        // 右先头插法入list
+        // 左再头插法入list
+        // 实现右左根=>左右根
+        if(node.left !== null) {
+            stack.push(node.left)
+        }
+        if(node.right !== null) {
+            stack.push(node.right)
+        }
+    }
+    return list
+}
+```
+
+
+
 ### 自平衡树
+
 BST存在一个问题：取决于你添加的节点数，树的一条边可能会很深；也就是说，树的一条分支会有很多层，而其他的分支却只有几层。为了解决这个问题，有一种树叫做（AVL树）。AVL树是一种自平衡二叉搜索树，意思是任何一个节点左右两侧子树的高度之差最多为1.
 #### AVL树
 AVL树是一种自平衡树。添加或移除节点时，AVL树会尝试保持自平衡。任意一个节点（不论深度）的左子树和右子树高度最多相差1.添加或移除节点时，AVL树会尽可能尝试转换为完全树。
@@ -3209,7 +3380,7 @@ class AVLTress extend BinarySearchTree {
   }
 }
 ```
-### 红黑树
+### 红黑树？？？？？？？？？
 和AVL树一样，**红黑**树也是一个自平衡二叉搜索树。AVL树插入和移除节点可能会造成旋转，所以需要一个包含多次插入和删除的自平衡树。**红黑**树是比较好的。如果插入和删除频率较低（我们更需要多次进行搜索操作），那么AVL树比红黑树更好。
 
 在红黑树中，每个节点我们都遵循以下规则：
@@ -3219,6 +3390,17 @@ class AVLTress extend BinarySearchTree {
 4. 如果一个节点是红的，那么它的的两个子节点都是黑的。
 5. 不能有两个相邻的红节点，一个红节点不能有红的父节点或子节点。
 6. 从给定的节点到它的后代节点（NULL叶节点）的所有路径包含相同数量的黑色节点。
+
+这些条条框框保证红黑树的自平衡，保证红黑树从根节点到达每一个叶子节点的最长路径不会超过最短路径的 2 倍。
+
+- 插入和删除操作，一般认为红黑树的删除和插入会比 AVL 树更快。因为，红黑树不像 AVL 树那样严格的要求平衡因子小于等于1，这就减少了为了达到平衡而进行的旋转操作次数，可以说是牺牲严格平衡性来换取更快的插入和删除时间。
+- 红黑树不要求有不严格的平衡性控制，但是红黑树的特点，使得任何不平衡都会在三次旋转之内解决。而 AVL 树如果不平衡，并不会控制旋转操作次数，旋转直到平衡为止。
+- 查找操作，AVL树的效率更高。因为 AVL 树设计比红黑树更加平衡，不会出现平衡因子超过 1 的情况，减少了树的平均搜索长度。
+
+
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210706074856.png" style="zoom:33%;" />
+
 ```js
 const Colors = {
   RED = 0,

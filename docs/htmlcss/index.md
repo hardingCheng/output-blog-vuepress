@@ -450,14 +450,40 @@ table {
 - 圣杯布局
   
   两者的功能相同，都是为了实现一个两侧宽度固定，中间宽度自适应的三栏布局。（
+  
 - 双飞翼布局
   
   两者的功能相同，都是为了实现一个两侧宽度固定，中间宽度自适应的三栏布局。（
+  
 - 三行布局（头尾定高主栏自适应）
 
 - 多列等高布局
 
+#### HTML 标签有哪些行内元素
+
+- a
+- img
+- picture
+- span
+- input
+- textarea
+- select
+- label
+
+#### CSS前缀
+
+|   前缀   |               厂商               |
+| :------: | :------------------------------: |
+|  -epub-  |             ePub格式             |
+|  -moz-   | 基于Mozilla的浏览器（如Firefox） |
+|   -ms-   |      微软Internet Explorer       |
+|   -o-    |        基于Opera的浏览器         |
+| -webkit- |  基于Webkit的浏览器（Chrome ）   |
+
+
+
 ## CSS 高级技巧汇总
+
 #### 设置input的placeholder的字体样式
 ```css
 /*设置input占位符的样式*/
@@ -547,4 +573,209 @@ background-color: #00adb5;
 
 ```
 
+#### css 如何实现左侧固定300px，右侧自适应的布局
+
+```css
+.container
+  .left
+  .main
+
+
+//flex布局
+.container {
+  display: flex;
+}
+
+.left {
+  flex-basis: 300px;
+  flex-shrink: 0;
+}
+
+.main {
+  flex-grow: 1;
+}
+
+
+//grid布局
+
+```
+
+#### html 的默认 display 属性是多少
+
+```markdown
+html` 根元素的默认 `display` 为 `block`
+```
+
+####  对一个非定长宽的块状元素如何做垂直水平居中
+
+```css
+ .container {
+      position: relative;
+  }
+  .container .item {
+      width: 100px;
+      height: 50px;
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      margin: auto;
+ }
+```
+
+#### '+' 与 '~' 选择器有什么不同
+
+- `+` 选择器匹配紧邻的兄弟元素
+- `~` 选择器匹配随后的所有兄弟元素
+
+#### position: sticky 如何工作，适用于哪些场景
+
+`position: sticky` 可理解为 `relative` 与 `fixed` 的结合体
+
+#### 伪类与伪元素有什么区别
+
+1. 伪类使用单冒号，而伪元素使用双冒号。如 `:hover` 是伪类，`::before` 是伪元素
+2. 伪元素会在文档流生成一个新的元素，并且可以使用 `content` 属性设置内容
+
+####  css 如何匹配前N个子元素及最后N个子元素
+
+- 如何匹配最前三个子元素: `:nth-child(-n+3)`
+- 如何匹配最后三个子元素: `:nth-last-child(-n+3)`
+
+#### 如何使用 CSS 实现网站的暗黑模式 (Dark Mode)
+
+```css
+@media (prefers-color-scheme: dark) {
+    :root{
+    }
+}
+```
+
+#### css 如何实现响应式布局大屏幕三等分、中屏幕二等分、小屏幕一等分
+
+```html
+<section class="container">
+  <section class="item"></section>
+  <section class="item"></section>
+  <section class="item"></section>
+  <section class="item"></section>
+  <section class="item"></section>
+  <section class="item"></section>
+</section>
+```
+
+使用 Grid 布局可以轻松解决这个问题，如若使用其它方案，控制好等分的同时再控制好间距也是一个十分头疼的问题:
+
+1. `grid-template-columns`: 控制等分
+2. `gap`: 控制间隙
+
+```css
+@media (min-width: 768px) {
+  .container {
+    grid-template-columns: repeat(2, minmax(0,1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.container {
+  display: grid;
+}
+
+.conainer {
+  gap: 1rem;
+}
+```
+
+`TailwindCSS` 是一款非常方便的 CSS 原子类框架，只需要一行即可搞定
+
+```html
+<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></section>
+```
+
+### 终极解决方案
+
+`Grid` 布局可以自动判断容器大小，无论大小屏幕自动撑满并均分，请看以下属性
+
+```css
+.container {
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr))
+}
+```
+
+1. `repeat`: 用以 N 整分
+2. `auto-fill`：表示自动填充
+3. `minmx`: 即书面意思，最小宽度为 `300px`
+
+#### CSS如何设置一行超出显示省略号或者多行省略
+
+```css
+overflow: hidden;
+text-overflow: ellipsis;
+white-space: nowrap;
+
+
+
+overflow: hidden;
+display: -webkit-box;
+-webkit-box-orient: vertical;
+-webkit-line-clamp: 2;
+```
+
+#### flex 布局中 align-content 与 align-items 有何区别
+
+- `align-content` 作用于纵轴多行元素，一行元素不起作用
+- `align-items` 作用于纵轴单行元素
+
+####  flex 布局中 order 有何作用
+
+`order` 属性定义Flex布局中子元素的排列顺序，数值越小，排列越靠前，默认为0。
+
+#### 子元素垂直居中，并且长度为父容器一半的正方形
+
+```html
+<section class="container">
+  <section class="item"></section>
+</section>
+```
+
+以前采用百分比撑高 `padding`，那这种方案已经过时，会挤压 Content 内容，无法在其中填充内容(需要绝对定位)。
+
+可使用最新的属性 `aspect-ratio`，即长宽比
+
+```css
+.container {
+  display: grid;
+  place-items: center;
+}
+
+.item {
+  width: 50%;
+  aspect-ratio: 1/1;
+}
+```
+
+#### 简述 css 中 position 的值
+
+- `static`: 默认值，无定位，`top`、`right`、`bottom`、`left` 不起任何作用
+- `relative`: 相对定位
+- `absolute`: 绝对定位，脱离文档流，上下左右以最近的定位父元素为参照系
+- `fixed`: 脱离文档流，上下左右以浏览器视口为参照系
+- `sticky`: `relative` 与 `fixed` 的结合体
+
+####  什么是 BFC ？？？？？？？？？？？？
+
+更多描述: + 它是如何生成的 + 它有什么作用及应用
+
+#### rem、em、vw、wh 的值各是什么意思
+
+- `rem`: 根据根元素(即 `html`)的 `font-size`
+- `em`: 根据**「自身元素」**的 `font-size`
+- `vw`: viewport width
+- `vh`: viewport height
 

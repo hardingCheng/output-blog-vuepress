@@ -1,4 +1,4 @@
-# JavaScrip知识点日常总结
+# 	JavaScrip知识点日常总结
 
 ## javascript基础
 ### javascript中call()、apply()、bind()
@@ -69,7 +69,61 @@ obj.myFun.bind(db, ['成都', '上海'])(); //小张 年龄 99  来自 成都,�
 5.  `bind`方法在这里再多说一下，bind的时候传的参数会预先传给返回的方法，调用方法时就不用再传参数了。
 6.  如果`call()`和`apply()`的`第一个参数是null或者undefined，那么this的指向就是全局变量，在浏览器里就是window对象`。
 :::
+
+#### 手写bind()方法  ？？？？？
+
+```js
+Function.prototype.myBind = function (target) {
+    var target = target || window;
+    var _args1 = [].slice.call(arguments, 1);
+    var self = this;
+    var temp = function () {};
+    var F = function () {
+        var _args2 = [].slice.call(arguments, 0);
+        var parasArr = _args1.concat(_args2);
+        return self.apply(this instanceof temp ? this : target, parasArr)
+    }
+    temp.prototype = self.prototype;
+    F.prototype = new temp();
+    return F;
+}
+```
+
+#### 手写call()方法 ？？？？？
+
+```js
+Function.prototype.myCall = function () {
+    var ctx = arguments[0] || window;
+    ctx.fn = this;
+    var args = [];
+    for (var i = 1; i < arguments.length; i++) {
+        args.push(arguments[i])
+    }
+    var result = ctx.fn(...args);
+    delete ctx.fn;
+    return result;
+}
+```
+
+#### 手写apply()方法？？？？？
+
+```js
+Function.prototype.myApply = function () {
+    var ctx = arguments[0] || window;
+    ctx.fn = this;
+    if (!arguments[1]) {
+        var result = ctx.fn();
+        delete ctx.fn;
+        return result;
+    }
+    var result = ctx.fn(...arguments[1]);
+    delete ctx.fn;
+    return result;
+}
+```
+
 ### JavaScript构造函数、原型、原型链
+
 典型的OOP的语言中(如Java)，都存在类的概念，类就是对象的模板，对象就是类的实例，但在ES6之前，JS并没有类的概念。
 
 1. 对象字面量
@@ -280,11 +334,27 @@ console.log(Array.prototype)
 ```
 ### javascript `this`重点
 
-#### 普通函数和箭头函数对 this 的处理方式
-#### javaScript的this指向问题
+在面试的文件中有的！！
 
 ### 深浅拷贝
+
+```js
+
+```
+
 ### 手写数组相关函数
+
+#### 手写forEach方法
+
+```js
+Array.prototype.myForEach = function (func, context) {
+  	let arr = Array.prototype.slice.call(this)
+    for (var i = 0; i < arr.length; i++) {
+        func.call(context, arr[i], i, this)
+    }
+}
+```
+
 #### 手写map函数
 ```javascript
 Array.prototype.map = function(fn) {
@@ -299,6 +369,31 @@ Array.prototype.map = function(fn) {
 const arr = [1,2,3,,5]
 const result = arr.map(item => item*2)
 console.log(result)
+
+
+
+//es5实现map函数
+const selfMap = function (fn,context){
+  //当前带有length的对象转化为数组
+  let arr = Array.prototype.slice.call(this)
+  let mappedArr = []
+  for(let i = 0;i < arr.length;i++){
+    if(!arr.hasOwnProperty(i)) continue
+    mappedArr.push(fn.call(context,arr[i],i,this))	
+  }
+  return mappedArr
+}
+值得一提的是，map 的第二个参数为第一个参数回调中的 this 指向，如果第一个参数为箭头函数，那设置第二个 this 会因为箭头函数的词法绑定而失效
+
+
+//使用reduce实现数组map方法
+const selfMap2 = function(fn,context){
+  let arr = Array.prototype.slice.call(this)
+  return arr.reduce((pre,cur,index) => {
+    return [...pre,fn.call(context,cur,index,this)]
+  },[])
+}
+
 ```
 
 #### 手写filter函数
@@ -314,6 +409,24 @@ Array.prototype.filter = function (fn){
 const arr = [1,2,3,,5]
 const result = arr.filter(item => item > 2)
 console.log(result)
+
+
+//es5实现
+const seltFilter = function(fn,context){
+  let arr = Array.prototype.slice.call(this)
+  let filteredArr = []
+  for(let i = 0;i < arr.length;i++){
+    if (!this.hasOwnProperty(i)) continue; // 处理稀疏数组的情况
+    fn.call(context,arr[i],i,this) && filteredArr.push(arr[i])
+  }
+}
+
+//使用reduce实现数组filter方法
+const selfFilter2 = function(fn,context){
+  return this.reduce((pre,cur,index) => {
+    return  fn.call(context,arr[i],i,this) ? [...pre,...cur] :[...pre]
+  })
+}
 ```
 
 #### 手写reduce函数
@@ -329,6 +442,62 @@ Array.prototype.reduce = function (fn,initValue){
 const arr = [1,,2,3,,5]
 const result = arr.reduce((a,b) => a*b,2)
 console.log(result)
+
+
+
+//es5
+const findRealELementIndex = function(arr,initiIndex){
+  let index
+  for(let i = initIndex || 0;i < arr.length;i++){
+    if(!arr.hasOwnProperty(i)) continue
+    index = i
+    break
+  }
+  return index
+}
+const selfReduce = function(fn,initalValue){
+  let arr = Array.prototype.slice.call(this)
+  let res
+  
+  if(initalValue === undefined){
+    res = arr[findRealElementIndex(arr)]
+    for(let i = 0;i < arr.lenght -1;i++){
+      //reduce遍历时候 需要跳过稀疏元素，遍历到最后一个非稀疏元素
+      if(!arr.hasOwnProperty(i)) continue
+      let realElementIndex = findRealElementIndex(arr,i+1)
+      res = fn.call(null,res,arr[realElementIndex],realElementIndex,this)
+    }
+  }else {
+    res = initalValue
+    for(let i = 0;i <arr.length;i++){
+      if(!arr.hasOwnProperty(i)) continue
+      res = fn.call(null,res,arr[i],i,this)
+    }
+  }
+  return res
+}
+
+
+
+//另一种es5的方法
+Array.prototype.myReduce = function (func, initialValue) {
+    var len = this.length,
+        nextValue,
+        i;
+    if (!initialValue) {
+        // 没有传第二个参数
+        nextValue = this[0];
+        i = 1;
+    } else {
+        // 传了第二个参数
+        nextValue = initialValue;
+        i = 0;
+    }
+    for (; i < len; i++) {
+        nextValue = func(nextValue, this[i], i, this);
+    }
+    return nextValue;
+}
 ```
 
 #### 手写every函数
@@ -365,6 +534,27 @@ Array.prototype.some = function (fn){
 const arr = [1,2,3,,5]
 const result = arr.some(item => item > 3)
 console.log(result)
+
+
+//es5
+const selfSome = function(fn,context){
+  let arr = Array.prototype.slice.call(this)
+  if(!arr.length) return false
+  let flag = false
+  for(let i = 0;i < arr.length;i++){
+    if(!arr.hasOwnProperty(i)) continue
+    let res = fn.call(context,arr[i],i,this)
+    if(res) {
+      flag = true
+      break
+    }
+  }
+  return flag
+}
+
+执行 some 方法的数组如果是一个空数组，最终始终会返回 false，而另一个数组的 every 方法中的数组如果是一个空数组，会始终返回 true
+
+
 ```
 
 #### 手写find方法
@@ -420,6 +610,10 @@ const result1 = flattening1(arr,1)
 const result2 = flattening2(arr)
 const result3 = flattening2(arr)
 console.log(result3)
+
+
+
+//使用reduce实现数组的flat方法
 ```
 #### 手写图片懒加载&惰性函数
 实现图片懒加载其核心的思想就是将 img 的 src 属性先使用一张本地占位符，或者为空。然后真实的图片路径再定义一个 data-set 属性存起来，待达到一定条件的时将 data-img 的属性值赋给 src。
@@ -525,8 +719,112 @@ const throttle = (fn,waiting=1000,option)=>{
     }
     return _throttle
 }
+
+
+
+
+
+//防抖
+function debounce(handle, delay) {
+    var timer = null;
+    return function () {
+        var _self = this,
+            _args = arguments;
+        clearTimeout(timer);
+        timer = setTimeout(function () {
+            handle.apply(_self, _args)
+        }, delay)
+    }
+}
+
+//节流
+function throttle(handler, wait) {
+    var lastTime = 0;
+    return function (e) {
+        var nowTime = new Date().getTime();
+        if (nowTime - lastTime > wait) {
+            handler.apply(this, arguments);
+            lastTime = nowTime;
+        }
+    }
+}
 ```
+#### **JS函数防抖和函数节流**
+
+1. 函数防抖(debounce)
+   - **概念：** `在事件被触发n秒后再执行回调，如果在这n秒内又被触发，则重新计时。`
+   - **生活中的实例：** `如果有人进电梯（触发事件），那电梯将在10秒钟后出发（执行事件监听器），这时如果又有人进电梯了（在10秒内再次触发该事件），我们又得等10秒再出发（重新计时）。`**生活中的实例：** `我们知道目前的一种说法是当 1 秒内连续播放 24 张以上的图片时，在人眼的视觉中就会形成一个连贯的动画，所以在电影的播放（以前是，现在不知道）中基本是以每秒 24 张的速度播放的，为什么不 100 张或更多是因为 24 张就可以满足人类视觉需求的时候，100 张就会显得很浪费资源。`
+2. 函数节流(debounce)
+   - **概念：** `规定一个单位时间，在这个单位时间内，只能有一次触发事件的回调函数执行，如果在同一个单位时间内某事件被触发多次，只有一次能生效。`
+   - **生活中的实例：** `我们知道目前的一种说法是当 1 秒内连续播放 24 张以上的图片时，在人眼的视觉中就会形成一个连贯的动画，所以在电影的播放（以前是，现在不知道）中基本是以每秒 24 张的速度播放的，为什么不 100 张或更多是因为 24 张就可以满足人类视觉需求的时候，100 张就会显得很浪费资源。`、
+
+对于函数防抖，有以下几种应用场景：
+
+- 给按钮加函数防抖防止表单多次提交。
+- 对于输入框连续输入进行AJAX验证时，用函数防抖能有效减少请求次数。
+- 判断`scroll`是否滑到底部，`滚动事件`+`函数防抖`
+
+总的来说，适合多次事件**一次响应**的情况
+
+```js
+function debounce(fn, wait) {
+  var timer = null;
+  return function () {
+      var context = this
+      var args = arguments
+      if (timer) {
+          clearTimeout(timer);
+          timer = null;
+      }
+      timer = setTimeout(function () {
+          fn.apply(context, args)
+      }, wait)
+  }
+}
+
+var fn = function () {
+  console.log('boom')
+}
+
+setInterval(debounce(fn,500),1000) // 第一次在1500ms后触发，之后每1000ms触发一次
+
+setInterval(debounce(fn,2000),1000) // 不会触发一次（我把函数防抖看出技能读条，如果读条没完成就用技能，便会失败而且重新读条）
+
+```
+
+对于函数节流，有如下几个场景：
+
+- 游戏中的刷新率
+- DOM元素拖拽
+- Canvas画笔功能
+
+总的来说，适合**大量事件**按时间做**平均**分配触发。
+
+```js
+function throttle(fn, gapTime) {
+  let _lastTime = null;
+
+  return function () {
+    let _nowTime = + new Date()
+    if (_nowTime - _lastTime > gapTime || !_lastTime) {
+      fn();
+      _lastTime = _nowTime
+    }
+  }
+}
+
+let fn = ()=>{
+  console.log('boom')
+}
+
+setInterval(throttle(fn,1000),10)
+
+```
+
+函数防抖和函数节流是**在时间轴上控制函数的执行次数**。防抖可以类比为`电梯不断上乘客`,节流可以看做`幻灯片限制频率播放电影`。
+
 ## javascript语法简明手册
+
 ### Chrome控制台
 1. copy()函数
     + 将已有对象的JSON表达式复制到缓冲区
@@ -1395,7 +1693,22 @@ for...in循环只迭代可枚举的对象属性。尽管所有的对象属性都
 - Array.map((value) => value = value + 1)
   - 返回修改之后的副本
 - Array.reduce((a,b) => a + b)
-  - 累加器
+
+可用之处很多的
+
+```js
+const array  = [5,4,7,8,9,2];
+
+//求和
+array.reduce((a,b) => a+b); // 输出: 35
+
+//最大值
+array.reduce((a,b) => a>b?a:b);// 输出: 9
+
+//最小值
+array.reduce((a,b) => a<b?a:b);// 输出: 2
+```
+
 - Array.flat(depth)
   - 扁平化多维数组
   - 指定嵌套数组结构应展平的深度的深度级别。默认为 1。
@@ -1575,19 +1888,11 @@ let arrow = () => {
 
 当定义在全局作用域中时，对于this绑定来说，传统函数和箭头函数之间似乎没有什么区别。
 
-
-
 箭头函数并不绑定this关键字，它从外部作用域中查找this的值，这与其他的变量一样。可以说箭头函数拥有“透明”的作用域。
-
-
 
 箭头函数无argument对象
 
-
-
 箭头函数无构造函数
-
-
 
 继承的this语境。
 
@@ -1618,6 +1923,12 @@ document.querySelector("id-1").appendChild(div)
 
 
 也可以写函数创建
+```
+
+#### 函数柯里化？？？？？？？？
+
+```js
+
 ```
 
 ### 原型
@@ -2213,4 +2524,316 @@ g.throw(new Error('Something went wrong'))
 
 
 ## 你不知道的JavaScript上卷
+
+### 作用域
+
+- 分词/词法分析
+- 解析/语法分析   AST
+- 代码生成
+
+JavaScript的编译过程不是发生在构建之前的。大部分情况下编译发生在代码执行前的几微秒。
+
+编译器首先会将这段程序分解成词法单元，然后将词法单元解析成一个树结构。但是当编译器开始进行代码生成时，它对这段程序的处理方式会和预期的有所不同。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210708210350.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210708210626.png)
+
+作用域嵌套
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210708211342.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210708211756.png)
+
+变量进行赋值，那么就会使用LHS查询；如果目的是获取变量的值，就会使用RHS查询。赋值操作符会导致LHS查询。=操作符或调用函数时候传入参数的操作都会导致关联作用域的赋值操作。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210708212046.png)
+
+### 词法作用域
+
+词法作用域就是定义在词法阶段的作用域。换句话说，词法作用域是由你在写代码时将变量和块作用域写在哪里来决定的，因此当词法分析器处理代码时会保持作用域不变。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210708223824.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210708224123.png)
+
+### 函数作用域和块作用域
+
+#### 函数中的作用域
+
+无论标识符声明出现在作用域中的何处，这个标识符所代表的变量或函数都将附属于所处作用域的气泡。
+
+函数作用域的含义是指：属于这个函数的全部变量都可以在整个函数的范围内使用及复用。嵌套的作用域中也可以使用。
+
+#### 隐藏内部实现
+
+从所写代码中选出一个任意片段，然后用函数声明对它进行包装，实际上就是把这些代码“隐藏”起来了。
+
+“隐藏”作用域中的变量和函数所带来的的另一个好处，是可以避免同名标识符之间的冲突，两个标识符可能具有相同的名字但用途却不一样，无意见可能造成命名冲突。冲突会导致变量的值被意外覆盖。
+
+#### 函数作用域
+
+在任意代码片段外部添加包装函数，可以将内部的变量和函数定义“隐藏”起来，外部作用域无法访问包装函数内部的任何内容。
+
+**立即执行函数**
+
+```js
+var a = 2
+
+(function foo(){
+  var a = 3
+  console.log(a)
+})()
+console.log(a)
+```
+
+由于函数被包含在一对`( )`括号内部，因此成为了一个表达式，通过在末尾加上另一个`( )`可以立即执行这个函数，比如`(function foo(){...})()`。第一个`( )`将函数变成表达式，第二个`( )`执行了这个函数。
+
+进阶用法是把它们当作函数调用并传递参数进去。
+
+```js
+var a = 2
+
+(function IFEE(global){
+  var a = 3
+  console.log(a) //3
+  console.log(global.a) //2
+})(window)
+console.log(a) //2
+```
+
+我们将`window`对象的引用传递进去，但是将参数命名为`global`,因此在代码风格上对全局对象的引用变得比引用一个没有“全局”字样的变量更加清晰。
+
+高级进阶用法倒置代码的运行数顺序，将需要运行的函数防灾第二位。
+
+```js
+(function IFEE(def){
+  def(window)
+})(function def(global){
+  var a  = 3
+  console.log(a)
+  console.log(global.a)
+})
+```
+
+#### 块作用域
+
+**with**
+
+`with`关键字。它不仅是一个难于理解的结构，同时也是块作用域的一个例子。用`with`从对象中创建出的作用域仅在`with`声明而非外部作用域中有效。
+
+**try/catch**
+
+```js
+try{
+  undefind() //执行一个非法操作来强制制造一个异常
+}catch(err){
+  console.log(err) //能够正常执行
+}
+
+console.log(err) //ReferenceError:err not found
+```
+
+**let**
+
+`let`关键字可以将变量绑定到所在的任意作用域中（通常是{...}内部）。换机话所，let为其声明的变量隐式地劫持了所在的块作用域。
+
+```js
+var foo = ture
+if(foo){
+  let bar = foo*2
+  bar = something(bar)
+  console.log(bar)
+}
+
+console.log(bar) //ReferenceError
+```
+
+使用let关键字声明不会再块作用域中进行提升。
+
+1.**垃圾回收**
+
+作用域非常有用的原因和闭包及回收内存垃圾的回收机制相关。
+
+```js
+function process(data){
+  //do
+}
+var someReallyBigData = {...}
+                         
+process(someReallyBigData)
+var btn = document.getElementById('my_button')
+btn.addEventListener('click',function click(evt){
+  console.log("do")
+})
+
+//process执行完之后，在内存中占用大量空间的数据结构就可以被垃圾回收了。但是，由于click函数形成了一个覆盖整个作用域的闭包，javascript引擎极有可能依然保存着这个结构。
+```
+
+```js
+function process(data){
+  //do
+}
+//块级作用域  可以让引擎清楚的知道没有必要继续保存无关哇数据结构了
+{
+  var someReallyBigData = {...}                        
+	process(someReallyBigData)
+}
+var btn = document.getElementById('my_button')
+btn.addEventListener('click',function click(evt){
+  console.log("do")
+})
+
+
+```
+
+2.**循环**
+
+```js
+for(let i = 0;i<10;i++){
+  console.log(i)
+}
+
+console.log(i) //ReferenceError
+```
+
+for循环头部的let不仅将i绑定到了for玄幻的块中，事实上它将其重新绑定到了循环的每一个迭代中，确保使用上一个循环迭代结束时的值重新进行赋值。
+
+**const**
+
+除了let以外，ES6还引入了const。
+
+```js
+var foo = true
+
+if(foo) {
+  var a = 2
+  const b = 3 //包含在if中的块作用域常量
+  
+  a = 3
+  b = 4 //错误
+}
+console.log(a) //3
+console.log(b) //ReferenceError
+```
+
+#### 提升
+
+引擎会在解释JavaScript代码之前首先对其进行编译。编译阶段中的一部分工作就是找到所有的声明，并用合适的作用域将它们关联起来。
+
+```js
+a = 2
+var a 
+console.log(a)  //2
+
+---------->转化为
+var a
+a = 2
+console.log(a) //2
+
+
+
+
+
+console.log(a) //undefined
+var a =2
+---------->转化为
+var a
+console.log(a) //undefined
+a = 2
+
+```
+
+先有蛋（声明）后有鸡（赋值）
+
+只有声明本身会被提升，而赋值或其他运行逻辑会留在原地。如果提升改变了代码执行的顺序，会造成非常严重的破坏。
+
+```js
+foo()
+function foo(){
+  console.log(a)
+  var a = 2
+}
+---------->转化为
+function foo(){
+  var a
+  console.log(a) //undefined
+  a = 2
+}
+foo()
+```
+
+函数声明会被提升，但是函数表达式却不会提升。
+
+```js
+foo() //不是ReferenceError,而是TypeError
+var foo = function bar(){
+  //....
+}
+```
+
+即使是具名的函数表达式，名称标识符在赋值之前也无法在所在作用域中使用：
+
+```js
+foo() //TypeError
+bar() //ReferenceError
+
+var foo = function bar() {
+  //...
+}
+---------->转化为
+var foo
+foo() //TypeError
+bar() //ReferenceError
+foo = function() {
+  var bar = ....
+}
+```
+
+函数声明和变量声明都会被提升。但是一个值得注意的细节（出现多个重复的声明的代码中）是函数会首先被提升，然后是变量
+
+```js
+foo()
+var foo
+function(){
+  console.log(1)
+}
+foo = function(){
+  console.log(2)
+}
+---------->转化为
+function foo(){
+  console.log(1)
+}
+foo()
+foo = function() {
+  console.log(2)
+}
+
+//var foo尽管出现在function foo()...的声明之前，但它是重复的声明，因为函数声明会被提升到普通变量之前。
+```
+
+```js
+foo() // foo is not a function
+
+var a = true
+
+if(a){
+    function foo(){
+        console.log("a")
+    }
+}else{
+    function foo(){
+        console.log("b")
+    }
+}
+```
+
+#### 作用域闭包
+
+
+
+
+
+
 

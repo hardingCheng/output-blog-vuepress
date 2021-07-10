@@ -59,7 +59,34 @@ module.exports = {
             },
           ]
         },
-        { text: '面试', link: '/interview/index' },
+        { text: '面试', 
+          items: [
+            {
+              text: 'js',
+              items: [
+                { text: 'JavaScript', link: '/interview/js' },
+              ]
+            },
+            {
+              text: 'css',
+              items: [
+                { text: 'css', link: '/interview/css' },
+              ]
+            },
+            {
+              text: 'Vue',
+              items: [
+                { text: 'Vue', link: '/interview/vue' },
+              ]
+            },
+            {
+              text: 'React',
+              items: [
+                { text: 'React', link: '/interview/react' },
+              ]
+            },
+          ]
+        },
         { text: '工具技巧', link: '/tool-skills/index' },
       ],
     sidebar: 'auto',// 侧边栏配置
