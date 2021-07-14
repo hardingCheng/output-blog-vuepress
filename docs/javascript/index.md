@@ -70,7 +70,7 @@ obj.myFun.bind(db, ['成都', '上海'])(); //小张 年龄 99  来自 成都,�
 6.  如果`call()`和`apply()`的`第一个参数是null或者undefined，那么this的指向就是全局变量，在浏览器里就是window对象`。
 :::
 
-#### 手写bind()方法  ？？？？？
+#### 手写bind()方法 /Function.prototype.bind？？？？？
 
 ```js
 Function.prototype.myBind = function (target) {
@@ -89,28 +89,34 @@ Function.prototype.myBind = function (target) {
 }
 ```
 
-#### 手写call()方法 ？？？？？
+#### 手写call()方法/Function.prototype.call ？？？？？
 
 ```js
 Function.prototype.myCall = function () {
     var ctx = arguments[0] || window;
-    ctx.fn = this;
+    //fn被占用  设置一个唯一值
+  	const fn = Symbol()
+    ctx[fn] = this;
     var args = [];
     for (var i = 1; i < arguments.length; i++) {
         args.push(arguments[i])
     }
     var result = ctx.fn(...args);
     delete ctx.fn;
-    return result;
+    return result;S
 }
 ```
 
-#### 手写apply()方法？？？？？
+#### 手写apply()方法/Function.prototype.apply ？？？？？
 
 ```js
 Function.prototype.myApply = function () {
-    var ctx = arguments[0] || window;
-    ctx.fn = this;
+     if (typeof arguments[0] === "undefined" || arguments[0] === null) {
+                arguments[0] = window
+            }
+ 		//fn被占用  设置一个唯一值
+    const fn = Symbol()
+    ctx[fn] = this;
     if (!arguments[1]) {
         var result = ctx.fn();
         delete ctx.fn;
@@ -2553,6 +2559,8 @@ JavaScript的编译过程不是发生在构建之前的。大部分情况下编�
 
 词法作用域就是定义在词法阶段的作用域。换句话说，词法作用域是由你在写代码时将变量和块作用域写在哪里来决定的，因此当词法分析器处理代码时会保持作用域不变。
 
+词法作用域是一套关于引擎如何寻找变量以及会在何处找到变量的规则。词法作用域最重要的特征是它的定义过程发生在代码的书写阶段。
+
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210708223824.png)
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210708224123.png)
@@ -2717,7 +2725,7 @@ console.log(a) //3
 console.log(b) //ReferenceError
 ```
 
-#### 提升
+### 提升
 
 引擎会在解释JavaScript代码之前首先对其进行编译。编译阶段中的一部分工作就是找到所有的声明，并用合适的作用域将它们关联起来。
 
@@ -2829,7 +2837,556 @@ if(a){
 }
 ```
 
-#### 作用域闭包
+### 作用域闭包
+
+闭包是基于词法作用域书写代码时所产生的自然结果。
+
+当函数可以记住并且访问所在的词法作用域时，就产生了闭包，及时函数是在当前词法作用域之外执行。
+
+```js
+function foo() {
+  var a = 2
+  function bar() {
+    console.log(a)
+  }
+  return bar
+}
+var baz = foo()
+baz()   //2  这就是闭包效果
+```
+
+拜bar()所在声明的位置所赐，它拥有涵盖foo()内部作用域的闭包，使得该作用域能够一直存活，以供bar()在之后任何时间进行引用。bar()依然持有对该作用域的引用，而这个引用就叫做闭包。可以访问定义时的词法作用域。
+
+这个函数在定义时的词法作用域以外的值进行传递，当函数在别处被调用时都可以观察到闭包。
+
+```js
+function foo(){
+  var a = 2
+  function baz() {
+    console.log(a)
+  }
+  bar (baz)
+}
+function bar(fn){
+  fn()
+}
+foo()
+```
+
+把内部函数baz传递给bar，当调用这个函数时（现在叫做fn），它涵盖的foo（）内部作用域的闭包就可以观察到了，因为它能够访问a。
+
+```js
+var fn
+
+function foo(){
+  var a = 2
+  function baz(){
+    console.log(a)
+  }
+  fn = baz //将baz分配给全局变量
+}
+
+function bar(){
+  fn() //闭包
+}
+foo()
+bar() //2
+```
+
+无论通过何种手段将内部函数传递到所在的词法作用域以外，它都会持有对原始定义作用域的引用，无论在何处执行这个函数都会使用闭包。
+
+ ```js
+ function wait(message){
+   setTimeout(function timer(){
+     console.log(message)
+   },1000)
+ }
+ wait("hello,closure!")
+ 
+ 
+ 
+ function setupBot(name,selector){
+   $(selector).click(function activator(){
+     console.log("Activating:" + names)
+   })
+ }
+ setupBot("Closure Bot 1","#bot_1")
+ setupBot("Closure Bot 2","#bot_2")
+ ```
+
+定时器、事件监听器、Ajax请求、跨窗口通信、Web Workers或者任何其他的异步 （或者同步）任务中，只要使用了**回调函数**，实际上就是在使用闭包。
+
+```js
+for(var i = 1;i<=5;i++){
+  setTimeout(function timer(){
+    console.log(i)   // 6 6 6 6 6
+  },i*1000)
+}
+//他们都被封闭到一个共享的全局作用域中，因此实际上只有一个i。
+
+//修改之后
+//声明一个立即执行函数来创建作用域
+for(var i = 1;i<=5;i++){
+  (function(){
+    var j = i
+    setTimeout(function timer(){
+      console.log(j)
+    },j*1000)
+  })()
+}
+for(var i = 1;i<=5;i++){
+  (function(j){
+    setTimeout(function timer(){
+      console.log(j)
+    },j*1000)
+  })(i)
+}
+```
+
+每次迭代我们需要一个**块作用域**。`let`
+
+```js
+for(let i = 1;i<=5;i++){
+  setTimeout(function timer(){
+    console.log(i)   // 1 2 3 4 5 6
+  },i*1000)
+}
+
+// 块作用域和闭包联手便可天下无敌。
+```
+
+与回调无关的。**模块**
+
+```js
+//函数闭包模块
+function CoolModule(){
+  var something = "cool"
+  var another = [1,2,3]
+  function doSomethig(){
+    console.log(somethin)
+  }
+  function doAnother(){
+    console.log(another.join("!"))
+  }
+  return {
+    doSomethig,
+    doAnother
+  }
+}
+var foo = CoolModule()
+
+foo.doSomething() //cool
+foo.doAnother() //1!2!3!
+
+```
+
+模块模式需要具备两个必要条件。
+
+1. 必须有外部的封闭函数，该函数必须至少被调用一次（每次调用都会创建一个新的模块实例）。
+2. 封闭函数必须返回至少一个内部函数，这样内部函数才能在私有作用域中形成闭包，并且可以返回或者修改私有的状态。
+
+```js
+//只要一个实例时候，使用单例模式    也就是立即执行函数
+var foo = (function CoolModule(){
+  var something = "cool"
+  var another = [1,2,3]
+  function doSomethig(){
+    console.log(somethin)
+  }
+  function doAnother(){
+    console.log(another.join("!"))
+  }
+  return {
+    doSomethig,
+    doAnother
+  }
+})()
+
+foo.doSomething() //cools
+foo.doAnother() //1!2!3!
+```
+
+模块也是普通函数，可以接受参数。
+
+```js
+function CoolModule(id){
+  function identify(){
+    console.log(id)
+  }
+  return {
+    identify
+  }
+}
+var foo1 = CoolModule("foo 1")
+var foo2 = CoolModule("foo 2")
+foo1.identify() //"foo 1"
+foo2.identify() //"foo 2"
+```
+
+模块模式另一个简单但强大的用法是命名将要作为公共API返回的对象。
+
+```js
+var foo = (function CoolModule(){
+	function change(){
+    publicApi.identify = identify2
+  }
+  function identify1(){
+      console.log(id)
+  }
+  function identify2(){
+      console.log(id.toUpperCase())
+  }
+  var publicAPI = {
+    change,
+    identify
+  }
+  return publicApi
+})("foo module")
+
+foo.identify() //foo module
+foo.change()
+foo.identify2() //FOO MODULE
+```
+
+现代模块化机制
+
+```js
+
+var MyModules = (function Manger(){
+    var module = {};
+    
+    function define(name,deps,impl){
+        for(var i=0;i<deps.length;i++>){
+            deps[i] = module[deps[i]]
+        }
+        module[name] = impl.apply(impl,deps)
+    }
+    function get(name){
+        return module[name]
+    }
+    return {
+        define,
+        get
+    }
+})()
+
+
+MyModules.define('bar',[],function(){
+    function hello(who){
+        return "Let me introduce: "+ who
+    }
+    return { 
+        hello
+    }
+})
+MyModules.define('foo',['bar'],function(){
+    var hungry = "hippo"
+    function awesome(){
+        console.log(bar.hello(hungry).toUpperCase());
+    }
+    return {
+        awesome
+    }
+})
+var bar = MyModules.get("bar")
+var foo = MyModules.get("foo")
+
+console.log(bar.hello('hippo'))
+
+foo.awesome()
+
+//foo和bar模块都是通过一个返回公共api的函数来定义的。foo甚至接受bar的实例作为依赖参数，并且相应地使用它。
+```
+
+未来的模块化机制
+
+```js
+bar.js
+function hello(who){
+  return "xxx"
+}
+export hello
+
+
+
+foo.js
+import hello from "bar"
+var hungry = "hippo"
+function awesome(){
+  console.log(hello(hungry).toUpperCase())
+}
+export awesome
+
+
+
+baz.js
+module foo from "foo"
+module bar from "bar"
+console.log(bar.hello("rhino"))
+foo.awesome()
+```
+
+**当函数可以记住并访问所在的词法作用域，即使函数是在当前词法作用域之外执行，这时就产生了闭包**。
+
+### 关于this
+
+this关键字是JavaScript是最复杂的机制之一。
+
+```js
+function identify() {
+  return this.name.toUpperCase()
+}
+function speak() {
+  let greeting = "Hello,I'm" + identify.call(this)
+  console.log(greeting)
+}
+let me = {
+  name:'Kyle'
+}
+let you = {
+  name:'Reader'
+}
+
+identify.call(me) //KYLE
+identify.call(you) //READER
+
+speak.call(me) //Hello,我是KYLE
+speak.call(you) //Hello,我是READER
+```
+
+this提供一种更优雅的方法来隐私“传递”一个对象引用，因此可以将API设计得更加简洁并且易于复用。随着你的使用模式原来越复杂，显示。
+
+```JS
+//
+//误解1:指向自身
+//
+function foo(num){
+  console.log("foo: " + num)
+  
+  //记录foo被调用的次数
+  this.count++
+}
+foo.count = 0
+for(i = 0;i<10;i++){
+  if(i>5){
+    foo(i)
+  }
+}
+console.log(foo.count) //0 
+
+
+
+
+function foo(num){
+  console.log("foo: " + num)
+  
+  //记录foo被调用的次数
+  foo.count++
+}
+foo.count = 0
+for(i = 0;i<10;i++){
+  if(i>5){
+    foo(i)
+  }
+}
+console.log(foo.count) //4
+
+
+
+
+function foo(num){
+  console.log("foo: " + num)
+  
+  //记录foo被调用的次数  在当前的调用方式下（参考下方代码），this确实指向foo
+  this.count++
+}
+foo.count = 0
+for(i = 0;i<10;i++){
+  if(i>5){
+    foo.all(foo,i)
+  }
+}
+console.log(foo.count) //4
+
+
+
+
+
+
+
+//
+//误解2:它的作用域  this指向函数作用域
+//
+// this在任何情况下都不指向函数的词法作用域。
+function foo(){
+  var a = 2
+  this.bar()
+}
+function bar(){
+  console.log(this.a)
+}
+foo() //ReferenceError:a is not defined
+```
+
+每当你想把this和词法作用域的查找混合使用的时，一定要提醒自己，这是无法实现的。
+
+**this绑定和函数声明的位置没有任何关系，只取决于函数的调用方式**。
+
+**当一个函数被调用的时，会创建一个活动记录（执行上下文）。这个记录会包含函数在哪里被调用（调用栈）、函数的调用方法、传入的参数等信息。this就是记录的其中一个属性，会在函数执行的过程中用到。**
+
+**this实际上是在函数被调用时发生的绑定的，它指向什么完全取决于函数在哪里被调用。**
+
+
+
+
+
+### this的全面解析
+
+排除了一些对this的错误理解并且明白了每个函数的this是在调用时绑定的，完全取决于函数的调用位置（函数的调用方法）。
+
+#### **调用位置**
+
+理解调用位置：调用位置就是函数在代码中被调用的位置（而不是声明位置）。
+
+最重要的就是分析调用栈（就是为了到达当前执行位置所调用的所有函数）。
+
+```js
+function baz(){
+  // 当前调用栈是baz
+  // 因此当前调用位置是全局作用域
+  console.log("baz")
+  bar()//<--bar调用位置
+}
+function bar()
+  // 当前调用栈是baz -> bar 
+  // 因此当前调用位置在baz中
+  console.log("bar")
+  foo() //<--foo调用位置
+}
+function foo(){
+  // 当前调用栈是baz -> bar -> foo
+  // 因此当前调用位置在bar中
+  console.log("foo")
+}
+baz() //<--baz的调用位置
+```
+
+#### 绑定规则
+
+1. **默认绑定**
+
+首先是最常用的函数调用类型：独立函数调用。
+
+```js
+function foo(){
+  // 函数调用的时候应用了this的默认绑定，因此this指向全局对象。
+  console.log(this.a)
+}
+var a = 2
+foo() // 2
+```
+
+在非严格模式下this的默认绑定，因此this指向全局对象。在严格模式下this会绑定到undefined。
+
+```js
+function foo(){
+  "use strict"
+  console.log(this.a)
+}
+var a = 2
+foo() // TypeError:this is undefined
+```
+
+2. **隐式绑定**
+
+调用位置是否有上下文对象，或者说是否被某个对象拥有或者包含。
+
+```js
+function foo(){
+  console.log(this.a)
+}
+var obj = {
+  a:2,
+  // foo()是声明式的，无论直接在obj中定义还是先定义再添加为引用属性，这个函数严格来说都不属于obj对象
+  foo:foo
+}
+obj.foo() //2
+```
+
+然而，调用位置会使用`obj`上下文来引用函数，因此你可以说函数被调用时obj对象“拥有”或者“包含”函数引用。
+
+当函数引用有上下文对象时，`隐式绑定`规则会把函数调用中的`this`绑定到这个上下文对象。因为调用`foo()`时this被绑定到`obj`，因此`this.a`和`obj.a`是一样的。
+
+**对象引用链中只有上一层或者最后一层在调用位置起作用**
+
+```js
+function foo(){
+  console.log(this.a)
+}
+var obj2 = {
+  a:42,
+  foo:foo
+}
+var obj1 = {
+  a:2,
+  obj2:obj2
+}
+obj1.obj2.foo() //42  this绑定的只有上一层或者最后一层在调用位置起作用
+```
+
+**隐式丢失**
+
+一个最常见的this绑定问题就是`隐式绑定`的函数会丢失绑定的对象，也就是说它会应用`默认绑定`，从而把`this`绑定到全局对象或者`undefined`上，取决于是否严格模式。
+
+```JS
+function foo(){
+  console.log(this.a)
+}
+var obj = {
+  a:2,
+  foo:foo
+}
+var bar = obj.foo //函数别名
+var a = "oops,global" //a是全局对象的属性
+//  this绑定的只有上一层或者最后一层在调用位置起作用
+bar() // "oops,global" 
+```
+
+```js
+function foo(){
+  console.log(this.a)
+}
+function doFoo(fn){
+  //fn其实引用的是foo
+  fn() //<--调用位置
+}
+var obj = {
+  a:2,
+  foo:foo
+}
+var a = "opp,global" //a是全局对象的属性
+doFoo(obj.foo) //"oops,global" 
+```
+
+```js
+function foo(){
+  console.log(this.a)
+}
+var obj = {
+  a:2,
+  foo:foo
+}
+var a = "opp,global" //a是全局对象的属性
+setTimeout(obj.foo,100) //"opp,global"
+```
+
+回调函数丢失`this`绑定是非常常见的。调用回调函数的函数可能会修改`this`。在一些流行的JavaScirpt库中事件处理器常会吧回调函数的`this`强制绑定到触发事件的`DOM`元素上。
+
+3. **显示绑定**
+
+
+
+
 
 
 
