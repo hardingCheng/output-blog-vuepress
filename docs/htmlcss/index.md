@@ -1,4 +1,4 @@
-# HTMLCSS 日常总结
+#  HTMLCSS 日常总结
 ## CSS基础
 #### 1.选择器
 ##### 基础选择器
@@ -7,15 +7,58 @@
 - ID 选择器：`#picker`
 - 通配选择器：`*`
 ##### 属性选择器
+
 - `[attr]`：指定属性的元素；
 - `[attr=val]`：属性等于指定值的元素；
+
+```html
+<pml-planet>Venus</pml-planet>
+<pml-planet moons="1">Venus</pml-planet>
+<pml-planet moons="2">Venus</pml-planet>
+
+pm-planet[moons] { font-weight: bold; }
+img[alt] { border:3px solid red; }
+a[href][title] { font-weight: bold; }
+
+<!--必须要精确-->
+pm-planet[moons="1"] { font-weight: bold; }
+a[href="http://www.w3.org/"][title="W3C Home"] { font-weight: bold; }
+```
+
 - `[attr*=val]`：属性包含指定值的元素；
+```html
+<input type="tel" title="Telephone number should be formatted as XXX-XXX-XXXX"/>
+
+input[title*="format"] { background-color:#dedede; }
+```
+
 - `[attr^=val]` ：属性以指定值开头的元素；
 - `[attr$=val]`：属性以指定值结尾的元素；
 - `[attr~=val]`：属性包含指定值(完整单词)的元素(不推荐使用)；
-- `[attr|=val]`：属性以指定值(完整单词)开头的元素(不推荐使用)；
+```html
+<span class="barren rocky">Mercury</span>
+<span class="cloudy barren">Venus</span>
+
+span[class~="barren"] { font-style:italic; }
+```
+
+- `[attr|=val]`：属性以指定值(完整单词)开头的元素(不推荐使用):以bar和一个英文波折号开头或者bar本身；
+```html
+<h1 lang="en">Hello!</h1>
+<p lang="en-us">Greetings</p>
+<div lang="en-au">G'day!</div>
+
+*[lang|="en"] { color: white; }
+```
+
+- 不区分大小写
+
+```html
+a[href$='.PDF' i] <!-- 不区分大小写 -->   .pdf、.PDF、.Pdf  只针对于属性值不区分大小写，对于属性还是区分的
+```
+
 ##### 组合选择器
-- 相邻兄弟选择器：`A + B`
+- 相邻兄弟选择器：`A + B` 
 - 普通兄弟选择器：`A ~ B`
 - 子选择器：`A > B`
 - 后代选择器：`A B`

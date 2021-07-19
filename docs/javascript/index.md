@@ -3685,6 +3685,65 @@ ES6的箭头函数并不会使用四条标准的绑定规则，而是根据当�
 
 ### 对象
 
+#### 语法
+
+对象定义的两种形似：**声明（文字）**和**构造形式**。
+
+```js
+// 对象的文字
+var myObj = {
+  key:value
+}
+// 构造形式
+var myObj = new Object()
+myObj.key = value
+```
+
+#### 类型
+
+JavaScript中一共有六种主要类型（术语是“语言类型”）。
+
+- string
+- number
+- boolean
+- null
+- undefined
+- object
+
+**内置对象**
+
+对象的子类型，通产称为内置对象。
+
+- String
+- Number
+- Boolean
+- Object
+- Function
+- Array
+- Date
+- RegExp
+- Error
+
+JavaScript会自动把字面量转换为相应的对象。
+
+`null`和`undefined`没有对应的构造形式，它们只有文字形式。相反，`Date`只有构造，没有文字形式。
+
+#### 内容
+
+对象的内容是由一些存储在特定命名位置的（任意类型）值组成的，我们称之为属性。
+
+存储在对象容器内部的是这些属性的名称，它们就像指针（引用）一样，指向这些值真正的存储位置。
+
+```js
+var myObject = {
+  a : 2
+}
+myObject.a; //2    属性访问
+myOject['a'] //2   键访问
+```
+
+
+
 
 
 
