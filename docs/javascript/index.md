@@ -3742,6 +3742,299 @@ myObject.a; //2    属性访问
 myOject['a'] //2   键访问
 ```
 
+1. **可计算属性名**
+
+ES6增加了`可计算属性名`，可以在文字形式中使用`[]`包裹一个表达式来当作属性名字。
+
+```js
+var perfix = "foo"
+
+var myObject = {
+  [prefix + "bar"]:"hello",
+  [prefix + "baz"]:"world"
+}
+myObject["foobar"];//hello
+myObject["foobaz"];//world
+
+
+var myObject = {
+  [Symbol.something]:"hello world"
+}
+```
+
+2. **属性和方法**
+
+```js
+function foo(){
+  console.log("foo")
+}
+var someFoo = foo //对foo的变量引用
+var myObjetct = {
+  someFoo:foo
+}
+foo; //function foo(){...}
+someFoo; //function foo(){...}
+myObject.someFoo //function foo(){...}
+```
+
+`someFoo`和`myObject.someFoo`知识对于同一个函数的不同引用，并不能说明这个函数是特别的或者”属于“某个对象。如果`foo()`定义时在内部有一个`this`引用，那这两个函数引用的唯一区别就是`myObject.someFoo`中的`this`会被隐式绑定到一个对象。无论哪种引用形式都不能称之为”方法“。
+
+即使你在对象的文字形式中声明一个函数表达式，这个函数也不会”属于“这个对象-它们只是对于相同函数对象的多个引用。
+
+```js
+var myObjetc = {
+  foo:function(){
+    console.log("foo")
+  }
+}
+var someFoo = myObject.foo
+someFoo //function foo(){...}
+myObject.foo //function foo(){...}
+```
+
+3. **数组**
+
+```js
+var myArray = ['foo',42,'bar']
+myArray.length //3
+```
+
+数组当做一个普通的键/值对象来使用，并且不添加任何数值索引。
+
+对象来存储键/值对，只用数组来存储数值下标/值对。
+
+4. **赋值对象**
+
+```js
+function anotherFunction(){ /* ...*/ }
+
+var anotherObject = {
+  c:true
+}
+
+var anotherArray = []
+
+var myObject = {
+  a:2,
+  b:anotherObject, //引用，不是复本
+  c:anotherArray, //另一个引用
+  d:anotherFunction
+}
+anotherArray.push(anotherObject,myObject)
+
+```
+
+首先判断是`浅拷贝`还是`深拷贝`。
+
+```js
+//深复制
+var newObj = JSON.parse(JSON.stringify(someObj))
+
+
+//浅复制
+var newObj = Object.assign({},myObject)
+newObj.a //2
+newObj.b === anotherObject //true
+newObj.c === anotherArray //true
+newObj.d === anotherFunction //true
+//源对象属性的一些特性（比如writable）不会被复制到目标对象。
+```
+
+5. **属性描述符**
+
+从ES5开始，所有的属性都具备了属性描述符。
+
+```js
+var myObject = {
+  a:2
+}
+
+Object.getOwnPropertyDescriptor(myObject,"a")
+/*
+{ 
+  value: 2,  //值
+  writable: true,  //可写
+  enumerable: true,  //可枚举
+  configurable: true  //可配置
+}
+*/
+```
+
+创建普通属性时属性描述符会使用默认值，我们也可以使用`Object.defineProperty(..。)`来添加一个新属性或者修改一个已有属性。
+
+```js
+var myObject = {}
+
+Object.defineProperty(myObject,"a",{ 
+  value: 2,  //值
+  writable: true,  //可写
+  enumerable: true,  //可枚举
+  configurable: true  //可配置
+})
+myObject.a //2
+```
+
+如果对象的某个属性是某个对象/函数的最后一个`引用者`对这个属性执行`delete`操作之后，这个未引用的对象/函数就可以被垃圾回收。
+
+6. **不变性**
+
+希望属性或者对象时不可改变的。有很多多种方法。所有的方法创建的都是浅不变性，也就是说，它们只会影响目标对象和它的直接属性。如果目标对象引用了其他对象（数组,对象，函数等），其他对象的内容不受影响，仍然可变。
+
+```js
+myImmutableObject.foo //[1,2,3]
+myImmutableObject.foo.push(4)
+myImmutableObject.foo //[1,2,3,4]
+```
+
+- **对象常量**
+
+结合`writable:false`和`configurable:false`就可以创建一个真正的常量属性（不可修改、重定义或者删除）。
+
+```js
+var myObject = {}
+Object.defineProperty(myObject,"FAVORITE_NUMBER",{
+  value:2,
+  writable:false,
+  configurable:false
+})
+```
+
+- **禁止扩展**
+
+禁止一个对象添加新属性并且保留已有属性。
+
+```js
+var myObject = {
+  a:2
+}
+
+Object.preventExtensions(myObject)
+
+myObject.b = 3
+myObject.b //undefined
+//在非严格模式下，创建属性b会静默失败。在严格模式下，将会抛出TypeError错误
+```
+
+- **密封**
+
+`Object.seal(...)`会创建一个密封的对象，这个方法实际上就是表用了`Object.preventExtensions(...)`并把所有现有属性标记为`configurable:false`。
+
+所以，密封之后不仅不能添加新属性，也不能重新配置或者删除任何现有属性（虽然可以修改属性的值）。
+
+- **冻结**
+
+`Object.freeze(...)`会创建一个冻结对象，这个方法实际上就是表用了`Object.seal(...)`并把所有现有属性标记为`writable:false`。这样就无法修改它们的值。
+
+这个方法是你可以应用在对象上的级别最高的不可变性，它会禁止对于对象及其任意直接属性修改。（引用其他对象时不受影响的）
+
+”深度冻结“一个对象。首先在一个对象上调用`Object.freeze(...)`然后遍历它引用的所有对象并在这些对象上调用`Object.freeze(...)`。但是一定要小心，因为这样做有可能会在无意中冻结其他（共享）对象。
+
+7. **[[Get]]**
+
+```js
+var myObject = {
+  a:2
+}
+myObject.a //2    [[[Get]]()]
+```
+
+8. **[[Put]]**
+
+`[[Put]]`来设置或者创建这个属性。但是`[[Put]]`被触发时，实际的行为取决于许多因素，包括对象中是否已经存在这个属性。
+
+- 属性是否是访问描述符？如果是并且存在`setter`就调用`setter`。
+- 属性的数据描述符中的`writable`是否为`false`?如果是，非严格模式下静默失败，在严格模式下抛出`TypeError`异常。
+- 如果都不是，就将该值设置为属性值。
+
+9. **Getter和Setter**
+
+对象默认的`[[Put]]`和`[[Get]]`操作分别可以控制属性值的设置和获取。
+
+改写整个对象（不仅仅是某个属性）的默认`[[Put]]`和`[[Get]]`操作。
+
+使用`setter和getter`，部分改写默认操作，只能应用到单个属性上，无法使用在整个对象上。
+
+```js
+var myObject = {
+  // a定义一个getter
+  get a(){
+    return 2
+  }
+}
+Object.defineProperty("myObject",b,{
+  //描述符
+  //给b设置一个getter
+  get:function(){
+    return this.a * 2
+  }
+  //确保b会出现在对象的属性列表中
+  enumerable:true
+})
+myObject.a //2
+myObject.a //4
+```
+
+```js
+var myObject = {
+  // a定义一个getter
+  get a(){
+    return this._a_
+  }
+  set a(val){
+    this._a_ = val * 2
+  }
+}
+myObject.a = 2
+myObject.a //4
+```
+
+10. **存在性**
+
+判断对象中是否存在这个属性：
+
+```js
+var myObject = {
+  a:2
+}
+("a" in myObject) //true
+("b" in myObject) //false
+myObject.hasOwnProperty("a")//true
+myObject.hasOwnProperty("b")//false
+
+
+Object.prototype.hasOwnProperty(myObject,"a")//true
+```
+
+in运算符实际上检查的是某个属性名是否存在，不是值是否存在。
+
+```js
+var myObject = {};
+
+Object.defineProperty(myObject,"a",{
+  enumerable:true,
+  value:2
+})
+Object.defineProperty(myObject,"b",{
+  enumerable:false,
+  value:3
+})
+myObject.b //3
+("b" in myObject) //true
+myObject.hasOwnProperty("b") //true
+
+for(var key in myObject){
+  console.log(key)//a
+}
+
+myObject.propertyIsEnumerable("a") //true
+myObject.propertyIsEnumerable("b") //false
+
+Object.keys(myObject) //['a']
+Object.getOwnPropertyNames(myObject) //['a','b']
+```
+
+#### 遍历
+
 
 
 
