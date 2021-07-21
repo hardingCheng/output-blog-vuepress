@@ -1909,3 +1909,263 @@ A.html
 </script>
 ```
 
+### ES6 Module和Commonjs区别
+
+1. `ES6 Module`静态引入，编译时引入
+2. `Commonjs`动态引入，执行时引入
+3. 只有`ES6 Module`才能静态分析，实现`Tree-Shaking`
+
+```js
+//Commonjs
+let apiList = require('../config/api.js')
+if(isDev) {
+ // 动态也引入执行时引入
+ apiList = require('../config/api.js')
+}
+
+//ES6 Module
+import apiList form '../config/api.js'
+if(isDev) {
+ // 编译时报错，只能静态引入
+ import apiList from '../config/api_dev.js'
+}
+```
+
+`Scope Hosting`:(作用域托管)
+
+```js
+// hello.js
+export default 'hello'
+
+// main.js
+import str from './hello.js'
+console.log(str)
+```
+
+### Webpack性能优化
+
+模块1：
+
+- `webpack`性能优化-产出代码
+
+1. 小图片`base64`编码
+2. `bundle`加`hash`
+3. 懒加载
+4. 提供公共代码
+5. 使用`CDN`加速
+6. 使用`production`
+7. `Scope Hosting`
+
+- 代码体积更小
+- 创建函数作用域更小
+- 代码可读性更好
+
+`babel`:前端开发环境必备工具,同`webpack`，需要了解基本的配置和使用
+
+环境搭建和基本配置：`babel-polyfill，babel-runtime`
+
+环境搭建：`.babelrc`配置：`presets`和`plugins`
+
+`core-js`,`regenerator`结合，如何按需引入`babel-polyfill`，`Babel 7.4`之后弃用`babel-polyfill`，推荐直接使用`core-js`和`regenerator`。
+
+`babel-polyfill`按需引入：文件较大，只有一部分功能，无需全部引入，配置按需引入。
+
+`babel-polyfill`的问题？
+
+1. 会污染全局环境；
+2. 如果做一个独立的`web`系统，则无碍；
+3. 如果做一个第三方`Lib`,则会有问题；
+
+`babel-runtime`不会污染全局环境：
+
+1. 基本配置
+2. 高级配置
+3. 优化打包效率
+4. 优化产生代码
+5. 构建流程概述
+6. `babel`
+
+> `babel-polyfill`和`babel-runtime`的区别
+
+1. `babel-polyfill`会污染全局
+2. `babel-runtime`不会污染全局
+3. 产生第三方`lib`要用`babel-runtime`
+
+细分：
+
+拆分配置和`merge`；启动本地服务；处理`ES6`；处理样式；处理图片；多入口；抽离css文件；抽离公共代码；懒加载；处理JSX；处理Vue；webpack优化构建速度：优化`babel-loader`，`IgnorePlugin`，`noParse`，`happyPacK`，`ParalleIUglifyPlugin`。
+
+> 前端为何打包构建，好处？
+
+1. 体积更小（`Tree-Shaking`，压缩，合并），加载更快
+2. 编译高级语言或语法（`TS，ES6+，模块化，SCSS`）
+3. 兼容性和错误检查（`Polyfill，postcss，eslint`）
+
+通过打包和构建，可以统一，高效的开发环境；统一的构建流程和产出标准，集成公司构建规范（提测，上线等）。
+
+### 
+
+
+
+模块2：
+
+> module, chunk, bundle的区别？
+
+1. `module`各个源码文件，`webpack`中一切皆模块
+2. `chunk`多模块合并成的，如`entry`，`import()`，`splitChunk`
+3. `bundle`最终的输出文件
+
+`loader`和`plugin`的区别：`loader`模块转换器，如`less-css`；`plugin`扩展插件，如：`HtmlWebpackPlugin`。
+
+`babel`和`webpack`的区别？
+
+1. `babel`-`js`新语法编译工具，不关心模块化。
+2. `webpack`-打包构建工具，是多个`loader`，`plugin`的集合
+
+如何产生一个`lib`？参考`webpack.dll.js ouput library.`
+
+```js
+output: {
+ // lib的文件名
+ filename: 'lodash.js',
+ // 输出lib到dist目录下
+ path: disPath,
+ library: 'lodash',
+},
+```
+
+为何`Proxy`不能被`Polyfill`?
+
+1. 如`Class`可以用`function`模拟
+2. 如`Promise`可以用`callback`来模拟
+3. 但`Proxy`的功能用`Object.defineProperty`无法模拟
+
+> `webpack`如何实现懒加载
+
+- `import()`
+- 结合`Vue React`异步组件
+- 结合`Vue-router,React-router`异步加载路由
+
+> webpack优化构建速度（可用于生产环境）
+
+- 优化`babel-loader`
+- `IgnorePlugin`
+- `noParse`
+- `happyPack`
+- `ParalleIUglifyPlugin`
+
+> `webpack`优化构建速度（不用于生产环境）
+
+- 自动刷新
+- 热更新
+- DIIPlugin
+
+### HTTP协议
+
+1. HTTP协议的主要特点
+2. HTTP报文的组成部分
+3. HTTP方法
+4. POST和GET的区别
+5. HTTP状态码
+6. 什么是持久连接
+7. 什么是管线化
+
+HTTP报文的组成部分
+
+请求报文：请求行，请求头，空行，请求体；响应报文：状态行，响应头，空行，响应体。请求行包含：http方法，页面地址，http协议以及版本；请求头包含：key-value值，告诉服务器端我要什么内容。
+
+HTTP协议类的主要特点：简单快速，灵活，无连接，无状态。
+
+HTTP协议类，HTTP方法：GET，获取资源，POST，传输资源，PUT，更新资源，DELETE，删除资源，HEAD，获得报文首部。
+
+HTTP协议类：POST和GET的区别：1.GET在浏览器回退时是无害的，而POST会再次提交请求；2.GET产生的URL地址可以被收藏，而POST不可以；3.GET请求会被浏览器主动缓存，而POST不会，除非手动设置；4.GET请求只能进行url编码，而POST支持多种编码方式；5.GET请求参数会被完整保留在浏览器历史记录里，而POST中的参数不会保留；6.GET请求在URL中传送的参数是有长度限制的，而POST是没有限制的；7.对参数的数据类型，GET只接受ASCII字符，而POST没有限制；8.GET比POST更不安全，因为参数直接暴露在URL中，所以不是用来传递敏感信息的；9.GET参数通过URL传递的，POST放在Request body中。
+
+`HTTP`状态码：
+
+- `1xx`:指示信息，表示请求已接收，继续处理；
+- `2xx`:成功，表示请求已被成功接收；
+- `3xx`:重定向，要完成请求必须进行更进一步的操作；
+- `4xx`:客户端错误，请求有语法错误或请求无法实现；
+- `5xx`:服务器错误，服务器未能实现合法的请求。
+- `200` ok: 客户端请求成功
+- `206 Partial Content`: 客户发送了一个带有Range头的GET请求，服务器完成了它
+- `301 Moved Permanently`: 所请求的页面已经转移至新的url
+- `302 Found`: 所有请求的页面已经临时转移至新的url
+- `304 Not Modified`：客户端有缓冲的文档并发出了一个条件性的请求 服务器告诉客户，原来缓冲的文档还可以继续使用
+- `400` 客户端请求有语法错误，不能被服务器所理解
+- `401` 请求未经授权，这个状态码必须和`www-Authenticate`报头域一起使用
+- `403` 对被请求页面的访问被禁止
+- `404` 请求资源不存在
+- `505` 服务器发送不可预期的错误，原来缓冲的文档还可以继续使用
+- `503` 请求未完成，服务器临时过载或宕机，一段时间后可能恢复正常
+
+HTTP协议采用“请求-应答”模式，当使用普通模式，即非`keep-alive`模式时，每个请求/应答 客户和服务器都要新键一个连接，完成之后立即断开连接（HTTP协议为无连接的协议）。
+
+当使用`keep-alive`模式（又称为持久连接，连接重用）时，`keep-alive`功能使客户端到服务器端的连接有效，当出现对服务器的后继请求时，`keep-alive`功能避免了建立或重新建立连接。
+
+### 浏览器缓存？？？？？？？
+
+### 渲染机制？？？？？
+
+1. 什么是`DOCTYPE`及作用
+2. 浏览器渲染过程
+3. 重排`Reflow`
+4. 重绘`Repaint`
+5. 布局`Layout`
+
+> 页面性能
+
+提升页面性能的方法：
+
+1. 资源压缩合并，减少HTTP请求
+2. 非核心代码异步加载，异步加载的方式，
+3. 利用浏览器缓存
+4. 使用CDN
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## 其他项目问题
+
+### 项目流程
+
+1. 项目分多人，多角色参与
+2. 项目分多阶段
+3. 项目需要计划和执行
+
+需求分析：了解背景，质疑需求是否合理，需求是否闭环，开发难度如何，是否需要其他支持，不要急于给排期。
+
+技术方案设计：1，求简，不过渡设计；2，产出文档，复盘；3，找准设计重点，组件怎么设计；4，组内评审；5，和`RD，CRD`沟通；6，发出会议结论。
+
+完整项目流程：各个角色（需求分析），技术方案设计，开发，联调，测试，上线。
+
+如何保证代码质量，开发，项目质量？
+
+1. 如何反馈排期
+2. 符合开发规范
+3. 写出开发文档
+4. 及时写单元测试
+5. `Mock API`
+6. `Code Review`
+
+联调：1，和RD，CRD技术联调；2，让UE确定视觉效果；3，让PM确定产品功能。
+
+加需求：走需求变更流程，按规定走，发起项目组和leader的评审，重新评估排期。
+
+测试：提测发邮件，抄送项目组，测试问题要详细记录。
+
+有问题及时沟通，QA和FE天生信息不对称，当面讨论，让QA帮你复现，需要特定设备才能复现。沟通，及时识别风险，及时汇报。
+
+
+

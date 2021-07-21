@@ -1668,7 +1668,10 @@ for(let key of Object.values(enumerable)) console.log(key)
 for(let key of Object.entries(enumerable)) console.log(key)
 ```
 
+`for...of `只能遍历对象中有内置的`@@iterator`
+
 #### for...in  只能处理可枚举的对象属性
+
 ```js
 let object = {
     a : 1, 
@@ -4036,6 +4039,42 @@ Object.getOwnPropertyNames(myObject) //['a','b']
 #### 遍历
 
 `for...in...`遍历对象是无法直接获取属性值的，因为实际上遍历的是对象中的所有可枚举属性，需要动手获取属性值。
+
+使用`for...of..`遍历对象。
+
+```js
+var myObject = {
+  a:2,
+  b:3
+}
+Object.defineProperty(m,Object,Symbol.iterator,{
+  enumerable:false,
+  writable:false,
+  configurable:true,
+  value:function(){
+    var o = this
+    var indx =0
+    var ks = Object.keys(o)
+    // 闭包
+    return {
+      next:function(){
+        return {
+          value:o[ks[indx++]],
+          done:(indx > ks.length)
+        }
+      }
+    }
+  }
+})
+var it = myObject[Symbol.iterator]()
+it.next() //{value:2,done:false}
+it.next() //{value:3,done:false}
+it.next() //{value:undefined,done:true}
+
+for(var v of myOject){
+  console.log(v)
+}
+```
 
 
 

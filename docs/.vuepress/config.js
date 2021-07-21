@@ -59,12 +59,13 @@ module.exports = {
             },
           ]
         },
-        { text: '面试', 
+        { text: '面试',
           items: [
             {
               text: 'js',
               items: [
                 { text: 'JavaScript', link: '/interview/js' },
+                { text: '大厂面经总结', link: '/interview/interviewq' },
               ]
             },
             {
