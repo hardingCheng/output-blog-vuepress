@@ -4076,6 +4076,106 @@ for(var v of myOject){
 }
 ```
 
+### **混合对象"类"**
+
+在子类（而不是它们创建的实例对象！）中也可以相对引用它继承的父类，这种`相对`引用通常被称为`super`。
+
+子类得到的仅仅是继承自父类行为的一份副本。子类对继承到的一个方法进行”重写“，不会影响父类中的方法，这两个方法互不影响，因此才能使用相对多态引用访问父类中的方法。（如果重写会影响父类的方法，那重写之后父类中的原始方法就不存在了，自然也无法运用）。
+
+多态并不表示子类和父类有关联，子类得到的只是父类的一份副本。类的继承其实就是复制。
+
+模拟类的复制行为（继承）,这个方法就是`混入`。
+
+1. **显示混入**
+
+```js
+function mixin(sourceObj,targetObj){
+  for(var key in sourceObj){
+    if(!(key in targetObje)){
+      targetObj[key] = sourceObj[key]
+    }
+  }
+  return targetObj
+}
+var Vehicle = {
+  engines:1,
+  ignition:function(){
+    console.log("Turning on my engine")
+  },
+  dirve:function(){
+    this.ignition()
+    console.log("Steering and moving forward")
+	}
+}
+
+var Car = mixin(Vehicle,{
+  wheels:4,
+  drive:function(){
+    Vehicle.dirve.call(this)
+    console.log("Rolling on all" + this.wheels+" wheels!")
+  }
+})
+```
+
+2. **寄生继承**
+
+```js
+function Vehicle() {
+    this.engines = 1
+}
+
+Vehicle.prototype.igniton = function () {
+    console.log("Turning on my engine")
+}
+
+Vehicle.prototype.drive = function (){
+    this.igniton()
+    console.log("Steering and moving forward")
+}
+
+function Car() {
+    let car = new Vehicle()
+    car.wheels = 4
+    let vehDriver = car.drive
+    car.drive  = function (){
+        vehDriver.call(this)
+        console.log("Rolling on all" + this.wheels + " wheels")
+    }
+    return car
+}
+let myCar = new Car()
+myCar.drive()
+Turning on my engine
+Steering and moving forward
+Rolling on all4 wheels
+```
+
+3. **隐式混入**
+
+```js
+let Something = {
+    cool:function(){
+        this.greeting = "Hello World"
+        this.count = this.count ? this.count + 1 :1
+    }
+}
+Something.cool()
+Something.greeting
+Something.count
+
+let Another = {
+    cool:function(){
+        //隐式的吧Something混入Another
+        Something.cool.call(this)
+    }
+}
+Another.cool()
+Another.greeting
+Another.count
+```
+
+
+
 
 
 
