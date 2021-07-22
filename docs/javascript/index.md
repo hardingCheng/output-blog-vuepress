@@ -4174,13 +4174,90 @@ Another.greeting
 Another.count
 ```
 
+### **原型**
 
+#### **[[Prototype]]**
 
+`JavaScript`中的对象有一个特殊的`[[Prototype]]`内置属性，其实就是对于其他对象的引用。几乎所有的对象在创建时候`[[Prototype]]`属性都会被赋予一个非空值。
 
+```js
+//创建一个关联到anotherObject的对象
+var myObject = Object.create(anotherObjetc)
+for(var k in myObject){
+  console.log("found:" + k)
+}
+("a" in myObject)
+```
 
+通过各种语法进行属性检查查找都会查找`[[Prototype]]`链，直到找到属性或者查找完整条原型链。
 
+1. **Object.prototype**
 
+所有`普通`的`[[Prototype]]`链最终都会指向内置的`Object.prototype`。由于所有的“普通”(内置，不是特定主机的扩展)对象都“源于”(或者说把`[[Prototype]]`链的顶端设置为)这个`Object.prototype`对象，所有它包含`JavaScript`中许多通用的功能。
 
+2. **属性设置和屏蔽**
+
+```js
+myObject.foo = "bar"
+```
+
+如果`foo`不是直接存在于`myObject`中，`[[Prototype]]`链就会被遍历，类似`[[Get]]`操作。如果原型链上找不到`foo`，`foo`就会被直接添加到`myObject`上。
+
+如果属性名`foo`即出现在`myObject`中也出现在`myObject`的`[[Prototype]]`链上层，那就会发生屏蔽。`myObject`中包含的`foo`属性会屏蔽原型链上层的所有`foo`属性，因为`myObject.foo`总会选择原型链中最底层的`foo`属性。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210722075842.png)
+
+如果需要屏蔽方法进行委托的话就不得不使用丑陋的显示伪多态。
+
+```js
+var anotherObejct = {
+  a:2
+}
+var myObject = Obejct.create(anotherObject)
+anotherObject.a //2
+myObject.a //2
+anotherObejct.hasOwnPrototype("a") //true
+myObject.hasOwnPrototype("a") //false
+
+myObject.a++ //隐式屏蔽！myObject.a = myObject.a + 1
+
+anotherObject.a //2
+myObject.a //3    
+myObject.hasOwnPrototype("a") //true
+```
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210722080657.png)
+
+#### **类**
+
+在`JavaScript`中，类如法描述对象的行为（因为根本不存在类！）对象直接定义自己的行为。`JavaScript`中只有对象。
+
+1. **类函数**
+
+```js
+function Foo(){
+	//....
+}
+Foo.prototype; //{}
+```
+
+通过调用`new Foo()`创建的每个对象将最终被`[[Prototype]]`链接到这个`“Foo.prototype”`对象。
+
+```js
+function Foo(){  
+  //....
+}
+var a = new Foo()
+Object.getPrototypeOf(a) === Foo.protptype //true
+```
+
+通过调用`new Foo()`创建`a`,`a`内部的`[[Prototype]]`链接到这个`“Foo.prototype”`对象。
+
+最后我们得到了两个对象，他们之间相互关联，就是这样。我们并没有初始化一个类，实际上我们并没有从“类”中复制任何行为到一个对象中，只是让两个对象相互互联。
+
+**关于名称**
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210722082657.png)
 
 
 
