@@ -126,7 +126,7 @@ a[href$='.PDF' i] <!-- 不区分大小写 -->   .pdf、.PDF、.Pdf  只针对于
 #### CSS特性
 
 ##### 继承性
-CSS 属性很多，但并不是所有的属性默认都是能继承父元素对应属性的，那哪些属性存在默认继承的行为呢？一定是那些不会影响到页面布局的属性，可以分为如下几类：
+CSS 属性很多，但并不是所有的属性默认都是能继承父元素对应属性的，那哪些属性存在默认继承的行为呢？一定是那些不会影响到页面布局的属性，可以分为如下几类： 
 - 字体相关：`font-family`、`font-style`、`font-size`、`font-weight` 等；
 - 文本相关：`text-align`、`text-indent`、`text-decoration`、`text-shadow`、`letter-spacing`、`word-spacing`、`white-space`、`line-height`、`color` 等；
 - 列表相关：`list-style`、`list-style-image`、`list-style-type`、`list-style-position` 等；
@@ -178,13 +178,13 @@ CSS 属性很多，但并不是所有的属性默认都是能继承父元素对�
 `em:`
 
 em 是 CSS 中的相对长度单位中的一个。居然是相对的，那它到底是相对的谁呢？它有 2 层意思：
-• 在 font-size 中使用是相对于父元素的 font-size 大小，比如父元素 font-size: 16px，当给子元素指定 font-size: 2em 的时候，经过计算后它的字体大小会是 32px；
+• 在 font-size 中使用是相对于`父元素的 font-size 大小`，比如父元素 font-size: 16px，当给子元素指定 font-size: 2em 的时候，经过计算后它的字体大小会是 32px；
 • 在其他属性中使用是相对于自身的字体大小，如 width/height/padding/margin 等；
 我们都知道每个浏览器都会给 HTML 根元素 html 设置一个默认的 font-size，而这个值通常是 16px。这也就是为什么 1em = 16px 的原因所在了。
 
 `rem:`
 
-rem(root em) 和 em 一样，也是一个相对长度单位，不过 rem 相对的是 HTML 的根元素 html。
+rem(root em) 和 em 一样，也是一个相对长度单位，不过 `rem 相对的是 HTML 的根元素 html`。
 rem 由于是基于 html 的 font-size 来计算，所以通常用于自适应网站或者 H5 中。
 比如在做 H5 的时候，前端通常会让 UI 给 750px 宽的设计图，而在开发的时候可以基于 iPhone X 的尺寸 375px * 812px 来写页面，这样一来的话，就可以用下面的 JS 依据当前页面的视口宽度自动计算出根元素 html 的基准 font-size 是多少。
 
@@ -223,17 +223,90 @@ rem 由于是基于 html 的 font-size 来计算，所以通常用于自适应�
 ```
 
 `vw/vh`
-vw 和 vh 分别是相对于屏幕视口宽度和高度而言的长度单位：
-• 1vw = 视口宽度均分成 100 份中 1 份的长度；
-• 1vh = 视口高度均分成 100 份中 1 份的长度；
+`vw `和` vh `分别是相对于屏幕视口宽度和高度而言的长度单位：
+• `1vw `= 视口宽度均分成 100 份中 1 份的长度；
+• `1vh` = 视口高度均分成 100 份中 1 份的长度；
 在 JS 中 100vw = window.innerWidth，100vh = window.innerHeight。
 
 `vw/vh `的出现使得多了一种写自适应布局的方案，开发者不再局限于 rem 了。
 相对视口的单位，除了 vw/vh 外，还有 vmin 和 vmax：
-• vmin：取 vw 和 vh 中值较小的；
-• vmax：取 vw 和 vh 中值较大的；
+• `vmin`：取 vw 和 vh 中值较小的；
+• `vmax`：取 vw 和 vh 中值较大的；
 
-##### 媒体查询
+`calc`计算值  + - * / 
+
+```css
+p {
+  width:calc(90% - 2em)
+}
+// 算子可以是数字，百分数，也可以是长度
+```
+
+##### 颜色
+
+具名颜色
+
+```css
+h1 {
+  color:red | navy | bule
+}
+```
+
+RGB
+
+```css
+/* 颜色值中不能混用整数和百分数 */
+rgb(100%,100%,100%)
+
+rgb(300%,300%,300%)  /* 100%,100%,100% */
+rgb(0%,-300%,-300%)  /* 0%,0%,0% */
+```
+
+RGBa 增加了透明度选项
+
+```css
+rgba(255,255,255,0.5)
+rgba(100%,100%,100%,0.5)
+```
+
+十六进制RGB值
+
+```css
+h1 {
+  color:#FF0000
+}
+h1 {
+  color:#000000
+}
+h1 {
+  color:#000
+}
+```
+
+颜色关键字
+
+```css
+/*透明色*/
+main {
+  color:gray;
+  border-color:transparent
+}
+/*计算颜色*/
+main {
+  color:gray;
+  border-color:currentColor
+}
+```
+
+##### 角度
+
+`deg` 360度
+
+`grad` 400分度
+
+`rad` 弧度 2π
+
+`trun` 圈数
 
 ##### 自定义属性
 之前我们通常是在预处理器里才可以使用变量，而现在 CSS 里也支持了变量的用法。通过自定义属性就可以在想要使用的地方引用它。
@@ -245,7 +318,10 @@ vw 和 vh 分别是相对于屏幕视口宽度和高度而言的长度单位：
 :root {
     --theme-color: red;
 }
-
+html {
+  --base-color:#639;
+  --highlight-color:#AEA;
+}
 /*<!-- 使用变量 -->*/
 h1 {
     color: var(--theme-color);
