@@ -4259,5 +4259,100 @@ Object.getPrototypeOf(a) === Foo.protptype //true
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210722082657.png)
 
+继承意味着复制操作，`Javascript`（默认）并不会复制对象属性。相反，`Javascript` 会在两个对象之间创建一个关联，这样一个对象就可以通过`委托`访问另一个对象的属性和函数。`委托`这个术语可以更加准确地描述 `Javascript` 中对象的关联机制。
 
+还有个偶尔会用到的 Javascript 术语`差异继承`。基本原则是在描述对象行为时，使用其`不同于普遍描述的特质`。举例来说，描述汽车时你会说汽车是有四个轮子的一种交通工具，但是你不会重复描述交通工具具备的通用特性（比如引擎）。
+
+但是和原型继承一样，差异继承会更多是你脑中构建出的模型，而非真实情况。它忽略了个事实，那就是对象` B `实际上并不是被差异构造出来的，我们只是定义了` B` 的一些指定特性，其他没有定义的东西都变成了“洞”。而这些洞（或者说缺少定义的空白处）最终会被委托行为“填满”。
+
+默认情况下，对象并不会像差异继承暗示的那样通过复制生成。因此，差异继承也不适合用来描述 Javascript 的[[Prototype]]机制。
+
+1. **构造函数**
+
+```js
+function Foo(){
+  // ...
+}
+var a = new Foo()
+
+
+
+function Foo(){
+  // ...
+}
+Foo.prototype.constructor === Foo //true
+var a = new Foo()
+a.constructor === Foo //true
+```
+
+`Foo. Prototype` 默认（在代码中第一行声明时！）有一个公有并且不可枚举的属性。`.constructor`，这个属性引用的是对象关联的函数（本例中是 `Foo`）。可以看到通过`“构造函数”`调用 `new Foo（）`创建的对象也有一个，`constructor` 属性，指向“创建这个对象的函数”。
+
+- **构造函数还是调用**
+
+当你在普通的函数调用前面加上 `new` 关键字之后，就会把这个函数调用变成一个`“构造函数调用”`。实际上，`new` 会劫持所有普通函数并用`构造对象的形式来调用它`。
+
+```js
+function NothingSpecial(){
+  cosole.log("Dont't mind me!")
+}
+var a = new NothingSpecial()
+ // Dont't mind me!
+
+a // {}
+```
+
+`Nothingspecial` 只是一个普通的函数，但是使用 `new` 调用时，它就会构造一个对象并赋值给 `a`，这看起来像是 `new` 的一个副作用（无论如何都会构造一个对象）。这个调用是一个构造函数调用，但是 `NothingSpecial `本身并不是一个构造函数。
+
+换句话说，在 `Javascript` 中对于“构造函数”最准确的解释是，所有带 `new` 的函数调用。函数不是构造函数，但是当且仅当使`用 new 时，函数调用会变成“构造函数调用”`
+
+2. **技术**
+
+```js
+function Foo(name){
+    this.name = name
+}
+Foo.prototype.myName = function(){ 
+    return this.name
+}
+var a = new Foo("a")
+var b = new Foo("b")
+ 
+a.myName() //a
+b.myName() //b
+```
+
+因此，在创建的过程中，`a` 和` b` 的内部`[[Prototype]]`都会`关联`到` Foo. Prototype `上。当 `a` 和` b `中无法找到`myName` 时，它会通过`委托`在` Foo. Prototype `上找到。
+
+实际上，`.constructor` 引用同样被`委托`给了` Foo. Prototype`，而 `Foo. Prototype. constructor `默认指向 Foo。
+
+`Foo. Prototype `的 `constructor` 属性只`是 Foo 函数`在`声明时的默认属性`。如果你创建了一个新对象并替换了函数默认的`.prototype `对象引用，那么新对象并`不会`自动获得`.constructor 属性`。
+
+```js
+function Foo(){ /*....*/ }
+Foo.prototype = { /*....*/ } //创建一个新原型对象
+
+var a1 = new Foo()
+a1.constructor === Foo //false
+a1.constructor === Object //true
+```
+
+`a1 `并没有，`constructor` 属性，所以它会委托`[[Prototype]]`链上的` Foo.prototype`。但是这个对象也没有，`constructor` 属性（不过默认的` Foo.prototype `对象有这属性！），所以它会继续委托，这次会委托给委托链顶端的` Object. prototype`。这个对象有`constructor` 属性，指向内置的` Object（）`函数。
+
+```js
+function Foo(){ /*....*/ }
+Foo.prototype = { /*....*/ } //创建一个新原型对象
+
+// 需要修复在Foo.prototype上修复丢失的.constructor属性
+// 新对象属性起到Foo.prototype的作用
+Object.defineProperty(Foo.prototype,"constructor",{
+    enumerable:false,
+    writable:false,
+    configurable:true,
+    value:Foo //让.constructor指向Foo
+})
+```
+
+`.constructor `并不是一个不可属性。它是不可枚举的，但是它的值是可写的（可以被修改）。此外，你可以给任意`[[Prototype]]`链中的任意对象添加一个名为 `constructor` 的属性或者对其进行修改，你可以任意对其赋值。
+
+和`[[Get]]`算法査找`[[Prototype]]`链的机制一样，`.constructor `属性引用的目标可能和你想的完全不同。
 
