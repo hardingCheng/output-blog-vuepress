@@ -4356,3 +4356,136 @@ Object.defineProperty(Foo.prototype,"constructor",{
 
 和`[[Get]]`算法査找`[[Prototype]]`链的机制一样，`.constructor `属性引用的目标可能和你想的完全不同。
 
+#### (原型)继承
+
+实际上，我们已经了解了通常被称作`原型继承`的机制，`a` 可以“继承”`Foo.prototype `并访问` Foo.prototype `的 `myName（）`函数。但是之前我们只把继承看作是类和类之间的关系。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210725075842.png)
+
+展示出对象（实例）`a1` 到` Foo.prototype` 的`委托`关系，还展示出` Bar.prototype` 到` Foo.prototype `的`委托`关系，而`后者和类继承很相似`，只有箭头的方向不同。`图中由下到上的箭头表明这是委托关联，不是复制操作`。
+
+典型的”原型风格“继承
+
+```js
+function Foo(name){
+  this.name = name
+}
+Foo.prototype.myName = function(){
+  return this.name
+}
+function Bar(name,label){
+  Foo.call(this,name)
+  this.label = label
+}
+// 我们创建了一个新的Bar.prototype的对象并关联到Foo.prototype
+Bar.prototype = Object.create(Foo.prototype)
+
+// 注意！现在没有Bar.prototype.constructor了
+// 如果你需要这个属性的话可能需要手动修复一下
+Bar.prototype.myLabel = function(){
+  return this.label
+}
+var a = new Bar("a","obj a")
+a.myName() //"a"
+a.myLabel() //"obj a"
+```
+
+这段代码的核心部分就是语句` Bar.prototype=Object.create (Foo.prototype）`。调用`Object.create (..) `会凭空创建一个“新”对象并把新对象内部的`[[Prototype]]`关联到你指定的对象（本例中是 `Foo.prototype`）。
+
+换句话说，这条语句的意思是：“创建一个新的 `Bar.prototype `对象并把它关联到` Foo.prototype`
+
+```js
+// 我们创建了一个新的Bar.prototype的对象并关联到Foo.prototype
+// ES6之前
+Bar.prototype = Object.create(Foo.prototype)
+// ES6之后
+Object.setPrototypeOf(Bar.prototype ，Foo.prototype)
+```
+
+检查一个实例（JavaScript中的对象）的继承祖先（JavaScript中的委托关联）通常被称为`内省`或者`反射`。
+
+```js
+function Foo(){
+  // ...
+}
+Foo.prototype.blah = ....
+var a = new Foo()
+```
+
+通过内省找出`a`的`”祖先“（委托关联）`。
+
+```js
+a  instanceof Foo //true
+// a 的整个[[Prototype]]链中是否有Foo.prototype指向的对象 
+
+
+Foo.prototype.isPrototypeOf(a) //true
+// 在a的整个[[Prototype]]链中是否出现过Foo.prototype
+b.isPrototypeOf(c)  //b是否出现在c的[[Prototype]]链
+
+
+a.__proto__ === Foo.prototype //true
+```
+
+#### 对象关联
+
+`[[Prototype]]`机制就是存在于对象中的一个`内部链接`，它会引用其他对象。
+
+1. **创建关联**
+
+`[[Prototype]]`建立对象间的关联。
+
+```js
+var foo = {
+  something:function(){
+    console.log("something!")
+  }
+}
+var bar = Obejct.create(foo)
+bar.something() //something
+```
+
+`Object.create (...) `会创建一个新对象`（bar）`并把它关联到我们指定的对象`（foo）`，这样我们就可以充分发挥`[[Prototy]]`机制的威力（委托）并且避免不必要的麻烦（比如使用 `new` 的构造函数调用会生成，`.prototype `和，`.constructor `引用）。
+
+`不需要类创建两个对象之间的关系，只需要用过委托来关联对象就足够了。`
+
+```js
+if(!Object.create){
+  Object.create = function(o){
+    function F(){}
+    F.prototype = o
+    return new F()
+  }
+}
+```
+
+```js
+var anotherObject = {
+    a:2
+}
+var myObject = Object.create(anotherObject,{
+    b:{
+        enumerable:false,
+        writable:true,
+        configurable:false,
+        value:3
+    },
+    c:{
+        enumerable:true,
+        writable:false,
+        configurable:false,
+        value:4
+    }
+})
+```
+
+2. **关联关系是备用的**
+
+对象之间的关联关系是处理”缺失“属性或者方法时的一种备用选项。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210725094417.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210725094456.png)
+
+### 行为委托
+
