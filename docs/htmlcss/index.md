@@ -328,7 +328,54 @@ h1 {
 }
 ```
 
+##### 字体
+
+```css
+p {
+  font-family:Times,'Times New Roman','New Century Schoolbook',Georgia,'Karrank%';
+}
+/*支持字体格式  EOT(embedded-opentype) OTF(opentype) SVG(svg) TTF(truetype) WOFF(woff)*/
+@font-face {
+  font-family:"SwitzeraADF";
+  font-weight:normal;
+  font-style:normal;
+  font-stretch:normal;
+  src:url("SwitzeraADF-Regular"),
+    url("SwitzeraADF-Regular.otf") format("opentype"),
+    url("/fonts/SwitzeraADF-Regular.otf");
+  unicode-range:U+590-5FF;
+}
+
+p {
+  /*字重*/
+  font-weight；normal | bold | bolder | lighter | 100 ~ 900;
+  font-size:xx-small | x-small | small | medium | large | x-large | xx-large | smaller | larger | 12px | 35%;
+  font-style:italic | oblique(从字体方面) | normal;
+  font-stretch: normal | ultra-condensed | extra-condensed | condensed | semi-condensed | semi-expanded | expanded | extra-expanded | ultra-expanded;
+  
+  
+  /*font: font-style font-weight font-size/line-height font-family;*/
+  /*必须严格按照下面的格式，顺序不饿改变*/
+  /*font: italic 700  16px 'Microsoft yahei';/*
+}
+```
+
+##### 文本属性
+
+
+
+
+
+
+
+
+
+
+
+
+
 ##### 1px 边框解决方案
+
 Retina 显示屏比普通的屏幕有着更高的分辨率，所以在移动端的 1px 边框就会看起来比较粗，为了美观通常需要把这个线条细化处理。
 
 ```css
