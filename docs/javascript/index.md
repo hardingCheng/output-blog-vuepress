@@ -693,43 +693,6 @@ const loadedImages = function(...imgs){
 节流实现原理是通过定时器以和时间差做判断。定时器有延迟的能力，事件一开始不会立即执行，事件结束后还会再执行一次；而时间差事件一开始就立即执行，时间结束之后也会立即停止。
 结合两者的特性封装节流函数：
 ```javascript
-const throttle = (fn,waiting=1000,option)=>{
-    let preTime = new Date(0).getTime(),
-        options = option || {
-            firstTime:true,
-            endTime:false
-        },
-        timer;
-    let _throttle = (...args) => {
-        let newTime = new Date().getTime();
-        if (!options.firstTime){
-            if (timer) return
-            timer = setTimeout(() => {
-                fn.apply(fn,args);
-                timer = null
-            },waiting)
-        }else if (newTime - preTime > waiting){
-            fn.apply(fn,args);
-            preTime = newTime
-        }else if (options.endTime) {
-            timer = setTimeout(() => {
-                fn.apply(fn,args);
-                timer = null
-            },waiting)
-        }
-    }
-    _throttle.cancel = () => {
-        preTime = 0
-        clearTimeout(timer);
-        time = null
-    }
-    return _throttle
-}
-
-
-
-
-
 //防抖
 function debounce(handle, delay) {
     var timer = null;
@@ -760,33 +723,81 @@ function throttle(handler, wait) {
 1. 函数防抖(debounce)
    - **概念：** `在事件被触发n秒后再执行回调，如果在这n秒内又被触发，则重新计时。`
    - **生活中的实例：** `如果有人进电梯（触发事件），那电梯将在10秒钟后出发（执行事件监听器），这时如果又有人进电梯了（在10秒内再次触发该事件），我们又得等10秒再出发（重新计时）。`**生活中的实例：** `我们知道目前的一种说法是当 1 秒内连续播放 24 张以上的图片时，在人眼的视觉中就会形成一个连贯的动画，所以在电影的播放（以前是，现在不知道）中基本是以每秒 24 张的速度播放的，为什么不 100 张或更多是因为 24 张就可以满足人类视觉需求的时候，100 张就会显得很浪费资源。`
+   - **事件响应函数在一段规定时间（前/后）才执行。如果在规定时间内，再次触发，重新计算时间。**
 2. 函数节流(debounce)
    - **概念：** `规定一个单位时间，在这个单位时间内，只能有一次触发事件的回调函数执行，如果在同一个单位时间内某事件被触发多次，只有一次能生效。`
    - **生活中的实例：** `我们知道目前的一种说法是当 1 秒内连续播放 24 张以上的图片时，在人眼的视觉中就会形成一个连贯的动画，所以在电影的播放（以前是，现在不知道）中基本是以每秒 24 张的速度播放的，为什么不 100 张或更多是因为 24 张就可以满足人类视觉需求的时候，100 张就会显得很浪费资源。`、
 
 对于函数防抖，有以下几种应用场景：
 
-- 给按钮加函数防抖防止表单多次提交。
-- 对于输入框连续输入进行AJAX验证时，用函数防抖能有效减少请求次数。
+- 防止表单多次提交。
+- 对于输入框连续输入进行AJAX验证时，用函数防抖能有效减少请求次数。搜索框输入查询（监听输入框输入内容，设定每隔一段时间访问接口。
 - 判断`scroll`是否滑到底部，`滚动事件`+`函数防抖`
+- 浏览器窗口缩放时，resize事件。
 
 总的来说，适合多次事件**一次响应**的情况
 
 ```js
-function debounce(fn, wait) {
-  var timer = null;
-  return function () {
-      var context = this
-      var args = arguments
-      if (timer) {
-          clearTimeout(timer);
-          timer = null;
-      }
-      timer = setTimeout(function () {
-          fn.apply(context, args)
-      }, wait)
+
+function debounce(fn, wait = 200, immediate = false) {
+  let timer = null, 
+      isEnd = true, // 默认后执行  用变量来判断先后执行
+      result
+  let debounced = function (...args) {
+    if (timer) clearTimeout(timer)
+    if (immediate) { // 立即执行
+      // 改变this指向
+      isEnd && (result = fn.apply(this, args))
+      isEnd = false
+    }
+    // 后执行
+    timer = setTimeout(() => {
+      (!immediate) && (result = fn.apply(this, args))
+      isEnd = true
+    }, wait)
+    return result
   }
+  debounced.cancel = function () {
+    if (timer) clearTimeout(timer)
+    timer = null
+  }
+  return debounced
 }
+
+
+
+
+//解决函数异步问题 
+//  配合async 和  awit使用
+function debounce(fn, wait, immediate) {
+  let timer = null, result
+  let debounced = function (...args) {
+    // 使用Promise
+    return new Promise(res => {
+      if (timer) clearInterval(timer)
+      if (immediate) {// 立即执行
+        if (!timer) {
+          result = fn.apply(this, args)
+          res(result)
+        }
+        timer = setTimeout(() => {
+          timer = null
+        }, wait);
+      } else {
+        timer = setTimeout(() => {
+          result = fn.apply(this, args)
+          res(result)
+        }, wait);
+      }
+    })
+  }
+  debounced.cancel = function () {
+    if (timer) clearTimeout(timer)
+    timer = null
+  }
+  return debounced
+}
+
 
 var fn = function () {
   console.log('boom')
