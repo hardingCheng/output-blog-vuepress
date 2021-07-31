@@ -362,6 +362,28 @@ p {
 
 ##### 文本属性
 
+```css
+/*缩进文本  第一行缩进*/
+/*只能用在块级元素	*/
+p {
+  text-indent: 3em;
+}
+
+/*文本对齐 */
+/*只能用在块级元素	*/
+p {
+  text-align:start | end | left | right | center | justify | match-parent | start end;
+}
+
+/*文本对齐最后一行 */
+/*只能用在块级元素	*/
+p {
+  text-align-last:start | end | left | right | center | justify ;
+}
+
+ 
+```
+
 
 
 
