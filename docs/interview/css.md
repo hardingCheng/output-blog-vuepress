@@ -163,5 +163,234 @@ element宽度＝内容宽度（width包含了元素内容宽度、边框、内�
 </html>
 ```
 
+### 3. 页面布局
 
+1. 三栏布局
+
+   - 浮动
+
+   ```html
+    <style>
+           html, * {
+               padding: 0;
+               margin: 0;
+           }
+           .layout article div {
+               min-height:100px;
+           }
+           .layout.float .left {
+               float: left;
+               width: 300px;
+               background: red;
+           }
+           .layout.float .right {
+               float: right;
+               width: 300px;
+               background: blue;
+           }
+           .layout.layout .center {
+               background: yellow;
+           }
+       </style>
+   
+    <section class="layout float">
+           <article class="left-right-center">
+               <div class="left"></div>
+               <div class="right"></div>
+               <div class="center">
+                   <h1>浮动解决方案</h1>
+               </div>
+           </article>
+       </section>
+   ```
+
+   **优点：** 兼容性比较好；把清除浮动和周边元素的关系处理好的话。
+
+   **缺点： **清除浮动，浮动以后脱离文档流，处理不好会带来很多问题。
+
+   - 绝对定位
+
+   ```html
+   <style>
+           html *{
+               padding: 0;
+               margin: 0;
+           }
+           .layout article div{
+               min-height: 100px;
+           }
+           .layout.absolute .left-center-right>div{
+             position: absolute;
+           }
+           .layout.absolute .left{
+             left:0;
+             width: 300px;
+             background: red;
+           }
+           .layout.absolute .center{
+             left: 300px;
+             right: 300px;
+             background: yellow;
+           }
+           .layout.absolute .right{
+             right:0;
+             width: 300px;
+             background: blue;
+           }
+   </style>
+   <section class="layout absolute">
+           <article class="left-center-right">
+               <div class="left"></div>
+               <div class="center">
+                 <h2>绝对定位解决方案</h2>
+               </div>
+               <div class="right"></div>
+             </article>
+    </section>
+   ```
+
+   **优点：** 快捷，配合js使用不容易出问题。
+
+   **缺点：** 布局已经脱离文档流了，就意味下面所有子元素也必须脱离文档流，导致了这个方案的可使用性比较差。
+
+   - flex布局
+
+   ```html
+    <style>
+           .layout.flexbox{
+             margin-top: 110px;
+           }
+           .layout.flexbox .left-center-right{
+             display: flex;
+           }
+           .layout.flexbox .left{
+             width: 300px;
+             background: red;
+           }
+           .layout.flexbox .center{
+             flex:1;
+             background: yellow;
+           }
+           .layout.flexbox .right{
+             width: 300px;
+             background: blue;
+           }
+   </style>
+   <section class="layout flexbox">
+         <h1>三栏布局</h1>
+         <article class="left-center-right">
+           <div class="left"></div>
+           <div class="center">
+             <h2>flexbox解决方案</h2>
+           </div>
+           <div class="right"></div>
+         </article>
+       </section>
+   ```
+
+   **优点：** 解决了上面两个方案的不足
+
+   **缺点：** IE8及以下不支持 flex
+
+   - table布局
+
+   ```html
+         <style>
+           .layout.table .left-center-right{
+             width:100%;
+             height: 100px;
+             display: table;
+           }
+           .layout.table .left-center-right>div{
+             display: table-cell;
+           }
+           .layout.table .left{
+             width: 300px;
+             background: red;
+           }
+           .layout.table .center{
+             background: yellow;
+           }
+           .layout.table .right{
+             width: 300px;
+             background: blue;
+           }
+         </style>
+   <section class="layout table">
+         <h1>三栏布局</h1>
+         <article class="left-center-right">
+           <div class="left"></div>
+           <div class="center">
+             <h2>表格布局解决方案</h2>
+           </div>
+           <div class="right"></div>
+         </article>
+       </section>
+   ```
+
+   **优点：** 轻易的做到，表格兼容性非常好，flex解决不了的（IE8不支持flex），想实现同样效果可以用表格。
+
+   **缺点：** 历史的诟病以外，其中某一个单元格的高度超出了的时候，两侧的单元格也是要调整高度的；有时候的场景是不需要同时增高的。
+
+   - grid布局
+
+   ```html
+      <style>
+           /*网格布局有行有列*/
+           .layout.grid .left-center-right{
+             width:100%;
+             display: grid;
+             grid-template-rows: 100px;
+             grid-template-columns: 300px auto 300px;
+           }
+           .layout.grid .left-center-right>div{
+   
+           }
+           .layout.grid .left{
+             width: 300px;
+             background: red;
+           }
+           .layout.grid .center{
+             background: yellow;
+           }
+           .layout.grid .right{
+   
+             background: blue;
+           }
+         </style>
+   <section class="layout grid">
+         <h1>三栏布局</h1>
+         <article class="left-center-right">
+           <div class="left"></div>
+           <div class="center">
+             <h2>网格布局解决方案</h2>
+           </div>
+           <div class="right"></div>
+         </article>
+       </section>
+   ```
+
+   **优点：** 可以做很多复杂的布局，代码量也简化很多，是未来的趋势；
+
+   **缺点：** 兼容性问题，各种浏览器及旧版本支持不是很好。
+
+2. **上面都是确定高度已知。高度不已知的情况下。**
+
+- flex
+- table
+
+3. **总结：**
+
+- 各方案优缺点
+  float：需要清除浮动，但是兼容性好；
+
+  绝对定位：快捷，已理解，但是绝对定位脱离了文档流，可用性差；
+
+  flexbox：有兼容性，其他的都挺好的；
+
+  表格布局：兼容性好；
+
+  网格布局：有兼容性
+
+### 4. 你知道哪些清除浮动的方案？每种方案的有什么优缺点?
 
