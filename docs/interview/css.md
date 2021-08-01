@@ -1,8 +1,10 @@
 ## 基础
 
-### 1. 标准模型，IE模型的区别
+### 1. 标准模型，IE模型的区别 (CSS盒模型)
 
 可以设置box-sizing：border-box；设置为IE盒子模型，来避免盒子被padding撑破。
+
+可以设置box-sizing：content-box；设置为标准盒子模型。
 
 **两者的区别在于content的不同，IE盒模型的content包括border、padding**
 
@@ -27,16 +29,29 @@ element高度＝内容高度（height包含了元素内容宽度、边框、内�
 element宽度＝内容宽度（width包含了元素内容宽度、边框、内距）
 ```
 
-### 2. BFC(边距重叠解决方案）块级格式化上下文
+**JS如何设置获取盒模型对应的宽和高**
+
+```js
+dom.style.width/height
+dom.currentStyle.width/height  //渲染以后的 IE
+window.getComputedStyle(dom).width/height  //所有浏览器都支持
+dom.getBoundingClientRect().width/height //计算一个元素的绝对位置
+```
+
+
+
+### 2. BFC块级格式化上下文   (边距重叠解决方案）
+
+块级格式化上下文   (边距重叠解决方案）
 
 `BFC`是一个完全独立的空间（布局环境），让空间里的子元素不会影响到外面的布局。
 
 > #### BFC的规则
 
 1. 垂直方向的距离由margin决定， 属于同一个`BFC`的两个相邻的标签外边距会发生重叠。（给其中一个元素增加一个父级，然后让他的父级触发BFC）
-2. BFC的区域不会与浮动元素的boxs重叠，清除浮动布局，阻止同级元素被浮动元素覆盖。（非浮动元素触发了BFC）
+2. BFC的区域不会与浮动元素的boxs重叠。清除浮动布局，阻止同级元素被浮动元素覆盖。（非浮动元素触发了BFC）
 3. BFC在页面上是独立的容器，外面的元素不会影响里面的元素，里面的元素也不会影响外面的元素。（父级触发了BFC）
-4. 计算BFC高度的时候，浮动元素也会参与计算。（父级触发了BFC）
+4. 计算BFC高度的时候，浮动元素也会参与计算，防止使用float脱离文档流，高度塌陷。（父级触发了BFC）
 
 > #### BFC触发
 
@@ -47,7 +62,7 @@ element宽度＝内容宽度（width包含了元素内容宽度、边框、内�
 
 > #### BFC解决了什么问题
 
-1. 使用Float脱离文档流，高度塌陷
+1. 使用float脱离文档流，高度塌陷
 
 ```html
 <!DOCTYPE html>
@@ -105,6 +120,8 @@ element宽度＝内容宽度（width包含了元素内容宽度、边框、内�
       .box2 {
           margin: 30px 0;
       }
+      
+      // 给子元素加一个父级
       .box5 {
           overflow: auto/hidden/scroll  /** 创建一个BFC **/
       }
@@ -393,4 +410,96 @@ element宽度＝内容宽度（width包含了元素内容宽度、边框、内�
   网格布局：有兼容性
 
 ### 4. 你知道哪些清除浮动的方案？每种方案的有什么优缺点?
+
+- 给外部盒子也添加浮动
+
+把外部盒子也从标准文档流中抽离，让它和孩子们见面。
+缺点：可读性差，不易于维护（别人很难理解为什么要给父元素也添上float），而且可能需要调整整个页面布局。
+
+- 在外部盒子内最下方添上带clear属性的空盒子
+
+可以是div也可以是其它块级元素，把 `<div style="clear:both;"></div>`放在盒内底部，用最下面的空盒子清除浮动，把盒子重新撑起来。
+缺点：引入了冗余元素
+
+- 用overflow:hidden清除浮动
+
+给外部盒子添上这个属性就好了，非常简单。
+缺点：有可能造成溢出元素不可见，影响展示效果。
+
+- 用after伪元素清除浮动
+
+```css
+.clearfloat:after{
+  display:bloc;
+  clear:both;
+  content:"";
+  visibility:hidden;
+  height:0
+}
+
+.clearfloat{
+  *zoom: 1;
+}
+
+```
+
+给外部盒子的after伪元素设置clear属性，再隐藏它
+这其实是对空盒子方案的改进，一种纯CSS的解决方案，不用引入冗余元素。
+
+### 5. DOM事件
+
+1. **DOM事件基本**
+
+```js
+//DOM0 时代
+element.onclick = function(){}
+
+//DOM2 时代
+element.addEventListener('click',function(){},false)
+
+//DOM3 时代
+element.addEventListener('keyup',function(){},false)
+```
+
+2. **DOM事件模型** 
+
+冒泡：从下往上
+
+捕获：从上往下
+
+3. **DOM事件流**
+
+用户的操作（例如点击事件）是怎么传递到页面上的，然后怎么响应的。
+
+事件通过**捕获**达到**目标阶段**（目标元素），从目标元素**冒泡**到**windon**对象。
+
+4. **描述DOM事件的捕获流程**
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210801180424.png" style="zoom:33%;" />
+
+5. **Event对象的常见应用**
+
+```js
+event.preventDefault() //阻止默认事件
+event.stopPropagation() //阻止冒泡行为
+event.stopImmediatePropagation() //一个元素绑定两个事件。在一个事件中加入，另一个事件不执行
+event.currentTarget() //返回其监听器触发事件的节点，即当前处理该事件的元素、文档或窗口。包括冒泡和捕获事件。
+event.target() //target 事件属性可返回事件的目标节点（触发该事件的节点，也就是事件发生的源头，事件发生所绑定的那个节点
+```
+
+6. **自定义事件**
+
+```js
+var newEvent = new Event('custom')
+// CustomEvent可以带参数
+var newEvent2 = new CustomEvent('custom',{
+    a:2
+})
+dom.addEventListener('custom',function(){
+    console.log('custom')
+})
+
+// 触发自定义事件
+dom.dispatchEvent(newEvent)
+```
 
