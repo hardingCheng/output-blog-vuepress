@@ -496,6 +496,15 @@ function ArrayOf() {
 
 ## 栈
 
+只要后进先出的都是可以使用栈的。
+
+### LeetCode
+
+简单： 
+
+		- 20 [有效的括号](https://leetcode-cn.com/problems/valid-parentheses/)
+		- 
+
 ### 栈数据结构
 
 栈是一种遵从后进先出（LIFO）原则的有序集合。新添加或待删除的元素都保存在栈的同一端，称做栈顶，另一端叫做栈低。在栈里，新元素都靠近栈顶，旧元素都接近栈低。
@@ -747,6 +756,12 @@ function baseConverter(decNumber, base) {
 ```
 
 ## 队列和双端队列
+
+先进先出的的场景。
+
+#### LeetCode
+
+		- [933. 最近的请求次数](https://leetcode-cn.com/problems/number-of-recent-calls/)
 
 ### 队列数据结构
 
