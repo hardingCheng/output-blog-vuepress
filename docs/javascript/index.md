@@ -4500,3 +4500,436 @@ var myObject = Object.create(anotherObject,{
 
 ### 行为委托
 
+如果在第一个对象上没有找到需要的属性或者方法引用，引擎就会继续在`[[Prototype]]`关联的对象上进行査找。同理，如果在后者中也没有找到需要的引用就会继续査找它的`[[Prototype]]`，以此类推。这一系列对象的链接被称为“原型链”。
+
+换句话说，Javascript中这个机制的本质就是对象之间的关联关系。
+
+#### 面向委托的设计
+
+```js
+Task = {
+    setID:function(id) {
+        this.id = ID
+    },
+    outputID:function() {
+        console.log(this.id)
+    }
+}
+
+// XYZ委托Task
+XYZ = Object.create(Task)
+
+XYZ.prepareTask = function(ID,Label) {
+    this.setID(ID)
+    this.label = Label
+}
+
+XYZ.outputTaskDetails = function(){
+    this.outputID()
+    console.log(this.label)
+}
+
+// ABC = Object.create(Task)
+```
+
+在这段代码中，Task 和 XYZ 并不是类（或者函数），它们是对象。XYZ 通过 Object.create (..) 创建，它的`[[Prototype]]`委托了 Task 对象。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210801082802.png)
+
+在 API 接口的设计中，委托最好在内部实现，不要直接暴露出去。在之前的例子中我们并没有让开发者通过 API 直接调用 XYZ.setID()。（当然，可以这么做！）相反，我们把委托隐藏在了 API 的内部，XYZ. Preparetask （）会 委托 Task.setID (...)。
+
+	- **相互委托（禁止）**
+
+你无法在两个或两个以上互相（双向）委托的对象之间创建循环委托。如果你把 B 关联到 A 然后试着把 A 关联到 B，就会出错。
+
+	- **调试**
+
+“类”设计模式和“委托”设计模式不一样。
+
+2. **比较思维模型**
+
+“类”设计模式和“委托”设计模式不一样。
+
+下面是典型的（“原型”）面向对象风格：
+
+```js
+function Foo() {
+    this.me = who
+}
+Foo.prototype.identity = function(){
+    return "I am " + this.me
+}
+function Bar(who) {
+    Foo.call(this.who)
+}
+Bar.prototype = Object.create(Foo.prototype)
+Bar.prototype.speak = function(){
+    alert("Hello, " + this.identity() + ". " )
+}
+var b1 = new Bar("b1")
+var b2 = new Bar("b2")
+
+b1.speak()
+b2.speak()
+```
+
+下面是对象关联风格的代码：
+
+```js
+Foo = {
+    init: function(who) {
+        this.me = who;
+    },
+    identity: function() {
+        return "I am " + this.me
+    }
+}
+Bar = Object.create(Foo);
+
+Bar.speak = function(){
+    alert("Hello, " + this.identity() + ". " )
+}
+var b1 = Object.create(Bar)
+b1.init("b1")
+var b2 = Object.create(Bar)
+b2.init("b2")
+b1.speak()
+b2.speak()
+```
+
+我们只是把对象关联起来，并不需要那些既复杂又令人困惑的模仿类的行为（构造函数、原型以及new）。
+
+类风格代码的思维模型强调实体以及实体间的关系。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210801093746.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210801094114.png)
+
+对象关联风格代码的思维模型：
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210801094300.png)
+
+#### 类和对象
+
+控件“类”
+
+```js
+// 父类
+function Widget(width, height) {
+    this.width = width || 50;
+    this.height = height || 50;
+    this.$elem = null;
+}
+
+Widget.prototype.render = function($where) {
+    if(this.$elem) {
+        this.$elem.css({
+            width: this.width + 'px',
+            height: this.height + 'px'
+        }).appendTo($where)
+    }
+}
+// 子类
+function Button(width, height,label) {
+    // 调用super构造函数
+    Widget.call(this,width,height)
+    this.label = label || 'Default'
+    this.$elem = $('<button>').text(this.label)
+}
+
+// 让Button继承Widget
+Button.prototype = Object.create(Widget.prototype)
+
+// 重写render()
+Button.prototype.render = function($where) {
+    // super调用
+    Widget.prototype.render.call(this,$where)
+    this.$elem.click(this.onClick.bind(this))
+}
+
+Button.prototype.onClick = function(evt) {
+    console.log("Button '" + this.label + "'clicked！")
+}
+
+$(document).ready(function(){
+    var $body = $(document.body)
+    var btn1 = new Button(125,30,"Hello")
+    var btn1 = new Button(125,40,"World")
+
+    btn1.render($body)
+    btn2.render($body)
+})
+
+
+
+class Widget {
+    constructor(width, height){
+        this.width = width || 50;
+        this.height = height || 50;
+        this.$elem = null;
+    }
+    render($where) {
+        if(this.$elem) {
+            this.$elem.css({
+                width: this.width + 'px',
+                height: this.height + 'px'
+            }).appendTo($where)
+        }
+    }
+}
+class Button extends Widget {
+    constructor(width, height,label){
+        super(width, height)
+        this.label = label || 'Default'
+        this.$elem = $('<button>').text(this.label)
+    }
+    render($where){
+        super.render($where)
+        this.$elem.click(this.onClick.bind(this))
+    }
+    onClick(evt) {
+        console.log("Button '" + this.label + "'clicked！")
+    }
+}
+$(document).ready(function(){
+    var $body = $(document.body)
+    var btn1 = new Button(125,30,"Hello")
+    var btn1 = new Button(125,40,"World")
+
+    btn1.render($body)
+    btn2.render($body)
+})
+```
+
+委托控件
+
+```js
+
+var Widget = {
+    init:function(width, height){
+        this.width = width || 50;
+        this.height = height || 50;
+        this.$elem = null;
+    },
+    insert:function($where){
+        if(this.$elem) {
+            this.$elem.css({
+                width: this.width + 'px',
+                height: this.height + 'px'
+            }).appendTo($where)
+        }
+    }
+}
+
+var Button = Object.create(Widget)
+
+Button.setup = function(width, height, label){
+    // 委托调用
+    this.init(width, height)
+    this.label = label || 'Default'
+    this.$elem = $('<button>').text(this.label)
+}
+
+Button.build = function($where){
+    this.insert($where)
+    this.$elem.click(this.onClick.bind(this))
+}
+
+Button.onClick = function(evt) {
+    console.log("Button '" + this.label + "'clicked！")
+}
+$(document).ready(function(){
+    var $body = $(document.body)
+    var btn1 = Object.create(Button)
+    btn1.setup(125,30,"Hello")
+    var btn2 = Object.create(Button)
+    btn2.setup(125,40,"World")
+
+    btn1.render($body)
+    btn2.render($body)
+})
+```
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210801114126.png)
+
+类
+
+```js
+// 父类
+function Controller() {
+    this.error = []
+}
+Controller.prototype.showDialog = function(title,msg) {
+    // 给用户显示标题和消息
+}
+Controller.prototype.success = function(msg) {
+    this.showDialog("Success",msg);
+}
+Controller.prototype.failure = function(err) {
+    this.errors.push(err)
+    this.showDialog("Error",err)
+}
+
+// 子类
+function LoginController() {
+    Controller.call(this)
+}
+
+// 子类关联到父类
+LoginController.prototype = Object.create(Controller.prototype)
+LoginController.prototype.getUser = function(){
+    return document.getElementById("Login_username").value
+}
+LoginController.prototype.getPassword = function(){
+    return document.getElementById("Login_password").value 
+}
+LoginController.prototype.validateEntry = function(user,pw){
+    user = user || this.getUser()
+    pw = pw || this.getPassword()
+
+    if(!(user&&pwd)){
+        return this.failure("Please enter a username & password!")
+    }
+    else if(pw.length < 5){
+        return this.failure("Password must be 5+ characters!")
+    }
+    return true
+}
+LoginController.prototype.failure = function(err){
+    // super调用
+    Controller.prototype.failure.call(this,"Login invalid: " + err)
+}
+// 子类
+function AuthController(login){
+    Controller.call(this,login)
+    // 合成
+    this.login = login
+}
+// 把子类关联到父类
+AuthController.prototype = Object.create(Controller.prototype)
+AuthController.prototype.server = function(url,data) {
+    return $.ajax({
+        url,
+        data
+    })
+}
+AuthController.prototype.checkAuth = function(){
+    var user = this.login.getUser()
+    var pwd = this.login.getPassword()
+    if(this.login.validateEntry(user,pwd)){
+        this.server("/check-auth",{
+            user,
+            pwd
+        }).then(this.success.bind(this))
+        .fail(this.failure.bind(this))
+    }
+}
+// 重写基础的success
+AuthController.prototype.success = function() {
+    // super调用
+    Controller.prototype.success.call(this,'Authenticated!')
+}
+
+// 重写基础的failure
+AuthController.prototype.failure = function(err) {
+    // super调用
+    Controller.prototype.failure.call(this,"Auth Failed: " + err)
+}
+var auth = new AuthController(
+    // 除了继承还要合成
+    new LoginController()
+)
+auth.checkAuth()
+```
+
+反类
+
+```js
+var LoginController = {
+    errors:[],
+    getUser:function(){
+        return document.getElementById("Login_username").value
+    },
+    getPassword:function(){
+        return document.getElementById("Login_password").value 
+    },
+    validateEntry:function(user,pw){
+        user = user || this.getUser()
+        pw = pw || this.getPassword()
+    
+        if(!(user&&pwd)){
+            return this.failure("Please enter a username & password!")
+        }
+        else if(pw.length < 5){
+            return this.failure("Password must be 5+ characters!")
+        }
+        return true
+    },
+    showDialog:function(title,msg) {
+        // 给用户显示标题和消息
+    },
+    
+    failure:function(err) {
+        this.errors.push(err)
+        this.showDialog("Error",err)
+    }
+}
+// 让AuthController委托LoginController
+var AuthController = Object.create(LoginController)
+AuthController.errors = []
+AuthController.checkAuth = function(){
+    var user = this.login.getUser()
+    var pwd = this.login.getPassword()
+    if(this.login.validateEntry(user,pwd)){
+        this.server("/check-auth",{
+            user,
+            pwd
+        }).then(this.success.bind(this))
+        .fail(this.failure.bind(this))
+    }
+}
+AuthController.server = function(url,data) {
+    return $.ajax({
+        url,
+        data
+    })
+}
+AuthController.accepted = function() {
+    this.showDialog("Success",msg);
+}
+AuthController.rejected = function(err) {
+    this.failure("Auth Failed: " + err)
+}
+```
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210801160357.png)
+
+#####  更好的语法
+
+```js
+// 类
+class Foo(){
+  methodName(){
+    
+  }
+}
+
+
+// 委托对象
+var LoginController = {
+  errors:[],
+  getUser(){
+    
+  },
+  getPassword(){
+    
+  }
+}
+// 现在把AuthController关联到LoginController
+Object.setPrototypeOf(AuthController,LoginController)
+```
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210801161717.png)
+
+ ES6中为了实现类，新增加了关键字class,extends,super，用来实现传统的面相对象编程。然而，class语法并没有解决所有的问题。class基本上只是现在的prototype机制的一种语法糖。也就是说class并不会向传统的面向类的语言一样在声明是静态复制所有行为。如果你有意或者无意修改或者替换了父“类”中的一个方法，那子“类”和所有实例都会受到影响，因为它们在定义时并没有进行复制，只是使用基于prototype的实时委托。
+
