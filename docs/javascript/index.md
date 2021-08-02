@@ -348,7 +348,69 @@ console.log(Array.prototype)
 
 ```
 
-### 手写数组相关函数
+### 手写相关函数
+
+#### 手写`——proto__`
+
+```js
+Object.defineProperty(Object.prototype, "__proto__", {
+    get: function() {
+        return Object.getPrototypeOf(this);
+    },
+    // ES6中的Object.setPrototypeOf
+    set: function(o) {
+        Object.setPrototypeOf(this, o);
+        return o;
+    }
+})
+```
+
+#### 手写instanceof
+
+```js
+function _instanceof(A, B) {
+    var O = B.prototype;// 取B的显示原型
+    A = A.__proto__;// 取A的隐式原型
+    while (true) {
+        //Object.prototype.__proto__ === null
+        if (A === null)
+            return false;
+        if (O === A)// 这里重点：当 O 严格等于 A 时，返回 true
+            return true;
+        A = A.__proto__;
+    }
+}
+```
+
+#### 手写new运算符
+
+```js
+/**
+ * Con 目标对象
+ * args 参数
+ */
+function myNew(Con, ...args) {
+  // 创建一个空的对象
+  let obj = {};
+  // 链接到原型，obj 可以访问到构造函数原型中的属性
+  obj.__proto__ = Con.prototype;
+  // 绑定 this 实现继承，obj 可以访问到构造函数中的属性
+  let ret = Con.call(obj, ...args);
+  // 优先返回构造函数返回的对象
+  return ret instanceof Object ? ret : obj;
+}
+
+
+function Person(name) {
+  this.name = name;
+}
+Person.prototype.getName = function() {
+  console.log(`your name is ${this.name}`);
+};
+let p2 = myNew(Person, "lisi");
+// your name is lisi
+p2.getName();
+```
 
 #### 手写forEach方法
 
@@ -1953,7 +2015,11 @@ document.querySelector("id-1").appendChild(div)
 
 ### 原型
 
-在定义函数时，会执行两个动作：一个动作是创建函数对象，这是因为函数是对象；另一个动作是创建一个完全独立的原型对象；另一个动作是创建一个完全独立的原型对象。定义的函数的原型属性将指向该原型对象。
+在定义函数时，会执行两个动作：一个动作是创建函数对象，这是因为函数是对象；另一个动作是创建一个完全独立的原型对象；定义的函数的原型属性将指向该原型对象。
+
+我们创建的每个函数都有一个 [[prototype\]](https://link.juejin.cn/?target=%E5%8E%9F%E5%9E%8B))属性，这个属性是一个指针，指向一个对象，而这个对象的用途是包含可以由特定类型的所有实例共享的属性和方法。那么 prototype 就是调用 `构造函数` 而创建的那个对象`实例`的`的原型对象`。使用原型对象的好处是可以让所有对象实例共享它所包含的属性和方法。
+
+最主要的就是节省内存，如果属性和方法定义在原型上，那么所有的实例对象就能共享。
 
 ```js
 // 定义Human函数
@@ -2003,17 +2069,49 @@ Object的构造函数，会得到一个构造好的链接。
 
 <img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210627093044.png" style="zoom:50%;" />
 
-prototype属性执行单独的对象—内置的原型对象，在该示例中即Object.prototype,它类似于前面示例中的Human.prototype。
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210802100638.png" style="zoom:50%;" />
 
-Object类型的对象实例拥有`__proto__`属性，后者指向构造函数的原型对象。Object、创建的二级原型对象和`__proto__`指向Object的原型对象的实例。
+在原型对象中使用.constructor（构造器）属性来区分，我这个原型对象被那个构造函数引用了。
 
-### 原型链
+.prototype属性执行单独的对象—内置的原型对象，在该示例中即Object.prototype,它类似于前面示例中的Human.prototype。
 
-<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210627093913.png" style="zoom:50%;" />
+`__proto__` 属性是对象实例和构造函数的原型对象的链接。  就是一级一级往上找原型对象。
 
-#### 查找方法
+Object类型的**对象实例**拥有`__proto__`属性，后者指向构造函数的原型对象。Object创建的二级原型对象和`__proto__`指向Object的原型对象的实例。
 
-<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210627100827.png" style="zoom:50%;" />
+<img src="/Users/cr/Library/Application Support/typora-user-images/image-20210802110806767.png" alt="image-20210802110806767" style="zoom:100%;" />
+
+![image-20210802110911644](/Users/cr/Library/Application Support/typora-user-images/image-20210802110911644.png)
+
+- js 每个对象都会拥有`prototype`属性的。这个属性指向一个对象，这个对象的所有属性和方法都会被构造函数的实例所继承。
+
+- 只有对象（任何对象）只有`__proto__`去找它的原型对象。( 实例都包含一个指向构造函数的`原型对象`的内部指针。)。
+- 实例都会有一个`constructor`属性去指向它的构造函数。
+- 在原型对象中使用`.constructor`（构造器）属性来区分，我这个原型对象被那个构造函数引用了。
+
+
+
+- 每个`构造函数`都有一个`原型对象`
+- `原型对象`都包含一个指向`构造函数`的`指针.constructor`
+- 而`实例`都包含一个指向`原型对象`的`指针.__proto__`
+
+### 原型链   
+
+![image-20210802110907463](/Users/cr/Library/Application Support/typora-user-images/image-20210802110907463.png)
+
+ 可以看出 `p1.__proto__.__proto__` 指向了 `Object.prototype`，`p1.__proto__.__proto__.__proto__` 最后指向了 null，由此可以看出了构建了一条**原型链**。
+
+**原型链的构建依赖于实例对象的 `__proto__` ，并不是原对象的 `prototype`**
+
+任何一个`实例对象`通过`原型链`找到它上面的`原型对象`，原型对象上的方法都是被对象实例所共享的。
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210627093913.png" style="zoom:33%;" />
+
+####  查找方法
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210627100827.png" style="zoom:33%;" />
+
+**如果在对象上没有找到需要的属性或者方法引用，引擎就会继续在 `[[ptototype]]`关联的对象上进行查找，同理，如果在后者中也没有找到需要的引用就会继续查找它的[[prototype]],以此类推。这一系列对象的链接被称为“原型链”。**
 
 调用Array.toString时，实际的动作是：JavaScript先在Array对象的原型上查找toString方法，但并未找到该方法；接下来，JavaScript决定在Array的父类Object的原型属性上查找toString方法，最终它找到Object.prototype.toString,并且执行后者。
 
@@ -2037,9 +2135,9 @@ Function.construct是Function（循环），而Object.construct也是Function。
 
 <img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210627103619.png" style="zoom:50%;" />
 
-#### 原型实践
+#### 原型实践（创建对象的集中方法）
 
-#### 对象字面量
+#### 对象字面量（创建对象方法1）
 
 ```js
 let cat = {}
@@ -2062,9 +2160,17 @@ cat.wakeup = function(amount) {
 }
 ```
 
-#### 使用Function构造函数
+#### 使用Function构造函数（创建对象方法2）
 
 ```js
+function Cat(name){
+  this.name = name
+}
+var cat = new Cat('Felix')
+
+
+
+
 function Cat(name,hunger,energy,state){
   let cat = {}
 
@@ -2096,7 +2202,13 @@ luna.sleep()
 luna.wakeup()
 ```
 
-#### 原型
+#### 原型（Object.create来创建对象）（创建对象方法3）
+
+`Object.create()`方法创建一个新对象，使用现有的对象来提供新创建的对象的`__proto__`。
+
+```js
+const me = Object.create(person); // me.__proto__ === person
+```
 
 我们发现一个问题。felix和luna的所有方法占用的内存空间是之前的两倍。这是因为我们为每只猫创建了两个对象字面量。这就是原型要解决的问题。
 
@@ -2133,7 +2245,7 @@ function Cat(name,hunger,energy,state){
 }
 ```
 
-#### 使用Object.create来创建对象
+##### 使用Object.create来创建对象
 
 ```js
 const cat = {
@@ -2183,6 +2295,59 @@ luna.sleep()
 
 现在语法是最佳的，sleep在内存中仅定义一次。无论创建多少个felix或luna，都不是会因为方法而浪费内存，因为他们只定义一次。
 
+- 字面量和`new`关键字创建的对象是`Object`的实例，原型指向`Object.prototype`，继承内置对象`Object`
+
+- `Object.create(arg, pro)`创建的对象的原型取决于`arg`，`arg`为`null`，新对象是空对象，没有原型，不继承任何对象；`arg`为指定对象，新对象的原型指向指定对象，继承指定对象。
+
+#### instanceof
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210802103943.png)
+
+1、instanceof的作用是用来做检测类型：
+
+（1）instanceof可以检测某个对象是不是另一个对象的实例；
+
+```js
+var Person = function() {};
+var student = new Person();
+console.log(student instanceof Person);  // true
+```
+
+（2）instanceof可以检测父类型；
+
+```js
+function Person() {};
+function Student() {};
+var p = new Person();
+Student.prototype=p; //继承原型
+var s=new Student();
+console.log(s instanceof Student); //true
+console.log(s instanceof Person); //true
+
+// 但是，instanceof不适合检测一个对象本身的类型。
+```
+
+2、instanceof 检测一个对象A是不是另一个对象B的实例的原理：
+
+其实 `instanceof` 主要的实现原理就是只要右边变量的 `prototype` 在左边变量的原型链上即可。因此，`instanceof` 在查找的过程中会遍历左边变量的原型链，直到找到右边变量的 `prototype`，如果查找失败，则会返回 false，告诉我们左边变量并非是右边变量的实例。
+
+查看对象B的prototype指向的对象是否在对象A的[[prototype]]链上。如果在，则返回true,如果不在则返回false。不过有一个特殊的情况，当对象B的prototype为null将会报错(类似于空指针异常)。
+
+```js
+function _instanceof(A, B) {
+    var O = B.prototype;// 取B的显示原型
+    A = A.__proto__;// 取A的隐式原型
+    while (true) {
+        //Object.prototype.__proto__ === null
+        if (A === null)
+            return false;
+        if (O === A)// 这里重点：当 O 严格等于 A 时，返回 true
+            return true;
+        A = A.__proto__;
+    }
+}
+```
+
 #### 构造函数
 
 ```js
@@ -2211,13 +2376,51 @@ let luna = Cat("Luan",5,1,"sleeping")
 luna.sleep()
 ```
 
-在这种情况下，JavaScript将先在luna对象上查找sleep方法，但是找不到它；然后JavaScript会在Cat.prototype上查找sleep方法，并在找到后进行调用。
-
-
+在这种情况下，JavaScript将先在luna对象上查找sleep方法，但是找不到它；然后JavaScript会在Cat.prototype上查找sleep方法，并在找到后进行调用。 
 
 因此原型对象主要是作为一种特殊的查找对象保护在内存中，并在使用其构造函数实例化的所有对象实例之间进行共享。
 
 #### new运算符
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210802110120.png" style="zoom:33%;" />
+
+`new`运算符的步骤。
+
+` let p1 = new Person();`
+
+- step1，让变量`p1`指向一个空对象   `let p1 = {};`
+- step2， 让 `p1` 这个对象的 `__proto__` 属性指向 `Person` 对象的原型对象。   `p1.__proto__ = Person.prototype;`
+- step3， 让 `p1` 来执行 `Person` 方法。  `Person.call(p1);`
+
+```js
+/**
+ * Con 目标对象
+ * args 参数
+ */
+function myNew(Con, ...args) {
+  // 创建一个空的对象
+  let obj = {};
+  // 链接到原型，obj 可以访问到构造函数原型中的属性
+  obj.__proto__ = Con.prototype;
+  // 绑定 this 实现继承，obj 可以访问到构造函数中的属性
+  let ret = Con.call(obj, ...args);
+  // 优先返回构造函数返回的对象
+  return ret instanceof Object ? ret : obj;
+}
+
+
+function Person(name) {
+  this.name = name;
+}
+Person.prototype.getName = function() {
+  console.log(`your name is ${this.name}`);
+};
+let p2 = myNew(Person, "lisi");
+// your name is lisi
+p2.getName();
+```
+
+自己实现一个new运算符原理
 
 ```js
 function Cat(name,hunger,energy,state){
@@ -2231,7 +2434,7 @@ Cat.prototype.wakeup = function() { //实现 }
 Cat.prototype.eat = function() { //实现 }
 Cat.prototype.wander = function() { //实现 }
 
-let luna = Cat("Luan",5,1,"sleeping")
+let luna =new Cat("Luan",5,1,"sleeping")
 luna.sleep()
 ```
 

@@ -1584,9 +1584,157 @@ sort
   - `splice`对数组进行操作并返回该数组，会改变原有数组
 - 函数式编程不会保留计算中间的结果，所以变量是不可变的（无状态的）
 
-
-
 ### 闭包？？？？？
+
+### typeof和instanceof原理
+
+JavaScript有八种内置类型
+
+- 空值（null)
+- 未定义(undefined)
+- 布尔值（boolean)
+- 数字（number)
+- 字符串（string)
+- 对象 (object)
+- 符号（symbol, ES6中新增)
+- 大整数（BigInt, ES2020 引入）
+
+> 除对象外，其他统称为“基本类型”。
+
+1. **typeof**
+
+`typeof`是一个操作符而不是函数，用来检测给定变量的数据类型。
+
+```js
+typeof null // 'object'
+typeof undefined; // "undefined"
+typeof false; // "boolean"
+typeof 1; // "number"
+typeof '1'; // "string"
+typeof {}; // "object" 
+typeof []; // "object" 
+typeof new Date(); // "object"
+typeof Symbol(); // "Symbol"
+typeof 123n // 'bigint'
+```
+
+但是使用 `typeof`不能 判断对象具体是哪种类型。所有`typeof` 返回值为 "object" 的对象（如数组，正则等）都包含一个内部属性 `[[class]]`(我们可以把它看做一个内部的分类)。这个属性无法直接访问，一般通过 `Object.prototype.toString(...)`来查看。
+
+每种引用类型都会直接或者间接继承自Object类型，因此它们都包含toString()函数。不同数据类型的toString()类型返回值也不一样，所以通过toString()函数可以准确判断值的类型。
+
+```js
+Object.prototype.toString.call(1) // "[object Number]"
+
+Object.prototype.toString.call('hi') // "[object String]"
+
+Object.prototype.toString.call({a:'hi'}) // "[object Object]"
+
+Object.prototype.toString.call([1,'a']) // "[object Array]"
+
+Object.prototype.toString.call(true) // "[object Boolean]"
+
+Object.prototype.toString.call(() => {}) // "[object Function]"
+
+Object.prototype.toString.call(null) // "[object Null]"
+
+Object.prototype.toString.call(undefined) // "[object Undefined]"
+
+Object.prototype.toString.call(Symbol(1)) // "[object Symbol]"
+
+```
+
+`instanceof` 运算符也常常用来判断对象类型。用法: 左边的运算数是一个`object`，右边运算数是对象类的名字或者构造函数; 返回`true`或`false`。
+
+```js
+[] instanceof Array; // true
+[] instanceof Object; // true
+[] instanceof RegExp; // false
+new Date instanceof Date; // true
+```
+
+`instanceof` 的内部机制是：检测构造函数的 `prototype` 属性是否出现在某个实例对象的原型链上。
+
+`typeof`原理： **不同的对象在底层都表示为二进制，在Javascript中二进制前（低）三位存储其类型信息**。
+
+- 000: 对象
+- 010: 浮点数
+- 100：字符串
+- 110： 布尔
+- 1： 整数
+
+
+
+2. **instanceof**
+
+`instanceof` 用来比较一个对象是否为某一个构造函数的实例。注意，instanceof运算符只能用于对象，不适用原始类型的值。
+
+- 判断某个`实例`是否属于`某种类型`
+
+```js
+let person = function () {
+}
+let nicole = new person()
+nicole instanceof person // true
+
+
+function Foo() {
+}
+
+Object instanceof Object // true
+Function instanceof Function // true
+Function instanceof Object // true
+Foo instanceof Foo // false
+Foo instanceof Object // true
+Foo instanceof Function // true
+```
+
+- 也可以判断一个实例是否是其父类型或者祖先类型的实例。
+
+```js
+function Car(make, model, year) {
+  this.make = make;
+  this.model = model;
+  this.year = year;
+}
+const auto = new Car('Honda', 'Accord', 1998);
+
+console.log(auto instanceof Car);
+// expected output: true
+
+console.log(auto instanceof Object);
+// expected output: true
+```
+
+判断一个函数是否时数组或者对象，从另一个角度讲，就是判断变量的构造函数时Array类型还是Ojbect类型。因为一个对象的实例都是通过构造函数生成的，所以，我们可以直接判断一个变量的constructor属性。
+
+```js
+ const a = [0, 1, 2];
+        console.log(a.constructor === Array); // true
+        console.log(a.constructor === Object);  // false
+
+        const b = {name: 'xx'};
+        console.log(b.constructor === Array); // false
+        console.log(b.constructor === Object); // true
+
+
+function getDataType (o) {
+            const constructor = o.__proto__.constructor || o.constructor
+            if (constructor === Array) return 'Array';
+            if (constructor === Object) return 'Object';
+            return 'others'
+        }
+
+```
+
+我们使用 `typeof` 来判断基本数据类型是 ok 的，不过需要注意当用 `typeof` 来判断 `null` 类型时的问题，如果想要判断一个对象的具体类型可以考虑用 `instanceof`，但是 `instanceof` 也可能判断不准确，比如一个数组，他可以被 `instanceof` 判断为 Object。所以我们要想比较准确的判断对象实例的类型时，可以采取 `Object.prototype.toString.call` 方法。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210802130036.png)
+
+
+
+
+
+
 
 ## 常见面试问题
 
@@ -2059,25 +2207,63 @@ output: {
 - 热更新
 - DIIPlugin
 
+
+
+
+
 ### HTTP协议
 
 1. HTTP协议的主要特点
+
+HTTP协议类的主要特点：简单快速，灵活，无连接，无状态（无法区分两次连接是否一样）。
+
 2. HTTP报文的组成部分
-3. HTTP方法
-4. POST和GET的区别
-5. HTTP状态码
-6. 什么是持久连接
-7. 什么是管线化
 
 HTTP报文的组成部分
 
-请求报文：请求行，请求头，空行，请求体；响应报文：状态行，响应头，空行，响应体。请求行包含：http方法，页面地址，http协议以及版本；请求头包含：key-value值，告诉服务器端我要什么内容。
+请求报文：请求行，请求头，空行，请求体；
 
-HTTP协议类的主要特点：简单快速，灵活，无连接，无状态。
+响应报文：状态行，响应头，空行，响应体。
 
-HTTP协议类，HTTP方法：GET，获取资源，POST，传输资源，PUT，更新资源，DELETE，删除资源，HEAD，获得报文首部。
+请求行包含：http方法，页面地址，http协议以及版本；
 
-HTTP协议类：POST和GET的区别：1.GET在浏览器回退时是无害的，而POST会再次提交请求；2.GET产生的URL地址可以被收藏，而POST不可以；3.GET请求会被浏览器主动缓存，而POST不会，除非手动设置；4.GET请求只能进行url编码，而POST支持多种编码方式；5.GET请求参数会被完整保留在浏览器历史记录里，而POST中的参数不会保留；6.GET请求在URL中传送的参数是有长度限制的，而POST是没有限制的；7.对参数的数据类型，GET只接受ASCII字符，而POST没有限制；8.GET比POST更不安全，因为参数直接暴露在URL中，所以不是用来传递敏感信息的；9.GET参数通过URL传递的，POST放在Request body中。
+请求头包含：key-value值，告诉服务器端我要什么内容。
+
+3. HTTP方法
+
+HTTP协议类，
+
+HTTP方法：
+
+GET，获取资源，
+
+POST，传输资源，
+
+PUT，更新资源，
+
+DELETE，删除资源，
+
+HEAD，获得报文首部。
+
+4. POST和GET的区别
+
+HTTP协议类：
+
+POST和GET的区别：
+
+- **GET在浏览器回退时是无害的，而POST会再次提交请求；**
+
+- GET产生的URL地址可以被收藏，而POST不可以；
+
+- **GET请求会被浏览器主动缓存，而POST不会，除非手动设置；**
+- GET请求只能进行url编码，而POST支持多种编码方式； 
+- **GET请求参数会被完整保留在浏览器历史记录里，而POST中的参数不会保留；**
+- **GET请求在URL中传送的参数是有长度限制的，而POST是没有限制的；**
+- 对参数的数据类型，GET只接受ASCII字符，而POST没有限制；
+- GET比POST更不安全，因为参数直接暴露在URL中，所以不是用来传递敏感信息的；
+- **GET参数通过URL传递的，POST放在Request body中。**
+
+5. HTTP状态码
 
 `HTTP`状态码：
 
@@ -2086,6 +2272,9 @@ HTTP协议类：POST和GET的区别：1.GET在浏览器回退时是无害的，�
 - `3xx`:重定向，要完成请求必须进行更进一步的操作；
 - `4xx`:客户端错误，请求有语法错误或请求无法实现；
 - `5xx`:服务器错误，服务器未能实现合法的请求。
+
+ 
+
 - `200` ok: 客户端请求成功
 - `206 Partial Content`: 客户发送了一个带有Range头的GET请求，服务器完成了它
 - `301 Moved Permanently`: 所请求的页面已经转移至新的url
@@ -2098,9 +2287,35 @@ HTTP协议类：POST和GET的区别：1.GET在浏览器回退时是无害的，�
 - `505` 服务器发送不可预期的错误，原来缓冲的文档还可以继续使用
 - `503` 请求未完成，服务器临时过载或宕机，一段时间后可能恢复正常
 
+6. 什么是持久连接（HTTP1.1版本才支持）
+
 HTTP协议采用“请求-应答”模式，当使用普通模式，即非`keep-alive`模式时，每个请求/应答 客户和服务器都要新键一个连接，完成之后立即断开连接（HTTP协议为无连接的协议）。
 
 当使用`keep-alive`模式（又称为持久连接，连接重用）时，`keep-alive`功能使客户端到服务器端的连接有效，当出现对服务器的后继请求时，`keep-alive`功能避免了建立或重新建立连接。
+
+7. 什么是管线化
+
+在使用持久化连接的情况下，某个连接上消息的传递类似于
+
+请求1->响应1->请求2->响应2->请求3->响应3
+
+在某个连接上的消息变成了类似这样，也是在持久化连接情况下（请求一次打包发过去，响应也一次打包发过来）
+
+请求1->请求2->请求3->响应1->响应2->响应3
+
+
+
+- 管线化机制通过持久连接完成,仅HTP/1.1支持此技术。
+
+- 只有 GET 和 HEAD 请求可以进行管线化，而 POST 则有所限制。
+
+- 初次创建连接时不应启动管线机制,因为对方(服务器)不一定支持HTTP/1.1版本的协议
+
+- 管线化不会影响响应到来的顺序，如上面的例子所示，响应返回的顺序并未改变 HTP1.1 要求服务器端支持管线化，但并不要求服务器端也对响应进行管线化处理，只是要求对于管线化的请求不失败即可。
+
+- 由于上面提到的服务器端问题，开启管线化很可能并不会带来大幅度的性能提升，而且很多服务器端和代理程序对管线化的支持并不好，因此现代浏览器如 Chrome 和 Firefox 默认并未开启管线化支持。
+
+
 
 ### 浏览器缓存？？？？？？？
 
