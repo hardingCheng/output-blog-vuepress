@@ -985,6 +985,18 @@ function palindromeChecker(aString) {
 
 ## 链表
 
+链表是有序的，所以重复元素一定相邻。  
+
+### LeetCode
+
+- 237.删除链表中的节点
+- 206.反转链表
+- 2. 两数相加
+- 83. 删除排序链表中的重复元素
+- 141. 环形链表
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210802140711.png)
+
 ### 链表数据结构
 
 数组数据结构有一个缺点：（在大多数语言中）数组的大小是固定的，从数组的起点或者中间插入或者移除的成本很高，因为需要移动元素。
@@ -1765,6 +1777,8 @@ export default class StackLinkedList {
   }
 }
 ```
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210802174251.png" style="zoom:33%;" />
 
 ## 集合
 
