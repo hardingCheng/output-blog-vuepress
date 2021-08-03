@@ -350,6 +350,56 @@ console.log(Array.prototype)
 
 ### 手写相关函数
 
+#### 手写Ajax
+
+```js
+ var opt = {
+         url: '',
+         type: 'get',
+         data: {},
+         success: function () {},
+         error: function () {},
+     };
+     if (opt.url) {
+         // 声明XMLHttpRequest对象 并且做兼容处理
+         var xhr = XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
+         var data = opt.data,
+             url = opt.url,
+             type = opt.type.toUpperCase(),
+             dataArr = [];
+         for (var k in data) {
+             dataArr.push(k + '=' + data[k]);
+         }
+         if (type === 'GET') {
+             url = url + '?' + dataArr.join('&');
+             xhr.open(type, url.replace(/\?$/g, ''), true);
+             xhr.send();
+         }
+         if (type === 'POST') {
+             xhr.open(type, url, true);
+             xmlhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+             xhr.send(dataArr.join('&'));
+         }
+         // 只判断响应时间就可以了
+         xhr.onload = function () {
+             if (xhr.status === 200 || xhr.status === 304 || xhr.status === 206) {
+                 var res;
+                 if (opt.success && opt.success instanceof Function) {
+                     res = xhr.responseText;
+                     if (typeof res ==== 'string') {
+                         res = JSON.parse(res);
+                         opt.success.call(xhr, res);
+                     }
+                 }
+             } else {
+                 if (opt.error && opt.error instanceof Function) {
+                     opt.error.call(xhr, res);
+                 }
+             }
+         };
+     }
+```
+
 #### 手写`——proto__`
 
 ```js
@@ -2204,7 +2254,7 @@ luna.wakeup()
 
 #### 原型（Object.create来创建对象）（创建对象方法3）
 
-`Object.create()`方法创建一个新对象，使用现有的对象来提供新创建的对象的`__proto__`。
+`Object.create()`方法`创建一个新对象`，使用现有的对象来提供新创建的对象的`__proto__`。可以实现隔离。
 
 ```js
 const me = Object.create(person); // me.__proto__ === person
@@ -2502,6 +2552,105 @@ export default class Fridge {
     return this.items.filter(i => i.type == type,0)
   }
 }
+```
+
+#### 类的继承方式(优缺点)
+
+1. **借助构造函数实现继承**
+
+```js
+			function Parent1 () {
+          this.name = 'parent1';
+      }
+			// 子类无法继承父类原型链上的方法
+      Parent1.prototype.say = function () {};
+      function Child1 () {
+          //修改执行上下文
+          Parent1.call(this);
+          this.type = 'child1';
+      }
+      console.log(new Child1(), new Child1().say());
+```
+
+2. **借助原型链实现继承**
+
+```js
+     function Parent2 () {
+          this.name = 'parent2';
+          this.play = [1, 2, 3];
+      }
+      function Child2 () {
+          this.type = 'child2';
+      }
+      Child2.prototype = new Parent2();
+
+      var s1 = new Child2();
+      var s2 = new Child2();
+			// s1.__proto__ === s2.__proto__  true
+      console.log(s1.play, s2.play);
+      // 原型链继承的同一个对象引用，创建对个实例，实例使用的都是一个对象，修改一个另一个也跟着变，因为是一个。
+			s1.play.push(4);
+```
+
+3. **组合方式**（构造函数+原型链）
+
+```js
+      // 解决了上面两种的每个问题
+			// 父类多次实例化问题
+			function Parent3 () {
+          this.name = 'parent3';
+          this.play = [1, 2, 3];
+      }
+      function Child3 () {
+          Parent3.call(this);
+          this.type = 'child3';
+      }
+			// 就是为了继承父类的原型对象
+      Child3.prototype = new Parent3();
+      var s3 = new Child3();
+      var s4 = new Child3();
+      s3.play.push(4);
+      console.log(s3.play, s4.play);
+```
+
+4. **组合继承优化1**
+
+```js
+			function Parent4 () {
+          this.name = 'parent4';
+          this.play = [1, 2, 3];
+      }
+      function Child4 () {
+          Parent4.call(this);
+          this.type = 'child4';
+      }
+			// 就是为了继承父类的原型对象
+			// 在原型对象中有constructor属性，因为子类和父类都是一个原型对象，所以属性值都是一样的
+			// Child4.prototype.constructor = Child4  加上这句话也不行，因为Child4.prototype = Parent4.prototype是一个对象，你改变Child4.prototype 就等于改变 Parent4.prototype
+      Child4.prototype = Parent4.prototype;
+      var s5 = new Child4();
+      var s6 = new Child4();
+      console.log(s5, s6);
+
+      console.log(s5 instanceof Child4, s5 instanceof Parent4);
+			// 但是使用这种的时候  你去找我这实例是谁产生的，竟然是父类（不是我们想要的）
+      console.log(s5.constructor);
+```
+
+5. **组合继承优化2**
+
+```js
+			function Parent5 () {
+          this.name = 'parent5';
+          this.play = [1, 2, 3];
+      }
+      function Child5 () {
+          Parent5.call(this);
+          this.type = 'child5';
+      }
+			// 对象关联 一个新的对象  子类和父类的原型进行隔离
+      Child5.prototype = Object.create(Parent5.prototype);
+			Child5.prototype.constructor = Child5
 ```
 
 ### 事件

@@ -1730,40 +1730,31 @@ function getDataType (o) {
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210802130036.png)
 
-
-
-
-
-
-
 ## 常见面试问题
 
-### 跨域
+### 通信类
 
-解决跨域的方案
-
-- 修改本地HOST
-- JSONP
-- CORS
-- Proxy
-- Nginx反向代理
-- Post Message（利用`iframe`标签，实现不同域的关联）
-
-同源是什么？
+#### **同源是什么？**
 
 如果两个URL的协议`protocol`、主机名`host`和端口号`port`都相同的话，则这两个URL是同源。
 
-同源策略
+#### **同源策略(协议、域名与端口号)**
 
 同源策略是一个重要的安全策略。它能够阻断恶意文档，减少被攻击的媒介。
 
 > 真实项目中，很少有**同源策略**，大部分都是**非同源策略**
 
-跨域是什么？
+#### 前后端通讯的方式
+
+- Ajax（同源的通信方式）
+- WebSocket（不受同源策略的限制）
+- CORS（支持跨域通信，也支持同源通信）
+
+#### **跨域是什么？**
 
 **当协议、域名与端口号中任意一个不相同时，都算作不同域，不同域之间相互请求资源的表现(非同源策略请求)，称作”跨域“**。
 
-造成跨域的几种常见表现
+#### **造成跨域的几种常见表现**
 
 - 服务器分开部署（Web服务器 + 数据请求服务器）
 - 本地开发（本地预览项目 调取 测试服务器的数据）
@@ -1771,14 +1762,16 @@ function getDataType (o) {
 
 > **Web服务器**：主要用来静态资源文件的处理
 
-解决方案
+#### **解决跨域的方案**
 
-- 修改本地HOST(不作介绍)
+- 修改本地HOST
 - JSONP
 - CORS
 - Proxy
 - Nginx反向代理
 - Post Message（利用`iframe`标签，实现不同域的关联）
+- Hash
+- WebSocket
 
 1. **JSONP**
 
@@ -1805,15 +1798,13 @@ function jsonp(url, callback) {
   // 套了一层 anonymous function
   // 目的让 返回的callback执行且删除创建的标签
   window[uniqueName] = data => {
-  // 从服务器获取结果并让浏览器执行callback
+   // 从服务器获取结果并让浏览器执行callback
     document.body.removeChild(script);
     delete window[uniqueName];
     callback && callback(data);
   }
-  
   // 处理URL
   url += `${url.includes('?')} ? '&' : '?}callback=${uniqueName}'`;
-  
   // 发送请求
   let script = document.createElement('script');
   script.src = url;
@@ -1833,15 +1824,12 @@ jsonp('http://127.0.0.1:1001/list?userName="lsh"', (result) => {
 // 服务器端
 // Api请求数据
 app.get('/list', (req, res) => {
-  
   // req.query 问号后面传递的参数信息
   // 此时的callback 为传递过来的函数名字 (uniqueName)
  let { callback } = req.query;
-  
   // 准备返回的数据（字符串）
   let res = { code: 0, data: [10,20] };
   let str = `${callback}($(JSON.stringify(res)))`;
-  
   // 返回给客户端数据
   res.send(str);
 })
@@ -1854,17 +1842,15 @@ app.get('/list', (req, res) => {
 // 服务器请求的 url
 Request URL:
  http://127.0.0.1:1001/list?userName="lsh"&callback=jsonp159876002
-
 // 服务器返回的函数callback
  jsonp159876002({"code":0, "data": [10,20]});
-
 // 客户端接收的数据信息
 { code: 0, data: Array(2) }
 ```
 
 在上文中说到只要服务器端那里设置了允许通过`jsonp`的形式跨域请求，我们就可以取回数据。
 
-2. **CORS**
+2. **CORS**（支持跨域通信的Ajax）
 
 上文提到，不允许跨域的根本原因是因为`Access-Control-Allow-Origin`已被禁止。那么只要让`服务器端设置允许源`就可以了。
 
@@ -1886,6 +1872,8 @@ app.use((req, res, next) => {
 
 
 
+
+
 // 客户端
 let xhr = new XMLHttpRequest;
 xhr.open('get', 'http://127.0.0.1:1001/list');
@@ -1897,6 +1885,16 @@ xhr.onreadystatechange = () => {
   }
 };
 xhr.send();
+
+// CORS【参考资料】http://www.ruanyifeng.com/blog/2016/04/cors.html
+// url（必选），options（可选）
+fetch('/some/url/', {
+      method: 'get',
+ }).then(function (response) {
+
+ }).catch(function (err) {
+     // 出错了，等价于 then 的第二个参数，但这样更好用更直观
+ });
 ```
 
 当我们一旦在服务器端设置了允许`任何源`可以请求之后，其实请求是不安全的，并且要求`客户端`不能携带资源凭证（比如上文中的Cookie字段），浏览器端会报错。
@@ -1988,7 +1986,7 @@ module.exports = {
 
 另外如果是自己实现`node服务层代理`：无论是开发环境还是生产环境都可以处理（node中间层和客户端是同源，中间层帮助我们向服务器请求数据，再把数据返回给客户端）
 
-### Proxy的局限性
+**Proxy的局限性**
 
 只能在本地开发阶段使用
 
@@ -2029,14 +2027,13 @@ server {
 A.html
 
 ```JS
+// A 页面
 // 把 B页面当做A的子页面嵌入到A页面里
 <iframe id="iframe" src="http://127.0.0.1:1002/B.html" frameborder="0" style="display: none;"></iframe>
-
 <script>
   iframe.onload = function () {
     iframe.contentWindow.postMessage('珠峰培训', 'http://127.0.0.1:1002/');
   }
-
   //=>监听B传递的信息
   window.onmessage = function (ev) {
     console.log(ev.data);
@@ -2045,16 +2042,57 @@ A.html
 
 
 
+
+// B页面
 <script>
   //=>监听A发送过来的信息
   window.onmessage = function (ev) {
     // console.log(ev.data);
-
     //=>ev.source:A
     ev.source.postMessage(ev.data + '@@@', '*');
   }
 </script>
 ```
+
+6. **Hash**
+
+url后面的# 改变不会导致页面刷新
+
+```js
+   // 利用hash，场景是当前页面 A 通过iframe或frame嵌入了跨域的页面 B
+      // 在A中伪代码如下：
+      var B = document.getElementsByTagName('iframe');
+      B.src = B.src + '#' + 'data';
+      // 在B中的伪代码如下
+      window.onhashchange = function () {
+          var data = window.location.hash;
+      };
+```
+
+6. **WebSocket**
+
+```js
+      // Websocket【参考资料】http://www.ruanyifeng.com/blog/2017/05/websocket.html
+      var ws = new WebSocket('wss://echo.websocket.org');
+      // 发送消息
+      ws.onopen = function (evt) {
+          console.log('Connection open ...');
+          ws.send('Hello WebSockets!');
+      };
+      // 接收消息
+      ws.onmessage = function (evt) {
+          console.log('Received Message: ', evt.data);
+          ws.close();
+      };
+      // 关闭连接
+      ws.onclose = function (evt) {
+          console.log('Connection closed.');
+      };
+```
+
+
+
+
 
 ### ES6 Module和Commonjs区别
 
@@ -2088,6 +2126,10 @@ export default 'hello'
 import str from './hello.js'
 console.log(str)
 ```
+
+
+
+
 
 ### Webpack性能优化
 
