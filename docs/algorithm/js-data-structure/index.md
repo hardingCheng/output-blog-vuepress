@@ -1,5 +1,3 @@
-
-
 # JavaScript 数据结构与算法
 
 ## JavaScript 基础
@@ -1784,6 +1782,12 @@ export default class StackLinkedList {
 
 集合，这是一种**不允许出现重复**的顺序数据结构。
 
+集合，**无序且唯一**的数据结构。
+
+### LeetCode
+
+- 349. 两个数组的交集
+
 ### 构建数据集合
 
 **集合**是由**一组无序且唯一**(不能重复)的项组成。该数据解雇使用了与有限集合相同的数学概念，但应用在计算机科学的数据结构中。
@@ -2030,7 +2034,7 @@ const difference = (setA, setB) => {
 //
 ```
 
-### 使用扩展运算符计算并交差
+### 使用扩展运算符计算并交差(就是转换为数组)
 
 ```js
 // 并
@@ -2042,6 +2046,41 @@ let newSet = new Set([...setA].filter((x) => setB.has(x)));
 // 差
 let newSet = new Set([...setA].filter((x) => !setB.has(x)));
 ```
+
+### 数组去重
+
+```js
+let arr = [1,1,2,3]
+let arr1 = [...new Set(arr)]
+```
+
+### Set多种迭代方法
+
+```js
+let setA = new Set([1,2,4,5])
+// 1.第一种
+for(let item of steA){
+  console.log(item)
+}
+// 2.第二种
+for(let item of setA.keys()){
+  console.log(item)
+}
+// 3.第三种
+for(let item of setA.values()){
+  console.log(item)
+}
+// 4.第四种
+for(let (key,value) of setA.entries()){
+  console.log(key,value)
+}
+
+
+
+
+```
+
+
 
 ## 字典和散列表
 
