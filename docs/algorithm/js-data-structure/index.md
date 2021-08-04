@@ -5078,6 +5078,38 @@ function radixSort(array, radixBase = 10) {
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210630231547.png)
 
+#### 希尔排序
+
+- 先将整个待排序的记录序列分割成为若干子序列。
+- 分别进行直接插入排序。
+- 待整个序列中的记录基本有序时，再对全体记录进行依次直接插入排序。
+
+```js
+const shellSort = arr => {
+	let len = arr.length,
+		temp,
+		gap = 1;
+	console.time('希尔排序耗时');
+	while (gap < len / 3) {
+		//动态定义间隔序列
+		gap = gap * 3 + 1;
+	}
+	for (gap; gap > 0; gap = Math.floor(gap / 3)) {
+		for (let i = gap; i < len; i++) {
+			temp = arr[i];
+			let j = i - gap;
+			for (; j >= 0 && arr[j] > temp; j -= gap) {
+				arr[j + gap] = arr[j];
+			}
+			arr[j + gap] = temp;
+			console.log('arr  :', arr);
+		}
+	}
+	console.timeEnd('希尔排序耗时');
+	return arr;
+};
+```
+
 ### 搜索算法
 
 #### 顺序搜索
