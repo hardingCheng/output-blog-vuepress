@@ -2084,6 +2084,14 @@ for(let (key,value) of setA.entries()){
 
 ## 字典和散列表
 
+### LeetCode
+
+- 349. 两个数组的交集
+- 20.有效的括号
+- 1. 两数之和
+- 3. 无重复字符的最长子串
+- 76. 最小覆盖子串
+
 使用字典和散列表来存储唯一值（不重复的值）的数据结构。
 在集合中，我们感兴趣的是每个值本身，并不它当做主要元素。在字典（的映射）中，我们用`[键，值]`对的形式来存储数据。在散列表中也是一样的。
 
@@ -2239,6 +2247,50 @@ class Dictionary {
     return objString;
   }
 }
+```
+
+### ES2015Map类
+
+```js
+const map = new Map()
+map.set('Gandalf','gandalf@email.com')
+map.set('John','john@email.com')
+map.set('Tyrion','tyrion@email.com')
+
+console.log(map.has('Gandalf')) //true
+console.log(map.size) //3
+console.log(map.keys()) //{'Gandalf','John','Tyrion'}
+console.log(map.values()) //{'gandalf@email.com','john@email.com','tyrion@email.com'}
+console.log(map.get('Tyrion')) //tyrion@email.com
+map.delete('Tyrion')
+map.clear()
+```
+
+Map类和我们Dictionary类不同，Map类的keys()，values()方法都返回Iterator，而不是值或者键构成的数组。另一个区别是，我们实现的size方法返回字典中存储的值的个数，而ES2015Map类则是一个size属性。
+
+### ES2015WeakMap类和WeakSet类
+
+除了Set和Map类这两种数据结构，ES2015还增加了它们的弱化版本，WeakSet和WeakMap。及本省，Map和Set与其弱化版本之间仅有的区别是：
+
+- WeakSet或WeakMap类没有entries、keys和values等方法；
+- 只能用对象作为键。
+
+创建和使用这两个类主要是为了性能。WeakSet和WeakMap是弱化的（用对象作为键），没有强引用的键。这使得JavaScript的来及回收器可以从中清除整个入口。
+
+必须有键才可以取出值。这些类没有entries、keys和values等迭代器方法，因此除非知道键，否则没办法取出值。
+
+```js
+const map = new WeakMap()
+const obj1 = {name:'Gandalf'}
+const obj2 = {name:'John'}
+const obj3 = {name:'Tyrion'}
+map.set(obj1,'gandalf@email.com')
+map.set(obj2,'john@email.com')
+map.set(obj3,'tyrion@email.com')
+
+console.log(map.has(obj1)) //true
+console.log(map.get(obj3)) //tyrion@email.com
+map.delete(obj2)
 ```
 
 ### 散列表
@@ -2791,44 +2843,6 @@ djb2HashCode(key) {
     }
     return hash % 1013
 }
-```
-### ES2015Map类
-```js
-const map = new Map()
-map.set('Gandalf','gandalf@email.com')
-map.set('John','john@email.com')
-map.set('Tyrion','tyrion@email.com')
-
-console.log(map.has('Gandalf')) //true
-console.log(map.size) //3
-console.log(map.keys()) //{'Gandalf','John','Tyrion'}
-console.log(map.values()) //{'gandalf@email.com','john@email.com','tyrion@email.com'}
-console.log(map.get('Tyrion')) //tyrion@email.com
-map.delete('Tyrion')
-map.clear()
-```
-Map类和我们Dictionary类不同，Map类的keys()，values()方法都返回Iterator，而不是值或者键构成的数组。另一个区别是，我们实现的size方法返回字典中存储的值的个数，而ES2015Map类则是一个size属性。
-
-### ES2015WeakMap类和WeakSet类
-除了Set和Map类这两种数据结构，ES2015还增加了它们的弱化版本，WeakSet和WeakMap。及本省，Map和Set与其弱化版本之间仅有的区别是：
-- WeakSet或WeakMap类没有entries、keys和values等方法；
-- 只能用对象作为键。
-
-创建和使用这两个类主要是为了性能。WeakSet和WeakMap是弱化的（用对象作为键），没有强引用的键。这使得JavaScript的来及回收器可以从中清除整个入口。
-
-必须有键才可以取出值。这些类没有entries、keys和values等迭代器方法，因此除非知道键，否则没办法取出值。
-```js
-const map = new WeakMap()
-const obj1 = {name:'Gandalf'}
-const obj2 = {name:'John'}
-const obj3 = {name:'Tyrion'}
-map.set(obj1,'gandalf@email.com')
-map.set(obj2,'john@email.com')
-map.set(obj3,'tyrion@email.com')
-
-console.log(map.has(obj1)) //true
-console.log(map.get(obj3)) //tyrion@email.com
-map.delete(obj2)
 ```
 ## 递归
 #### 理解递归
