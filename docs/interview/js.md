@@ -1,4 +1,4 @@
-​	
+s	
 
 # JavaScript面试
 
@@ -2261,6 +2261,506 @@ HttpOnly 最早由微软提出，至今已经成为一个标准。浏览器将�
 - **通常来说 CSRF 是由 XSS 实现的，CSRF 时常也被称为 XSRF（CSRF 实现的方式还可以是直接通过命令行发起请求等）。**
 - 本质上讲，XSS 是代码注入问题，**CSRF 是 HTTP 问题。** XSS 是内容没有过滤导致浏览器将攻击者的输入当代码执行。**CSRF 则是因为浏览器在发送 HTTP 请求时候自动带上 cookie，而一般网站的 session 都存在 cookie里面(Token验证可以避免)。**
 
+### 从输入 URL 到页面展示，这中间发生了什么？
+
+1. **用户输入URL**
+
+浏览器判断输入内容是否为URL，如果不是URL，用浏览器默认的搜索引擎来合成新的带搜索关键字的URL，如果判断输入内容符合URL规则，则加上协议合成完整URL。
+
+2. **URL请求**
+
+- 1. 浏览器进程通过进程间通信（IPC）把URL请求发送至网络进程，由网络进程发起真正的URL请求。
+- 2. 网络进程查找本地缓存是否缓存了该资源，如果有缓存资源，那么直接返回资源给浏览器进程，如果没有缓存则进入网络请求流程。
+- 3. 请求前第一步进行DNS解析，以获取请求域名的服务器IP地址。如果请求协议是HTTPS，需要建立TLS连接。
+- 4. 利用IP地址和服务器建立TCP连接。
+- 5. 构建请求行、请求头等信息，并把和该域名相关的Cookie等数据附加到请求头中，然后向服务器发送构建的请求信息。
+- 6. 服务器接收到请求信息后，会根据请求信息生成响应数据（包括响应行、响应头和响应体等信息），并发给网络进程。
+- 7. 网络进程接收到响应后，解析响应头的内容。
+
+如果返回的状态码是301或者302，从响应头的 Location 字段读取重定向的地址，发起新的 HTTP 或者 HTTPS 请求。
+
+如果响应行是200，根据Content-Type，判断服务器返回的响应体数据是什么类型，如果响应头中的Content-type字段的值是text/html，说明服务器返回的数据是HTML格式。
+
+3. ####  准备渲染进程
+
+同一站点：根域名（例如，geekbang.org）和协议（例如，https:// 或者 http://）相同的页面。
+
+Chrome 默认会为每个页面分配一个渲染进程，但是，如果从一个页面打开了另一个新页面，而新页面和当前页面属于同一站点的话，那么新页面会复用父页面的渲染进程。
+
+4. #### 提交文档（即响应体数据）
+
+- 浏览器进程发出“提交请求”消息给渲染进程，渲染进程接收到“提交文档”的消息后，和网络进程建立传输数据的“管道”。
+
+- 等文档数据传输完成之后，渲染进程会返回“确认提交”的消息给浏览器进程。
+
+- 浏览器进程在收到“确认提交”的消息后，会更新浏览器界面状态，包括了安全状态、地址栏的 URL、前进后退的历史状态，并更新。
+
+5. #### 渲染流程（就是下面的渲染机制）
+
+### 渲染机制
+
+1. 什么是`DOCTYPE`及作用
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210806083900.png)
+
+![image-20210806084003066](/Users/cr/Library/Application Support/typora-user-images/image-20210806084003066.png)
+
+2. 浏览器渲染过程
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210806084829.png)
+
+- **1.构建DOM树**
+
+浏览器从响应体读取HTML原始字节，并指定编码(如UTF-8)转换成字符串， 再将字符串转换成Token，Token会标识是“开始标签”、“结束标签”或“文本”等信息，如"StartTag:head"、"EndTag:title"、"sometext"， 然后由Token生成节点对象，最后构建DOM树。如"StartTag:head"、"EndTag:title"、"sometext"， 然后由Token生成节点对象，最后构建DOM树。
+
+> 事实上，构建DOM的过程中，不是等所有Token都转换完成后再去生成节点对象，而是一边生成Token一边消耗Token来生成节点对象。 换句话说，每个Token被生成后，会立刻消耗这个Token创建出节点对象。注意：带有结束标签标识的Token不会创建节点对象。
+
+![image-20210806091455092](/Users/cr/Library/Application Support/typora-user-images/image-20210806091455092.png)
+
+- **2.构建CSSOM树**
+
+构建CSSOM的过程与构建DOM的过程相似。
+
+CSS 样式来源主要有三种：
+
+​	 - 通过 link 引用的外部 CSS 文件
+
+​     - `<style>`标记内的 CSS
+
+​     - 元素的 style 属性内嵌的 CSS
+
+在这一过程中，浏览器会确定下每一个节点的样式到底是什么，并且这一过程其实是很消耗资源的。因为样式既可以自行设置给某个节点，也可以通过继承获得。 在这一过程中，浏览器得递归CSSOM树，确定具体的元素样式。
+
+![image-20210806091541398](/Users/cr/Library/Application Support/typora-user-images/image-20210806091541398.png)
+
+- **3.构建渲染树（布局树**
+
+遍历DOM树中的所有可见节点，并把这些节点添加到渲染树，不可见的节点会被忽略掉，如head标签下面的全部内容、样式属性包含dispaly:none的元素等。
+
+计算渲染树节点的坐标位置。
+
+![image-20210806091605013](/Users/cr/Library/Application Support/typora-user-images/image-20210806091605013.png)
+
+- **4. 构建分层树**
+
+渲染引擎为特定的节点生成专用的图层，并生成一棵对应的图层树。
+
+- **5. 生成绘制表**
+
+把每一个图层的绘制拆分成很多小的绘制指令，然后再把这些指令按照顺序组成一个待绘制列表。
+
+绘制列表只是用来记录绘制顺序和绘制指令的列表，而实际上绘制操作是由渲染引擎中的合成线程来完成的。
+
+所以这一步还要将绘制列表提交到合成线程。
+
+![image-20210806091635510](/Users/cr/Library/Application Support/typora-user-images/image-20210806091635510.png)
+
+- **6.栅格化**
+
+> 合成线程会将图层划分为图块（tile），按照视口附近的图块来优先生成位图，实际生成位图的操作是由栅格化来执行的。 所谓栅格化，是指将图块转换为位图。而图块是栅格化执行的最小单位。 渲染进程维护了一个栅格化的线程池，所有的图块栅格化都是在线程池内执行的。 通常，栅格化过程都会使用 GPU 来加速生成，使用 GPU 生成位图的过程叫快速栅格化，或者 GPU 栅格化，生成的位图被保存在 GPU 内存中。
+
+- **7.合成**
+
+所有图块都被光栅化后，合成线程发送绘制图块的命令DrawQuad给浏览器进程。
+
+- **8.显示**
+
+浏览器进程里面有一个叫viz的组件，用来接收合成线程发过来的DrawQuad命令，然后根据DrawQuad命令，将其页面内容绘制到内存中，最后再将内存显示在屏幕上。
+
+3. 重排`Reflow`
+
+当渲染树中部分或全部元素的更改，能引起元素的几何位置属性，例如改变元素的宽度、高度等，浏览器会触发重新布局，这个过程称为回流或者重排。
+
+会导致回流的操作：
+
+- 页面首次渲染
+- 浏览器窗口大小发生改变
+- 元素尺寸或位置发生改变（边距、填充、边框、宽度和高度）
+- 元素内容变化（文字数量或图片大小等等）
+- 元素字体大小变化
+- 添加、删除、修改、移动可见的DOM元素
+- 计算 offsetWidth 和 offsetHeight 属性
+- 设置/查询某些属性、调用某些方法
+
+- 当你修改 CSS 样式的时候
+
+常见的会导致回流的属性和方法：
+
+- width、height、margin、padding、border
+- display、position、overflow
+- clientWidth、clientHeight、clientTop、clientLeft
+- offsetWidth、offsetHeight、offsetTop、offsetLeft
+- scrollWidth、scrollHeight、scrollTop、scrollLeft
+- scrollIntoView()、scrollIntoViewIfNeeded()
+- getComputedStyle()
+- getBoundingClientRect()
+- scrollTo()
+
+4. 重绘`Repaint`
+
+当页面中元素样式的改变并不影响它在文档流中的位置时，例如修改了元素的背景颜色，由于没有引起几何位置的变换，所以不会重新执行布局，浏览器会将新样式赋予给元素并重新绘制它，这个过程称为重绘。
+
+相较于重排操作，重绘省去了布局和分层阶段，所以执行效率会比重排操作要高一些。
+
+常见的会导致重绘的属性和方法：
+
+- color、text-decoration、visibility
+- background、background-image、background-position、background-repeat、background-size
+- outline、outline-color、outline-style、outline-radius、outline-width
+- border-style、box-shadow
+
+5. 布局`Layout`
+
+> 页面性能
+
+提升页面性能的方法：
+
+1. 资源压缩合并，减少HTTP请求
+2. 非核心代码异步加载，异步加载的方式，
+3. 利用浏览器缓存
+4. 使用CDN
+
+6. 如何减少重绘和重排
+
+### JS运行机制
+
+**Event Loop是javascript的执行机制**
+
+**执行同步任务** -> **行异步任务** -> **先执行微任务** -> **后执行宏任务**
+
+主线程从**任务队列**中读取事件，这个过程是不断循环的，所以整个的这种运行机制又称为Event Loop（事件循环）。Event Loop是JavaScript的执行机制
+
+- **同步任务和异步任务（宏任务和微任务）**
+
+同步任务：在主线程上排队执行的任务，只有前一个任务执行完毕，才能执行后一个任务。
+
+异步任务：不进入主线程，而进入**任务队列（task queue）** 只有**任务队列**通知主线程，某个异步任务可以执行了，该任务才会进入主线程执行。
+
+<img src="/Users/cr/Library/Application Support/typora-user-images/image-20210806133659358.png" alt="image-20210806133659358" style="zoom:33%;" />
+
+- **宏任务和微任务**
+
+|           宏任务            |            微任务             |
+| :-------------------------: | :---------------------------: |
+|           定时器            |    Promise（async/await）     |
+|          事件绑定           | process.nexTick（Node独有的） |
+|            Ajax             |        MutationObserve        |
+|          回调函数           |                               |
+| Node中fs可以进行异步I/O操作 |                               |
+
+ **JavaScript 执行机制：**
+
+- **主线程任务——>微任务——>宏任务**
+
+如果宏任务里还有微任就继续执行宏任务里的微任务，如果宏任务中的微任务中还有宏任务就在依次进行
+
+- **主线程任务——>微任务——>宏任务——>宏任务里的微任务——>宏任务里的微任务中的宏任务——>直到任务全部完成**
+
+```js
+console.log('1');
+setTimeout(function() {
+    console.log('2');
+    new Promise(function(resolve) {
+        console.log('3');
+        resolve();
+    }).then(function() {
+        console.log('4')
+    })
+})
+new Promise(function(resolve) {
+    console.log('5');
+    resolve();
+}).then(function() {
+    console.log('6')
+})
+
+setTimeout(function() {
+    console.log('7');
+    new Promise(function(resolve) {
+        console.log('8');
+    }).then(function() {
+        console.log('9')
+    })
+})
+console.log('10');
+
+// 1 5 10 6 2 3 4 7 8
+
+第一轮：
+首先是进入主线程，遇到 console.log(‘1’)，打印1
+然后遇到 promise 中的 console.log(‘5’); 直接执行，打印5
+再遇到 console.log(‘10’)，打印10
+
+第二轮：
+然后运行微任务，我们看到这里面的微任务有 promise，依次执行。
+首先promise完成态，走到 then，遇到 console.log(‘6’)，打印6
+
+第三轮：
+然后运行宏任务，我们看到这里面的微任务有 setTimeout，依次执行。
+遇到 console.log(‘2’)，打印2，然后发现里面还有个微任务 promise，先打印3，等完成后，走到 then，打印4
+遇到第二个 setTimeout 打印7，然后发现里面还有个微任务 promise，先打印8，由于没有完成态resolve()，所以不打印9
+```
+
+
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210806134040.png" style="zoom:33%;" />
+
+
+
+```js
+    console.log('一碗白米饭')
+    setTimeout(function () {
+      console.log('麻辣鱼头')
+    }, 0)
+    new Promise(function (resolve, reject) {
+      resolve('凉拌小菜')
+    }).then(res => {
+      console.log(res)
+    })
+    new Promise(function (resolve, reject) {
+      resolve('麻婆没豆腐')
+    }).then(res => {
+      console.log(res)
+    })
+    setTimeout(function () {
+      console.log('红烧乳猪蹄')
+      console.log('油焖大虾')
+    }, 0)
+    setTimeout(function () {
+      console.log('糖醋鲤鱼')
+    }, 0)
+    new Promise(function (resolve, reject) {
+      resolve('红烧木耳')
+    }).then(res => {
+      console.log(res)
+    })
+    console.log('白开水')
+// 控制台结果
+    白米饭
+    白开水
+    凉拌小菜
+    麻婆没豆腐
+    红烧木耳
+    麻辣鱼头
+    红烧乳猪蹄
+    油焖大虾
+    糖醋鲤鱼
+
+```
+
+<img src="/Users/cr/Library/Application Support/typora-user-images/image-20210806134254388.png" alt="image-20210806134254388" style="zoom:33%;" />
+
+将同步代码放入执行栈中执行，在控制台输出。
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210806134345.png" style="zoom:33%;" />
+
+**清空执行栈** -> **先执行微任务** ->**清空微任务队列**
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210806134652.png" style="zoom:33%;" />
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210806134722.png" style="zoom:33%;" />
+
+**执行宏任务** ->**清空宏任务队列** -> **一次事件循环结束**
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210806134621.png" style="zoom:33%;" />
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210806134759.png" style="zoom:33%;" />
+
+### 页面性能
+
+1. **提升页面性能的方法有那些**
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210806101028.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210806101655.png)
+
+```js
+    <script src="./defer1.js" charset="utf-8" defer></script>
+    <script src="./defer2.js" charset="utf-8" defer></script>
+    <script src="./async1.js" charset="utf-8" async></script>
+    <script src="./async2.js" charset="utf-8" async></script>
+```
+
+![image-20210806102138417](/Users/cr/Library/Application Support/typora-user-images/image-20210806102138417.png)
+
+### 浏览器缓存
+
+1. **DNS缓存**
+
+通常我们输入一个网址，它包含了`域名`和`端口`可以指定唯一的IP地址，然后建立连接进行通信，而`域名`查找`IP地址`的过程就是`dns解析`。
+
+```
+www.dnscache.com (域名) - DNS解析 -> 11.222.33.444 (IP地址)
+```
+
+这个过程会对网络请求带来一定的损耗，所以浏览器在第一次获取到`IP地址`后，会将其缓存起来。下次相同域名再次发起请求时，浏览器会先查找本地缓存，如果缓存有效，则会直接返回该`IP地址`，否则会继续开始寻址之旅。
+
+- 首先搜索浏览器自身的DNS缓存,如果存在，则`域名解析`到此完成。
+- 如果`浏览器自身的缓存`里面没有找到对应的条目，那么会尝试读取`操作系统的hosts文件`看是否存在对应的映射关系,如果存在，则域名解析到此完成。
+- 如果本地hosts文件不存在映射关系，则查找`本地DNS服务器`(ISP服务器,或者自己手动设置的DNS服务器),如果存在,域名到此解析完成。
+- 如果本地DNS服务器还没找到的话,它就会向`根服务器`发出请求,进行递归查询。
+
+2. **memory cache（本地缓存）**
+
+这是浏览器为了加快读取缓存速度而进行的`自身的优化行为`，不受开发者控制，也不受 HTTP 协议头的约束。当资源被存入内存后，下次同样的请求将不再通过网络，而是直接访问内存，`当关闭该页面时，此资源就被内存释放掉`了，再次重新打开相同页面时不再出现`from memory cache`的情况。
+
+什么时候资源会被放入memory缓存呢?
+
+答案是:几乎`所有的网络请求资源`都会根据相关的策略被浏览器自动加入到 memory cache 中。但是也正因为数量很大但是浏览器占用的内存不能无限扩大这样两个因素，memory cache 注定只能是个`“短期存储”`。当数据量过大，即使网页不关闭，缓存依然会失效。
+
+memory cache 机制保证了一个页面中如果有两个相同的请求 (例如两个 `src` 相同的 `<img>`，两个 `href` 相同的 `<link>`)都实际只会被请求最多一次，避免浪费。
+
+3. **http缓存（disk cache）**
+
+强制缓存优先于协商缓存进行，若强制缓存(Expires和Cache-Control)生效则直接使用缓存，若不生效则进行协商缓存(Last-Modified / If-Modified-Since和Etag / If-None-Match)，协商缓存由服务器决定是否使用缓存，若协商缓存失效，那么代表该请求的缓存失效，返回200，重新返回资源和缓存标识，再存入浏览器缓存中；生效则返回304，继续使用缓存。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210806145754.png)
+
+![image-20210806102204768](/Users/cr/Library/Application Support/typora-user-images/image-20210806102204768.png)
+
+`硬盘缓存又叫HTTP缓存`，它也是浏览器缓存中最重要的内容。因为你想啊，DNS缓存它主要是做一个ip地址查找并且是自主完成的，memory cache 也是不受控制，算是一个黑盒。所以剩下的`可以受我们控制`的硬盘缓存的重要性就不言而喻了，`大多优化手段也是针对硬盘缓存`。HTTP缓存分为`强缓存`和`协商缓存`。
+
+- **强缓存**
+
+`控制它的字段`分别是：`Expires`和`Cache-Control`，其中`Cache-Control`优先级比`Expires`高。
+
+当客户端发出一个请求到服务器，服务器希望你把资源缓存起来，于是在响应头中加入了这些内容。
+
+```js
+Cache-Control: max-age=3600 我希望你把这个资源缓存起来，缓存时间是3600秒（1小时）
+Expires: Thu, 10 Nov 2020 08:45:11 GMT 到达指定时间过期 
+Date: Thu, 30 Apr 2020 12:39:56 GMT 
+Etag:W/"121-171ca289ebf"，(后面协商缓存内容)这个资源的编号是W/"121-171ca289ebf" 
+Last-Modified:Thu, 30 Apr 2020 08:16:31 GMT，(后面协商缓存内容)这个资源的上一次修改时间
+```
+
+`Cache-Control`和 `Expires`分别是HTTP/1.1 和 HTTP/1.0的内容，为了兼容 HTTP/1.0 和 HTTP/1.1，实际项目中两个字段我们都会设置。
+
+浏览器收到这个响应之后就会做下面的事情:
+
+			- 浏览器把这次请求得到的响应体`缓存到本地文件`中
+			- 浏览器`标记这次请求的请求方法和请求路径`
+
+- 浏览器`标记这次缓存的时间`是3600秒
+- 浏览器`记录服务器的响应时间`是格林威治时间`2020-04-30 12:39:56`
+
+这一次的记录非常重要，它为以后浏览器要不要去请求服务器提供了依据。
+
+之后当客户端收准备再次请求同样的地址时，它突然想起了一件事：`我需要的东西在不在缓存里呢？`
+
+此时，客户端会到缓存中去寻找是否有缓存的资源，如下
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210806141946.png" style="zoom:33%;" />
+
+判断缓存是否有效就是通过把`max-age + Date`，得到一个过期时间，看看这个过期时间是否大于当前时间，如果是，则表示缓存还没有过期，仍然有效，如果不是，则表示`缓存失效`。
+
+- **协商缓存**
+
+一旦发现缓存无效，它**并不会简单的把缓存删除**，而是抱着一丝希望，想问问服务器，我**这个缓存在上次修改之后是否重新做了更改？还能继续使用吗**？
+
+**协商缓存就是强制缓存失效后，浏览器携带缓存标识向服务器发起请求，由服务器根据缓存标识决定是否使用缓存的过程**。
+
+于是，浏览器向服务器发出了一个**带缓存的请求**。
+
+**（1）Last-Modified和If-Modified-Since**
+
+`Last-Modified: Fri, 22 Jul 2016 01:47:00 GMT`
+
+浏览器下一次请求这个资源，浏览器检测到有 Last-Modified这个header，于是添加If-Modified-Since这个header，值就是Last-Modified中的值；服务器再次收到这个资源请求，会根据 If-Modified-Since 中的值与服务器中这个资源的最后修改时间对比，如果没有变化，返回304和空的响应体，直接从缓存读取，如果If-Modified-Since的时间小于服务器中这个资源的最后修改时间，说明文件有更新，于是返回新的资源文件和200
+
+但是 Last-Modified 存在一些弊端：
+
+> - 如果本地打开缓存文件，即使没有对文件进行修改，但还是会造成 Last-Modified 被修改，服务端不能命中缓存导致发送相同的资源
+> - 因为 Last-Modified 只能以秒计时，如果在不可感知的时间内修改完成文件，那么服务端会认为资源还是命中了，不会返回正确的资源
+
+**(2) ETag和If-None-Match**
+
+**Etag是服务器响应请求时，返回当前资源文件的一个唯一标识(由服务器生成)，只要资源有变化，Etag就会重新生成**。浏览器在下一次加载资源向服务器发送请求时，会将上一次返回的Etag值放到request header里的If-None-Match里，服务器只需要比较客户端传来的If-None-Match跟自己服务器上该资源的ETag是否一致，就能很好地判断资源相对客户端而言是否被修改过了。如果服务器发现ETag匹配不上，那么直接以常规GET 200回包形式将新的资源（当然也包括了新的ETag）发给客户端；如果ETag是一致的，则直接返回304知会客户端直接使用本地缓存即可。
+
+所谓带缓存的请求，无非就是加入了以下的请求头：
+
+```js
+If-Modified-Since: Thu, 30 Apr 2020 08:16:31 GMT  亲，你曾经告诉我，这个资源的上一次修改时间是格林威治时间2020-04-30 08:16:31，请问这个资源在这个时间之后有发生变动吗？
+If-None-Match: W/"121-171ca289ebf"  亲，你曾经告诉我，这个资源的编号是W/"121-171ca289ebf，请问这个资源的编号发生变动了吗？
+```
+
+之所以要发两个信息，是为了兼容不同的服务器，因为有些服务器只认`If-Modified-Since`，有些服务器只认`If-None-Match`，有些服务器两个都认,但是一般来说 `If-None-Match 的优先级高于 If-Modified-Since`。
+
+**（3）两者对比**
+
+- 首先在精确度上，Etag要优于Last-Modified。
+
+Last-Modified的时间单位是秒，如果某个文件在1秒内改变了多次，那么他们的Last-Modified其实并没有体现出来修改，但是Etag每次都会改变确保了精度；如果是负载均衡的服务器，各个服务器生成的Last-Modified也有可能不一致。
+
+- 第二在性能上，Etag要逊于Last-Modified，毕竟Last-Modified只需要记录时间，而Etag需要服务器通过算法来计算出一个hash值。
+- 第三在优先级上，服务器校验优先考虑Etag
+
+此时可能会产生两个结果
+
+**缓存失效：** 那么非常简单，服务器再次给予一个正常的响应（响应码200 带响应体），同时可以附带上新的缓存指令，浏览器缓存新的内容
+
+**缓存有效：** 服务器返回304重定向，并且响应头带上新的缓存指令，浏览器作出相应缓存动作。
+
+- **Cache-Control**
+
+`Cache-Control`还可以设置下面一个或多个值：
+
+​		- `public`：指示服务器资源是公开的。比如有一个页面资源，所有人看到的都是一样的。这个值对于浏览器而言没有什么意义，但可能在某些场景可能有用。本着「我告知，你随意」的原则，`http`协议中很多时候都是客户端或服务器告诉另一端详细的信息，至于另一端用不用，完全看它自己。
+
+ 	-`private`：指示服务器资源是私有的。比如有一个页面资源，每个用户看到的都不一样。这个值对于浏览器而言没有什么意义，但可能在某些场景可能有用。本着「我告知，你随意」的原则，`http`协议中很多时候都是客户端或服务器告诉另一端详细的信息，至于另一端用不用，完全看它自己。
+
+​	- `no-cache`：告知客户端，你可以缓存这个资源，但是不要**直接**使用它。当你缓存之后，后续的每一次请求都需要附带缓存指令，让服务器告诉你这个资源有没有过期。
+
+​	- `no-store`：告知客户端，不要对这个资源做任何的缓存，之后的每一次请求都按照正常的普通请求进行。若设置了这个值，浏览器将不会对该资源做出任何的缓存处理。
+
+​	- `max-age`：不再赘述
+
+比如，`Cache-Control: public, max-age=3600`表示这是一个公开资源，请缓存1个小时。
+
+不仅仅是在响应头中出现，在`http1.1`版本中，也可以在**请求头**中加入`Cache-Control: no-cache，`它的含义是向服务器表达：不要考虑任何缓存，给我一个正常的结果。这和`http1.0`版本的消息头字段pragma是一样的功能。
+
+- **expire**
+
+在`http1.0`版本中，是通过`Expire`响应头来指定过期时间点的，例如：
+
+```js
+Expire: Thu, 30 Apr 2020 23:38:38 GMT
+```
+
+到了`http1.1`版本，已更改为通过`Cache-Control`的`max-age`来记录了。
+
+4. **总结**
+
+当浏览器再次访问一个已经访问过的资源时，它会这样做：
+
+​		- 根据相关字段判断是否命中`强缓存`，如果命中，就直接使用缓存了。
+
+​		- 如果没有命中强缓存，就发请求到服务器检查是否命中`协商缓存`。
+
+​		- 如果命中协商缓存，服务器会返回 304 告诉浏览器使用`本地缓存`。
+
+​		- 否则，返回`最新的资源`。
+
+5. **实际场景应用缓存策略**
+
+- **频繁变动的资源**
+
+对于频繁变动的资源，首先需要使用`Cache-Control: no-cache` 使浏览器每次都请求服务器，然后配合 ETag 或者 Last-Modified 来验证资源是否有效。这样的做法虽然不能节省请求数量，但是能显著减少响应数据大小。
+
+- **不常变化的资源**
+
+通常在处理这类资源时，给它们的 Cache-Control 配置一个很大的 `max-age=31536000` (一年)，这样浏览器之后请求相同的 URL 会命中强制缓存。而为了解决更新的问题，就需要在文件名(或者路径)中添加 hash， 版本号等动态字符，之后更改动态字符，从而达到更改引用 URL 的目的，让之前的强制缓存失效 (其实并未立即失效，只是不再使用了而已)。 在线提供的类库 (如 `jquery-3.3.1.min.js`, `lodash.min.js` 等) 均采用这个模式。
+
+6. **用户行为对浏览器缓存的影响**
+
+所谓用户行为对浏览器缓存的影响，指的就是用户在浏览器如何操作时，会触发怎样的缓存策略。主要有 3 种：
+
+- 打开网页，地址栏输入地址： 查找 disk cache 中是否有匹配。如有则使用；如没有则发送网络请求。
+- 普通刷新 (F5)：因为 TAB 并没有关闭，因此 memory cache 是可用的，会被优先使用(如果匹配的话)。其次才是 disk cache。
+- 强制刷新 (Ctrl + F5)：浏览器不使用缓存，因此发送的请求头部均带有 `Cache-control: no-cache`(为了兼容，还带了 `Pragma: no-cache`),服务器直接返回 200 和最新内容。
+
+
+
 ### ES6 Module和Commonjs区别
 
 1. `ES6 Module`静态引入，编译时引入
@@ -2293,10 +2793,6 @@ export default 'hello'
 import str from './hello.js'
 console.log(str)
 ```
-
-
-
-
 
 ### Webpack性能优化
 
@@ -2418,38 +2914,27 @@ output: {
 
 
 
+### 前端错误监控（产品质量 体系）
 
+1. **前端错误的分类**
+   - 即时运行错误：代码错误
+   - 资源加载错误
+2. **错误的捕获方式**
 
-### 浏览器缓存？？？？？？？
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210806103223.png)
 
-### 渲染机制？？？？？
+![image-20210806103901231](/Users/cr/Library/Application Support/typora-user-images/image-20210806103901231.png)
 
-1. 什么是`DOCTYPE`及作用
-2. 浏览器渲染过程
-3. 重排`Reflow`
-4. 重绘`Repaint`
-5. 布局`Layout`
+3. **上报错误的基本原理**
 
-> 页面性能
+- 采用Ajax通信方式上报
+- 利用Image对象上报
 
-提升页面性能的方法：
-
-1. 资源压缩合并，减少HTTP请求
-2. 非核心代码异步加载，异步加载的方式，
-3. 利用浏览器缓存
-4. 使用CDN
-
-
-
-
-
-
-
-
-
-
-
-
+```js
+  <script type="text/javascript">
+      (new Image()).src = 'http://baidu.com/tesjk?r=tksjk';
+    </script>
+```
 
 
 
@@ -2484,5 +2969,27 @@ output: {
 
 有问题及时沟通，QA和FE天生信息不对称，当面讨论，让QA帮你复现，需要特定设备才能复现。沟通，及时识别风险，及时汇报。
 
+### 业务能力、团队协作能力、事务推动能力、带人能力、其他能力。
 
+1. 业务能力
+
+![image-20210806120922386](/Users/cr/Library/Application Support/typora-user-images/image-20210806120922386.png)
+
+![image-20210806121229650](/Users/cr/Library/Application Support/typora-user-images/image-20210806121229650.png)
+
+2. 团队协作能力
+
+![image-20210806121718302](/Users/cr/Library/Application Support/typora-user-images/image-20210806121718302.png)
+
+3. 事务推动能力
+
+![image-20210806122740734](/Users/cr/Library/Application Support/typora-user-images/image-20210806122740734.png)
+
+4. 带人能力
+
+![image-20210806122915468](/Users/cr/Library/Application Support/typora-user-images/image-20210806122915468.png)
+
+![image-20210806125607989](/Users/cr/Library/Application Support/typora-user-images/image-20210806125607989.png)
+
+![image-20210806130234177](/Users/cr/Library/Application Support/typora-user-images/image-20210806130234177.png)
 
