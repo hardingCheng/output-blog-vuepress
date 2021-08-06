@@ -22,8 +22,19 @@ module.exports = {
           ]
         },
         { text: 'HTMLCSS', link: '/htmlcss/index' },
-        { text: 'Vue', link: '/vue/index' },
-        { text: 'React', link: '/react/index' },
+        {
+          text: 'Vue',
+          items:[
+            { text: 'Vue技巧', link: '/vue/index' },
+            { text: 'Vue源码', link: '/vue/vue-source-code' },
+          ]
+        },
+        { text: 'React',
+          items:[
+            { text: 'React技巧', link: '/react/index' },
+            { text: 'React源码', link: '/react/react-source-code' },
+          ]
+        },
         {
           text: 'Node',
           items: [
