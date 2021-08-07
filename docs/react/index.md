@@ -517,6 +517,8 @@ ReactDOM.render(<Counter  />, document.getElementById('root'));
 - **useEffect 接收一个函数，该函数会在组件渲染到屏幕之后才执行，该函数有要求：要么返回一个能清除副作用的函数，要么就不返回任何内容**
 - 与 `componentDidMount` 或 `componentDidUpdate` 不同，使用 useEffect 调度的 effect 不会阻塞浏览器更新屏幕，这让你的应用看起来响应更快。大多数情况下，effect 不需要同步地执行。在个别情况下（例如测量布局），有单独的 useLayoutEffect Hook 供你使用，其 API 与 useEffect 相同。
 
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210807091944.png)
+
 #### 7.1 使用 class 组件实现修改标题
 
 - 在这个 class 中，我们需要在两个生命周期函数中编写重复的代码，这是因为很多情况下，我们希望在组件加载和更新时执行同样的操作。我们希望它在每次渲染之后执行，但 React 的 class 组件没有提供这样的方法。即使我们提取出一个方法，我们还是要在两个地方调用它。而 **useEffect 会在第一次渲染之后和每次更新之后都会执行**
