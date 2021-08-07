@@ -2919,8 +2919,113 @@ function fibonacci(n, n1, n2) {
 ```
 
 ## 树
+
+### LeetCode
+
+- 104. 二叉树的最大深度（深度遍历）
+- 111. 二叉树的最小深度 （广度遍历）
+- 102. 二叉树的层序遍历
+- 94. 二叉树的中序遍历
+- 112. 路径总和
+
 非顺序数据结构——树。它对于存储需要快速查找的数据非常有用。
+
+`JavaScript` 中没有树这种数据结构，但是可以用 `Object` 和 `Array` 来模拟一颗树。
+
+```js
+const tree = {
+  value:"a",
+  children:[
+    {
+      value:"b",
+      children:[
+        {
+          value:"d",
+          children:[
+            {
+              value:"e",
+              children:[]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      value:"c",
+      children:[
+        {
+          value:"f",
+          children:[]
+        },
+        {
+          value:"g",
+          children:[]
+        }
+      ]
+    }
+  ]
+}
+```
+
+### 树的常见操作有： `DFS` 、 `BFS` 
+
+#### DFS
+
+深度优先遍历，尽可能深的搜索树的分支。
+
+序号表示被搜索的顺序，它的算法口诀是：
+
+1. 访问根节点；
+2. 对根节点的 children 挨个（递归）进行深度优先遍历。
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210807111336.png" style="zoom:33%;" />
+
+```js
+# tree 为上文所述的结构，这里就不重复展示
+
+# 深度优先代码
+const dfs = (node)=>{
+  console.log(node.value);
+  node.children.forEach(dfs);
+}
+
+# 调用
+dfs(tree);
+
+打印结果输出顺序： a、b、d、e、c、f、g 。
+```
+
+#### BFS
+
+广度优先遍历，先访问离根节点最近的节点。
+
+序号表示被搜索的顺序，先把同层的节点给遍历完，再去遍历子节点。它的算法口诀是：
+
+1. 新建一个队列，把根节点入队；
+2. 把对头出队并访问；
+3. 把对头的 `children` 挨个入队；
+4. 重复（循环）第二、三步，直到队列为空。
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210807111710.png" style="zoom:33%;" />
+
+```js
+const bfs = (root) => {
+    const queue = [root];
+    while (queue.length > 0) {
+        const n = queue.shift();
+        console.log(n.val);
+        n.children.forEach(child => {
+            queue.push(child); 
+        });
+    }
+};
+
+bfs(tree);
+打印结果输出顺序： a、b、c、d、e、f、g 。
+```
+
 ### 树数据结构
+
 ### 树的相关术语
 一个树结构包含一系列存在父子关系的节点。每个节点都有一个父节点（除了顶部的第一个节点）以及零个或多个子节点。
 - 位于树顶部的节点叫作根结点。
@@ -3160,6 +3265,14 @@ class BinarySearchTree {
 
 先序遍历
 
+- 访问根节点。
+
+- 对根节点的左子树进行先序遍历。
+
+- 对根节点的右子树进行先序遍历。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210807122112.png)
+
 ```js
 // 前序遍历
 const preorderTraversal = (root) => {
@@ -3191,6 +3304,7 @@ const preorderTraversal = (root) => {
         // 第一步的时候，先访问的是根节点
         list.push(curNode.val)
         
+      	// 负负为正
         // 我们先打印左子树，然后右子树
         // 所以先加入栈的是右子树，然后左子树
         if(curNode.right !== null) {
@@ -3206,21 +3320,27 @@ const preorderTraversal = (root) => {
 
 中序遍历
 
+- 对根节点的左子树进行中序遍历。
+- 访问根节点。
+- 对根节点的右子树进行中序遍历。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210807122143.png)
+
 ```js
 // 中序遍历
 const inorderTraversal = (root) => {
     let result = []
-    var inorderTraversal = (node) => {
+    var inorderTraversalNode = (node) => {
         if(node) {
             // 先遍历左子树
-            inorderTraversal(node.left)
+            inorderTraversalNode(node.left)
            // 再根节点
             result.push(node.val)
             // 最后遍历右子树
-            inorderTraversal(node.right)
+            inorderTraversalNode(node.right)
         }
     }
-    inorderTraversal(root)
+    inorderTraversalNode(root)
     return result
 };
 
@@ -3242,11 +3362,17 @@ const inorderTraversal = (root) => {
       list.push(node.val)
       node = node.right
     }
-    return list
+    return list 
 }
 ```
 
 后序遍历
+
+- 对根节点的左子树进行后序遍历。
+- 对根节点的右子树进行后序遍历。
+- 访问根节点
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210807122203.png)
 
 ```js
 // 后序遍历
@@ -3270,15 +3396,32 @@ const postorderTraversal = function(root) {
 
 
 // 后序遍历
+const postorder = (root) => {
+    if (!root) { return; }
+    const outputStack = [];
+    const stack = [root];
+    while (stack.length) {
+        const n = stack.pop();
+        outputStack.push(n);
+        if (n.left) stack.push(n.left);
+        if (n.right) stack.push(n.right);
+    }
+    while(outputStack.length){
+        const n = outputStack.pop();
+        console.log(n.val);
+    }
+};
+
 const postorderTraversal = (root) => {
     const list = [];
+    // （进入顺序 根  左 右
     const stack = [];
     
     // 当根节点不为空的时候，将根节点入栈
     if(root) stack.push(root)
     while(stack.length > 0) {
         const node = stack.pop()
-        // 根左右=>右左根
+        // （进入顺序）根左右=>（输出顺序）左右根
         list.unshift(node.val)
         
         // 先进栈左子树后右子树
@@ -3295,6 +3438,50 @@ const postorderTraversal = (root) => {
     }
     return list
 }
+```
+
+#### 层序遍历
+
+队列来保存节点，每轮循环中，我们都取一层出来，将它们的左右孩子放入队列。
+
+```js
+var levelOrder = function(root) {
+    const res = [];
+    function levelOrderNode(node, level) {
+      if (!node) return null;
+      // 当前层数组初始化
+      res[level] =  res[level] || [];
+      res[level].push(node.val);
+      // 下一层 +1
+      levelOrderNode(node.left, level + 1);
+      levelOrderNode(node.right, level + 1);
+    }
+    levelOrderNode(root, 0);
+    return res;
+};
+
+
+
+var levelOrder = function(root) {
+    if (root == null) return [];
+    const ans = [];
+    let level = 0;
+    const queue = [root];
+    while(queue.length) {
+      ans.push([]);
+      const len = queue.length;
+      // 通过遍历，提前执行完一层的所有元素，层级level就可以+1
+      for (let i = 0; i < len; i++) {
+        const node = queue.shift();
+        ans[level].push(node.val);
+        node.left && queue.push(node.left);
+        node.right && queue.push(node.right);
+      }
+      level++;
+    }
+    return ans;
+  };
+
 ```
 
 
