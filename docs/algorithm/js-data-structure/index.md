@@ -5555,9 +5555,18 @@ function shuffle(array) {
 
 ### 分为治之
 
+#### LeetCode
+
+- LeetCode：374. 猜数字大小
+-  LeetCode：226. 翻转二叉树
+- LeetCode：100. 相同的树
+- LeetCode：101. 对称二叉树
+
 归并和排序算法。两者都是分为治之算法。两者的共同点在于它们都是分而治之。分而治之是算法设计中的一种方法。它将一个问题分成多个问题和原问题相似的小问题，递归解决小问题，再将解决方式合并以解决原来的问题。
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210701125931.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210808143106.png)
 
 #### 二分搜索
 
@@ -5609,6 +5618,22 @@ function binarySearch(array, value, compareFn = defaultCompare) {
 ```
 
 <img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210701154342.png" style="zoom:50%;" />
+
+#### 归并排序
+
+- 分：把数组从中间一分为
+
+- 解：递归地对两个子数组进行归并排序。
+
+- 合：合并有序子数组。
+
+#### 快速排序
+
+- 分：选基准，按基准把数组分成两个子数组。
+
+- 解：递归地对两个子数组进行快速排序。
+
+- 合：对两个子数组进行合并
 
 ### 动态规划
 
