@@ -3819,9 +3819,15 @@ class RedBlackTree extends BinarySearchTree {
 
 ## 二叉堆和堆排序
 
+### LeetCode
+
+- 215. 数组中的第 K 个最大元素
+- 347. 前 K 个高频元素
+- 23. 合并K个排序链表
+
 堆数据结构也叫作，**二叉堆**。二叉堆是计算机科学中一种非常著名的数据结构，由于它能效高、快速地找出最大值和最小值，常被应用于**优先队列**。也被用于著名的**堆排序算法**中。
 
-### 二叉堆数据结构
+### 二叉堆数据结构（完全二叉树）
 
 二叉堆是一种特殊的二叉树，有以下两个特性。
 
@@ -3831,7 +3837,13 @@ class RedBlackTree extends BinarySearchTree {
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210628223323.png)
 
-在二叉堆中，每个子节点都要大于等于父节点（最小堆）或者小于等于父节点（最大堆）。然而在二叉搜索树中，左侧子节点综述比父节点小，右侧子节点也总是更大。
+**在二叉堆中，每个子节点都要大于等于父节点（最小堆）或者小于等于父节点（最大堆）。然而在二叉搜索树中，左侧子节点综述比父节点小，右侧子节点也总是更大。**
+
+### 堆的应用
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210808115731.png" style="zoom:33%;" />
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210808120016.png" style="zoom:33%;" />
 
 ### 创建最小堆类
 
@@ -3859,13 +3871,13 @@ class MinHeap {
 
 要访问使用普通数组的二叉树**节点**我们可以使用下面的方式操作index。
 
-对于给定位置index的节点：
+- 对于给定位置index的节点：
 
-它的左侧子节点的位置是2 * index + 1(如果位置可用)
+- 它的左侧子节点的位置是2 * index + 1(如果位置可用)
 
-它的右侧子节点的位置是2 * index + 2(如果位置可用)
+- 它的右侧子节点的位置是2 * index + 2(如果位置可用)
 
-它的父节点位置是index / 2(如果位置可用)
+- 它的父节点位置是(index-1 )/ 2(如果位置可用)
 
 ```js
 const Compare = {
@@ -3944,9 +3956,9 @@ class MinHeap {
       array[a] = array[b]
       array[b]= temp
     }
-    siftUp(index){
+    shiftUp(index){
       // 获取父节点的位置
-      let parent = this.getParentInde(index)
+      let parent = this.getParentIndex(index)
       while(index>0 && this.compareFn(this.heap[parent],this.heap[index]) === Compare.BIGGER_THAN){
         // 插入元素 小于父节点  和父节点交换
         swap(this.heap,parent,index)
@@ -3959,7 +3971,7 @@ class MinHeap {
     insert(value){
       if(value != null){
         this.heap.push(value)
-        this.siftUp(this.heap.legth-1)
+        this.shiftUp(this.heap.legth-1)
         return true
       }
       return false
@@ -3979,8 +3991,8 @@ class MinHeap {
     }
     
     
-    
-    siftDown(index){
+    // 下移操作
+    shiftDown(index){
       let element = index
       const left = this.getLeftIndex(index)
       const right = this.getRightIndex(index)
@@ -3996,7 +4008,7 @@ class MinHeap {
         this.siftDown(element) //递归
       }
     }
-   // extract():这个方法移除最小值（最小堆）或最大值（最大堆），并返回这个值。
+    // extract():这个方法移除最小值（最小堆）或最大值（最大堆），并返回这个值。
     extract(){
       if(this.siEmpty()){
         return underfined
@@ -4006,7 +4018,7 @@ class MinHeap {
       }
       const removedValue = this.heap.shift()
       this.heap[0] = this.heap.pop()
-      this.siftDown(0)
+      this.shiftDown(0)
       return removedValue
     }
   }
@@ -4071,6 +4083,13 @@ class MinHeap {
   }
   ```
 ## 图
+
+### LeetCode
+
+- 65. 有效数字
+- 417. 太平洋大西洋水流问题
+- 133. 克隆图
+
 ### 图的相关术语
 图是网络结构的抽象模型。图是一组由**边**连接的节点(或顶点)。任何二元关系都是可以用图来表示。
 一个图G=(V,E)由以下元素组成。
@@ -4235,6 +4254,27 @@ const breadthFirstSearch = (graph,startVertex,callback) => {
   }
 }
 
+
+
+const graph = {
+    0: [1, 2],
+    1: [2],
+    2: [0, 3],
+    3: [3]
+};
+const visited = new Set();
+visited.add(2)
+const queue = [2];
+while (queue.length) {
+    const n = queue.shift();
+    console.log(n);
+    graph[n].forEach(c => {
+        if (!visited.has(c)) {
+            queue.push(c);
+            visited.add(c);
+        }
+    });
+}
 ```
 
 #### 1. 使用BFS寻找最短路径
@@ -4364,6 +4404,26 @@ const depthFirstSearchVist = (u,color,adjList,callback){
   // 在该顶点和邻点按深度访问后，我们回退，意思是该顶点已被完全探索，并且标注为黑色。
   color[u] = Colors.BLACK
 }
+
+
+
+
+const graph = {
+    0: [1, 2],
+    1: [2],
+    2: [0, 3],
+    3: [3]
+};
+const visited = new Set();
+const dfs = (n) => {
+    console.log(n);
+    visited.add(n);
+    graph[n].forEach(c => {
+        if(!visited.has(c)){
+            dfs(c);
+        }
+    });
+};
 ```
 
 ![image-20210629073009255](/Users/cr/Library/Application Support/typora-user-images/image-20210629073009255.png)
