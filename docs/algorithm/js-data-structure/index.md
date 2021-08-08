@@ -6016,6 +6016,15 @@ function knapSack(capacity, weights, values) {
 
 ### 回溯算法
 
+#### LeetCode
+
+- LeetCode：46. 全排列
+- LeetCode：78. 子集
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210808174151.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210808174322.png)
+
 回溯是一种渐进式寻找构建问题解决方式的策略。我们从一个可能动作开始并试着用这个动作解决问题。如果不能解决问题，就回溯并选择另一个动作指导将问题解决。根据这种行为，回溯算法会尝试所有的动作。
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210703201044.png)
