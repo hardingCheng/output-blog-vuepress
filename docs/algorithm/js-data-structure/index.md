@@ -4780,6 +4780,8 @@ export const kruskal = graph => {
 
 ### 排序算法
 
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210808140625.png)
+
 #### 冒泡排序
 
 从运行时间的角度来看，冒泡排序是最差的一个。
@@ -5372,6 +5374,8 @@ const shellSort = arr => {
 ```
 
 ### 搜索算法
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210808140741.png)
 
 #### 顺序搜索
 
