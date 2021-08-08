@@ -5637,6 +5637,11 @@ function binarySearch(array, value, compareFn = defaultCompare) {
 
 ### 动态规划
 
+#### LeetCode
+
+-  LeetCode：70. 爬楼梯
+- LeetCode：198. 打家劫舍
+
 动态规划是一种将复杂问题分解成更小的子问题来解决的优化技术。
 
 :::tip 注意
@@ -5644,6 +5649,10 @@ function binarySearch(array, value, compareFn = defaultCompare) {
 动态规划和分而治之是不同的方法。分而治之方法是把问题分解成相互独立的子问题，然后组合它们的答案，而动态规划是将问题分解成互相依赖的子问题。
 
 :::
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210808162233.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210808162612.png)
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210701154914.png)
 
@@ -5689,7 +5698,7 @@ function minCoinChange(coins, amount) {
 }
 ```
 
-#### ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210703082357.png)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210703082357.png)
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210703082442.png)
 
@@ -5941,7 +5950,16 @@ function matrixChainOrder(p) {
 
 ### 贪心算法
 
+#### LeetCode
+
+- LeetCode：455. 分饼干
+- LeetCode：122. 买卖股票的最佳时机
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210808171203.png)
+
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210703193334.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210808171412.png)
 
 #### 最少找找零问题
 
