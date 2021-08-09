@@ -340,11 +340,339 @@ console.log(Array.prototype)
 ```
 ### javascript `this`重点
 
-在面试的文件中有的！！
+1. 作为普通函数执行时，`this`指向`window`。
+2. 当函数作为对象的方法被调用时，`this`就会指向`该对象`。
+3. 构造器调用，`this`指向`返回的这个对象`。
+4. 箭头函数 箭头函数的`this`绑定看的是`this所在函数定义在哪个对象下`，就绑定哪个对象。如果有嵌套的情况，则this绑定到最近的一层对象上。
+5. 基于Function.prototype上的 `apply 、 call 和 bind `调用模式，这三个方法都可以显示的指定调用函数的 this 指向。`apply`接收参数的是数组，`call`接受参数列表，`` bind`方法通过传入一个对象，返回一个` this `绑定了传入对象的新函数。这个函数的 `this`指向除了使用`new `时会被改变，其他情况下都不会改变。若为空默认是指向全局对象window。
 
 ### 深浅拷贝
 
+#### 浅拷贝
+
+如果属性是基本类型，拷贝的就是基本类型的值，如果属性是引用类型，拷贝的就是内存地址 ，所以如果其中一个对象改变了这个地址，就会影响到另一个对象。
+
+浅拷贝后会重新在堆中创建内存，拷贝前后对象的基本数据类型互不影响，但拷贝前后引用类型会共享堆中的内存，引用类型就会互相影响
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210809212740.png)
+
 ```js
+//方法 1
+Object.assign(target, ...sources)  // 缺陷：没能处理数组，不够通用
+//方法 2
+var simpleClone = function (target) {
+  if (typeof target === "object") {
+    let cloneTarget = Array.isArray(target) ? [] : {};
+    for (const key in target) {
+       if (obj.hasOwnProperty(key)) {
+            cloneTarget[key] = target[key];
+        }
+    }
+    return cloneTarget;
+  } else {
+    return target;
+  }
+};
+//方法 3
+let obj1 = {
+    name: 'yang',
+    res: {
+        value: 123
+    }
+}
+let {...obj2} = obj1
+obj2.res.value = 456
+console.log(obj2) // {name: "yang", res: {value: 456}}
+console.log(obj1) // {name: "yang", res: {value: 456}}
+obj2.name = 'haha'
+console.log(obj2) // {name: "haha", res: {value: 456}}
+console.log(obj1) // {name: "yang", res: {value: 456}}
+//方法 4
+ const arr1 = [
+     'yang',
+     {
+         value: 123
+     }
+ ];
+ const arr2 = arr1.slice(0);
+ arr2[1].value = 456;
+ console.log(arr2); // ["yang", {value: 456}]
+ console.log(arr1); // ["yang", {value: 456}]
+ arr2[0] = 'haha';
+ console.log(arr2); // ["haha", {value: 456}]
+ console.log(arr1); // ["yang", {value: 456}]
+//方法 5
+const arr1 = [
+      'yang',
+      {
+          value: 123
+      }
+  ];
+  const arr2 = [].concat(arr1);
+  arr2[1].value = 456;
+  console.log(arr2); // ["yang", {value: 456}]
+  console.log(arr1); // ["yang", {value: 456}]
+  arr2[0] = 'haha';
+  console.log(arr2); // ["haha", {value: 456}]
+  console.log(arr1); // ["yang", {value: 456}]
+```
+
+```
+实际上对于数组来说， 只要不修改原数组， 重新返回一个新数组就可以实现浅拷贝，比如说map、filter、reduce等方法
+```
+
+#### 深拷贝
+
+将一个对象从内存中完整的拷贝一份出来,从堆内存中开辟一个新的区域存放新对象,且修改新对象不会影响原对象。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210809212944.png)
+
+```js
+//方法 1 JSON.parse(JSON.stringify())
+let student = {
+  name: "小明",
+  score: {
+    english: 88,
+    chinese: 77,
+    math: 99,
+  },
+};
+
+let deepStudent = JSON.parse(JSON.stringify(student));
+// JSON.stringify 对于拷贝其他引用类型、拷贝函数、循环引用等情况无法很好处理，只能运用于简单 JSON。
+// 会忽略 undefined、symbol、不能序列化函数、不能解决循环引用的对象、不能正确处理new Date()、不能处理正则、不能处理new Error()
+deepStudent.name = "李雷";
+deepStudent.score.english = 98;
+console.log("deepStudent: ", deepStudent);
+console.log("student: ", student);
+
+
+
+
+
+//方法 2 深拷贝更为通用的做法：递归遍历赋值
+var deepClone = function (target) {
+  if (typeof target === "object") {
+    let cloneTarget = Array.isArray(target) ? [] : {};
+    for (const key in target) {
+      cloneTarget[key] = deepClone(target[key]);
+    }
+    return cloneTarget;
+  } else {
+    return target;
+  }
+};
+
+
+
+// target.target = target;
+// 这个case如果还用以上递归代码的话，会导致死循环、栈内存溢出。
+// 附加考虑循环引用
+var deepClone = function (target, map = new Map()) {
+  if (typeof target === "object") {
+    let cloneTarget = Array.isArray(target) ? [] : {};
+    if (map.get(target)) {
+      return map.get(target);
+    }
+    map.set(target, cloneTarget);
+    for (const key in target) {
+      cloneTarget[key] = deepClone(target[key], map);
+    }
+    return cloneTarget;
+  } else {
+    return target;
+  }
+};
+// 附加考虑循环引用,弱引用对象，垃圾回收机制会自动帮我们回收。
+var deepClone = function (target, map = new WeakMap()) {
+  if (typeof target === "object") {
+    let cloneTarget = Array.isArray(target) ? [] : {};
+    if (map.get(target)) {
+      return map.get(target);
+    }
+    map.set(target, cloneTarget);
+    for (const key in target) {
+      cloneTarget[key] = deepClone(target[key], map);
+    }
+    return cloneTarget;
+  } else {
+    return target;
+  }
+};
+
+
+
+
+
+
+
+
+// 超级全面的深拷贝
+const mapTag = "[object Map]";
+const setTag = "[object Set]";
+const arrayTag = "[object Array]";
+const objectTag = "[object Object]";
+const argsTag = "[object Arguments]";
+const boolTag = "[object Boolean]";
+const dateTag = "[object Date]";
+const numberTag = "[object Number]";
+const stringTag = "[object String]";
+const symbolTag = "[object Symbol]";
+const errorTag = "[object Error]";
+const regexpTag = "[object RegExp]";
+const funcTag = "[object Function]";
+const deepTag = [mapTag, setTag, arrayTag, objectTag, argsTag];
+
+function forEach(array, iteratee) {
+  let index = -1;
+  const length = array.length;
+  while (++index < length) {
+    iteratee(array[index], index);
+  }
+  return array;
+}
+function isObject(target) {
+  const type = typeof target;
+  return target !== null && (type === "object" || type === "function");
+}
+function getType(target) {
+  return Object.prototype.toString.call(target);
+}
+function getInit(target) {
+  const Ctor = target.constructor;
+  return new Ctor();
+}
+function cloneSymbol(targe) {
+  return Object(Symbol.prototype.valueOf.call(targe));
+}
+function cloneReg(targe) {
+  const reFlags = /\w*$/;
+  const result = new targe.constructor(targe.source, reFlags.exec(targe));
+  result.lastIndex = targe.lastIndex;
+  return result;
+}
+function cloneFunction(func) {
+  const bodyReg = /(?<={)(.|\n)+(?=})/m;
+  const paramReg = /(?<=\().+(?=\)\s+{)/;
+  const funcString = func.toString();
+  if (func.prototype) {
+    const param = paramReg.exec(funcString);
+    const body = bodyReg.exec(funcString);
+    if (body) {
+      if (param) {
+        const paramArr = param[0].split(",");
+        return new Function(...paramArr, body[0]);
+      } else {
+        return new Function(body[0]);
+      }
+    } else {
+      return null;
+    }
+  } else {
+    return eval(funcString);
+  }
+}
+// 处理 不可继续遍历的类型
+function cloneOtherType(targe, type) {
+  const Ctor = targe.constructor;
+  switch (type) {
+    case boolTag:
+    case numberTag:
+    case stringTag:
+    case errorTag:
+    case dateTag:
+      return new Ctor(targe);
+    case regexpTag:
+      return cloneReg(targe);
+    case symbolTag:
+      return cloneSymbol(targe);
+    case funcTag:
+      return cloneFunction(targe);
+    default:
+      return null;
+  }
+}
+function clone(target, map = new WeakMap()) {
+  // 克隆原始类型
+  if (!isObject(target)) {
+    return target;
+  }
+  // 初始化
+  const type = getType(target);
+  let cloneTarget;
+  if (deepTag.includes(type)) {
+    cloneTarget = getInit(target, type);
+  } else {
+    return cloneOtherType(target, type);
+  }
+  // 防止循环引用
+  if (map.get(target)) {
+    return map.get(target);
+  }
+  map.set(target, cloneTarget);
+  // 克隆set
+  if (type === setTag) {
+    target.forEach((value) => {
+      cloneTarget.add(clone(value, map));
+    });
+    return cloneTarget;
+  }
+  // 克隆map
+  if (type === mapTag) {
+    target.forEach((value, key) => {
+      cloneTarget.set(key, clone(value, map));
+    });
+    return cloneTarget;
+  }
+  // 克隆对象和数组
+  const keys = type === arrayTag ? undefined : Object.keys(target);
+  forEach(keys || target, (value, key) => {
+    if (keys) {
+      key = value;
+    }
+    cloneTarget[key] = clone(target[key], map);
+  });
+
+  return cloneTarget;
+}
+module.exports = {
+  clone,
+};
+
+
+
+
+
+// 其他的高级版
+function deepClone(obj, cache = new WeakMap()) {
+  if (!obj instanceof Object) return obj
+  // 防止循环引用
+  if (cache.get(obj)) return cache.get(obj)
+  // 支持函数
+  if (obj instanceof Function) {
+    return function () {
+      return obj.apply(this, arguments)
+    }
+  }
+  // 支持日期
+  if (obj instanceof Date) return new Date(obj)
+  // 支持正则对象
+  if (obj instanceof RegExp) return new RegExp(obj.source, obj.flags)
+
+  // 数组是 key 为数字索引的特殊对象
+  const res = Array.isArray(obj) ? [] : {}
+  // 缓存 copy 的对象，用于处理循环引用的情况
+  cache.set(obj, res)
+
+  Object.keys(obj).forEach((key) => {
+    if (obj[key] instanceof Object) {
+      res[key] = deepClone(obj[key], cache)
+    } else {
+      res[key] = obj[key]
+    }
+  });
+  return res
+}
 
 ```
 
@@ -2109,6 +2437,13 @@ JavaScript内部已经创建了Object.prototype。每当定义新对象时，都
 
 #### 原型链接
 
+5条原型规则，是学习理解原型链的基础。
+ 1.所有的引用类型（数组、对象、函数），都`具有对象特性`，即可自由扩展属性（除了“null”意外）
+ 2.所有的引用类型（数组、对象、函数），`都有一个_proto_(隐式原型)属性`，属性值是一个普通的对象
+ 3.所有的函数，`都有一个prototype(显式原型)属性`，属性值也是一个普通的对象
+ 4.所有的引用类型（数组、对象、函数），`__ proto __ 属性值指向它的构造函数的" __ prototype __ "属性值`
+ 5.当试图得到一个对象的某个属性时，`如果这个对象本身没 有这个属性，那么会去它的__proto__（即它的构造函数的 prototype）中寻找`。
+
 ```js
 let instance = new Object()
 instance.prop = 123
@@ -2133,6 +2468,8 @@ Object类型的**对象实例**拥有`__proto__`属性，后者指向构造函�
 
 ![image-20210802110911644](/Users/cr/Library/Application Support/typora-user-images/image-20210802110911644.png)
 
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210809210423.png)
+
 - js 每个对象都会拥有`prototype`属性的。这个属性指向一个对象，这个对象的所有属性和方法都会被构造函数的实例所继承。
 
 - 只有对象（任何对象）只有`__proto__`去找它的原型对象。( 实例都包含一个指向构造函数的`原型对象`的内部指针。)。
@@ -2147,6 +2484,14 @@ Object类型的**对象实例**拥有`__proto__`属性，后者指向构造函�
 
 ### 原型链   
 
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210809210529.png)
+
+**基于原型的执行规则：即原型链**
+
+- 获取属性 xialuo.name或执行方法 xialuo. sahi()时
+- 先在自身属性和方法寻找
+- 如果找不到则自动去隐式原型_ proto_中查找
+
 ![image-20210802110907463](/Users/cr/Library/Application Support/typora-user-images/image-20210802110907463.png)
 
  可以看出 `p1.__proto__.__proto__` 指向了 `Object.prototype`，`p1.__proto__.__proto__.__proto__` 最后指向了 null，由此可以看出了构建了一条**原型链**。
@@ -2160,6 +2505,8 @@ Object类型的**对象实例**拥有`__proto__`属性，后者指向构造函�
 ####  查找方法
 
 <img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210627100827.png" style="zoom:33%;" />
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210809210529.png)
 
 **如果在对象上没有找到需要的属性或者方法引用，引擎就会继续在 `[[ptototype]]`关联的对象上进行查找，同理，如果在后者中也没有找到需要的引用就会继续查找它的[[prototype]],以此类推。这一系列对象的链接被称为“原型链”。**
 
@@ -2432,9 +2779,12 @@ luna.sleep()
 
 #### new运算符
 
-<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210802110120.png" style="zoom:33%;" />
+### new运算符的实现机制
 
-`new`运算符的步骤。
+1. 首先创建了一个新的`空对象`
+2. `设置原型`，将对象的原型设置为函数的`prototype`对象。
+3. 让函数的`this`指向这个对象，执行构造函数的代码（为这个新对象添加属性）
+4. 判断函数的返回值类型，如果是值类型，返回创建的对象。如果是引用类型，就返回这个引用类型的对象。
 
 ` let p1 = new Person();`
 
@@ -2505,7 +2855,7 @@ class Cat {
 }
 ```
 
-### 面向对象编程
+### 面向对象编程(+类的继承实现方式)
 
 ```js
 //print.js
@@ -2558,6 +2908,8 @@ export default class Fridge {
 
 1. **借助构造函数实现继承**
 
+使用`借用构造函数`的方式，这种方式是通过在子类型的函数中调用超类型的构造函数来实现的，这一种方法解决了不能向超类型传递参数的缺点，但是它存在的一个问题就是无法实现函数方法的复用，并且超类型原型定义的方法子类型也没有办法访问到。
+
 ```js
 			function Parent1 () {
           this.name = 'parent1';
@@ -2573,6 +2925,8 @@ export default class Fridge {
 ```
 
 2. **借助原型链实现继承**
+
+以`原型链的方式来实现继承`，但是这种实现方式存在的缺点是，在包含有引用类型的数据时，会被所有的实例对象所共享，容易造成修改的混乱。还有就是在创建子类型的时候不能向超类型传递参数。
 
 ```js
      function Parent2 () {
@@ -2594,6 +2948,8 @@ export default class Fridge {
 
 3. **组合方式**（构造函数+原型链）
 
+`组合继承`，组合继承是将原型链和借用构造函数组合起来使用的一种方式。通过借用构造函数的方式来实现类型的属性的继承，通过将子类型的原型设置为超类型的实例来实现方法的继承。这种方式解决了上面的两种模式单独使用时的问题，但是由于我们是以超类型的实例来作为子类型的原型，所以调用了两次超类的构造函数，造成了子类型的原型中多了很多不必要的属性。
+
 ```js
       // 解决了上面两种的每个问题
 			// 父类多次实例化问题
@@ -2614,6 +2970,8 @@ export default class Fridge {
 ```
 
 4. **组合继承优化1**
+
+
 
 ```js
 			function Parent4 () {
@@ -2639,6 +2997,8 @@ export default class Fridge {
 
 5. **组合继承优化2**
 
+`原型式继承`，原型式继承的主要思路就是基于已有的对象来创建新的对象，实现的原理是，向函数中传入一个对象，然后返回一个以这个对象为原型的对象。这种继承的思路主要不是为了实现创造一种新的类型，只是对某个对象实现一种简单继承，ES5 中定义的 Object.create() 方法就是原型式继承的实现。缺点与原型链方式相同。
+
 ```js
 			function Parent5 () {
           this.name = 'parent5';
@@ -2652,6 +3012,18 @@ export default class Fridge {
       Child5.prototype = Object.create(Parent5.prototype);
 			Child5.prototype.constructor = Child5
 ```
+
+（1）第一种是以`原型链的方式来实现继承`，但是这种实现方式存在的缺点是，在包含有引用类型的数据时，会被所有的实例对象所共享，容易造成修改的混乱。还有就是在创建子类型的时候不能向超类型传递参数。
+
+（2）第二种方式是使用`借用构造函数`的方式，这种方式是通过在子类型的函数中调用超类型的构造函数来实现的，这一种方法解决了不能向超类型传递参数的缺点，但是它存在的一个问题就是无法实现函数方法的复用，并且超类型原型定义的方法子类型也没有办法访问到。
+
+（3）第三种方式是`组合继承`，组合继承是将原型链和借用构造函数组合起来使用的一种方式。通过借用构造函数的方式来实现类型的属性的继承，通过将子类型的原型设置为超类型的实例来实现方法的继承。这种方式解决了上面的两种模式单独使用时的问题，但是由于我们是以超类型的实例来作为子类型的原型，所以调用了两次超类的构造函数，造成了子类型的原型中多了很多不必要的属性。
+
+（4）第四种方式是`原型式继承`，原型式继承的主要思路就是基于已有的对象来创建新的对象，实现的原理是，向函数中传入一个对象，然后返回一个以这个对象为原型的对象。这种继承的思路主要不是为了实现创造一种新的类型，只是对某个对象实现一种简单继承，ES5 中定义的 Object.create() 方法就是原型式继承的实现。缺点与原型链方式相同。
+
+（5）第五种方式是`寄生式继承`，寄生式继承的思路是创建一个用于封装继承过程的函数，通过传入一个对象，然后复制一个对象的副本，然后对象进行扩展，最后返回这个对象。这个扩展的过程就可以理解是一种继承。这种继承的优点就是对一个简单对象实现继承，如果这个对象不是我们的自定义类型时。缺点是没有办法实现函数的复用。
+
+（6）第六种方式是`寄生式组合继承`，组合继承的缺点就是使用超类型的实例做为子类型的原型，导致添加了不必要的原型属性。寄生式组合继承的方式是使用超类型的原型的副本来作为子类型的原型，这样就避免了创建不必要的属性。
 
 ### 事件
 
@@ -2885,7 +3257,52 @@ g.throw(new Error('Something went wrong'))
 
 ```
 
-### 事件循环 ？？？？
+### 事件循环 （**Event Loop**）
+
+++++++++++++++++++++++面试题目中：js运行机制有++++++++++
+
+```
+JS`是单线程的，为了防止一个函数执行时间过长阻塞后面的代码，所以会先将同步代码压入执行栈中，依次执行，将异步代码推入异步队列，异步队列又分为宏任务队列和微任务队列，因为宏任务队列的执行时间较长，所以微任务队列要优先于宏任务队列。微任务队列的代表就是，`Promise.then`，`MutationObserver`，宏任务的话就是`setImmediate setTimeout setInterval
+```
+
+JS运行的环境。一般为浏览器或者Node。 在浏览器环境中，有JS 引擎线程和渲染线程，且两个线程互斥。 Node环境中，只有JS 线程。 不同环境执行机制有差异，不同任务进入不同Event Queue队列。 当主程结束，先执行准备好微任务，然后再执行准备好的宏任务，一个轮询结束。
+
+#### **浏览器中的事件环（Event Loop)**
+
+事件环的运行机制是，先会执行栈中的内容，栈中的内容执行后执行微任务，微任务清空后再执行宏任务，先取出一个宏任务，再去执行微任务，然后在取宏任务清微任务这样不停的循环。
+
+- eventLoop 是由JS的宿主环境（浏览器）来实现的；
+- 事件循环可以简单的描述为以下四个步骤:
+  1. 函数入栈，当Stack中执行到异步任务的时候，就将他丢给WebAPIs,接着执行同步任务,直到Stack为空；
+  2. 此期间WebAPIs完成这个事件，把回调函数放入队列中等待执行（微任务放到微任务队列，宏任务放到宏任务队列）
+  3. 执行栈为空时，Event Loop把微任务队列执行清空；
+  4. 微任务队列清空后，进入宏任务队列，取队列的第一项任务放入Stack(栈）中执行，执行完成后，查看微任务队列是否有任务，有的话，清空微任务队列。重复4，继续从宏任务中取任务执行，执行完成之后，继续清空微任务，如此反复循环，直至清空所有的任务。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210809222955.png)
+
+浏览器中的任务源(task):
+
+- `宏任务(macrotask)`：
+   宿主环境提供的，比如浏览器
+   ajax、setTimeout、setInterval、setTmmediate(只兼容ie)、script、requestAnimationFrame、messageChannel、UI渲染、一些浏览器api
+- `微任务(microtask)`：
+   语言本身提供的，比如promise.then
+   then、queueMicrotask(基于then)、mutationObserver(浏览器提供)、messageChannel 、mutationObersve
+
+#### **Node 环境中的事件环（Event Loop)**
+
+`Node`是基于V8引擎的运行在服务端的`JavaScript`运行环境，在处理高并发、I/O密集(文件操作、网络操作、数据库操作等)场景有明显的优势。虽然用到也是V8引擎，但由于服务目的和环境不同，导致了它的API与原生JS有些区别，其Event Loop还要处理一些I/O，比如新的网络连接等，所以Node的Event Loop(事件环机制)与浏览器的是不太一样。
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210809223542.png" style="zoom:33%;" />
+
+执行顺序如下：
+
+- `timers`: 计时器，执行setTimeout和setInterval的回调
+- `pending callbacks`: 执行延迟到下一个循环迭代的 I/O 回调
+- `idle, prepare`: 队列的移动，仅系统内部使用
+- `poll轮询`: 检索新的 I/O 事件;执行与 I/O 相关的回调。事实上除了其他几个阶段处理的事情，其他几乎所有的异步都在这个阶段处理。
+- `check`: 执行`setImmediate`回调，setImmediate在这里执行
+- `close callbacks`: 执行`close`事件的`callback`，一些关闭的回调函数，如：socket.on('close', ...)
 
 ### 调用栈？？？？
 
