@@ -895,6 +895,18 @@ makeRequest()
 
 结论 async/await是过去几年中JavaScript引入的最具革命性的特性之一。它使你意识到promise在语法上的糟糕之处，并提供了一种简单，直接的替代方案。
 
+#### promise怎么实现链式调用跟返回不同的状态？
+
+实现链式调用：使用`.then()`或者`.catch()`方法之后会返回一个`promise`对象，可以继续用`.then()`方法调用，再次调用所获取的参数是上个`then`方法`return`的内容
+
+1. promise的三种状态是 `fulfilled`(已成功)/`pengding`(进行中)/`rejected`(已拒绝)
+2. 状态只能由 Pending --> Fulfilled 或者 Pending --> Rejected，且一但发生改变便不可二次修改；
+3. Promise 中使用 `resolve` 和 `reject` 两个函数来更改状态；
+4. then 方法内部做的事情就是状态判断:
+
+- 如果状态是成功，调用成功回调函数
+- 如果状态是失败，调用失败回调函数
+
 ### 前后端接口鉴权全解 Cookie/Session/Token 的区别
 
 #### Cookie
@@ -1470,7 +1482,9 @@ Reflect.get(target, key, context) // 等价于  target[key]
 Reflect.set(target, key, val) // 等价于 target[key] = val
 ```
 
-### 函数柯里化？？？？？？？
+### 函数柯里化
+
+`柯里化(Currying)` 是把接收多个参数的原函数变换成接受一个单一参数（原来函数的第一个参数的函数)并返回一个新的函数，新的函数能够接受余下的参数，并返回和原函数相同的结果。
 
 - 当一个函数有多个参数的时候，先传递一部分参数调用它（这部分参数以后永远不变）
 - 然后返回一个新的函数接受剩余的参数，返回结果
@@ -1503,9 +1517,15 @@ function curry(fn){
 
 ```
 
-- 柯里化可以我们给一个函数传递较少的参数得到一个已经记住了某些固定参数的函数，这是一种对函数参数的缓存
-- 让函数变得更灵活，颗粒度更小
-- 可以把多元函数转换为一元函数，可以组合使用函数产生强大的功能
+- 柯里化可以我们给一个函数传递较少的参数得到一个已经记住了某些固定参数的函数，这是一种对函数参数的缓存。
+- 让函数变得更灵活，颗粒度更小。
+- 可以把多元函数转换为一元函数，可以组合使用函数产生强大的功能。
+
+- 参数对复用。
+
+- 提高实用性。
+
+- 延迟执行 只传递给函数一部分参数来调用它，让它返回一个函数去处理剩下的参数。柯里化的函数可以延迟接收参数，就是比如一个函数需要接收的参数是两个，执行的时候必须接收两个参数，否则没法执行。但是柯里化后的函数，可以先接收一个参数。
 
 ### 函数式编程？？？？？？？？
 
@@ -2989,6 +3009,139 @@ export default 'hello'
 import str from './hello.js'
 console.log(str)
 ```
+
+### ES6的WeakSet和WeakMap
+
+`WeakSet` 结构与 `Set` 类似，也是不重复的值的集合。
+
+- 成员都是数组和类似数组的对象，若调用 `add()` 方法时传入了非数组和类似数组的对象的参数，就会抛出错误。
+
+```
+const b = [1, 2, [1, 2]]
+new WeakSet(b) // Uncaught TypeError: Invalid value used in weak set
+复制代码
+```
+
+- 成员都是弱引用，可以被垃圾回收机制回收，可以用来保存 DOM 节点，不容易造成内存泄漏。
+- `WeakSet` 不可迭代，因此不能被用在 `for-of` 等循环中。
+- `WeakSet` 没有 `size` 属性。
+
+WeakSet 对象中储存的对象值都是被弱引用的，即**垃圾回收机制不考虑 WeakSet 对该对象的应用**，如果没有其他的变量或属性引用这个对象值，则这个对象将会被垃圾回收掉（不考虑该对象还存在于 WeakSet 中），所以，WeakSet 对象里有多少个成员元素，取决于垃圾回收机制有没有运行，运行前后成员个数可能不一致，遍历结束之后，有的成员可能取不到了（被垃圾回收了），**WeakSet 对象是无法被遍历**的（ES6 规定 WeakSet 不可遍历），也没有办法拿到它包含的所有元素
+
+
+
+`WeakMap` 结构与 `Map` 结构类似，也是用于生成键值对的集合。
+
+WeakMap 就是为了解决这个问题而诞生的，它的键名所引用的对象都是弱引用，即垃圾回收机制不将该引用考虑在内。因此，只要所引用的对象的其他引用都被清除，垃圾回收机制就会释放该对象所占用的内存。也就是说，一旦不再需要，WeakMap 里面的键名对象和所对应的键值对会自动消失，不用手动删除引用。
+
+基本上，**如果你要往对象上添加数据，又不想干扰垃圾回收机制，就可以使用 WeakMap**。一个典型应用场景是，在网页的 DOM 元素上添加数据，就可以使用WeakMap结构。当该 DOM 元素被清除，其所对应的WeakMap记录就会自动被移除。
+
+```js
+const wm = new WeakMap();
+
+const element = document.getElementById('example');
+
+wm.set(element, 'some information');
+wm.get(element) // "some information"
+```
+
+总之，WeakMap的专用场合就是，它的键所对应的对象，可能会在将来消失。WeakMap结构有助于防止内存泄漏。
+
+注意，WeakMap 弱引用的只是键名，而不是键值。键值依然是正常引用。
+
+```js
+const wm = new WeakMap();
+let key = {};
+let obj = {foo: 1};
+
+wm.set(key, obj);
+obj = null;
+wm.get(key)
+// Object {foo: 1}
+```
+
+- 只接受对象作为键名（`null` 除外），不接受其他类型的值作为键名
+- 键名是弱引用，键值可以是任意的，键名所指向的对象可以被垃圾回收，此时键名是无效的
+- 不能遍历，方法有 `get`、`set`、`has`、`delete`
+
+### 总结
+
+Set
+
+- 是一种叫做集合的数据结构(ES6新增的)
+- 成员唯一、无序且不重复
+- `[value, value]`，键值与键名是一致的（或者说只有键值，没有键名）
+- 允许储存任何类型的唯一值，无论是原始值或者是对象引用
+- 可以遍历，方法有：`add`、`delete`、`has`、`clear`
+
+WeakSet
+
+- 成员都是对象
+- 成员都是弱引用，可以被垃圾回收机制回收，可以用来保存 `DOM` 节点，不容易造成内存泄漏
+- 不能遍历，方法有 `add`、`delete`、`has`
+
+Map
+
+- JavaScript 的对象（Object），本质上是键值对的集合（Hash 结构），但是传统上只能用**字符串**当作键。这给它的使用带来了很大的限制。
+-  **“键”的范围不限于字符串，各种类型的值（包括对象）都可以当作键**。
+
+- 是一种类似于字典的数据结构，本质上是键值对的集合
+- 可以遍历，可以跟各种数据格式转换
+- 操作方法有:`set`、`get`、`has`、`delete`、`clear`
+
+WeakMap
+
+- 只接受对象作为键名（`null` 除外），不接受其他类型的值作为键名
+
+- 键名是弱引用，键值可以是任意的，键名所指向的对象可以被垃圾回收，此时键名是无效的
+
+- 不能遍历，方法有 `get`、`set`、`has`、`delete`
+
+- ```js
+  //WeakMap 应用的典型场合就是 DOM 节点作为键名。下面是一个例子:
+  //一旦这个 DOM 节点删除，该状态就会自动消失，不存在内存泄漏风险。
+  let myWeakmap = new WeakMap();
+  myWeakmap.set(
+    document.getElementById('logo'),
+    {timesClicked: 0})
+  ;
+  document.getElementById('logo').addEventListener('click', function() {
+    let logoData = myWeakmap.get(document.getElementById('logo'));
+    logoData.timesClicked++;
+  }, false);
+  
+  
+  
+  //WeakMap 的另一个用处是部署私有属性。
+  //上面代码中，Countdown类的两个内部属性_counter和_action，是实例的弱引用，所以如果删除实例，它们也就随之消失，不会造成内存泄漏。
+  const _counter = new WeakMap();
+  const _action = new WeakMap();
+  
+  class Countdown {
+    constructor(counter, action) {
+      _counter.set(this, counter);
+      _action.set(this, action);
+    }
+    dec() {
+      let counter = _counter.get(this);
+      if (counter < 1) return;
+      counter--;
+      _counter.set(this, counter);
+      if (counter === 0) {
+        _action.get(this)();
+      }
+    }
+  }
+  
+  const c = new Countdown(2, () => console.log('DONE'));
+  
+  c.dec()
+  c.dec()
+  // DONE
+  
+  ```
+
+  
 
 ### Webpack性能优化
 

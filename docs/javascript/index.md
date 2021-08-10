@@ -680,6 +680,14 @@ function deepClone(obj, cache = new WeakMap()) {
 
 #### 手写Ajax
 
+1. 创建`XMLHttpRequest`对象;
+
+2. 调用`open`方法传入三个参数 请求方式`(GET/POST)、url、同步异步(true/false)`;
+
+3. 监听`onreadystatechange`事件，当`readystate`等于4时返回`responseText`;
+
+4. 调用send方法传递参数。
+
 ```js
  var opt = {
          url: '',
