@@ -70,64 +70,6 @@ obj.myFun.bind(db, ['成都', '上海'])(); //小张 年龄 99  来自 成都,�
 6.  如果`call()`和`apply()`的`第一个参数是null或者undefined，那么this的指向就是全局变量，在浏览器里就是window对象`。
 :::
 
-#### 手写bind()方法 /Function.prototype.bind？？？？？
-
-```js
-Function.prototype.myBind = function (target) {
-    var target = target || window;
-    var _args1 = [].slice.call(arguments, 1);
-    var self = this;
-    var temp = function () {};
-    var F = function () {
-        var _args2 = [].slice.call(arguments, 0);
-        var parasArr = _args1.concat(_args2);
-        return self.apply(this instanceof temp ? this : target, parasArr)
-    }
-    temp.prototype = self.prototype;
-    F.prototype = new temp();
-    return F;
-}
-```
-
-#### 手写call()方法/Function.prototype.call ？？？？？
-
-```js
-Function.prototype.myCall = function () {
-    var ctx = arguments[0] || window;
-    //fn被占用  设置一个唯一值
-  	const fn = Symbol()
-    ctx[fn] = this;
-    var args = [];
-    for (var i = 1; i < arguments.length; i++) {
-        args.push(arguments[i])
-    }
-    var result = ctx.fn(...args);
-    delete ctx.fn;
-    return result;S
-}
-```
-
-#### 手写apply()方法/Function.prototype.apply ？？？？？
-
-```js
-Function.prototype.myApply = function () {
-     if (typeof arguments[0] === "undefined" || arguments[0] === null) {
-                arguments[0] = window
-            }
- 		//fn被占用  设置一个唯一值
-    const fn = Symbol()
-    ctx[fn] = this;
-    if (!arguments[1]) {
-        var result = ctx.fn();
-        delete ctx.fn;
-        return result;
-    }
-    var result = ctx.fn(...arguments[1]);
-    delete ctx.fn;
-    return result;
-}
-```
-
 ### JavaScript构造函数、原型、原型链
 
 典型的OOP的语言中(如Java)，都存在类的概念，类就是对象的模板，对象就是类的实例，但在ES6之前，JS并没有类的概念。
@@ -340,10 +282,17 @@ console.log(Array.prototype)
 ```
 ### javascript `this`重点
 
+-------------------------js面试中也有this-------------------------
+
+`this`是在执行的时候确定的。不执行，你就不知道在哪里。
+
 1. 作为普通函数执行时，`this`指向`window`。
 2. 当函数作为对象的方法被调用时，`this`就会指向`该对象`。
 3. 构造器调用，`this`指向`返回的这个对象`。
-4. 箭头函数 箭头函数的`this`绑定看的是`this所在函数定义在哪个对象下`，就绑定哪个对象。如果有嵌套的情况，则this绑定到最近的一层对象上。
+4. 箭头函数 箭头函数的`this`绑定看的是`this所在函数定义在哪个对象下`，就绑定哪个对象。如果有嵌套的情况，则this绑定到**最近的一层对象上**。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210811195727.png)
+
 5. 基于Function.prototype上的 `apply 、 call 和 bind `调用模式，这三个方法都可以显示的指定调用函数的 this 指向。`apply`接收参数的是数组，`call`接受参数列表，`` bind`方法通过传入一个对象，返回一个` this `绑定了传入对象的新函数。这个函数的 `this`指向除了使用`new `时会被改变，其他情况下都不会改变。若为空默认是指向全局对象window。
 
 ### 深浅拷贝
@@ -455,7 +404,10 @@ var deepClone = function (target) {
   if (typeof target === "object") {
     let cloneTarget = Array.isArray(target) ? [] : {};
     for (const key in target) {
-      cloneTarget[key] = deepClone(target[key]);
+      if (target.hasOwnProperty(key)) {
+            // 递归调用！！！
+           cloneTarget[key] = deepClone(target[key]);
+       }
     }
     return cloneTarget;
   } else {
@@ -677,6 +629,137 @@ function deepClone(obj, cache = new WeakMap()) {
 ```
 
 ### 手写相关函数
+
+#### 手写bind、call、apply函数
+
+这道题其实理清楚`apply`,`call`,`bind`的特点就行了。首先`apply`,`call`,`bind`都是强制绑定`this`,而`apply`和`call`都是立即执行，只有`bind`是返回一个函数，所以可以将`apply`和`call`放在一起分析。
+
+通过上面的`apply`,`call`,`bind`用法可以得知：
+
+1. `apply`,`call`,`bind`都是可以改变`this`的指向
+2. `apply`,`call`会执行调用的函数，`bind`返回一个新函数。
+3. `apply`第二个参数要求是数组，`call`，`bind`则没有限制数据类型，它会把剩余的参数一起传给函数，`bind`还会把新函数调用时传入的参数一起合并，传给新函数。
+4. 他们都是绑定在`Function`的`prototype`上。
+
+```js
+// call
+Function.prototype._call = function (context, ...args) {
+   // 判断是否是个函数
+  if (typeof this !== 'function') {
+    throw new Error('not function')
+  }
+  // 不传默认是全局，window
+  context = context || window
+  // args不传时默认是空数组，防止下面用spread操作符时报错
+  args = args ? args : []
+  // 把this存到context.fn，这里的this是调用的函数
+  context.fn = this
+  // 执行调用的函数，this指向context，参数用spread操作符扩展
+  const res = context.fn(...args)
+  // 删除，不污染context
+  delete context.fn
+  // 返回res
+  return res
+}
+
+
+// bind
+Function.prototype._bind = function (context, ...args) {
+   // 判断是否是个函数
+  if (typeof this !== 'function') {
+    throw new Error('not function')
+  }
+  // 不传默认是全局，window
+  context = context || window
+  // 把this存到fn，这里的this是调用的函数
+  let fn = this
+  return function newFn (...fnArgs) {
+    let res
+    // 要考虑新函数是不是会当作构造函数
+    if (this instanceof newFn) {
+      // 如果是构造函数则调用new 并且合并参数args，fnArgs
+      res = new fn(...args, ...fnArgs)
+    } else {
+      // 当作普通函数调用 也可以用上面定义的_call
+      res = fn.call(context, ...args, ...fnArgs)
+    }
+    return res
+  }
+}
+
+
+// apply
+Function.prototype._apply = function (context, args) {
+  // 不传默认是全局，window
+  context = context || window
+  // args不传时默认是空数组，防止下面用spread操作符时报错
+  args = args ? args : []
+  // 把this存到context.fn，这里的this是调用的函数
+  context.fn = this
+  // 执行调用的函数，this指向context，参数用spread操作符扩展
+  const res = context.fn(...args)
+  // 删除，不污染context
+  delete context.fn
+  // 返回res
+  return res
+}
+```
+
+#### 手写jQuery
+
+```js
+class jQuery {
+    constructor(selector) {
+        const result = document.querySelectorAll(selector)
+        const length = result.length
+        for (let i = 0; i < length; i++) {
+            this[i] = result[i]
+        }
+        this.length = length
+        this.selector = selector
+    }
+    get(index) {
+        return this[index]
+    }
+    each(fn) {
+        for (let i = 0; i < this.length; i++) {
+            const elem = this[i]
+            fn(elem)
+        }
+    }
+    on(type, fn) {
+        return this.each(elem => {
+            elem.addEventListener(type, fn, false)
+        })
+    }
+    // 扩展很多 DOM API
+}
+
+// 插件
+jQuery.prototype.dialog = function (info) {
+    alert(info)
+}
+
+// “造轮子”
+class myJQuery extends jQuery {
+    constructor(selector) {
+        super(selector)
+    }
+    // 扩展自己的方法
+    addClass(className) {
+
+    }
+    style(data) {
+        
+    }
+}
+
+// const $p = new jQuery('p')
+// $p.get(1)
+// $p.each((elem) => console.log(elem.nodeName))
+// $p.on('click', () => alert('clicked'))
+
+```
 
 #### 手写Ajax
 
@@ -1609,7 +1692,8 @@ console.log(obj[sym])  // 25
 // 数值与其他类型比较，都会讲其他类型转化为数值。
 ```
 ### 作用域
-作用域包含3中类型：全局作用域、块级作用域和函数作用域。
+作用域包含3中类型：**全局作用域**、**块级作用域**和**函数作用域**。
+
 #### 变量定义
 1. 区分大小写
 2. 定义变量（var,let,const）
@@ -1822,12 +1906,21 @@ let c = [...a,...b]  //[1,2,3,4]
 ```
 
 ### 闭包
+
+------------------------------js面试中也有闭包--------------------
+
 就是用来让全局访问函数内部的变量的和方法。
 JavaScript中，即使`调用完函数，该函数内部定义的变量和方法仍会保留在内存中。在函数执行完后保留函数内部定义的变量或者方法的链接，这就是闭包工作方式的一部分。`
 闭包用来模拟类似于对象的私有方法内容。
 #### 什么是闭包
-在函数退出后，闭包还能够保留对所有局部函数变量的引用。
-JavaScript允许在一个函数中定义另一个函数，从技术上讲，这就是闭包。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210811194956.png)
+
+**闭包中：所有的自由变量的查找，是在函数定义的地方，向上级作用域查找。不是在执行的地方！！！**
+
+**在函数退出后，闭包还能够保留对所有局部函数变量的引用。
+JavaScript允许在一个函数中定义另一个函数，从技术上讲，这就是闭包。**
+
 ```js
 // 闭包结构
 // 函数global定义在与window一起创建的现有的执行语境中。
@@ -2484,7 +2577,7 @@ Object类型的**对象实例**拥有`__proto__`属性，后者指向构造函�
 - 实例都会有一个`constructor`属性去指向它的构造函数。
 - 在原型对象中使用`.constructor`（构造器）属性来区分，我这个原型对象被那个构造函数引用了。
 
-
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210811192816.png)
 
 - 每个`构造函数`都有一个`原型对象`
 - `原型对象`都包含一个指向`构造函数`的`指针.constructor`
@@ -2493,6 +2586,8 @@ Object类型的**对象实例**拥有`__proto__`属性，后者指向构造函�
 ### 原型链   
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210809210529.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210811193119.png)
 
 **基于原型的执行规则：即原型链**
 
@@ -2710,7 +2805,7 @@ luna.sleep()
 
 1、instanceof的作用是用来做检测类型：
 
-（1）instanceof可以检测某个对象是不是另一个对象的实例；
+（1）instanceof可以检测某个对象是不是另一个对象的实例(用于判断某个实例是否属于某构造函数)；
 
 ```js
 var Person = function() {};
@@ -2718,7 +2813,7 @@ var student = new Person();
 console.log(student instanceof Person);  // true
 ```
 
-（2）instanceof可以检测父类型；
+（2）instanceof可以检测父类型(在继承关系中用来判断一个实例是否属于它的父类型或者祖先类型的实)；
 
 ```js
 function Person() {};
