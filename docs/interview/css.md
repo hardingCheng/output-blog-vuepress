@@ -446,64 +446,7 @@ dom.getBoundingClientRect().width/height //计算一个元素的绝对位置
 给外部盒子的after伪元素设置clear属性，再隐藏它
 这其实是对空盒子方案的改进，一种纯CSS的解决方案，不用引入冗余元素。
 
-### 5. DOM事件
-
-1. **DOM事件基本**
-
-```js
-//DOM0 时代
-element.onclick = function(){}
-
-//DOM2 时代
-element.addEventListener('click',function(){},false)
-
-//DOM3 时代
-element.addEventListener('keyup',function(){},false)
-```
-
-2. **DOM事件模型** 
-
-冒泡：从下往上
-
-捕获：从上往下
-
-3. **DOM事件流**
-
-用户的操作（例如点击事件）是怎么传递到页面上的，然后怎么响应的。
-
-事件通过**捕获**达到**目标阶段**（目标元素），从目标元素**冒泡**到**windon**对象。
-
-4. **描述DOM事件的捕获流程**
-
-<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210801180424.png" style="zoom:33%;" />
-
-5. **Event对象的常见应用**
-
-```js
-event.preventDefault() //阻止默认事件
-event.stopPropagation() //阻止冒泡行为
-event.stopImmediatePropagation() //一个元素绑定两个事件。在一个事件中加入，另一个事件不执行
-event.currentTarget() //返回其监听器触发事件的节点，即当前处理该事件的元素、文档或窗口。包括冒泡和捕获事件。
-event.target() //target 事件属性可返回事件的目标节点（触发该事件的节点，也就是事件发生的源头，事件发生所绑定的那个节点
-```
-
-6. **自定义事件**
-
-```js
-var newEvent = new Event('custom')
-// CustomEvent可以带参数
-var newEvent2 = new CustomEvent('custom',{
-    a:2
-})
-dom.addEventListener('custom',function(){
-    console.log('custom')
-})
-
-// 触发自定义事件
-dom.dispatchEvent(newEvent)
-```
-
-### 6. 让一个元素水平垂直居中，到底有多少种方案？
+### 5. 让一个元素水平垂直居中，到底有多少种方案？
 
 - **水平居中**
 
@@ -532,3 +475,136 @@ dom.dispatchEvent(newEvent)
   3. 弹性布局 flex :父级设置display: flex; 子级设置margin为auto实现自适应居中
   4. 父级设置相对定位，子级设置绝对定位，并且通过位移 transform 实现
   5. `table 布局`，父级通过转换成表格形式，`然后子级设置 vertical-align 实现`。（需要注意的是：vertical-align: middle使用的前提条件是内联元素以及display值为table-cell的元素）。
+
+#### 水平居中
+
+`单行的文本、inline 或 inline-block 元素`
+此类元素需要水平居中，则父级元素必须是块级元素(block level)，且父级元素上需要这样设置样式：
+
+```css
+.parent {
+    text-align: center;
+}
+```
+
+#### 垂直居中
+
+方法一：通过设置上下内间距一致达到垂直居中的效果：
+
+```css
+.single-line {
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+```
+
+方法二：通过设置 height 和 line-height 一致达到垂直居中：
+
+```css
+.single-line {
+    height: 100px;
+    line-height: 100px;
+}
+```
+
+固定宽高的块级盒子
+方法一：absolute + 负 margin
+
+```css
+.parent {
+    position:relative;
+}
+.child {
+    width: 100px;
+    height: 100px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin: -50px 0 0 -50px;
+}
+```
+
+方法二：absolute + margin auto
+
+```css
+.parent {
+    position:relative;
+}
+.child {
+    width: 100px;
+    height: 100px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    margin: auto;
+}
+```
+
+方法三：absolute + calc
+
+```css
+.parent {
+    position:relative;
+}
+.child {
+    width: 100px;
+    height: 100px;
+    position: absolute;
+    left:calc(50% - 50px);
+    top:calc(50% - 50px);
+}
+```
+
+不固定宽高的块级盒子
+方法一：absolute + transform
+
+```css
+.parent {
+    position:relative;
+}
+.child {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+}
+```
+
+方法二：line-height + vertical-align
+
+```css
+.parent {
+    line-height: 150px;
+    text-align: center;
+}
+.child {
+    display: inline-block;
+    line-height: initial;
+    vertical-align:center;
+}
+```
+
+方法三：flex
+
+```css
+.parent {
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+```
+
+方法四：grid
+
+```css
+.parent {
+   display:grid;
+}
+.child {
+    display: inline-block;
+    justify-content:center;
+    align-self: center;
+}
+```

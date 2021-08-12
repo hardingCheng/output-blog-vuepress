@@ -197,13 +197,14 @@ console.log(p1.__proto__.constructor)
 9. 原型链
    ![](../img/prototype_chain.png)
    ::: tip 提示 
+   
    1. 只要是对象就有__proto__原型，指向原型对象。
    2. Person原型对象里面的__proto__原型指向的是Object.prototype。
    3. Object.prototype原型里的__proto__原型指向为null, 只要是对象，它里面都有一个原型__proto__，它指向的是原型对象prototype,原型对象里也有一个__proto__，它指向的是Object原型对象prototype， Object原型对象里也有一个__proto__,它指向的是null。
    
    简单来说就是，每个对象都有一个原型， 每一个原型又是一个对象，所以原型又有自己的原型，这样一环扣一环形成一条链，就叫原型链。
    :::
-
+   
 10. JS的成员查找机制（规则）
     1. 当访问一个对象的属性(包括方法)时，首先查找这个对象自身有没有该属性
     2. 如果没有就查找它的原型(也就是__proto__指向的prototype原型对象)
@@ -2486,12 +2487,6 @@ document.querySelector("id-1").appendChild(div)
 也可以写函数创建
 ```
 
-#### 函数柯里化？？？？？？？？
-
-```js
-// 待定不会
-```
-
 ### 原型
 
 在定义函数时，会执行两个动作：一个动作是创建函数对象，这是因为函数是对象；另一个动作是创建一个完全独立的原型对象；定义的函数的原型属性将指向该原型对象。
@@ -2530,8 +2525,6 @@ literal.constructor    // f Object { [本地代码] }
 
 创建literal时候，`literl.__proto__`就会连接到Object.prototype。
 
-
-
 <img src="https://output66.oss-cn-beijing.aliyuncs.com/img/__proto__%E6%8C%87%E5%90%91Object.prototype.png" style="zoom:50%;" />
 
 JavaScript内部已经创建了Object.prototype。每当定义新对象时，都会创建一个二级对象，作为其原型。
@@ -2565,9 +2558,9 @@ Object的构造函数，会得到一个构造好的链接。
 
 Object类型的**对象实例**拥有`__proto__`属性，后者指向构造函数的原型对象。Object创建的二级原型对象和`__proto__`指向Object的原型对象的实例。
 
-<img src="/Users/cr/Library/Application Support/typora-user-images/image-20210802110806767.png" alt="image-20210802110806767" style="zoom:100%;" />
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210812152130.png)
 
-![image-20210802110911644](/Users/cr/Library/Application Support/typora-user-images/image-20210802110911644.png)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210812152148.png)
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210809210423.png)
 
@@ -2595,7 +2588,7 @@ Object类型的**对象实例**拥有`__proto__`属性，后者指向构造函�
 - 先在自身属性和方法寻找
 - 如果找不到则自动去隐式原型_ proto_中查找
 
-![image-20210802110907463](/Users/cr/Library/Application Support/typora-user-images/image-20210802110907463.png)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210812152148.png)
 
  可以看出 `p1.__proto__.__proto__` 指向了 `Object.prototype`，`p1.__proto__.__proto__.__proto__` 最后指向了 null，由此可以看出了构建了一条**原型链**。
 
@@ -3134,19 +3127,92 @@ export default class Fridge {
 
 内置的浏览器事件是预设好的，并且在动作发生时，由浏览器执行。
 
-#### 合成事件
-
-可以使用事件对象来创建和调度自己的事件。以这种方式创建的事件称为合成事件。
+1. **DOM事件基本**
 
 ```js
-let startEvent = new Event('start')
+//HTML事件处理程序：
+<input type="button" value="Click Me" onclick="alert('Clicked!')" />
+<input type="button" value="Click Me" onclick="showMessage()" />
 
-document.addEventListener('start',() => {
-  // 实现
-},false)
+
+
+//DOM0 时代 DOM0级事件处理程序:
+element.onclick = function(){}
+var btn = document.getElementById("button")
+btn.onclick = function() {alert(this.id)}
+btn.onclick = null;
+
+
+//DOM2 时代 DOM2级事件处理程序:
+element.addEventListener('click',function(){},false)
+var btn = document.getElementById("button");
+btn.addEventListener("click", function() {alert(this.id)}, false);
+btn.removeEventListener("click", function() {alert(this.id)}, false)
+//false是冒泡阶段调用事件处理程序、true是捕获阶段
+
+
+//DOM3 时代
+element.addEventListener('keyup',function(){},false)
+
+
+//IE事件处理程序:
+var btn = document.getElementById("button");
+btn.attachEvent("onclick", function() {alert("Clicked!")}); 
+btn.detachEvent("onclick", function() {alert("Clicked!")}); 
+
 ```
 
-1. 事件捕获与事件冒泡
+2. **DOM事件模型** 
+
+冒泡：从下往上
+
+捕获：从上往下
+
+3. **DOM事件流**
+
+包含三个阶段：事件捕获阶段，处于事件阶段，和事件冒泡阶段。
+
+**事件发生的顺序：** 按照W3C的标准，先发生捕获事件，后发生冒泡事件。如果一个元素已经执行了有两个同样的事件，但一个是捕获，一个是冒泡，只执行捕获事件。
+
+用户的操作（例如点击事件）是怎么传递到页面上的，然后怎么响应的。
+
+事件通过**捕获**达到**目标阶段**（目标元素），从目标元素**冒泡**到**windon**对象。
+
+4. **描述DOM事件的捕获流程**
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210801180424.png" style="zoom:33%;" />
+
+5. **Event对象的常见应用**
+
+```js
+event.preventDefault() //阻止默认事件
+event.stopPropagation() //阻止冒泡行为
+event.stopImmediatePropagation() //一个元素绑定两个事件。在一个事件中加入，另一个事件不执行
+event.currentTarget() //返回其监听器触发事件的节点，即当前处理该事件的元素、文档或窗口。包括冒泡和捕获事件。
+event.target() //target 事件属性可返回事件的目标节点（触发该事件的节点，也就是事件发生的源头，事件发生所绑定的那个节点
+```
+
+6. **自定义事件**
+
+```js
+var newEvent = new Event('custom')
+// CustomEvent可以带参数
+var newEvent2 = new CustomEvent('custom',{
+    a:2
+})
+dom.addEventListener('custom',function(){
+    console.log('custom')
+})
+
+// 触发自定义事件
+dom.dispatchEvent(newEvent)
+```
+
+#### 事件捕获与事件冒泡
+
+事件冒泡：指事件最开始是由最具体的元素接收，然后逐级向上传播到不具体的节点（文档）。
+
+事件捕获：指事件最开始是由不具体的节点（文档）接收，然后逐级向下传播到最具体的元素。
 
 addEventListener方法的最后一个参数useCaptue设为false，以禁止事件捕获模式。
 
@@ -3163,7 +3229,7 @@ document.dispatchEvent(startEvent)
 3. removeEventListener
 
 ```js
-document.addEventListener('click',callback)
+document.removeEventListener('click',callback)
 ```
 
 4. CustomEvent对象
@@ -3184,7 +3250,6 @@ let callback = function(event){
 }
 document.addEventListener('pin',callback)
 document.dispatchEvent(eventPin)
-
 ```
 
 5. setTimeout
@@ -3206,6 +3271,28 @@ timer = null
 let interval = setInterval(callback,1000)
 clearInterval(interval)
 interval = null
+```
+
+#### **事件委托/事件代理**
+
+不在事件发生的直接DOM上设置监听函数，而在其父元素上设置监听函数，通过事件冒泡，父元素可以监听到子元素上事件的触发，通过判断事件发生元素DOM的类型（使用target属性），来做出不同的响应。
+
+**使用原因/性能内存问题：** 在JS中，添加到页面的事件处理程序数量会关系到页面的整体运行性能。两个方面：每个函数都是对象，会占用内存，内存中对象越多，性能越差；大量事件处理程序导致的DOM访问次数会延迟整个页面的交互就绪时间。
+
+```js
+<ul id="name">
+    <li id="1">a</li>
+</ul>
+
+var ul = document.getElementById("name");
+
+ul.addEventListener("click", function(event){
+    switch (event.target.id) {
+        case "1":
+            event.target.innerHTML = "aa";
+            break;
+    }
+},false);
 ```
 
 #### 拦截浏览器事件

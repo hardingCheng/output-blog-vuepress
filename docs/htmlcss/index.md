@@ -1,5 +1,30 @@
 #  HTMLCSS 日常总结
-## CSS基础
+
+## HTML
+
+### HTML基础
+
+#### 频繁操作DOM改为一次性操作DOM
+
+```js
+const list = document.getElementById('list')
+// 创建一个文档片段，此时还没有插入到 DOM 结构中
+const frag = document.createDocumentFragment()
+for (let i  = 0; i < 20; i++) {
+    const li = document.createElement('li')
+    li.innerHTML = `List item ${i}`
+    // 先插入文档片段中
+    frag.appendChild(li)
+}
+// 都完成之后，再统一插入到 DOM 结构中
+list.appendChild(frag)
+console.log(list)
+```
+
+## CSS
+
+### CSS基础
+
 #### 选择器
 ##### 基础选择器
 - 标签选择器：`h1`
@@ -544,133 +569,6 @@ table {
 }
 ```
 
-##### 水平居中
-
-`单行的文本、inline 或 inline-block 元素`
-此类元素需要水平居中，则父级元素必须是块级元素(block level)，且父级元素上需要这样设置样式：
-```css
-.parent {
-    text-align: center;
-}
-```
-
-##### 垂直居中
-方法一：通过设置上下内间距一致达到垂直居中的效果：
-```css
-.single-line {
-    padding-top: 10px;
-    padding-bottom: 10px;
-}
-```
-方法二：通过设置 height 和 line-height 一致达到垂直居中：
-```css
-.single-line {
-    height: 100px;
-    line-height: 100px;
-}
-```
-
-固定宽高的块级盒子
-方法一：absolute + 负 margin
-```css
-.parent {
-    position:relative;
-}
-.child {
-    width: 100px;
-    height: 100px;
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    margin: -50px 0 0 -50px;
-}
-```
-方法二：absolute + margin auto
-```css
-.parent {
-    position:relative;
-}
-.child {
-    width: 100px;
-    height: 100px;
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    margin: auto;
-}
-```
-方法三：absolute + calc
-```css
-.parent {
-    position:relative;
-}
-.child {
-    width: 100px;
-    height: 100px;
-    position: absolute;
-    left:calc(50% - 50px);
-    top:calc(50% - 50px);
-}
-```
-不固定宽高的块级盒子
-方法一：absolute + transform
-```css
-.parent {
-    position:relative;
-}
-.child {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%,-50%);
-}
-```
-方法二：line-height + vertical-align
-```css
-.parent {
-    line-height: 150px;
-    text-align: center;
-}
-.child {
-    display: inline-block;
-    line-height: initial;
-    vertical-align:center;
-}
-```
-方法三：flex
-```css
-.parent {
-    display:flex;
-    justify-content:center;
-    align-items:center;
-}
-```
-方法四：grid
-```css
-.parent {
-   display:grid;
-}
-.child {
-    display: inline-block;
-    justify-content:center;
-    align-self: center;
-}
-```
-##### 常用布局 ？？？？？？？
-- 圣杯布局
-  
-  两者的功能相同，都是为了实现一个两侧宽度固定，中间宽度自适应的三栏布局。（
-  
-- 双飞翼布局
-  
-  两者的功能相同，都是为了实现一个两侧宽度固定，中间宽度自适应的三栏布局。（
-  
-- 三行布局（头尾定高主栏自适应）
-
-- 多列等高布局
-
 #### HTML 标签有哪些行内元素
 
 - a
@@ -692,9 +590,7 @@ table {
 |   -o-    |        基于Opera的浏览器         |
 | -webkit- |  基于Webkit的浏览器（Chrome ）   |
 
-
-
-## CSS 高级技巧汇总
+### CSS 高级技巧汇总
 
 #### 设置input的placeholder的字体样式
 ```css

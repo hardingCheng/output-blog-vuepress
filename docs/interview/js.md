@@ -2469,7 +2469,7 @@ Chrome 默认会为每个页面分配一个渲染进程，但是，如果从一�
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210806083900.png)
 
-![image-20210806084003066](/Users/cr/Library/Application Support/typora-user-images/image-20210806084003066.png)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210812145201.png)
 
 2. 浏览器渲染过程
 
@@ -2481,7 +2481,7 @@ Chrome 默认会为每个页面分配一个渲染进程，但是，如果从一�
 
 > 事实上，构建DOM的过程中，不是等所有Token都转换完成后再去生成节点对象，而是一边生成Token一边消耗Token来生成节点对象。 换句话说，每个Token被生成后，会立刻消耗这个Token创建出节点对象。注意：带有结束标签标识的Token不会创建节点对象。
 
-![image-20210806091455092](/Users/cr/Library/Application Support/typora-user-images/image-20210806091455092.png)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210812145222.png)
 
 - **2.构建CSSOM树**
 
@@ -2497,7 +2497,7 @@ CSS 样式来源主要有三种：
 
 在这一过程中，浏览器会确定下每一个节点的样式到底是什么，并且这一过程其实是很消耗资源的。因为样式既可以自行设置给某个节点，也可以通过继承获得。 在这一过程中，浏览器得递归CSSOM树，确定具体的元素样式。
 
-![image-20210806091541398](/Users/cr/Library/Application Support/typora-user-images/image-20210806091541398.png)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210812145238.png)
 
 - **3.构建渲染树（布局树）**
 
@@ -2505,7 +2505,7 @@ CSS 样式来源主要有三种：
 
 计算渲染树节点的坐标位置。
 
-![image-20210806091605013](/Users/cr/Library/Application Support/typora-user-images/image-20210806091605013.png)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210812145254.png)
 
 - **4. 构建分层树**
 
@@ -2519,7 +2519,7 @@ CSS 样式来源主要有三种：
 
 所以这一步还要将绘制列表提交到合成线程。
 
-![image-20210806091635510](/Users/cr/Library/Application Support/typora-user-images/image-20210806091635510.png)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210812145311.png)
 
 - **6.栅格化**
 
@@ -2632,7 +2632,7 @@ JS 实现异步时通过 **事件循环（Event Loop）**,是JS异步的解决�
 
 异步任务：不进入主线程，而进入**任务队列（task queue）** 只有**任务队列**通知主线程，某个异步任务可以执行了，该任务才会进入主线程执行。
 
-<img src="/Users/cr/Library/Application Support/typora-user-images/image-20210806133659358.png" alt="image-20210806133659358" style="zoom:33%;" />
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210812145333.png" style="zoom:33%;" />
 
 - **宏任务和微任务**
 
@@ -2744,7 +2744,7 @@ console.log('10');
 
 ```
 
-<img src="/Users/cr/Library/Application Support/typora-user-images/image-20210806134254388.png" alt="image-20210806134254388" style="zoom:33%;" />
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210812145406.png" style="zoom:33%;" />
 
 将同步代码放入执行栈中执行，在控制台输出。
 
@@ -2804,7 +2804,7 @@ js 中存在多种作用域（全局，函数私有的，块级私有的），�
     <script src="./async2.js" charset="utf-8" async></script>
 ```
 
-![image-20210806102138417](/Users/cr/Library/Application Support/typora-user-images/image-20210806102138417.png)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210812145438.png)
 
 ### 浏览器缓存
 
@@ -2839,7 +2839,7 @@ memory cache 机制保证了一个页面中如果有两个相同的请求 (例�
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210806145754.png)
 
-![image-20210806102204768](/Users/cr/Library/Application Support/typora-user-images/image-20210806102204768.png)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210812145438.png)
 
 `硬盘缓存又叫HTTP缓存`，它也是浏览器缓存中最重要的内容。因为你想啊，DNS缓存它主要是做一个ip地址查找并且是自主完成的，memory cache 也是不受控制，算是一个黑盒。所以剩下的`可以受我们控制`的硬盘缓存的重要性就不言而喻了，`大多优化手段也是针对硬盘缓存`。HTTP缓存分为`强缓存`和`协商缓存`。
 
@@ -3071,7 +3071,7 @@ wm.get(key)
 - 键名是弱引用，键值可以是任意的，键名所指向的对象可以被垃圾回收，此时键名是无效的
 - 不能遍历，方法有 `get`、`set`、`has`、`delete`
 
-### 总结
+总结
 
 Set
 
@@ -3268,8 +3268,6 @@ output: {
 - 热更新
 - DIIPlugin
 
-
-
 ### 前端错误监控（产品质量 体系）
 
 1. **前端错误的分类**
@@ -3279,7 +3277,7 @@ output: {
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210806103223.png)
 
-![image-20210806103901231](/Users/cr/Library/Application Support/typora-user-images/image-20210806103901231.png)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210812145517.png)
 
 3. **上报错误的基本原理**
 
@@ -3346,26 +3344,3 @@ output: {
 有问题及时沟通，QA和FE天生信息不对称，当面讨论，让QA帮你复现，需要特定设备才能复现。沟通，及时识别风险，及时汇报。
 
 ### 业务能力、团队协作能力、事务推动能力、带人能力、其他能力。
-
-1. 业务能力
-
-![image-20210806120922386](/Users/cr/Library/Application Support/typora-user-images/image-20210806120922386.png)
-
-![image-20210806121229650](/Users/cr/Library/Application Support/typora-user-images/image-20210806121229650.png)
-
-2. 团队协作能力
-
-![image-20210806121718302](/Users/cr/Library/Application Support/typora-user-images/image-20210806121718302.png)
-
-3. 事务推动能力
-
-![image-20210806122740734](/Users/cr/Library/Application Support/typora-user-images/image-20210806122740734.png)
-
-4. 带人能力
-
-![image-20210806122915468](/Users/cr/Library/Application Support/typora-user-images/image-20210806122915468.png)
-
-![image-20210806125607989](/Users/cr/Library/Application Support/typora-user-images/image-20210806125607989.png)
-
-![image-20210806130234177](/Users/cr/Library/Application Support/typora-user-images/image-20210806130234177.png)
-
