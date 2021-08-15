@@ -100,6 +100,7 @@ module.exports = {
           ]
         },
         { text: '工具技巧', link: '/tool-skills/index' },
+        { text: '前端训练营', link: '/zijie/index' },
       ],
     sidebar: 'auto',// 侧边栏配置
     sidebarDepth: 2, // 侧边栏显示2级
