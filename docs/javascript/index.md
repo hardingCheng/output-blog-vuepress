@@ -1230,8 +1230,7 @@ const loadedImages = function(...imgs){
 function debounce(handle, delay) {
     var timer = null;
     return function () {
-        var _self = this,
-            _args = arguments;
+        var _self = this, _args = arguments;
         clearTimeout(timer);
         timer = setTimeout(function () {
             handle.apply(_self, _args)
@@ -1257,7 +1256,7 @@ function throttle(handler, wait) {
    - **概念：** `在事件被触发n秒后再执行回调，如果在这n秒内又被触发，则重新计时。`
    - **生活中的实例：** `如果有人进电梯（触发事件），那电梯将在10秒钟后出发（执行事件监听器），这时如果又有人进电梯了（在10秒内再次触发该事件），我们又得等10秒再出发（重新计时）。`**生活中的实例：** `我们知道目前的一种说法是当 1 秒内连续播放 24 张以上的图片时，在人眼的视觉中就会形成一个连贯的动画，所以在电影的播放（以前是，现在不知道）中基本是以每秒 24 张的速度播放的，为什么不 100 张或更多是因为 24 张就可以满足人类视觉需求的时候，100 张就会显得很浪费资源。`
    - **事件响应函数在一段规定时间（前/后）才执行。如果在规定时间内，再次触发，重新计算时间。**
-2. 函数节流(debounce)
+2. 函数节流(throttle)
    - **概念：** `规定一个单位时间，在这个单位时间内，只能有一次触发事件的回调函数执行，如果在同一个单位时间内某事件被触发多次，只有一次能生效。`
    - **生活中的实例：** `我们知道目前的一种说法是当 1 秒内连续播放 24 张以上的图片时，在人眼的视觉中就会形成一个连贯的动画，所以在电影的播放（以前是，现在不知道）中基本是以每秒 24 张的速度播放的，为什么不 100 张或更多是因为 24 张就可以满足人类视觉需求的时候，100 张就会显得很浪费资源。`、
 
@@ -1352,14 +1351,16 @@ setInterval(debounce(fn,2000),1000) // 不会触发一次（我把函数防抖�
 
 ```js
 function throttle(fn, gapTime) {
-  let _lastTime = null;
-
-  return function () {
-    let _nowTime = + new Date()
-    if (_nowTime - _lastTime > gapTime || !_lastTime) {
-      fn();
-      _lastTime = _nowTime
+  let timer = null
+  return function(){
+    var _self = this,_args = argument;
+    if(timer){
+      return 
     }
+    timer = setTimeout(() => {
+      fn.apply(_self,_args)
+      timer = null
+    })
   }
 }
 
@@ -1372,6 +1373,382 @@ setInterval(throttle(fn,1000),10)
 ```
 
 函数防抖和函数节流是**在时间轴上控制函数的执行次数**。防抖可以类比为`电梯不断上乘客`,节流可以看做`幻灯片限制频率播放电影`。
+
+### 编程范式
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210816185058.png" style="zoom:33%;" />
+
+1. **简单总结**
+
+编程范式是一种编程风格，可分为命令式、函数式（属于声明式）、面向对象等多种范式。
+
+JS 是一种动态语言，它支持多种范式，具体选择哪种范式，根据业务需求和个人风格做选择。
+
+编程范式没有绝对的好坏之分，只有合适和不合适。
+
+简单来说下这几种范式的特点。
+
+- 命令式更符合自然逻辑，容易理解。
+- 函数式减少了临时变量，容易维护。
+- 面向对象更方便扩展，代码复用程度高。
+
+2. **编程范式是什么**
+
+> [编程范式](https://link.juejin.cn/?target=https%3A%2F%2Fbaike.baidu.com%2Fitem%2F%E7%BC%96%E7%A8%8B%E8%8C%83%E5%9E%8B%2F1475451%3Ffromtitle%3D%E7%BC%96%E7%A8%8B%E8%8C%83%E5%BC%8F%26fromid%3D23696164%26fr%3Daladdin)是一类典型的编程风格，是指从事软件工程的一类典型的风格（可以对照方法学）。
+
+> 如：命令式编程、函数式编程、面向对象编程等不同的编程范式。
+
+**前端领域的函数式编程的体现**
+
+最近函数式编程逐渐又火了起来，我们看看前端领域有什么函数式编程的影子吧
+
+- ES6的箭头函数、map 、reduce 、filter
+- React 16.8 的Hook
+- Vue3.0的Composition API
+
+3. **命令式编程**
+
+**命令式编程就是关注计算执行步骤，如何执行，注重过程。** 
+
+大部分命令式编程语言都支持四种基本的语句
+
+运算语句；
+
+- 循环语句（for、while）；
+
+- 条件分支语句（if else、switch）；
+
+- 无条件分支语句（return、break、continue）。
+
+```js
+//命令式
+const WIDTHS = ['10px','20px','30px'], LENGTH = 3;
+let arr = [];
+for (let i = 0; i < LENGTH; i++) {
+  arr = arr.concat(WIDTHS);
+}
+// ["10px", "20px", "30px", "10px", "20px", "30px", "10px", "20px", "30px"]
+
+//函数式
+const WIDTHS = ['10px','20px','30px'], LENGTH = 3;
+const arr = Array(LENGTH).fill('').reduce(acc => acc.concat(WIDTHS), []);
+// ["10px", "20px", "30px", "10px", "20px", "30px", "10px", "20px", "30px"]
+```
+
+**命令式编程的优缺点**
+
+- 优点
+  - 性能高，因为有引擎作优化
+  - 容易理解，因为符合自然编程思路
+- 缺点
+  - 产生大量临时变量
+  - 代码可读性低，需要通读代码才知道具体做了什么
+
+4. **函数式编程**
+
+**函数式编程，主要强调如何通过函数的组合变化来解决问题，关注结果。**
+
+**函数式编程的特性**
+
+- 函数是"第一等公民"
+  - 函数可以像其他数据类型一样操作，如赋值给其他变量、作为函数的入参、作为函数的返回值。
+- 惰性计算
+  - 只在需要的时候执行，不产生无意义的中间变量。
+- 没有"副作用"
+  - 副作用指函数计算结果的过程中，系统状态的变化，或者函数内部和外部进行交互，产生其他影响。
+  - 常见的副作用：更改全局变量、发送http请求、dom查询。
+- 引用透明性
+  - 即如果提供同样的输入，那么函数总是返回同样的结果。
+  - 完全不依赖外部状态的变化（无状态），如全局变量，this 指针，IO 操作等。（函数的输出仅取决于输入，而不依赖外部状态；）
+  - PS：没有副作用 + 无状态 又可以称为纯函数。（不会造成超出其作用域的变化，即不修改函数参数或全局变量等。）
+
+柯里化其实就是流水线上的**加工站**，函数组合就是我们的**流水线**。
+
+- 柯里化（Currying）
+  - 理解为“加工站”，接受多个参数的函数变换成接受一个单一参数（最初函数的第一个参数）的函数，并且返回接受余下的参数而且返回结果的新函数。
+  - 将一个多元函数转为一个单元函数，可以依次调用`f(x,y,z) → f(x)(y)(z)`。
+  - 举个例子：求两个数的平方和
+
+```js
+// 原始版本
+const squares = function(x, y) {
+  return x * x + y * y;
+}
+// 柯里化版本
+const currySquares = function(x) {
+    return function(y) {
+    	return x * x + y * y;
+    }
+}
+console.log(squares(1,2));
+console.log(currySquares(1)(2));
+```
+
+- 函数组合（Compose）
+  - 理解为“流水线”，将多个函数组合成一个新的函数，初始数据通过多个函数依次处理，最后整体输出。
+  - 把复杂的逻辑拆分成一个个简单任务，最后组合起来完成任务，使得整个过程的数据流更明确、可控。
+  - 为了保证每个加工站的输出刚好流入下个工作站的输入，必须是单元函数。如果是加工站是多元函数，就需要用到柯里化转为单元函数，再放到流水线上组合使用。
+  - 两个函数组合示例： 注意compose (从右往左的组合顺序执行 )
+
+```js
+const compose = (f, g) => x => f(g(x))
+
+const f = x => x + 1;
+const g = x => x * 2;
+const fg = compose(f, g);
+fg(1) // 3
+```
+
+- 多个函数组合示例： 如果需要类似管道pipe（从左往右）的数据流，将reduce换成reduceRight即可。
+
+```js
+const compose = (...fns) => {
+  return fns.reduce((acc,cur) => {
+    return (...args) => {
+      return acc(cur(...args))
+    }
+  })
+}
+// 最后返回的函数先执行
+
+const f = x => {
+  console.log('f: ', x);
+  return x + 1;
+}
+
+const g = x => {
+  console.log('g: ', x);
+  return x + 1;
+}
+
+const t = x => {
+  console.log('t: ', x);
+  return x + 1;
+}
+
+compose(f, g, t)(1);
+
+// t:  1
+// g:  2
+// f:  3
+```
+
+**函数式编程的优缺点**
+
+- 优点
+  - 代码简洁，开发快速
+    - 函数复用率很高，减少重复，开发速度快
+  - 维护方便
+    - 减少状态变量的声明和维护
+  - 更少的出错概率
+    - 强调纯函数，没有副作用
+- 缺点
+  - 性能不好，容易过度抽象包装
+    - 比如 使用命令式就只需要 变量+命令式（一层循环），使用函数式，不使用外部变量（双重循环）。
+    - 在 JS 这种非函数式语言中，函数式的方式比直接写语句指令慢（引擎会针对很多指令做特别优化），如纯循环就比原生map性能快几倍。
+  - 内存容易占用过高
+    - 为了实现对象状态的不可变，创建更多新对象。消耗更多内存空间，JS引擎进行垃圾回收有压力。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210816224030.png)
+
+### 纯函数
+
+#### 什么是纯函数
+
+- 如果函数的调用参数相同, 则永远返回相同的结果. 它不依赖于程序执行期间函数外部任何状态或数据的变化, 只依赖于传入的参数
+- 纯函数不会产生任何可观察的副作用, 例如: 网络请求, 输入/输出设备, 或数据突变(mutation)等
+
+#### 纯函数特点
+
+- **无状态**：函数的输出仅取决于输入，而不依赖外部状态；
+- **无副作用**：不会造成超出其作用域的变化，即不修改函数参数或全局变量等。
+
+```js
+function add(obj) {
+  obj.num += 1
+  return obj
+}
+
+const obj = {num: 1}
+add(obj)
+console.log(obj)
+// { num: 2 }
+```
+
+这个函数不是纯的，因为js对象传递的是引用地址，函数内部的修改会直接影响外部变量，最后产生了预料之外的结果。接下来，我们改成纯函数的写法：
+
+```js
+function add(obj) {
+  const _obj = {...obj}
+  _obj.num += 1
+  return _obj
+}
+
+const obj = {num: 1}
+add(obj)
+console.log(obj);
+// { num: 1 }
+```
+
+- **可缓存性**正是因为函数式声明的无状态特点，即：**相同输入总能得到相同的输出**。所以我们可以提前缓存函数的执行结果，实现更多功能。例如：优化斐波拉契数列的递归解法。
+- **可移植性/自文档化**纯函数的依赖很明确，更易于观察和理解，配合类型签名可以使程序更加简单易读。
+- **可测试性**纯函数让测试更加简单，只需简单地给函数一个输入，然后断言输出就可以了。
+
+#### 副作用
+
+函数的副作用是指**在调用函数时，除了返回函数值外还产生了额外的影响**。例如修改上个例子中的修改参数或者全局变量。除此之外，以下副作用也都有可能会发生：
+
+- 更改全局变量
+- 处理用户输入
+- 屏幕打印或打印log日志
+- DOM查询以及浏览器cookie、localstorage查询
+- 发送http请求
+- 抛出异常，未被当前函数捕获
+- ...
+
+*副作用往往会影响代码的可读性和复杂性，从而导致意想不到的bug。在实际开发中，我们是离不开副作用的，那么在函数式编程中应尽量减少副作用，尽量书写纯函数。*
+
+例子：
+
+```js
+// 组合函数
+function compose(...fns) {
+  return fns.reduce((a,b) => {
+    return (...args) => {
+      return a(b(...args))
+    }
+  })
+}
+
+// redux
+function createStore(reducer) {
+  let currentState
+  let listeners = []
+  function getState() {
+    return currentState
+  }
+  function dispatch(action) {
+    currentState = reducer(currentState, action)
+    listeners.map(listener => {
+      listener()
+    })
+    return action
+  }
+  function subscribe(cb) {
+    listeners.push(cb)
+    return () => {}
+  }
+ 
+  return {
+    getState,
+    dispatch,
+    subscribe
+  }
+}
+// 应用实例如下：
+function reducer(state = 0, action) {
+  switch (action.type) {
+    case 'ADD':
+      return state + 1
+    case 'MINUS':
+      return state - 1
+    default:
+      return state
+  }
+}
+const store = createStore(reducer)
+
+console.log(store.getState());
+console.log(store.dispatch({type: 'ADD'}));
+console.log(store.getState());
+```
+
+首先使用`reducer`初始化`store`，后续事件产生时，通过`dispatch`更新`store`状态，同时通过`getState`获取`store`的最新状态。
+
+`redux`规范了**单向数据流**，`action`只能由`dispatch`函数派发，并通过纯函数`reducer`更新状态`state`，然后继续等待下一次的事件。这种单向数据流的机制进一步简化事件管理的复杂度，并且还可以在事件流程中插入**中间件（middleware）**。通过中间件，可以实现日志记录、thunk、异步处理等一系列扩展处理，大大得增强事件处理的灵活性。
+
+增强版：
+
+```js
+// 扩展createStore
+function createStore(reducer, enhancer){
+ if (enhancer) {
+   return enhancer(createStore)(reducer)
+  }
+  
+  ...
+}
+// 中间件的实现
+function applyMiddleware(...middlewares) {
+  return function (createStore) {
+    return function (reducer) {
+      const store = createStore(reducer)
+      let _dispatch = store.dispatch
+
+      const middlewareApi = {
+        getState: store.getState,
+        dispatch: action => _dispatch(action)
+      }
+
+      // 获取中间件数组：[mid1, mid2]
+      // mid1 = next1 => action1 => {}
+      // mid2 = next2 => action2 => {}
+      const midChain = middlewares.map(mid => mid(middlewareApi))
+
+      // 通过compose组合中间件：mid1(mid2(mid3()))，得到最终的dispatch
+      // 1. compse执行顺序：next2 => next1
+      // 2. 最终dispatch：action1 (action1中调用next时，回到上一个中间件action2; action2中调用next时，回到最原始的dispatch)
+      
+      _dispatch = compose(...midChain)(store.dispatch)
+
+      return {
+        ...store,
+        dispatch: _dispatch
+      }
+    }
+  }
+}
+
+// 自定义中间件模板
+const middleaware = store => next => action => {
+    // ...逻辑处理
+    next(action)
+}
+```
+
+通过`compose`组合所有的`middleware`，然后返回包装过的`dispatch`。接下来，在每次`dispatch`时，`action`会经过全部中间件进行一系列操作，最后透传给纯函数`reducer`进行真正的状态更新。任何`middleware`能够做到的事情，我们都可以通过手动包装`dispatch`调用实现，但是放在同一个地方统一管理使得整个项目的扩展变得更加容易。
+
+```js
+// 1. 手动包装dispatch调用，实现logger功能
+function dispatchWithLog(store, action) {
+ console.log('dispatching', action)
+ store.dispatch(action)
+ console.log('next state', store.getState())
+}
+
+dispatchWithLog(store, {type: 'ADD'})
+
+// 2. 中间件方式包装dispatch调用
+const store = new Store(reducer, applyMiddleware(thunkMiddleware, loggerMiddleware))
+
+store.dispatch(() => {
+ setTimeout(() => {
+   store.dispatch({type: 'ADD'})
+  }, 2000)
+})
+  
+// 中间件执行过程
+thunk => logger => store.dispatch
+```
+
+### 高阶函数
+
+高级函数是指至少满足下列条件之一的函数。
+
+- 函数可以作为参数被传递
+- 函数可以作为返回值输出
+
+其实就是函数式编程 上面有  柯里化啥的
 
 ## javascript语法简明手册
 

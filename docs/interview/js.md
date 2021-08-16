@@ -1,4 +1,4 @@
-# JavaScript面试
+JavaScript面试
 
 ## 基础面试问题
 ### Var、Let 和 Const 有什么区别
@@ -1541,88 +1541,9 @@ function curry(fn){
 
 - 延迟执行 只传递给函数一部分参数来调用它，让它返回一个函数去处理剩下的参数。柯里化的函数可以延迟接收参数，就是比如一个函数需要接收的参数是两个，执行的时候必须接收两个参数，否则没法执行。但是柯里化后的函数，可以先接收一个参数。
 
-### 函数式编程？？？？？？？？
+### 函数式编程
 
-函数式编程：把事物之间的一系列复杂的**联系**抽象到程序的事件（对运算过程进行抽象）。
-
-#### 函数式编程的好处（Why study FP(Functional Programming)）
-
-- react的流行，使函数式编程受到越来越多的关注
-
-- Vue3也开始大量使用函数式编程
-
-- 函数式编程可以抛弃this。即使用过程中，不用关注this指向问题
-
-- 项目打包过程中，可以更好的利用tree shaking过滤无用代码（vue3的改进点）
-
-- 方便测试、方便并行处理
-
-- 有很多库（lodash、underscore、ramda），可以帮助我们进行函数是的开发。
-
-#### 什么是高阶函数
-
-- 可以把函数作为参数传递给另一个函数
-
-```js
-function forEach(array,fn){
-	for(let i = 0; i < array.length; i++){
-        fn(array[i])
-    }
-}
-```
-
-- 可以把函数作为另一个函数的返回值
-
-```js
-function makeFn(){
-	let msg = "hello world!"
-    return function(){
-        console.log(msg)
-    }
-}
-
-const fn = makeFn();
-fn()
-```
-
-#### 使用高阶函数的意义
-
-- 抽象细节，即不需要关注内部执行细节，只需要关注想要实现的目标即可
-- 高阶函数是用来抽象通用问题的，精简代码，实现代码的复用
-
-```js
-// 面向过程的方式
-let array = [1,2,3,4];
-for (let i = 0; i< array.length; i++){
-    console.log(array[i])
-}
-
-// 高阶函数的方式
-let array = [1,2,3,4];
-forEach(array,item => {
-    console.log(item);
-    ... // something you want
-})
-
-//常用的高阶函数
-forEach
-map
-filter
-every
-some
-find/findIndex
-reduce
-sort
-```
-
-#### 纯函数
-
-**相同的输入永远都会得到相同的输出**，而且没有任何可观察的副作用。
-
-- 数组的slice和splice分别是：纯函数、不纯的函数
-  - `slice`返回数组中指定的部分，不会改变原有函数
-  - `splice`对数组进行操作并返回该数组，会改变原有数组
-- 函数式编程不会保留计算中间的结果，所以变量是不可变的（无状态的）
+在js的基础篇章中有
 
 ### 闭包
 
@@ -2429,6 +2350,12 @@ HttpOnly 最早由微软提出，至今已经成为一个标准。浏览器将�
 
 ### 从输入 URL 到页面展示，这中间发生了什么？
 
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210816130659.png" style="zoom:33%;" />
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210816130759.png" style="zoom:33%;" />
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210816130844.png" style="zoom:33%;" />
+
 1. **用户输入URL**
 
 浏览器判断输入内容是否为URL，如果不是URL，用浏览器默认的搜索引擎来合成新的带搜索关键字的URL，如果判断输入内容符合URL规则，则加上协议合成完整URL。
@@ -2464,6 +2391,8 @@ Chrome 默认会为每个页面分配一个渲染进程，但是，如果从一�
 5. #### 渲染流程（就是下面的渲染机制）
 
 ### 渲染机制
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210816132327.png)
 
 1. 什么是`DOCTYPE`及作用
 
@@ -2789,7 +2718,21 @@ js 中存在多种作用域（全局，函数私有的，块级私有的），�
 
 然后把上下文压缩进栈，进栈后，在当前上下文再依次执行代码； 全局执行器上下文（EC(G)）进栈（ECStack）执行,执行完代码就会把形成的上下文释放（出栈），执行后一些没用的上下文也将出栈，有用的上下文会压缩到栈底（闭包）。栈底永远是全局执行上下文，栈顶则永远是当前执行上下文。当页面关闭全局上下文出栈。
 
-### 页面性能
+### 页面性能（性能优化）
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210816155255.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210816160028.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210816160145.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210816155340.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210816155411.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210816160732.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210816160751.png)
 
 1. **提升页面性能的方法有那些**
 
@@ -2838,6 +2781,8 @@ memory cache 机制保证了一个页面中如果有两个相同的请求 (例�
 强制缓存优先于协商缓存进行，若强制缓存(Expires和Cache-Control)生效则直接使用缓存，若不生效则进行协商缓存(Last-Modified / If-Modified-Since和Etag / If-None-Match)，协商缓存由服务器决定是否使用缓存，若协商缓存失效，那么代表该请求的缓存失效，返回200，重新返回资源和缓存标识，再存入浏览器缓存中；生效则返回304，继续使用缓存。
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210806145754.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210816155911.png)
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210812145438.png)
 
