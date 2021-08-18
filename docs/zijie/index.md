@@ -1448,6 +1448,13 @@ https://blog.csdn.net/qq_26399665/article/details/79831490
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818234630.png)
 
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818234837.png)
+https://www.typescriptlang.org/zh/docs/
+https://basarat.gitbook.io/typescript/
+https://juejin.cn/search?query=TypeScript
+https://www.zhihu.com/topic/19766226/hot
+https://stackoverflow.com/questions/tagged/typescript
+https://github.com/microsoft/TypeScript/issues
 ## React
 
 ## Vue
