@@ -1,5 +1,7 @@
 # 字节前端训练营
 
+版权归字节跳动青训营。
+
 ## HTML
 
 ### 走进HTML
@@ -1345,10 +1347,107 @@ switcher.onclick = toggle(
   evt => evt.target.className = 'on'
 );
 ```
+
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210816234737.png)
 https://blog.csdn.net/qq_26399665/article/details/79831490
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210816235006.png)
+
+## TypeScript
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818224153.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818224348.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818224523.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818224611.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818224856.png)
+需要补充
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818224930.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818225038.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818225146.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818225333.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818225551.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818225651.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818225734.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818225909.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818230122.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818230357.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818230648.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818230801.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818230852.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818230940.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818231029.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818231141.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818231258.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818231441.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818231539.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818231642.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818231735.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818231848.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818231946.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818232212.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818232338.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818232437.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818232517.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818232618.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818232838.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818233026.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818233106.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818233328.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818233459.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818233727.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818233907.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818234005.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818234121.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818234155.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818234428.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818234522.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210818234630.png)
+
 ## React
 
 ## Vue
