@@ -132,12 +132,12 @@ class App extends React.Component<any, any> {
 
 通过在函数组件里调用它来给组件添加一些内部 state，React会 **在重复渲染时保留这个 state**
 
-useState 唯一的参数就是初始 state
+useState 唯一的参数就是初始 state。
 
 **useState 会返回一个数组**：**一个 state，一个更新 state 的函数**
 
 - 在初始化渲染期间，返回的状态 (state) 与传入的第一个参数 (initialState) 值相同
-- 你可以在事件处理函数中或其他一些地方调用这个函数。它类似 class 组件的 this.setState，但是它**不会把新的 state 和旧的 state 进行合并，而是直接替换**
+- 你可以在事件处理函数中或其他一些地方调用这个函数。它类似 class 组件的 this.setState，但是它**不会把新的 state 和旧的 state 进行合并，而是直接替换**。**注意：更新state的函数会直接替换state，而不是像以前setState会合并新老state**
 
 ```js
 import React,{useState} from "react";
@@ -250,7 +250,7 @@ export const Counter2 = () => {
 }
 ```
 
-#### 4.3 函数式更新
+#### 4.3 函数式更新（可以解决过时闭包的问题）
 
 - **如果新的 state 需要通过使用先前的 state 计算得出，那么可以将回调函数当做参数传递给 setState。**
 - **如果新的 state 需要通过使用先前的 state 计算得出，那么可以将回调函数当做参数传递给 setState。该回调函数将接收先前的 state，并返回一个更新后的值。**
@@ -377,6 +377,8 @@ export  default  const Counter6 = () => {
 
 1. **useCallback**：接收一个内联回调函数参数和一个依赖项数组（子组件依赖父组件的状态，即子组件会使用到父组件的值） ，useCallback 会返回该回调函数的 memoized 版本，该回调函数仅在某个依赖项改变时才会更新。
 
+useCallback不同于useMemo的是，useMemo是缓存的值，useCallback是缓存的函数，父组件给子组件传递参数为普通函数时，父组件每次更新子组件都会更新，但是大部分情况子组件更新是没必要的，这时候我们用useCallback来定义函数，并把这个函数传递给子组件，子组件就会根据依赖项再更新了
+
 ```js
 useCallback(fn, deps)
 ```
@@ -432,6 +434,8 @@ const Child = React.memo((props) => {
 ```
 
 2. **useMemo**：把创建函数和依赖项数组作为参数传入 `useMemo`，它仅会在某个依赖项改变时才重新计算 memoized 值。这种优化有助于避免在每次渲染时都进行高开销的计算。
+
+useMemo可以初略理解为Vue中的计算属性，在依赖的某一属性改变的时候自动执行里面的计算并返回最终的值(并缓存，依赖性改变时才重新计算)，对于性能消耗比较大的一定要使用useMemo不然每次更新都会重新计算。
 
 ```js
 useMemo(() => fn, deps)
@@ -681,6 +685,8 @@ export const Counter = () => {
 ```
 
 ### 六、useContext
+
+useContext可以实现类似react-redux插件的功能，上层组件使用createContext创建一个context，并使用<MyContext.Provider>来传递context，下层组件使用useContext来接收context。
 
 - 接收一个 context 对象（React.createContext 的返回值）并返回该 context 的当前值
 - 当前的 context 值由上层组件中距离当前组件最近的 <MyContext.Provider> 的 value prop 决定
@@ -977,7 +983,7 @@ function Counter(){
 }
 ```
 
-#### 7.4 跳过 effect 进行性能优化
+#### 7.4 跳过 effect 进行性能优化（（可以解决过时闭包的问题））
 
 - 每次重新渲染都要执行一遍这些副作用函数，显然是不经济的。怎么跳过一些不必要的计算呢？我们只需要给useEffect传第二个参数即可。用第二个参数来告诉react只有当这个参数的值发生改变时，才执行我们传的副作用函数（第一个参数）。
 
@@ -1119,6 +1125,10 @@ const App = () => {
 
 
 ### 八、useLayoutEffect
+
+其使用方法与useEffect一样，但它会在所有的 DOM 变更之后同步调用 effect。可以使用它来读取 DOM 布局并同步触发重渲染。在浏览器执行绘制之前，useLayoutEffect 内部的更新计划将被同步刷新。useEffect为异步，useLayoutEffect为同步，推荐你一开始先用 useEffect，只有当它出问题的时候再尝试使用 useLayoutEffect。
+
+要尽可能使用标准的 `useEffect` 以避免阻塞视觉更新。**因为 `useLayoutEffect` 是同步的，如果我们要在 `useLayoutEffect` 调用状态更新，或者执行一些非常耗时的计算，可能会导致 `React` 运行时间过长，阻塞了浏览器的渲染，导致一些卡顿的问题**。
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210713171750.png)
 
