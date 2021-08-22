@@ -1583,6 +1583,123 @@ https://github.com/microsoft/TypeScript/issues
 
 ## Vue
 
+## Node
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822115401.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822115523.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822155835.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822160012.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822160109.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822160134.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822160511.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822161035.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822161554.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822161702.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822163045.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822163112.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822163312.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822163716.png)
+https://jishuin.proginn.com/p/763bfbd62d45
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822163927.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822164020.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822164052.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822164433.png)
+https://docs.npmjs.com/cli/v7/configuring-npm/package-json
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822164753.png)
+https://semver.npmjs.com/
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822165038.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822165254.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822165332.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822165543.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822165725.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822165906.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822170153.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822170213.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822170230.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822170348.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822170633.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822170710.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822170744.png)
+需要看看koa的中间件的源码和实现方式。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822171138.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822171306.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822171432.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822171553.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822171956.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822172322.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822172433.png)
+
+
+
+
+
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822173010.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822173042.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822173452.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822173608.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822173818.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822174054.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822174846.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822175001.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822175810.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822175919.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822180704.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822180725.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822180744.png)
+
+
+
 ## 其他
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210817000618.png)
@@ -1620,3 +1737,340 @@ https://github.com/microsoft/TypeScript/issues
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210817180345.png)
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210817180635.png)
+
+
+
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822100157.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822100330.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822100844.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822100930.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822101002.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822101131.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822101149.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822101233.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822101252.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822101325.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822101337.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822101407.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822101714.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822101826.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822102021.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822102054.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822102130.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822102209.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822102227.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822102445.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822102706.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822102727.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822104744.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822104818.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822104837.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822104917.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822105005.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822105119.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822105230.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822105343.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822105629.png)
+
+```js
+function animate ({timing, draw, duration}) {
+  let start = performance.now();
+  return new Promise(resolve => {
+     requestAnimationFrame(function animate(time) {
+        // timeFraction goes from 0 to 1
+        let timeFraction = (time - start) / duration;
+        if (timeFraction > 1) timeFraction = 1;
+
+        // calculate the current animation state
+        let progress = timing(timeFraction)
+
+        draw(progress); // draw it
+
+        if (timeFraction < 1) {
+          requestAnimationFrame(animate);
+        } else {
+          resolve(timing);
+        }
+     });
+  });
+}
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822105758.png)
+
+```js
+const train = document.querySelector('.ball');
+
+// 沿着x轴匀速直线运动
+const linear = () => {
+  const draw = (progress) => {
+    train.style.transform = `translate(${progress}px, 0)`;
+  }
+
+  // 沿着x轴匀速运动
+  animate({
+    duration: 1000,
+    timing(timeFraction) {
+      return timeFraction * 100;
+    },
+    draw,
+  });
+};
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822110625.png)
+
+```js
+// 重力
+const gravity = () => {
+  const draw = (progress) => {
+    train.style.transform = `translate(0, ${500 * (progress - 1)}px)`;
+  };
+
+  // 沿着x轴匀速运动
+  animate({
+    duration: 1000,
+    timing(timeFraction) {
+      return timeFraction ** 2;
+    },
+    draw,
+  });
+};
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822110758.png)
+```js
+const friction = () => {
+  // 初始高度500px
+  const draw = (progress) => {
+    train.style.transform = `translate(0, ${500 * (progress - 1)}px)`;
+  };
+
+  // 沿着x轴匀速运动
+  animate({
+    duration: 1000,
+    timing(timeFraction) {
+      // 初始速度系数为2
+      return timeFraction * (2 - timeFraction);
+    },
+    draw,
+  });
+};
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822111055.png)
+```js
+const horizontalMotion = () => {
+  const draw = (progress) => {
+    train.style.transform = `translate(${500 * progress.x}px, ${500 * (progress.y - 1)}px)`;
+  };
+
+  // 有两个方向，沿着x轴匀速运动，沿着y轴加速运动
+  animate({
+    duration: 1000,
+    timing(timeFraction) {
+      return {
+        x: timeFraction,
+        y: timeFraction ** 2,
+      }
+    },
+    draw,
+  });
+};
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822111313.png)
+```js
+// 旋转 + 平抛
+const horizontalMotionWidthRotate = () => {
+  const draw = (progress) => {
+    train.style.transform = `translate(${500 * progress.x}px, ${500 * (progress.y - 1)}px) rotate(${2000 * progress.rotate}deg)`;
+  };
+
+  // 有两个方向，沿着x轴匀速运动，沿着y轴加速运动
+  animate({
+    duration: 2000,
+    timing(timeFraction) {
+      return {
+        x: timeFraction,
+        y: timeFraction ** 2,
+        rotate: timeFraction,
+      }
+    },
+    draw,
+  });
+};
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822111446.png)
+```js
+// 拉弓
+const arrowMove = () => {
+  const back = (x, timeFraction) => {
+    return Math.pow(timeFraction, 2) * ((x + 1) * timeFraction - x);
+  }
+  const draw = (progress) => {
+    train.style.transform = `translate(${200*progress.x}px, ${ - 500 * progress.y}px)`;
+  };
+  animate({
+    duration: 1000,
+    timing(timeFraction) {
+      return {
+        x: timeFraction,
+        y: back(2, timeFraction),
+      };
+    },
+    draw,
+  });
+};
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822111737.png)
+```js
+// 贝塞尔
+const bezier = () => {
+  const bezierPath = (x1, y1, x2, y2, timeFraction) => {
+    const x = 3 * x1 * timeFraction * (1 - timeFraction) ** 2 + 3 * x2 * timeFraction ** 2 * (1 - timeFraction) + timeFraction ** 3;
+    const y = 3 * y1 * timeFraction * (1 - timeFraction) ** 2 + 3 * y2 * timeFraction ** 2 * (1 - timeFraction) + timeFraction ** 3;
+    return [x, y];
+  }
+
+  const draw = (progress) => {
+    const [px, py] = bezierPath(0.2, 0.6, 0.8, 0.2, progress);
+    train.style.transform = `translate(${300 * px}px, ${-300 * py}px)`;
+  }
+
+  animate({
+    duration: 2000,
+    timing(timeFraction) {
+      return timeFraction * (2 - timeFraction);
+    },
+    draw,
+  });
+}
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822112018.png)
+```js
+// 缓动函数实现弹球
+const bounceMove = () => {
+  const bounce = (timeFraction) => {
+    if (timeFraction < 1 / 2.75) {
+      return 7.5625 * timeFraction * timeFraction
+    } else if (timeFraction < 2 / 2.75) {
+      return 7.5625 * (timeFraction -= 1.5 / 2.75) * timeFraction + 0.75
+    } else if (amount < 2.5 / 2.75) {
+      return 7.5625 * (timeFraction -= 2.25 / 2.75) * timeFraction + 0.9375
+    } else {
+      return 7.5625 * (timeFraction -= 2.625 / 2.75) * timeFraction + 0.984375
+    }
+  }
+  const draw = (progress) => {
+    train.style.transform = `translate(${200*progress.x}px, ${200 * (progress.y - 1)}px)`;
+  };
+  animate({
+    duration: 1000,
+    timing(timeFraction) {
+      return {
+        x: timeFraction,
+        y: bounce(timeFraction),
+      };
+    },
+    draw,
+  });
+};
+
+// 弹球
+const asyncBounce = () => {
+  (async function() {
+    let damping = 0.7, // 衰变系数
+        duration = 1000,
+        height = 300;
+    
+    while(height >= 1) {
+      const down = (progress) => {
+        train.style.transform = `translate(0, ${height * (progress - 1)}px)`;
+      };
+      await animate({
+        duration: duration,
+        timing(timeFraction) {
+          return timeFraction ** 2;
+        },
+        draw: down,
+      });
+      height *= damping ** 2;
+      duration *= damping;
+      const up = (progress) => {
+        train.style.transform = `translate(0, ${-height * progress}px)`;
+      }
+      await animate({
+        duration: duration,
+        timing(timeFraction) {
+          return timeFraction * (2 - timeFraction);
+        },
+        draw: up,
+      });
+    }
+  }());
+};
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822112231.png)
+```js
+// 椭圆
+const ellipsis = () => {
+  const draw = (progress) => {
+    const x = 150 * Math.cos(Math.PI * 2 * progress);
+    const y = 100 * Math.sin(Math.PI * 2 * progress);
+    train.style.transform = `translate(${x}px, ${y}px)`;
+  }
+  
+  animate({
+    duration: 2000,
+    timing(timeFraction) {
+      return timeFraction * (2 - timeFraction);
+    },
+    draw,
+  });
+};
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822112349.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822112529.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822112555.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822112614.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822112726.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822112912.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822113024.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822113112.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210822115037.png)
+
