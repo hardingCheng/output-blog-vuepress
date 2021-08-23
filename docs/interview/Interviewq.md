@@ -7,13 +7,9 @@
 7. 项目目录，规范，开发流程
 8. HTTP：服务器的认识，三次握手/四次挥手，一个url输入到浏览器产生界面发现了
 9. 单例模式
-10. 闭包是什么
-11. 原型链是什么
 12. `promise` - `api all,race,any`等，`async/await`
 13. 问道: `es6`的`fill,includes,find,Object.keys()`
-14. 问道：防抖，节流
 15. 道：`promise`,`let/const`,`axios`,`git flow`,`branch`分支等
-16. 问道: `es5,es6`的继承
 17. 问道：自动化包含：单元测试，`ui`测试，`CI/CD`，容器化，`DockerFile`，容器编排`k8s`监控`sentry`
 
 

@@ -97,6 +97,12 @@ module.exports = {
                 { text: 'React', link: '/interview/react' },
               ]
             },
+            {
+              text: '其他',
+              items: [
+                { text: '其他', link: '/interview/other' },
+              ]
+            },
           ]
         },
         { text: '工具技巧', link: '/tool-skills/index' },
