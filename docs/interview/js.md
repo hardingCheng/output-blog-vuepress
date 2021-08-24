@@ -1795,6 +1795,14 @@ DELETE，删除资源，
 
 HEAD，获得报文首部。
 
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210824172708.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210824172849.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210824184941.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210824184846.png)
+
 4. POST和GET的区别
 
 HTTP协议类：
@@ -2350,6 +2358,9 @@ HttpOnly 最早由微软提出，至今已经成为一个标准。浏览器将�
 
 ### 从输入 URL 到页面展示，这中间发生了什么？
 
+字节：
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210824171752.png)
+
 <img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210816130659.png" style="zoom:33%;" />
 
 <img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210816130759.png" style="zoom:33%;" />
@@ -2783,6 +2794,8 @@ memory cache 机制保证了一个页面中如果有两个相同的请求 (例�
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210806145754.png)
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210816155911.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210824185100.png)
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210812145438.png)
 
