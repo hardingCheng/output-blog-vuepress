@@ -89,7 +89,7 @@ IE盒模型
 </html>
 ```
 
-## flex
+## flex弹性布局
 
 弹性盒子是一种用于按行或按列布局元素的`一维布局`方法。元素可以膨胀以填充额外的空，收缩以适应更小的空间。
 
@@ -818,4 +818,318 @@ IE盒模型
     </div>
 </body>
 ```
+
+## grid网格布局
+
+CSS 网格是一个用于 web 的二维布局系统。利用网格，你可以把内容按照行与列的格式进行排版。另外，网格还能非常轻松地实现一些复杂的布局。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210829141003.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210829141323.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210829141348.png)
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210829141439.png" style="zoom:33%;" />
+
+### 定义网格及fr单位
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210829142152.png" style="zoom:25%;" />
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .main{
+            width:300px;
+            height:300px;
+            background:skyblue;
+            display: grid;
+          	/*定义网格的  行和列*/
+            /* grid-template-columns: 50px 50px 50px;
+            grid-template-rows: 50px 50px 50px; */
+
+            /* grid-template-columns: 50px 20% auto;
+            grid-template-rows: 50px 50px; */
+            /* 多少列，每列占多少 fr均分*/
+            grid-template-columns: 150px 1fr 1fr;
+            /* 多少行，每行占多少 fr均分*/
+            grid-template-rows: 0.3fr 0.3fr;
+        }
+        .main div{
+            background:pink;
+        }
+    </style>
+</head>
+<body>
+    <div class="main">
+        <div>1</div>
+        <div>2</div>
+        <div>3</div>
+        <div>4</div>
+        <div>5</div>
+        <div>6</div>
+    </div>
+</body>
+</html>
+```
+
+### 合并网格及网格命名
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210829142517.png" style="zoom:33%;" />
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .main{
+            width:300px;
+            height:300px;
+            background:skyblue;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr 1fr;
+            /* 每个区域的名称所占位置 */
+            grid-template-areas: 
+            "a1 a1 a2"
+            "a1 a1 a2"
+            "a3 a3 a3";
+        }
+        .main div{
+            background:pink;
+            border:1px black solid;
+            box-sizing: border-box;
+        }
+        .main div:nth-of-type(1){
+            /* 使用所占区域名称 */
+            grid-area: a1;
+        }
+        .main div:nth-of-type(2){
+            /* 使用所占区域名称 */
+            grid-area: a2;
+        }
+        .main div:nth-of-type(3){
+            /* 使用所占区域名称 */
+            grid-area: a3;
+        }
+    </style>
+</head>
+<body>
+    <div class="main">
+        <div>1</div>
+        <div>2</div>
+        <div>3</div>
+    </div>
+</body>
+</html>
+```
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210829145242.png" style="zoom:33%;" />
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .main{
+            width:300px;
+            height:300px;
+            background:skyblue;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr 1fr;
+            grid-template-areas: 
+            "a1 a1 a2"
+            "a1 a1 a2"
+            "a3 a3 a3";
+        }
+        .main div{
+            background:pink;
+            border:1px black solid;
+            box-sizing: border-box;
+        }
+        .main div:nth-of-type(1){
+            grid-area: a1;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="main">
+        <div>1</div>
+        <div>2</div>
+        <div>3</div>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+// grid-template-columns + grid-template-rows + grid-template-areas = grid-template
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .main{
+            width:300px;
+            height:300px;
+            background:skyblue;
+            display: grid;
+            /* grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr 1fr;
+            grid-template-areas: 
+            "a1 a1 a2"
+            "a1 a1 a2"
+            "a3 a3 a3"; */
+            grid-template: 
+            "a1 a1 a2" 1fr
+            "a1 a1 a2" 1fr 
+            "a3 a3 a3" 1fr
+            / 1fr 1fr 1fr;
+        }
+        .main div{
+            background:pink;
+            border:1px black solid;
+            box-sizing: border-box;
+        }
+        .main div:nth-of-type(1){
+            grid-area: a1;
+        }
+    </style>
+</head>
+<body>
+    <div class="main">
+        <div>1</div>
+        <div>2</div>
+        <div>3</div>
+    </div>
+</body>
+</html>
+```
+
+### 网格间隙及简写
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210829152446.png" style="zoom:33%;" />
+
+```html
+// grid
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .main{
+            width:300px;
+            height:300px;
+            background:skyblue;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr 1fr;
+            grid-template-areas: 
+            "a1 a1 a2"
+            "a1 a1 a2"
+            "a3 a3 a3";
+            /* 写法一，已经废弃 */
+            /* grid-row-gap: 20px;
+            grid-column-gap: 30px; */
+
+
+            /* 写法二 */
+            /* grid-gap: 20px 30px; */
+            /* row-gap: 20px;
+            column-gap: 30px; */
+
+
+            /* 写法三 */
+            gap:20px 30px;
+        }
+        .main div{
+            background:pink;
+            border:1px black solid;
+            box-sizing: border-box;
+        }
+        .main div:nth-of-type(1){
+            grid-area: a1;
+        }
+        .main div:nth-of-type(2){
+            grid-area: a2;
+        }
+        .main div:nth-of-type(3){
+            grid-area: a3;
+        }
+    </style>
+</head>
+<body>
+    <div class="main">
+        <div>1</div>
+        <div>2</div>
+        <div>3</div>
+    </div>
+</body>
+</html>
+
+
+
+
+// flex
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .main{
+            width:300px;
+            background:skyblue;
+            display: flex;
+            flex-wrap: wrap;
+            row-gap: 20px;
+            column-gap: 30px;
+            margin-top: 30px;
+        }
+        .main div{
+            width:100px;
+            height:100px;
+            background:pink;
+        }
+    </style>
+</head>
+<body>
+    <div class="main">
+        <div>1</div>
+        <div>2</div>
+        <div>3</div>
+        <div>4</div>
+        <div>5</div>
+    </div>
+</body>
+</html>
+```
+
+### 网格对齐方式及简写
 
