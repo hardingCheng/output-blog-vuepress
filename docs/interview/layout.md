@@ -2261,3 +2261,665 @@ CSS 网格是一个用于 web 的二维布局系统。利用网格，你可以�
 </html>
 ```
 
+## 移动端适配布局
+
+### 逻辑像素和物理像素
+
+（1）pt是逻辑像素
+
+​     px是物理像素
+
+（2) 逻辑像素和物理像素:
+
+   *逻辑像素（logic point）：逻辑像素的单位是PT，它是按照内容的尺寸计算的单位。**比如iPhone 4的逻辑像素是480x320pt。但是由于每个逻辑的点因为视网膜屏密度增加了一倍，即1pt=2px，那么其实iPhone 4的物理像素是960x640px**。iOS开发工程师和使用Sketch和     AdobeXD软件设计界面的设计师使用的单位都是PT。*
+
+
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210830161730.png" style="zoom:33%;" />
+
+### 移动端rem /em布局原理
+
+ps中量取的数值，是物理像素，css中设置的逻辑像素，所以对量取的值进行除以2 
+
+- em 是 CSS 中的相对长度单位中的一个。在 font-size 中使用是相对于`父元素的 font-size 大小`
+
+- rem(root em) 和 em 一样，也是一个相对长度单位，不过 `rem 相对的是 HTML 的根元素 html`。 rem 由于是基于 html 的 font-size 来计算，所以通常用于自适应网站或者 H5 中。 
+
+### 网易移动端
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210830173149.png" style="zoom:25%;" />
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./iconfont/iconfont.css">
+    <link rel="stylesheet" href="./css/reset.css">
+    <style>
+        html{
+            /*100px*/
+            font-size:26.666667vw;
+        }
+        body{
+            font-size: 0.16rem;
+        }
+        a{
+            color: #34372e;
+        }
+        .head{
+            height: 0.43rem;
+            background: #ef1b1a;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 0.1rem;
+        }
+        .head i {
+            font-size: 0.18rem;
+        }
+        .head-user, .head-email{
+            width: 25%;
+            font-size: 0.14rem;
+        }
+        .head-email{
+            text-align: right;
+        }
+        .head-logo{
+            width: 50%;
+            text-align: center;
+        }
+        .head-logo img{
+            height: 0.21rem;
+        }
+
+        .nav{
+            height: 0.46rem;
+            border-bottom: 0.005rem #ededed solid;
+            padding:0 0.1rem;
+            display: flex;
+            align-items: center; 
+            font-size: 0.18rem;
+        }
+        .nav li{
+            flex-grow: 1;
+            text-align: center;
+            position: relative;
+        }
+        .nav li.active a{
+            color: #ef191b;
+        }
+        .nav li.active::after{
+            content: "";
+            position: absolute;
+            left:50%;
+            bottom:-0.12rem;
+            margin-left: -0.07rem;
+            width: 0.15rem;
+            height: 0.02rem;
+            background: #ef191b;
+        }
+        .nav-sub{
+            padding: 0.11rem 0.1rem 0.07rem 0.1rem;
+            background: #f8f8f8;
+            position: relative;
+        }
+        .nav-sub-list{
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            grid-auto-rows: 0.35rem;
+        }
+        .nav-sub__closed{
+            height: 0.7rem;
+            overflow: hidden;
+        }
+        .nav-sub__closed + .nav-sub-arrow{
+            transform: rotate(0);
+        }
+        .nav-sub-arrow{
+            position: absolute;
+            right: 0.1rem;
+            bottom: 0.2rem;
+            transform: rotate(180deg);
+        }
+        .news{
+            padding: 0 0.1rem;
+        }
+        .news-title{
+            font-size: 0.18rem;
+            line-height: 0.66rem;
+        }
+        .news-item{
+            margin-bottom: 0.25rem;
+        }
+        .news-item-title{
+            width: 2.95rem;
+            line-height: 0.22rem;
+            font-size: 0.17rem;
+            margin-bottom: 0.08rem;
+            font-weight: 400;
+        }
+        .news-item-info{
+            font-size: 0.12rem;
+            color: #b3b4b6;
+        }
+        .news-item-img img{
+            width: 100%;
+            margin-top: 0.05rem;
+            margin-bottom: 0.09rem;
+        }
+
+        .news2-item{
+            border-top: 0.005rem #f6f7f9 solid;
+            padding: 0.1rem;
+            display: flex;
+        }
+        .news2-item-content{
+            flex-grow: 1;
+            margin-right: 0.15rem;
+        }
+        .news2-item-title{
+            line-height: 0.22rem;
+            font-size: 0.17rem;
+            margin-bottom: 0.08rem;
+            font-weight: 400;
+        }
+        .news2-item-info{
+            font-size: 0.12rem;
+            color: #b3b4b6;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .news2-item-img{
+            width: 1.17rem;
+        }
+        .news2-item-img img{
+            width:100%;
+            height:100%;
+            object-fit: cover;
+        }
+        .app{
+            color: #fb1515;
+            border:0.005rem #fbbab8 solid;
+            border-radius: 1rem;
+            padding:0.02rem 0.05rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="head">
+        <div class="head-user">
+            <i class="iconfont icon-yonghu"></i>
+        </div>
+        <div class="head-logo">
+            <img src="./img/logo.png" alt="">
+        </div>
+        <div class="head-email">
+            <i class="iconfont icon-youxiang"></i>
+            邮箱
+            <i class="iconfont icon-jiantou"></i>
+        </div>
+    </div>
+    <ul class="nav">
+        <li class="active">
+            <a href="#">要闻</a>
+        </li>
+        <li>
+            <a href="#">推荐</a>
+        </li>
+        <li>
+            <a href="#">原创</a>
+        </li>
+        <li>
+            <a href="#">热点</a>
+        </li>
+    </ul>
+    <div class="nav-sub">
+        <ul class="nav-sub-list">
+            <li>
+                <a href="#">新闻</a>
+            </li>
+            <li>
+                <a href="#">抗疫</a>
+            </li>
+            <li>
+                <a href="#">娱乐</a>
+            </li>
+            <li>
+                <a href="#">体育</a>
+            </li>
+            <li>
+                <a href="#">财经</a>
+            </li>
+            <li>
+                <a href="#">新闻</a>
+            </li>
+            <li>
+                <a href="#">抗疫</a>
+            </li>
+            <li>
+                <a href="#">娱乐</a>
+            </li>
+            <li>
+                <a href="#">体育</a>
+            </li>
+            <li>
+                <a href="#">财经</a>
+            </li>
+            <li>
+                <a href="#">新闻</a>
+            </li>
+            <li>
+                <a href="#">抗疫</a>
+            </li>
+            <li>
+                <a href="#">娱乐</a>
+            </li>
+            <li>
+                <a href="#">体育</a>
+            </li>
+            <li>
+                <a href="#">财经</a>
+            </li>
+        </ul>
+        <div class="nav-sub-arrow">
+            <i class="iconfont icon-down-arrow"></i>
+        </div>
+    </div>
+    <div class="news">
+        <h2 class="news-title">今日要闻</h2>
+        <div class="news-item">
+            <h3 class="news-item-title">测试文字测试文字</h3>
+            <p class="news-item-info">央视网 1小时前 879跟帖</p>
+        </div>
+        <div class="news-item">
+            <h3 class="news-item-title">测试文字测试文字</h3>
+            <p class="news-item-info">央视网 1小时前 879跟帖</p>
+        </div>
+        <div class="news-item">
+            <h3 class="news-item-title">测试文字测试文字测试文字测试文字测试文字测试文字</h3>
+            <div class="news-item-img"><img src="./img/news.jpg" alt=""></div>
+            <p class="news-item-info">央视网 1小时前 879跟帖</p>
+        </div>
+    </div>
+    <div class="news2">
+        <div class="news2-item">
+            <div class="news2-item-content">
+                <h3 class="news2-item-title">测试文字测试文字</h3>
+                <p class="news2-item-info">
+                    <span>上游新闻 2287跟贴</span>
+                    <span class="app">打开APP</span>
+                </p>
+            </div>
+            <div class="news2-item-img">
+                <img src="./img/news2.jpg" alt="">
+            </div>
+        </div>
+        <div class="news2-item">
+            <div class="news2-item-content">
+                <h3 class="news2-item-title">测试文字测试文字</h3>
+                <p class="news2-item-info">
+                    <span>上游新闻 2287跟贴</span>
+                    <span class="app">打开APP</span>
+                </p>
+            </div>
+            <div class="news2-item-img">
+                <img src="./img/news3.jpg" alt="">
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+```
+
+### 移动端vw布局原理
+
+`vw/vh` `vw`和`vh`分别是相对于屏幕视口宽度和高度而言的长度单位： • `1vw`= 视口宽度均分成 100 份中 1 份的长度； • `1vh` = 视口高度均分成 100 份中 1 份的长度； 在 JS 中 100vw = window.innerWidth，100vh = window.innerHeight。
+
+`vw/vh`的出现使得多了一种写自适应布局的方案，开发者不再局限于 rem 了。 相对视口的单位，除了 vw/vh 外，还有 vmin 和 vmax： • `vmin`：取 vw 和 vh 中值较小的； • `vmax`：取 vw 和 vh 中值较大的；
+
+### B站移动端布局
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210830180622.png" style="zoom:33%;" />
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./iconfont/iconfont.css">
+    <link rel="stylesheet" href="./css/reset.css">
+    <style>
+        a{
+            color: #4c514d;
+        }
+        .head{
+            height: 11.733vw;
+            display: flex;
+            align-items: center;
+            padding: 0 2.667vw;
+        }
+        .head-logo{
+            margin-left: 2.133vw;
+            margin-right: auto;
+        }
+        .head-logo i{
+            font-size: 7.467vw;
+            color: #f47296;
+        }
+        .head-search i{
+            font-size: 5.867vw;
+            color: #c9c9c9;
+        }
+        .head-login{
+            margin-left: 5.333vw;
+            background: #e8e8e8;
+            font-size: 3.2vw;
+            border-radius: 50%;
+            padding: 1.867vw;   
+        }
+        .head-login a{
+            color: #f47296;
+        }
+        .head-app{
+            margin-right: 0.533vw;
+            margin-left: 5.333vw;
+            background: #f47296;
+            border-radius: 1.067vw;
+            padding: 1.333vw 2.667vw;
+        }
+        .head-app a{
+            color: #fffefc;
+        }
+
+        .nav{
+            height: 10.667vw;
+            border-bottom: 0.133vw solid #f3f3f3; 
+            padding: 0 2.667vw;
+            position: relative;
+        }
+        .nav-list{
+            height:100%;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+        .nav-list li{
+            width: 10.667vw;
+            margin-right:5.333vw;
+            flex-shrink: 0;
+            text-align: center;
+            position: relative;
+        }
+        .nav-list li.active a{
+            color: #f47296;
+        }
+        .nav-list li.active::after{
+            content: "";
+            position: absolute;
+            width: 11.733vw;
+            height: 0.533vw;
+            background: #f47296;
+            bottom: -2.667vw;
+            left: -0.533vw;
+        }
+        .nav-arrow{
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 10.667vw;
+            height:100%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .video{
+            padding: 2.133vw 2.667vw;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            column-gap: 2.667vw;
+        }
+        .video-item-pic{
+            display: grid;
+        }
+        .video-item-pic img{
+            grid-area: 1/1/1/1;
+            width:100%;
+            height:100%;
+            object-fit: cover;
+            border-radius: 0.8vw;
+        }
+        .video-item-pic span{
+            grid-area: 1/1/1/1;
+            align-self: flex-end;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 0.533vw;
+        }
+        .video-item-pic i{
+            margin-right: 1.333vw;
+        }
+        .video-item-title{
+            margin-top: 1.867vw;
+            margin-bottom: 4vw;
+            font-size: 3.2vw;
+            line-height: 4.267vw;
+        }
+    </style>
+</head>
+<body>
+    <div class="head">
+        <div class="head-logo">
+            <i class="iconfont icon-BILIBILI_LOGO"></i>
+        </div>
+        <div class="head-search">
+            <i class="iconfont icon-fangdajing"></i>
+        </div>
+        <div class="head-login">
+            <a href="#">登录</a>
+        </div>
+        <div class="head-app">
+            <a href="#">下载 App</a>
+        </div>
+    </div>
+    <div class="nav">
+        <ul class="nav-list">
+            <li class="active">
+                <a href="#">首页</a>
+            </li>
+            <li>
+                <a href="#">动画</a>
+            </li>
+            <li>
+                <a href="#">番剧</a>
+            </li>
+            <li>
+                <a href="#">国创</a>
+            </li>
+            <li>
+                <a href="#">音乐</a>
+            </li>
+            <li>
+                <a href="#">首页</a>
+            </li>
+            <li>
+                <a href="#">动画</a>
+            </li>
+            <li>
+                <a href="#">番剧</a>
+            </li>
+            <li>
+                <a href="#">国创</a>
+            </li>
+            <li>
+                <a href="#">音乐</a>
+            </li>
+        </ul>
+        <div class="nav-arrow">
+            <i class="iconfont icon-arrow-bottom"></i>
+        </div>
+    </div>
+    <ul class="video">
+        <li class="video-item">
+            <div class="video-item-pic">
+                <img src="./img/video1.jpg" alt="">
+                <span>
+                    <span>
+                        <i class="iconfont icon-703bofang-fangxing-xianxing"></i>
+                        73.7万
+                    </span>
+                    <span>
+                        <i class="iconfont icon-xinxi"></i>
+                        5591
+                    </span>
+                </span>
+            </div>
+            <h3 class="video-item-title">
+                <a href="#">测试标题测试标题</a>
+            </h3>
+        </li>
+        <li class="video-item">
+            <div class="video-item-pic">
+                <img src="./img/video2.jpg" alt="">
+                <span>
+                    <span>
+                        <i class="iconfont icon-703bofang-fangxing-xianxing"></i>
+                        73.7万
+                    </span>
+                    <span>
+                        <i class="iconfont icon-xinxi"></i>
+                        5591
+                    </span>
+                </span>
+            </div>
+            <h3 class="video-item-title">
+                <a href="#">测试标题测试标题</a>
+            </h3>
+        </li>
+        <li class="video-item">
+            <div class="video-item-pic">
+                <img src="./img/video3.jpg" alt="">
+                <span>
+                    <span>
+                        <i class="iconfont icon-703bofang-fangxing-xianxing"></i>
+                        73.7万
+                    </span>
+                    <span>
+                        <i class="iconfont icon-xinxi"></i>
+                        5591
+                    </span>
+                </span>
+            </div>
+            <h3 class="video-item-title">
+                <a href="#">测试标题测试标题</a>
+            </h3>
+        </li>
+        <li class="video-item">
+            <div class="video-item-pic">
+                <img src="./img/video1.jpg" alt="">
+                <span>
+                    <span>
+                        <i class="iconfont icon-703bofang-fangxing-xianxing"></i>
+                        73.7万
+                    </span>
+                    <span>
+                        <i class="iconfont icon-xinxi"></i>
+                        5591
+                    </span>
+                </span>
+            </div>
+            <h3 class="video-item-title">
+                <a href="#">测试标题测试标题</a>
+            </h3>
+        </li>
+        <li class="video-item">
+            <div class="video-item-pic">
+                <img src="./img/video1.jpg" alt="">
+                <span>
+                    <span>
+                        <i class="iconfont icon-703bofang-fangxing-xianxing"></i>
+                        73.7万
+                    </span>
+                    <span>
+                        <i class="iconfont icon-xinxi"></i>
+                        5591
+                    </span>
+                </span>
+            </div>
+            <h3 class="video-item-title">
+                <a href="#">测试标题测试标题测试标题测试标题测试标题测试标题</a>
+            </h3>
+        </li>
+        <li class="video-item">
+            <div class="video-item-pic">
+                <img src="./img/video1.jpg" alt="">
+                <span>
+                    <span>
+                        <i class="iconfont icon-703bofang-fangxing-xianxing"></i>
+                        73.7万
+                    </span>
+                    <span>
+                        <i class="iconfont icon-xinxi"></i>
+                        5591
+                    </span>
+                </span>
+            </div>
+            <h3 class="video-item-title">
+                <a href="#">测试标题测试标题</a>
+            </h3>
+        </li>
+        <li class="video-item">
+            <div class="video-item-pic">
+                <img src="./img/video3.jpg" alt="">
+                <span>
+                    <span>
+                        <i class="iconfont icon-703bofang-fangxing-xianxing"></i>
+                        73.7万
+                    </span>
+                    <span>
+                        <i class="iconfont icon-xinxi"></i>
+                        5591
+                    </span>
+                </span>
+            </div>
+            <h3 class="video-item-title">
+                <a href="#">测试标题测试标题</a>
+            </h3>
+        </li>
+        <li class="video-item">
+            <div class="video-item-pic">
+                <img src="./img/video2.jpg" alt="">
+                <span>
+                    <span>
+                        <i class="iconfont icon-703bofang-fangxing-xianxing"></i>
+                        73.7万
+                    </span>
+                    <span>
+                        <i class="iconfont icon-xinxi"></i>
+                        5591
+                    </span>
+                </span>
+            </div>
+            <h3 class="video-item-title">
+                <a href="#">测试标题测试标题</a>
+            </h3>
+        </li>
+    </ul>
+</body>
+</html>
+```
+
+
+
