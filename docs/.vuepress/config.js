@@ -21,6 +21,11 @@ module.exports = {
             { text: 'javaScript技巧', link: '/javascript/js-skill.md' },
           ]
         },
+      { text: 'TypeScript',
+        items: [
+          { text: 'typeScript日常总结', link: '/typescript/index' },
+        ]
+      },
         { text: 'HTMLCSS', link: '/htmlcss/index' },
         {
           text: 'Vue',
