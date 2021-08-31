@@ -2074,10 +2074,6 @@ for(let item of setA.values()){
 for(let (key,value) of setA.entries()){
   console.log(key,value)
 }
-
-
-
-
 ```
 
 

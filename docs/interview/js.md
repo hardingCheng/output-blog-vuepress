@@ -2944,6 +2944,24 @@ Expire: Thu, 30 Apr 2020 23:38:38 GMT
 
 ### ES6 Module和Commonjs区别
 
+#### **commonjs 使用与原理**
+
+在使用  规范下，有几个显著的特点。
+
+- 在 `commonjs` 中每一个 js 文件都是一个单独的模块，我们可以称之为 module；
+- 该模块中，包含 CommonJS 规范的核心变量: exports、module.exports、require；
+- exports 和 module.exports 可以负责对模块中的内容进行导出；
+- require 函数可以帮助我们导入其他模块（自定义模块、系统模块、第三方库模块）中的内容；
+
+-------------------------
+
+- 在当前目录下的 `node_modules` 目录查找。
+- 如果没有，在父级目录的 `node_modules` 查找，如果没有在父级目录的父级目录的 `node_modules` 中查找。
+- 沿着路径向上递归，直到根目录下的 `node_modules` 目录。
+- 在查找过程中，会找 `package.json` 下 main 属性指向的文件，如果没有  `package.json` ，在 node 环境下会以此查找 `index.js` ，`index.json` ，`index.node`。
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210831134529.png" style="zoom:33%;" />
+
 1. `ES6 Module`静态引入，编译时引入
 2. `Commonjs`动态引入，执行时引入
 3. 只有`ES6 Module`才能静态分析，实现`Tree-Shaking`

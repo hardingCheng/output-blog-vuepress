@@ -69,8 +69,7 @@ module.exports = {
             {
               text: '设计模式',
               items: [
-                { text: '工厂', link: '/algorithm/design-pattern/single-case' },
-                { text: '单例', link: '/algorithm/design-pattern/factory'},
+                { text: 'js设计模式', link: '/algorithm/design-pattern/index' },
               ]
             },
           ]
@@ -115,7 +114,7 @@ module.exports = {
         { text: '前端训练营', link: '/zijie/index' },
       ],
     sidebar: 'auto',// 侧边栏配置
-    sidebarDepth: 2, // 侧边栏显示2级
+    sidebarDepth: 3, // 侧边栏显示2级
     logo: '/logo.png',
     searchMaxSuggestions: 10,
     lastUpdated: 'Last Updated', // string | boolean

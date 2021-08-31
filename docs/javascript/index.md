@@ -1270,7 +1270,7 @@ function throttle(handler, wait) {
 总的来说，适合多次事件**一次响应**的情况
 
 ```js
-
+// 包含立即执行
 function debounce(fn, wait = 200, immediate = false) {
   let timer = null, 
       isEnd = true, // 默认后执行  用变量来判断先后执行
@@ -1312,6 +1312,7 @@ function debounce(fn, wait, immediate) {
           result = fn.apply(this, args)
           res(result)
         }
+        //当我们提交失败了怎么办（哭），在设定的时间间隔内，将timer设置为null, 过了设定的时间间隔，可以再次触发提交按钮的立即执行，这才是完整的。
         timer = setTimeout(() => {
           timer = null
         }, wait);
