@@ -214,6 +214,110 @@ class Creator {
 let creator = new Creator()
 let p1 = creator.create('p1')
 let p2 = creator.create('p2')
-p1.init()
 ```
+
+#### 场景
+
+- Jquery的`$(div)`
+- `Reacr.createElement()`
+- Vue的异步组件
+
+#### 设计原则验证
+
+- 构造函数和创建者分离
+- 符合开放封闭原则
+
+### 单例模式
+
+- 系统中被唯一使用
+- 一个类只有一个实例
+- 保证一个类仅有一个实例，并提供一个访问它的全局访问点
+- 有一些对象，比如线程池/全局缓存/浏览器中的 `window` 对象等等，我们就只需要一个实例。
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210903084106.png" style="zoom:33%;" />
+
+```js
+class SingleObject {
+    login() {
+        console.log('login...')
+    }
+}
+SingleObject.getInstance = (function () {
+    //通过闭包存储实例，并进行判断
+    let instance
+    return function () {
+        if (!instance) {
+            instance = new SingleObject();
+        }
+        return instance
+    }
+})()
+
+// 测试
+let obj1 = SingleObject.getInstance()
+obj1.login()
+let obj2 = SingleObject.getInstance()
+obj2.login()
+console.log(obj1 === obj2)
+
+
+
+
+
+
+class LoginForm {
+    constructor() {
+        this.state = 'hide'
+    }
+    show() {
+        if (this.state === 'show') {
+            alert('已经显示')
+            return
+        }
+        this.state = 'show'
+        console.log('登录框已显示')
+    }
+    hide() {
+        if (this.state === 'hide') {
+            alert('已经隐藏')
+            return
+        }
+        this.state = 'hide'
+        console.log('登录框已隐藏')
+    }
+}
+LoginForm.getInstance = (function () {
+    let instance
+    return function () {
+        if (!instance) {
+            instance = new LoginForm();
+        }
+        return instance
+    }
+})()
+// 一个页面中调用登录框
+let login1 = LoginForm.getInstance()
+login1.show()
+// login1.hide()
+// 另一个页面中调用登录框
+let login2 = LoginForm.getInstance()
+login2.show()
+// 两者是否相等
+console.log('login1 === login2', login1 === login2)
+```
+
+单例模式是一种简单但非常实用的模式，特别是惰性单例技术，在合适的时候才创建对象，并且只创建唯一的一个。更奇妙的是，创建对象和管理单例的职责被分布在两个不同的方法中，这两个方法组合起来才具有单例模式的威力。
+
+#### 场景
+
+- `Jquery`只有一个`$`
+- 登录框
+- `vuex`和`redux`中的`store`
+- 购物车
+
+#### 设计原则验证
+
+- 符合单一职责原则，只实例化唯一的对象
+
+- 没法具体开放封闭原则，但是绝对不违反开放封闭原则
 
