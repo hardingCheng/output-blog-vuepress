@@ -1048,3 +1048,390 @@ Array.from(checkbox).forEach(i => {
 #### 设计原则验证
 
 - 不符合单一职责原则和开放封闭原则，因此谨慎使用，不可滥用
+
+### 观察者模式
+
+- 发布&订阅
+- 一对多
+- 当对象之间存在一对多的依赖关系时，其中一个对象的状态发生改变，所有依赖它的对象都会收到通知，这就是观察者模式。
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210905143324.png" style="zoom:33%;" />
+
+```js
+class Subject {
+  constructor() {
+    this.state = 0
+    this.observers = []
+  }
+  
+  getState() {
+    return this.state
+  }
+
+  setState(state) {
+    this.state = state
+    //修改状态，通知所有的观察者
+    this.notifyAllObservers()
+  }
+
+  //修改状态，通知所有的观察者
+  notifyAllObservers() {
+    this.observers.forEach(observer => {
+      //所有观察者操作
+      observer.update(this.state)
+    })
+  }
+
+  //添加观察者
+  attach(observer) {
+    this.observers.push(observer)
+    observer.subject = this
+  }
+}
+
+class Observer {
+  constructor(name) {
+    this.name = name
+    this.subject = null
+  }
+
+  //
+  update(state) {
+    console.log(`${this.name} update state to ${state}`)
+  }
+}
+
+const sub = new Subject()
+const obs1 = new Observer('obs1')
+const obs2 = new Observer('obs2')
+sub.attach(obs1)
+sub.attach(obs2)
+
+sub.setState(1)
+sub.setState(2)
+sub.setState(3)
+```
+
+#### 场景
+
+- 网页事件绑定
+
+```js
+document.body.addEventListener('click', function() {
+  console.log(1)
+}, false)
+
+document.body.addEventListener('click', function() {
+  console.log(2)
+}, false)
+
+document.body.click() //模拟用户点击
+```
+
+-  Promise
+
+```js
+function loadImg(src) {
+    var promise = new Promise(function(resolve, reject) {
+        var img = document.createElement('img');
+        im.onload = function() {
+            resolve(img);
+        }
+        img.onerror = function() {
+            reject(new Error('Could not load'))
+        }
+        img.src = src;
+    })
+    return promise
+}
+
+var src = 'xxxxx'
+var result = loadImg(src)
+//通知所有的then
+result.then(function(img) {
+    console.log('width: ' + img.width)
+    return img
+}).then(function(img) {
+    console.log('height: ' + img.height)
+})
+```
+
+- Jquery callbacks  
+
+```js
+var callbacks = $.Callbacks()
+    callbacks.add(function(info) {
+      console.log('fn1', info)
+    })
+    callbacks.add(function(info) {
+      console.log('fn2', info)
+    })
+    callbacks.add(function(info) {
+      console.log('fn3', info)
+    })
+
+    callbacks.fire('go')
+    callbacks.fire('fire')
+```
+
+- nodejs自定义事件
+
+```js
+const EventEmitter = require('events').EventEmitter
+const emitter1 = new EventEmitter()
+emitter1.on('some',() => {
+    //监听some事件
+    console.log('some event is occured 1')
+})
+emitter1.on('some',() => {
+    //监听some事件
+    console.log('some event is occured 2')
+})
+// 触发 some 事件
+emitter1.emit('some')
+
+
+const emitter2 = new EventEmitter()
+emitter2.on('sbowName',(name) => {
+    //监听some事件
+    console.log('event occured',name)
+})
+// 触发 some 事件
+emitter2.emit('sbowName','zhangsan')
+```
+
+```js
+const EventEmitter = require('events').EventEmitter
+
+//任何构造函数都可以继承 EventEmitter 的方法 on emit
+class Cat extends EventEmitter {
+    constructor(name){
+        super()
+        this.name = name
+    }
+}
+var simon = new Cat('simon')
+simon.on('miaomiao',function(){
+    console.log(this.name,'barked')
+})
+setInterval(function(){
+    simon.emit('miaomiao')
+},500)
+```
+
+```js
+//和上面的原理一样
+var fs = require('fs')
+var readStream = fs.createReadStream('./data/file.txt')
+var length = 0
+readStream.on('data', function(chunk) {
+    length += chunk.toString().length
+})
+readStream.on('end', function() {
+    console.log(length)
+})
+```
+
+```js
+//和上面的原理一样
+var readline = require('readline')
+var fs = require('fs')
+
+var rl = readline.createInterface({
+    input: fs.createReadStream('./data/file.txt')
+})
+
+var lineNum = 0
+rl.on('line', function(line) {
+    lineNum++
+})
+rl.on('close', function() {
+    console.log('lineNum',lineNum)
+})
+```
+
+- DOM事件
+
+最常见的观察者模式场景就是 `DOM` 事件函数。
+
+```js
+document.body.addEventListener('click', () => {
+    alert(2)
+}, false)
+```
+
+当 `body` 节点被点击时，触发 `alert(2)`，从观察者模式来解释，就是我们订阅了 `bdoy` 节点的点击事件，当点击事件触发，我们就会收到通知。
+
+- 网站登录
+
+网站登录功能，想必大多数做过平台需求的同学都实现过，当网站中的不同模块，如 Header 模块、Nav 模块、正文模块，都依赖登录后获取的用户数据时。
+
+登录模块是一个订阅对象，Header 模块、Nav 模块、正文模块添加对登录模块的订阅，当登录模块发生改变时，通知各个订阅了登录模块的模块。
+
+```js
+// 登录模块js
+// 登录成功后，发布“loginSucc”登录成功消息，并传递data数据
+login.succ(data=> {
+    login.trigger('loginSucc', data)
+})
+
+// header模块js
+// 订阅“loginSucc”登录成功消息
+login.listen('loginSucc', () => {
+    header.setAvatar(data.avatar)
+})
+
+// nav模块js
+// 订阅“loginSucc”登录成功消息
+login.listen('loginSucc', () => {
+    nav.setAvatar(data.avatar)
+})
+```
+
+- 双向数据绑定
+
+双向数据绑定也可以通过观察者模式实现。
+
+双向指的是视图 `view` 和模型 `model`，当视图发生改变时，模型也发生变化，同样，当模型发生改变，视图也跟着同步变化。
+
+1. #### 新建发布-订阅对象
+
+新建一个发布-订阅对象，用于发布消息，订阅消息。
+
+- `subscribe`：订阅函数，当其他对象添加订阅消息时，将回调函数 `push` 进 `callbacks` 对象数组中；
+- `publish`：发布函数，当发布消息时，触发 `callbacks` 中该消息对应的 `callback`.
+
+```js
+const Pubsub = {
+    subscribe: function (ev, callback) {
+        this._callbacks || (this._callbacks = {});
+        (this._callbacks[ev] || (this._callbacks[ev] = [])).push(callback);
+    },
+
+    publish: function () {
+        const args = [...arguments]
+        const ev = args.shift()
+
+        if (!this._callbacks) return
+        if (!this._callbacks[ev]) return
+
+        this._callbacks[ev].forEach(callback => {
+            callback(...args)
+        })
+    }
+}
+```
+
+2. #### `UI`更新
+
+   2.1 发布 `ui` 更新消息
+
+   注册 `document` 的 `keyup` / `change` 事件，当激活事件的 `dom` 元素拥有 `data-bind`属性时，说明 `ui` 正在更新，发布 `ui` 更新消息通知订阅者。
+
+   ```js
+   
+   function eventHander (e) {
+       const { target } = e
+       const { value: propValue } = target
+   
+       const propNameWhole = target.getAttribute('data-bind')
+       if (propNameWhole) {
+           // 发布ui更新消息
+           Pubsub.publish('ui-update-event', { propNameWhole, propValue })
+       }
+   }
+   
+   console.log(document.addEventListener)
+   document.addEventListener('change', eventHander, false)
+   document.addEventListener('keyup', eventHander, false)
+   ```
+
+   2.2 订阅`model`更新消息
+
+   所有包含 `data-bind` 属性的 `dom` 元素，订阅 `model` 更新消息，当 `model` 更新时，`ui` 将会收到通知。
+
+   ```js
+   // 订阅model更新消息，更新后所有符合条件的dom节点都会收到通知，进行更新
+   Pubsub.subscribe('model-update-event', function ({propNameWhole, propValue}) {
+       const elements = document.querySelectorAll(`[data-bind="${propNameWhole}"]`)
+   
+       elements.forEach(element => {
+           const elementTagName = element.tagName.toLowerCase()
+           const formTypeTagNames = ['input', 'select', 'textarea']
+           if (formTypeTagNames.includes(elementTagName)) {
+               element.value = propValue
+           } else {
+               element.innerHTML = propValue
+           }
+       })
+   })
+   ```
+
+3. `model`更新
+
+   3.1 订阅 `ui` 更新消息
+
+   订阅 `ui` 更新消息，当 `ui` 更新时，触发 `modal` 更新。
+
+   ```js
+   class Bind {
+       constructor () {
+           this.modelName = ''
+       }
+   
+       initModel ({ modelName }) {
+           this.modelName = modelName
+   
+           // 订阅ui更新消息
+           Pubsub.subscribe('ui-update-event', ({propNameWhole, propValue}) => {
+               const [ , _propName] = propNameWhole.split('.')
+               this.updateModalData(_propName, propValue)
+           })
+       }
+       
+       // xxx省略xxx
+   
+       updateModalData (propName, propValue) {
+           const propNameWhole = `${this.modelName}.${propName}`
+           // 发布model更新消息
+           Pubsub.publish('model-update-event', { propNameWhole, propValue });
+       }
+   
+   }
+   ```
+
+   3.2 发布model更新消息
+
+   `model` 更新时，发布 `model` 更新消息，此时，订阅了 `model` 更新消息的 `ui`，将得到通知。
+
+   ```js
+   class Bind {
+       constructor () {
+           this.modelName = ''
+       }
+       
+       // xxx省略xxx
+   
+       loadModalData (modelData) {
+           for (let propName in modelData) {
+               this.updateModalData(propName, modelData[propName])
+           }
+       }
+   
+       updateModalData (propName, propValue) {
+           const propNameWhole = `${this.modelName}.${propName}`
+           // 发布model更新消息
+           Pubsub.publish('model-update-event', { propNameWhole, propValue });
+       }
+   
+   }
+   ```
+
+- Nodejs 中：处理 ht 请求；多进程通讯
+- Vue 和 React 组件生命周期触发
+- Vue watch
+
+#### 设计原则验证
+
+- 主题和观察者分离，不是主动触发而是被动监听，两者解耦
+- 符合开放封闭原则
