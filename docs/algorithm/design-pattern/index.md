@@ -755,3 +755,279 @@ Function.prototype.after = function(afterfn) {
 
 装饰器模式，让对象更加稳定，且易于复用。而不稳定的功能，则可以在个性化定制时进行动态添加。
 
+### 代理模式
+
+- 使用者无权访问目标对象
+- 中间加代理，通过代理做授权和控制
+
+- 代理模式是为一个对象提供一个代用品或占位符，以便控制对它的访问。
+
+- 代理模式的关键是，当客户不方便直接访问一个对象或者不满足需要的时候，提供一个替身对象来控制对这个对象的访问，客户实际上访问的是替身对象
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210905105430.png" style="zoom:33%;" />
+
+```js
+class RealImg {
+  constructor(fileName) {
+    this.fileName = fileName
+    this.loadFromDisk()
+  }
+
+  display() {
+    console.log(`display... ${this.fileName}`)
+  }
+
+  loadFromDisk() {
+    console.log(`loading... ${this.fileName}`)
+  }
+}
+
+class ProxyImg {
+  constructor(fileName) {
+    this.realImg = new RealImg(fileName)
+  }
+
+  display() {
+    this.realImg.display()
+  }
+}
+
+const proxyImg = new ProxyImg('1.png')
+proxyImg.display()
+```
+
+#### 场景
+
+- 网页事件代理
+
+```js
+ var ul = document.getElementById('ul')
+    ul.addEventListener('click', function(e) {
+      var target = e.target;
+      if(target.nodeName === 'LI') {
+        alert(target.innerHTML)
+      }
+    })
+```
+
+- `Jquery的$.proxy`
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210905110001.png" style="zoom:33%;" />
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210905110043.png" style="zoom:33%;" />
+
+- `ES6的proxy`
+
+```js
+
+//明星
+let star = {
+  name: '张XX',
+  age: 25,
+  phone: '13900001111'
+}
+
+//经纪人
+let agent = new Proxy(star, {
+  get: function (target, key, receiver) {
+    if(key === 'phone') {
+      //返回经纪人自己的电话
+      return '13922225555'
+    }
+    if(key === 'price') {
+      //明星不报价，经纪人报价
+      return 120000
+    }
+    return target[key]
+  },
+  set: function (target, key, value, receiver) {
+    if(key === 'customPrice') {
+      if(value < 100000) {
+        throw new Error('价格太低')
+      } else {
+        target[key] = value
+        return true
+      }
+    }
+  }
+})
+
+console.log(agent.name) //张XX
+console.log(agent.age) //25 
+console.log(agent.phone) //13922225555
+console.log(agent.price) //120000
+agent.customPrice = 150000
+console.log(star.customPrice) //150000
+agent.customPrice = 90000 //Uncaught Error: 价格太低
+```
+
+- 图片懒加载
+
+图片预加载时一种常见的技术，如果直接给 img 标签节点设置 src 属性，由于图片过大或网络不佳，图片的位置往往有一段时间时空白。
+
+```js
+const myImage = (() => {
+ const imgNode = document.createElement('img')
+ document.body.appendChild(imgNode)
+
+ return {
+  setSrc: src => {
+   imgNode.src = src
+  }
+ }
+})()
+
+const loadingSrc = '../../../../img/loading.gif'
+const imgSrc = 'https://img30.360buyimg.com/ling/jfs/t1/187775/5/8271/435193/60c8117eE7d79ef41/1d21db2c4dca9a90.png'
+
+const proxyImage = (function () {
+ const img = new Image()
+ img.onload = () => {
+  myImage.setSrc(img.src)
+ }
+
+ return {
+  setSrc: src => {
+   myImage.setSrc(loadingSrc)
+   img.src = src
+  }
+ }
+})()
+
+proxyImage.setSrc(imgSrc)
+```
+
+1. 通过 `proxyImage` 控制了对 `MyImage` 的访问，在 `MyImage` 未加载成功之前，使用 `loading` 图占位；
+2. 践行单一职责原则，给 `img` 节点设置 `src` 的函数 `MyImage`，预加载图片的函数 `proxyImage`，都只有一个职责；
+3. 践行开放-封闭原则，给 `img` 节点设置 `src` 和预加载图片的功能，被隔离在两个对象里，它们可以各自变化不影响对方。
+
+- ### 合并HTTP请求
+
+假设我们要实现一个同步文件的功能，通过复选框，当复选框选中的时候，将该复选框对应的 id 传给服务器，告诉服务器需要同步 id 对应的文件。
+
+思考一下，会发现，如果每选中一个复选框，就请求一次接口，假设 1s 内选中了 10 个复选框，那么就要发送 10 次请求。
+
+可以通过虚拟代理来优化上述做法，新增一个代理，帮助复选框发起同步文件的请求，收集在这 1s 内的请求，1s 后再一起把这些文件 id 发送到服务器。
+
+```html
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8" />
+<head>
+ <title></title>
+</head>
+<body>
+  a <input type="checkbox" value="a" />
+  b <input type="checkbox" value="b" />
+  c <input type="checkbox" value="c" />
+  d <input type="checkbox" value="d" />
+ <script type="text/javascript" src="index.js">
+ </script>
+</body> 
+</html>
+
+
+```
+
+```js
+
+const synchronousFile = cache => {
+  console.log('开始同步文件，id为：'+ cache.join('/'))
+}
+
+const proxySynchronousFile = (() => {
+  const cache = []
+
+  let timer
+
+  return id => {
+    console.log(id)
+    cache.push(id)
+
+    if (timer) {
+      return
+    }
+
+    timer = setTimeout(() => {
+      synchronousFile(cache)
+      clearTimeout(timer)
+      timer = null
+      cache.length = 0
+    }, 2000)
+  }
+})()
+
+const checkbox = document.getElementsByTagName('input')
+
+Array.from(checkbox).forEach(i => {
+  console.log(i)
+  i.onclick = () => {
+    if (i.checked) {
+      proxySynchronousFile(i.value)
+    }
+  }
+})
+```
+
+- ### ajax异步请求数据
+
+在列表需要分页时，同一页的数据理论上只需要去后台拉取一次，可以把这些拉取过的数据缓存下来，下次请求时直接使用缓存数据。
+
+```js
+(async function () {
+  function getArticle (currentPage, pageSize) {
+    console.log('getArticle', currentPage, pageSize)
+    // 模拟一个ajax请求
+    return new Promise((resolve, reject) => {
+      resolve({
+        ok: true,
+        data: {
+          list: [],
+          total: 10,
+          params: {
+            currentPage, 
+            pageSize
+          }
+        }
+      })
+    })
+  }
+  
+  const proxyGetArticle = (() => {
+    const caches = []
+  
+    return async (currentPage, pageSize) => {
+  
+      const cache = Array.prototype.join.call([currentPage, pageSize],',')
+  
+      if (cache in caches) {
+        return caches[cache]
+      }
+      const { data, ok } = await getArticle(currentPage, pageSize)
+  
+      if (ok) {
+        caches[cache] = data
+      }
+  
+      return caches[cache]
+    }
+  })()
+  // 搜索第一页
+  await proxyGetArticle(1, 10)
+  // 搜索第二页
+  await proxyGetArticle(2, 10)
+  // 再次搜索第一页
+  await proxyGetArticle(1, 10)
+})()
+
+```
+
+#### 比较
+
+1. 代理模式和适配器模式
+   - 适配器模式：提供一个不同的接口（如不同版本的插头）
+   - 代理模式：提供一模一样的接口
+
+2. 代理模式和装饰器模式
+   - 裝饰器模式：扩展功能，原有功能不变且可直接使用代理模式：
+   - 显示原有功能，但是经过限制或者割之后的
