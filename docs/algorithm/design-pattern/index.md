@@ -1031,3 +1031,20 @@ Array.from(checkbox).forEach(i => {
 2. 代理模式和装饰器模式
    - 裝饰器模式：扩展功能，原有功能不变且可直接使用代理模式：
    - 显示原有功能，但是经过限制或者割之后的
+
+### 外观模式
+
+- 为子系统中的一组接口提供一个高层接口
+- 使用者使用这个接口
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210905141547.png" style="zoom:33%;" />
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210905141757.png" style="zoom:33%;" />
+
+#### 场景
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210905142759.png" style="zoom:33%;" />
+
+#### 设计原则验证
+
+- 不符合单一职责原则和开放封闭原则，因此谨慎使用，不可滥用
