@@ -321,3 +321,437 @@ console.log('login1 === login2', login1 === login2)
 
 - 没法具体开放封闭原则，但是绝对不违反开放封闭原则
 
+### 适配模式
+
+- 旧接口格式和使用者不兼容
+- 中间加一个适配转换接口
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210905092017.png)
+
+```js
+class Adaptee {
+    specificResource() {
+        return '香港标准插头'
+    }
+}
+
+class Target {
+    constructor() {
+        this.adaptee = new Adaptee()
+    }
+    request() {
+        let info = this.adaptee.specificResource()
+        return `${info}  -转换器-   中国标准插头`
+    }
+}
+
+let target = new Target()
+target.request()
+```
+
+#### 场景
+
+- 封装旧接口
+
+```js
+// 自己封装的 ajax,使用方式如下：
+ajax({
+    url: '/getData',
+    type: 'POST',
+    dataType: 'json',
+    data:{
+        id:'123'
+    }
+})
+.done(function(response){})
+
+
+// 但是历史原因，代码中全都是：
+// $.ajax({.....})
+
+
+
+
+
+// 就不用全局替换了
+// 做一层适配器
+var $ = {
+    ajax:function(options){
+        return ajax(options)
+    }
+}
+```
+
+- Vue Computed
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210905093745.png" style="zoom:33%;" />
+
+#### 设计原则验证
+
+- 将旧接口和使用者进行分离
+- 符合开放封闭原则
+
+### 装饰器模式
+
+- 为对象添加新功能
+- 不改变其原有的结构和功能
+
+- 简单来说，装饰器模式就是给对象动态增加功能。
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210905094810.png" style="zoom:33%;" />
+
+```js
+class Circle {
+  draw(){
+    console.log("画一个圆形")
+	}
+}
+
+// 装饰器
+class Decorator {
+  constructor(circle) {
+    this.circle = circle
+  }
+  draw() {
+    this.circle.draw()
+    this.setRedBorder(circle)
+  }
+  setRedBorder(circle) {
+    console.log("设置红色边框")
+  }
+}
+
+let circle = new Circle()
+circle.draw()
+// 装饰完毕的
+let dec = new Decorator()
+dec.draw()
+```
+
+不直接修改鸭子内部，而是通过一个外部函数，引用这个鸭子，并为外部函数添加下蛋的功能。
+
+```js
+const before = function (fn, beforeFn) {
+    return function () {
+        beforeFn.apply(this, arguments)
+        return fn.apply(this, arguments)
+    }
+}
+
+const after = function (fn, afterFn) {
+    return function () {
+        const __ = fn.apply(this, arguments)
+        afterFn.apply(this, arguments)
+        return __
+    }
+}
+
+const duck =  {
+    makeVoice: function () {
+        console.log('我会嘎嘎嘎啦')
+    },
+    sleep: function () {
+        console.log('谁又不会睡觉呢')
+    },
+    walk: function () {
+        console.log('哈哈哈，我会走路啦')
+    },
+    init: function () {
+        this.makeVoice()
+        this.sleep()
+        this.walk()
+    }
+}
+
+after(duck.init, function egg () {
+    console.log('生蛋快乐～')
+}).apply(duck)
+
+
+// 这就是装饰器模式，动态的为鸭子添加功能，而不直接修改鸭子本身。
+
+
+```
+
+#### 场景
+
+- ES7装饰器
+
+```js
+//装饰类
+@testable
+class MyTestableClass {
+  // ...
+}
+function testable(target) {
+  target.isTestable = true;
+}
+alert(MyTestableClass.isTestable) // true
+
+//原理
+@decorator
+class A{}
+//等同于
+class A {}
+A = decorator(A) || A
+
+
+function mixins(...list) {
+  return function (target) {
+    Object.assign(target.prototype, ...list)
+  }
+}
+const Foo = {
+  foo() { alert('foo') }
+}
+@mixins(Foo)
+class MyClass {}
+let obj = new MyClass();
+obj.foo() // 'foo'
+
+
+
+
+
+
+
+
+function readonly(target, name, descriptor){
+  // descriptor对象原来的值如下
+  // {
+  //   value: specifiedFunction,
+  //   enumerable: false,
+  //   configurable: true,
+  //   writable: true
+  // };
+  descriptor.writable = false;
+  return descriptor;
+}
+
+class Person {
+    constructor() {
+        this.first = 'A'
+        this.last = 'B'
+    }
+    // 方法装饰器
+    @readonly
+    name() { return `${this.first} ${this.last}` }
+}
+
+var p = new Person()
+console.log(p.name())
+p.name = function () {} // 这里会报错，因为 name 是只读属性
+
+
+
+function log(target, name, descriptor) {
+  var oldValue = descriptor.value;
+
+  descriptor.value = function() {
+    console.log(`Calling ${name} with`, arguments);
+    return oldValue.apply(this, arguments);
+  };
+
+  return descriptor;
+}
+class Math {
+  @log
+  add(a, b) {
+    return a + b;
+  }
+}
+const math = new Math();
+const result = math.add(2, 4);
+console.log('result', result);
+
+```
+
+- Core-decorators
+
+```js
+
+import { readonly, deprecate } from 'core-decorators'
+class Person {
+  constructor() {
+    this.first = 'A'
+    this.last = 'B'
+  }
+
+  @readonly
+  name() { 
+    return `${this.first} ${this.last}` 
+  }
+
+  // 提示一些API已经废弃了，给用户提示
+  @deprecate()
+  getName() {
+    return `${this.first} ${this.last}`
+  }
+}
+```
+
+- ### 数据上报
+
+自定义事件的数据上报一般都依赖于点击事件，那么这个点击事件既要承担原本的功能，又要承担数据上报的功能。
+
+**普通做法**
+
+```js
+const loginBtnClick = () => {
+    console.log('去登录'）
+    console.log('去上报')
+} 
+// 好像没毛病，这样的代码中项目中随处可见，逃避(面向过程编程)虽可耻但有用。
+```
+
+**装饰器模式做法**
+
+可以通过装饰器模式来重构上述代码，将职责划分更细，代码松耦合，可复用性更高。
+
+```js
+
+const after = function (fn, afterFn) {
+    return function () {
+        const __ = fn.apply(this, arguments)
+        afterFn.apply(this, arguments)
+        return __
+    }
+}
+
+const showLogin = function () {
+    console.log('去登录')
+}
+
+const log = function () {
+    console.log('去上报')
+}
+
+const loginBtnClick = after(showLogin, log)
+
+loginBtnClick()
+
+```
+
+- ### 动态增加参数
+
+一个常规的 `ajax` 请求参数包括 `type` / `url` / `param`，当突发一个特殊情况，需要在 `ajax` 的参数中，新增一个 `token` 参数。
+
+**普通做法**
+
+```js
+
+const ajax = function (type, url, param) {
+    // 新增token参数
+    param.token = 'xxx'
+    // ...ajax请求...省略
+}
+```
+
+**装饰器做法**
+
+通过装饰器模式，在 `ajax` 调用之前，为 `ajax` 增加 `token` 参数，代码如下：
+
+```js
+const before = function (fn, beforeFn) {
+    return function () {
+        //同一个arguments
+        beforeFn.apply(this, arguments)
+        return fn.apply(this, arguments)
+    }
+}
+
+let ajax = function (type, url, param) {
+    console.log(arguments)
+    // ...ajax请求...省略
+}
+
+ajax = before(ajax, function (type, url, param) {
+    console.log(param)
+    param.token = 'xxx'
+})
+
+ajax('type', 'url', {name: 'tj'})
+```
+
+- 其他
+
+```js
+class Plane{
+  fire() {
+    console.log('发射普通子弹')
+  }
+}
+
+class MissileDecorator {
+  constructor(plane) {
+    this.plane = plane
+  }
+
+  fire() {
+    this.plane.fire()
+    console.log('发射导弹')
+  }
+}
+
+class AtomDecorator {
+  constructor(plane) {
+    this.plane = plane
+  }
+
+  fire() {
+    this.plane.fire()
+    console.log('发射原子弹')
+  }
+}
+
+let plane = new Plane()
+//plane = new MissileDecorator(plane)
+//plane = new AtomDecorator(plane)
+//plane.fire() //发射普通子弹 发射导弹 发射原子弹
+
+
+
+
+
+Function.prototype.before = function(beforefn) {
+  var _self = this
+  return function() {
+    beforefn.apply(this, arguments)
+    return _self.apply(this, arguments)
+  }
+}
+
+Function.prototype.after = function(afterfn) {
+  var _self = this
+  return function() {
+    var ret = _self.apply(this, arguments)
+    afterfn.apply(this, arguments)
+    return ret
+  }
+}
+
+ var fun = function() {
+  console.log(1)
+ }
+
+ var beforeFun = fun.before(function() {
+   console.log(0)
+ })
+ beforeFun() //0 1 
+
+
+ var afterFun = fun.after(function() {
+   console.log(2)
+ }).after(function() {
+   console.log(3)
+ })
+ afterFun() //1 2 3
+```
+
+#### 设计原则
+
+- 将现有的对象和装饰器进行分离，两者独立存在
+- 符合开放封闭原则
+
+装饰器模式，让对象更加稳定，且易于复用。而不稳定的功能，则可以在个性化定制时进行动态添加。
+
