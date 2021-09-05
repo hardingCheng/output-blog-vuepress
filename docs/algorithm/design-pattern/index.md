@@ -1435,3 +1435,111 @@ const Pubsub = {
 
 - 主题和观察者分离，不是主动触发而是被动监听，两者解耦
 - 符合开放封闭原则
+
+#### 迭代器模式
+
+- 顺序访问一个集合
+- 使用者无需知知道集合的內部结构（封装）
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210905171232.png" style="zoom:33%;" />
+
+```js
+
+class Iterator {
+  constructor(container) {
+    this.list = container.list
+    this.index = 0
+  }
+
+  next() {
+    if(this.hasNext()) {
+      return this.list[this.index++] 
+    }
+    return null
+  }
+
+  hasNext() {
+    return this.index < this.list.length
+  }
+}
+
+class Container {
+  constructor(list) {
+    this.list = list
+  }
+
+  getIterator() {
+    return new Iterator(this)
+  }
+}
+
+// var arr = [1, 2, 3, 4, 5]
+// var container = new Container(arr)
+// var iterator = container.getIterator()
+// while(iterator.hasNext()) {
+//   console.log(iterator.next())
+// }
+```
+
+#### 场景
+
+- Jquery each
+
+```js
+    var arr = [1,2,3]
+    var nodeList = document.getElementsByTagName('li')
+    var $a = $('li')
+
+    function each(data) {
+      var $data = $(data)
+      $data.each(function(key, val) {
+        console.log(key, val)
+      })
+    }
+
+    each(arr)
+    each(nodeList)
+    each($a)
+```
+
+-  ES6 Iterator
+  - ES6 语法中，有序集合的数据类型已经有很多
+  -  Array Map Set String Typedarray arguments Nodelist 
+  - 需要有一个统一的遍历接口来遍历所有数据类型
+  - （注意，object 不是有序集合，可以用 Map 代替）
+  - 以上数据类型，都有【Symbol, Iterate】属性
+  - 属性值是函数，执行函数返回一个迭代器
+  - 这个迭代器就有 next 方法可顺序迭代子元素可运行 Array.prototype [Symbol.Iterator ]来测试
+
+```js
+function each(data) {
+  //生成遍历器
+  let iterator = data[Symbol.iterator]()
+
+  let item = { done: false }
+  while(!item.done) {
+    item = iterator.next()
+    if(!item.done) {
+      console.log(item.value)
+    }
+  }
+}
+
+var map = new Map()
+map.set(1, 'a')
+map.set(2, 'b')
+var arr = [1,2,3]
+var str = 'abc'
+each(arr)
+each(str)
+each(map)
+```
+
+- `for...of...`
+
+#### 设计原则验证
+
+- 迭代器对象和目标对象分离
+- 迭代器将使用者与目标对象隔离开
+- 符合开放封闭原则
+
