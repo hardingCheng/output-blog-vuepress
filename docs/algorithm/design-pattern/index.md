@@ -1543,3 +1543,1085 @@ each(map)
 - 迭代器将使用者与目标对象隔离开
 - 符合开放封闭原则
 
+### 状态模式
+
+- 每个对象有状态变化
+
+- 每次状态变化都会触发一个逻辑
+- 不能总是用 if-else 来控制
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210906064649.png" style="zoom:33%;" />
+
+```js
+//状态
+class State{
+  constructor(color) {
+    this.color = color
+  }
+  
+  handle(context) {
+    console.log(`turn to ${this.color} light`)
+    //获取什么灯
+    context.setState(this)
+  }
+}
+
+//主体
+//主体可以获得状态信息
+class Context {
+  constructor() {
+    this.state = null
+  }
+
+  getState() {
+    return this.state
+  }
+
+  setState(state) {
+    this.state = state
+  }
+}
+
+const context = new Context()
+const green = new State('green')
+const yellow = new State('yellow')
+const red = new State('red')
+//状态切换和状态获取是分开的
+green.handle(context)
+console.log(context.getState())
+
+yellow.handle(context)
+console.log(context.getState())
+
+red.handle(context)
+console.log(context.getState())
+```
+
+#### 场景
+
+- 有限状态机
+  - 有限个状态、以及在这些状态之间的变化
+  - 如交通信号灯
+
+```js
+import StateMachine from 'javascript-state-machine'
+import $ from 'jquery'
+//new了一个状态机模型
+let fsm = new StateMachine({
+  init: '收藏',//初始化状态
+  transitions: [
+    {
+      name: 'doStore',
+      form: '收藏',
+      to: '取消收藏'
+    },
+    {
+      name: 'deleteStore',
+      form: '取消收藏',
+      to: '收藏'
+    }
+  ],
+  methods: {
+    //执行收藏
+    onDoStore: function() {
+      alert('收藏成功') 
+      updateText()
+    },
+    //取消收藏
+    onDeleteStore: function() {
+      alert('取消收藏成功') 
+      updateText()      
+    }
+  }
+})
+
+let $btn = $('#btn')
+
+$btn.click(function() {
+  if(fsm.is('收藏')) {
+    fsm.doStore()
+  } else {
+    fsm.deleteStore()
+  }
+})
+
+// 更新按钮文案 
+function updateText() {
+  $btn.text(fsm.state)
+}
+
+//初始化文案
+updateText()
+```
+
+- 简单的Promise
+
+```js
+import StateMachine from 'javascript-state-machine'
+
+const fsm = new StateMachine({
+  init: 'pending',
+  transitions: [
+    {
+      name: 'resolve',
+      from: 'pending',
+      to: 'fullfilled'
+    },
+    {
+      name: 'reject',
+      from: 'pending',
+      to: 'rejected'
+    }
+  ],
+  methods: {
+    //监听resolve
+    onResolve(state, data){
+      //state - 当前状态机实例; data - fsm.resolve(xxx) 传递的参数
+      data.successList.forEach(fn => fn())
+    },
+    //监听reject
+    onReject(state, data){
+      //state - 当前状态机实例; data - fsm.reject(xxx) 传递的参数
+      data.failList.forEach(fn => fn())
+    }
+  }
+})
+
+class MyPromise {
+  constructor(fn) {
+    this.successList = []
+    this.failList = []
+    fn(() => {
+      // resolve 函数
+      fsm.resolve(this)
+    }, () => {
+      // reject 函数
+      fsm.reject(this)
+    })
+  }
+
+  then(successFn, failFn) {
+    this.successList.push(successFn)
+    this.failList.push(failFn)
+  }
+}
+
+function loadImg(src) {
+  const mp = new MyPromise((resolve, reject) => {
+    const img = document.createElement('img')
+    img.onload = () => resolve(img)
+    img.onerror = () => reject()
+    img.src = src
+  })
+  return mp
+}
+
+let src = 'https://www.baidu.com/img/bd_logo1.png'
+let mp = loadImg(src)
+
+mp.then(() => {
+  console.log('success1')
+}, () => {
+  console.log('fail1')
+})
+
+mp.then(() => {
+  console.log('success2')
+}, () => {
+  console.log('fail2')
+})
+```
+
+#### 设计原则验证
+
+- 将状态对象和主题对象分离，状态的变化逻辑单独处理
+- 符合开放封闭原则
+
+### 原型模式
+
+- Clone 自己，生成一个新对象
+- java 默认有 clone 接口，不用自己实现
+
+#### js中的应用
+
+`Object.create()`
+
+```js
+let prototype = {
+  getName() {
+    return this.first + '  ' + this.last
+  },
+
+  say() {
+    alert('hello')
+  }
+}
+
+let x = Object.create(prototype)
+x.first = 'A'
+x.last = 'B'
+alert(x.getName())
+x.say()
+
+
+//兼容不支持浏览器
+Object.create = Object.create || function(obj) {
+  var F = function() {}
+  F.prototype = obj
+  return new F()
+}
+```
+
+#### 其他
+
+```js
+var myObj = (function() {
+  var _name = 'sven'
+  return {
+    getName: function() {
+      return _name
+    }
+  }
+})()
+
+console.log(myObj.getName()) // sven
+//形成了的闭包，外部不可以访问函数内部的变量
+console.log(myObj._name) // undefined
+
+var obj1 = new Object()
+var obj2 = {}
+
+console.log(Object.getPrototypeOf(obj1) === obj1.__proto__)  //true
+console.log(Object.getPrototypeOf(obj1) === Object.prototype) //true
+console.log(Object.getPrototypeOf(obj2) === Object.prototype) //true
+
+
+var obj = {name: 'sven'}
+
+var A = function() {}
+A.prototype = obj
+
+var B = function() {}
+B.prototype = new A()
+
+var b = new B()
+console.log(b.name) //sven
+```
+
+### 桥接模式
+
+- 用于把抽象化与实现化解耦
+- 使得二者可以独立变化
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210906170512.png" style="zoom:33%;" />
+
+转化为：
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210906170438.png" style="zoom:33%;" />
+
+#### 设计原则验证
+
+- 抽象和实现分离，解耦
+- 符合开放封闭原则
+
+### 组合模式
+
+- 生成树形结构，表示“整体-部分”关系
+- 让整体和部分都具有一致的操作方式
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210906170808.png" style="zoom:33%;" />
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210906171442.png" style="zoom:33%;" />
+
+- 整体和单个节点的操作是一致的
+- 整体和单个节点的数据结构也保持一致 
+
+#### 设计原则验证
+
+- 讲整体和单个节点的操作抽象出来
+- 符合开放封闭原贝
+
+### 享元模式
+
+- 共享内存（主要考虑内存，而非效率）
+- 相同的数据，共享使用
+
+#### 设计原则
+
+- 将相同的部分抽象出来
+- 符合开放封闭原则
+
+### 策略模式
+
+当我们计划国庆出去游玩时，在交通方式上，我们可以选择贵而快的**飞机**、价格中等但稍慢的**动车**、便宜但超级慢的**火车**，根据不同的人，选择对应的交通方式，且可以随意更换交通方式，这就是**策略模式**。
+
+策略模式的定义是，定义一系列算法，把它们一个个封装起来，并且使它们可以相互替换。
+
+- 不同策略分开处理
+- 免出现大量 if.else 或者 switch.case
+
+```js
+class User {
+  constructor(type) {
+    this.type = type
+  }
+
+  buy() {
+    if(this.type === 'oridinary') {
+      console.log('普通用户购买')
+    } else if(this.type === 'member') {
+      console.log('会员用户购买')
+    } else if('this.type' === 'vip') {
+      console.log('vip 用户购买')
+    }
+  }
+}
+
+let u1 = new User('member') 
+u1.buy()
+
+class OridinaryUser {
+  buy() {
+    console.log('普通用户购买')
+  }
+}
+class MemberUser {
+  buy() {
+    console.log('会员用户购买')
+  }
+}
+
+class VipUser {
+  buy() {
+    console.log('vip 用户购买')
+  }
+}
+
+class UserManager {
+  constructor() {
+    this.user = null
+  }
+
+  setUser(user) {
+    this.user= user
+  }
+
+  userBuy() {
+    this.user.buy()
+  }
+}
+
+
+const m = new UserManager()
+const u = new OridinaryUser()
+m.setUser(u)
+m.userBuy() //u2.buy()
+
+
+class Color {
+  constructor(name) {
+    this.name = name
+  }
+}
+
+class Shape {
+  constructor(name, color) {
+    this.name = name
+    this.color = color
+  }
+
+  draw() {
+    console.log(`${this.color.name} ${this.name}`)
+  }
+}
+
+let red = new Color('red')
+let circle = new Shape('circle', red)
+circle.draw() //red circle
+```
+
+#### 场景
+
+- 计算年终奖
+
+有一个计算员工年终奖的需求，假设，绩效为 `S` 的员工年终奖是 `4` 倍工资，绩效为 `A` 的员工年终奖是 `3` 倍工资，绩效为 `B` 的员工年终奖是 `2` 倍工资，下面我们来计算员工的年终奖。
+
+```js
+var calculateBonus = function(performanceLevel, salary) {
+ if (performanceLevel === 'S') {
+  return salary * 4;
+ }
+ if (performanceLevel === 'A') {
+  return salary * 3;
+ }
+ if (performanceLevel === 'B') {
+  return salary * 2;
+ }
+};
+calculateBonus('B', 20000); // 输出：40000 
+calculateBonus( 'S', 6000 ); // 输出：24000
+
+上述代码有以下缺点：
+使用 if-else 语句描述逻辑，代码庞大；
+缺乏弹性，如果需要修改绩效 S 的奖金系数，必须修改 calculateBonus 函数，违反了开放-封闭原则；
+无法再次复用，当其他地方需要用到这套逻辑，只能再复制一份。
+
+
+
+
+const strategies = {
+ S: salary => {
+  return salary * 4
+ },
+ A: salary => {
+  return salary * 3
+ },
+ B: salary => {
+  return salary * 2
+ }
+}
+const calculateBonus = (level, salary) => {
+ return strtegies[level](salary)
+}
+
+console.log(calculateBonus('s', 20000))
+console.log(calculateBonus('a', 10000))
+
+可以看到上述代码做了以下改动：
+策略类 strategies 封装了具体的算法和计算过程（每种绩效的计算规则）；
+环境类 calculateBonus 接受请求，把请求委托给策略类 strategies（员工的绩效和工资；
+将算法的使用和算法的实现分离，代码清晰，职责分明；
+消除大量的 if-else 语句。
+```
+
+- 表单验证
+
+当网页上的表单需要校验输入框/复选框等等规则时，如何去实现呢？
+
+现在有一个注册用户的表单需求，在提交表单之前，需要验证以下规则：
+
+1. 用户名不能为空
+2. 密码长度不能少于 6 位
+3. 手机号码必须符合格式
+
+```html
+// 传统，使用 if-else 语句判断表单输入是否符合对应规则，如不符合，提示错误原因。
+
+<!DOCTYPE html>
+<html>
+<head>
+ <title></title>
+</head>
+<body>
+ <form id='registerForm' action="xxx" method="post">
+  用户名：<input type="text" name="userName">
+  密码：<input type="text" name="password">
+  手机号：<input type="text" name="phone">
+  <button>提交</button>
+ </form>
+ <script type="text/javascript">
+        let registerForm = document.getElementById('registerForm')
+
+        registerForm.onsubmit = () => {
+                if (registerForm.userName.value) {
+                        alert('用户名不能为空')
+                        return false
+                }
+
+                if (registerForm.password.value.length < 6) {
+                        alert('密码长度不能少于6')
+                        return false
+                }
+
+                if (!/(^1[3|5|8][0-9]$)/.test(registerForm.phone.value)) {
+                        alert('手机号码格式不正确')
+                        return false
+                }
+        }
+        </script>
+</body>
+</html>
+
+上述代码有以下缺点：
+onsubmit 函数庞大，包含大量 if-else 语句；
+onsubmit 缺乏弹性，当有规则需要调整，或者需要新增规则时，需要改动 onsubmit 函数内部，违反开放-封闭原则；
+算法复用性差，只能通过复制，复用到其他表单。
+```
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+ <title></title>
+</head>
+<body>
+ 
+ <form action="http://xxx.com/register" id="registerForm" method="post">
+   请输入用户名：
+  <input type="text" name="userName" />
+   请输入密码：
+  <input type="text" name="password" />
+   请输入手机号码：
+  <input type="text" name="phoneNumber" />
+  <button>
+   提交
+  </button>
+ </form>
+ <script type="text/javascript" src="index.js">
+  
+ </script>            
+</body>  
+</html>
+```
+
+```js
+// 表单dom
+const registerForm = document.getElementById('registerForm')
+
+// 表单规则
+const rules = {
+    userName: [
+        {
+            strategy: 'isNonEmpty',
+            errorMsg: '用户名不能为空'
+        },
+        {
+            strategy: 'minLength:10',
+            errorMsg: '用户名长度不能小于10位'
+        } 
+    ],
+    password: [
+        {
+            strategy: 'minLength:6',
+            errorMsg: '密码长度不能小于6位'
+        }
+    ],
+    phoneNumber: [
+        {
+            strategy: 'isMobile',
+            errorMsg: '手机号码格式不正确'
+        }
+    ]
+}
+
+// 策略类
+var strategies = {
+    isNonEmpty: function(value, errorMsg) {
+        if (value === '') {
+            return errorMsg;
+        }
+    },
+     minLength: function(value, errorMsg, length) {
+        console.log(length)
+        if (value.length < length) {
+            return errorMsg;
+        }
+    },
+     isMobile: function(value, errorMsg) {
+        if (!/(^1[3|5|8][0-9]{9}$)/.test(value)) {
+            return errorMsg;
+        }
+    }
+};
+
+// 验证类
+const Validator = function () {
+    this.cache = []
+}
+
+// 添加验证方法
+Validator.prototype.add = function ({ dom, rules}) {
+    rules.forEach(rule => {
+        const { strategy, errorMsg } = rule
+        console.log(rule)
+        const [ strategyName, strategyCondition ] = strategy.split(':')
+        console.log(strategyName)
+        const { value } = dom
+        this.cache.push(strategies[strategyName].bind(dom, value, errorMsg, strategyCondition))
+    })
+}
+
+// 开始验证
+Validator.prototype.start = function () {
+    let errorMsg
+    this.cache.some(cacheItem => {
+            const _errorMsg = cacheItem()
+            if (_errorMsg) {
+                    errorMsg = _errorMsg
+                    return true
+            } else {
+                    return false
+            }
+    })
+
+    return errorMsg
+}
+
+// 验证函数
+const validatorFn = () => {
+    const validator = new Validator()
+    console.log(validator.add)
+
+    Object.keys(rules).forEach(key => {
+        console.log(2222222, rules[key])
+        validator.add({
+            dom: registerForm[key],
+            rules: rules[key]
+        })
+    })
+
+    const errorMsg = validator.start()
+    return errorMsg
+}
+
+
+// 表单提交
+registerForm.onsubmit = () => {
+    const errorMsg = validatorFn()
+    if (errorMsg) {
+        alert(errorMsg)
+        return false
+    }
+    return false
+}
+
+
+// 上述代码通过 strategies 定义规则算法，通过 Validator 定义验证算法，将规则和算法分离，我们仅仅通过配置的方式就可以完成表单的校验，这些校验规则也可以复用在程序的任何地方，还能作为插件的形式，方便的被移植到其他项目中。
+```
+
+策略模式是一种常用且有效的设计模式，通过上述例子，可以总结出策略模式的一些优点：
+
+- 策略模式利用组合/委托和多态等技术和思想，可以有效的避免多重条件选择语句；
+- 策略模式提供了对开放-封闭原则的完美支持，将算法封装中独立的策略类中，使得它们易于切换/理解/扩展；
+- 在策略模式中利用组合和委托来让 `Context` 拥有执行算法的能力，这也是继承的一种更轻便的代替方案。
+
+#### 设计原则
+
+- 不同策略，分开处理，而不是混合在一起
+- 符合开放封闭原则
+
+### 模板方法模式
+
+```js
+class Action {
+  handle() {
+    this.handle1()
+    this.handle2()
+    this.handle3()
+  }
+
+  handle1() {
+    console('1')
+  }
+
+  handle2() {
+    console('2')
+  }
+
+  handle3() {
+    console('3')
+  }
+}
+```
+
+```js
+class Beverage {
+  init() {
+    this.boilWater()
+    this.brew()
+    this.pourInCup()
+    this.addCondiments()
+  }
+
+  boilWater() {
+    console.log('把水煮沸')
+  }
+
+  brew(){} //沸水冲泡饮料
+  pourInCup(){} //饮料倒进杯子
+  addCondiments(){} //加调料
+}
+
+class Coffee extends Beverage {
+  brew(){
+    console.log('用沸水冲泡咖啡')
+  } 
+  pourInCup(){
+    console.log('把咖啡倒进杯子')
+  } 
+  addCondiments(){
+    console.log('加糖和牛奶')
+  } 
+}
+
+class Tea extends Beverage {
+  brew(){
+    console.log('用沸水浸泡茶叶')
+  } 
+  pourInCup(){
+    console.log('把茶倒进杯子')
+  } 
+  addCondiments(){
+    console.log('加柠檬')
+  } 
+}
+
+const coffee = new Coffee()
+coffee.init()
+
+const tea = new Tea()
+tea.init()
+
+```
+
+### 职责链模式
+
+职责链模式就是当一个对象 `a`，有多种可能的请求对象 `b`、`c`、`d`、`e` 时，我们为 `b`、`c`、`d`、`e` 分别定义一个职责，组成一条职责链，这样 `a` 只需要找到 `b` 发起请求，然后沿着职责链继续请求，直到找到一个对象来处理 `a`。
+
+- 步操作可能分位多个职责角色来完成
+- 把这些角色都分开，然后用一个链串起来
+- 将发起者和各个处理者进行隔离
+
+```js
+class Action {
+  constructor(name) {
+    this.name = name
+    this.nextAction = null
+  }
+
+  setNextAction(action) {
+    this.nextAction = action
+  }
+
+  handle() {
+    console.log(`${this.name} 审批`)
+    this.nextAction && this.nextAction.handle()
+  }
+}
+
+const action1 = new Action('组长')
+const action2 = new Action('经理')
+const action3 = new Action('总监')
+
+action1.setNextAction(action2)
+action2.setNextAction(action3)
+
+action1.handle()
+```
+
+```js
+const order500 = (orderType, pay, stock) => {
+  if(orderType === 1 && pay === true){
+    console.log('500元定金预购，得到100优惠券')
+    return true
+  }
+  return false
+}
+
+const order200 = (orderType, pay, stock) => {
+  if(orderType === 2 && pay === true){
+    console.log('200元定金预购，得到50优惠券')
+    return true
+  }
+  return false
+}
+
+const orderNormal = (orderType, pay, stock) => {
+  if(stock > 0){
+    console.log('普通购买，无优惠券')
+  } else {
+    console.log('手机内存不足')
+  }
+  return true
+}
+
+class Chain {
+  constructor(fn) {
+    this.fn = fn
+    this.successor = null
+  }
+
+  setNextSuccessor(successor){
+    this.successor = successor
+  }
+
+  passRequest() {
+    const res = this.fn.apply(this, arguments)
+    return res ? res : this.successor && this.successor.passRequest.apply(this.successor, arguments)
+  }
+}
+
+const chainOrder500 = new Chain(order500)
+const chainOrder200 = new Chain(order200)
+const chainOrderNormal = new Chain(orderNormal)
+
+chainOrder500.setNextSuccessor(chainOrder200)
+chainOrder200.setNextSuccessor(chainOrderNormal)
+
+chainOrder500.passRequest(1, true, 500) //500元定金预购，得到100优惠券
+chainOrder500.passRequest(2, true, 500) //200元定金预购，得到50优惠券
+chainOrder500.passRequest(3, false, 500) //普通购买，无优惠券
+chainOrder500.passRequest(3, false, 0) //手机内存不足
+
+
+//上述代码将 chainOrder500 和 chainOrder200 组成一条职责链，不管用户是哪种类型，都只需要向 chainOrder500 发起请求，如果 chainOrder500 无法处理请求，就会继续沿着职责链发起请求，直到找到能处理请求的职责方法。
+
+//通过职责链模式，解耦了请求发送者和多个接收者之间的复杂关系，不再需要知道具体哪个接收者来接收发送的请求，只需要向职责链的第一个阶段发起请求。
+```
+
+职责链模式，帮助我们管理代码，降低发起请求和接收请求对象之间的耦合。
+
+职责链模式中的节点数量和顺序是可以自由变动的，可以在运行时决定链中包含哪些节点。
+
+#### 场景
+
+- JS 中能联想到链式操作  
+- jquery 的链式操作 Promise.then 的链式操作
+
+#### 设计原则验证
+
+- 发起者于各个处理者进行隔离
+- 符合开放封闭原贝
+
+### 命令模式
+
+- 执行命令时，发布者和执行者分开中间
+- 加入命令对象，作为中转站
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210906174323.png" style="zoom:33%;" />
+
+```js
+//接受者 执行者
+class Receiver{
+  exec() {
+    console.log('执行')
+  }
+}
+
+//命令者
+class  Command {
+  constructor(receiver) {
+    this.receiver = receiver
+  }
+
+  cmd() {
+    console.log('执行命令')
+    this.receiver.exec()
+  }
+}
+
+//触发者
+class Invoker {
+  constructor(command) {
+    this.command = command
+  }
+
+  invoke() {
+    console.log('开始')
+    this.command.cmd()
+  }
+}
+
+//士兵
+const soldier = new Receiver()
+//小号手 -> 吹号让士兵进攻
+const trumpeter = new Command(soldier)
+//将军 -> 命令小号手吹号
+const general = new Invoker(trumpeter)
+
+general.invoke()
+```
+
+#### 场景
+
+网页富文本编辑器操作，浏览器封装了一个命令对象  
+
+document.execcommand (bold)  
+
+document.execcommand (undo)
+
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210906174806.png" style="zoom:33%;" />
+
+```js
+const bindClick = (button, func) => {
+  button.onclick = func
+}
+
+const MenuBar = {
+  refresh() {
+    console.log('刷新菜单界面')
+  }
+}
+
+const SubMenu = {
+  add() {
+    console.log('增加子菜单')
+  },
+  del() {
+    console.log('删除子菜单')
+  }
+}
+
+bindClick(button1, MenuBar.refresh)
+bindClick(button2, SubMenu.add)
+bindClick(button3, SubMenu.del)
+```
+
+#### 设计原则验证
+
+- 命令对象于执行对象分开，解耦
+- 符合开放封闭原则
+
+### 备忘录模式
+
+- 随时记录一个对象的状态变化
+- 随时可以恢复之前的某个状态（如撤销功能）
+- 未找到 JS 中经典应用，除了一些工具（如编辑器）
+
+```js
+//备忘类
+class Memento {
+  constructor(content) {
+    this.content = content
+  }
+
+  getContent() {
+    return this.content
+  }
+}
+
+//备忘列表
+class CareTaker {
+  constructor() {
+    this.list = []
+  }
+
+  add(memento) {
+    this.list.push(memento)
+  }
+
+  get(index) {
+    return this.list[index]
+  }
+}
+
+//编辑器
+class Editor {
+  constructot() {
+    this.content =  null
+  }
+
+  setContent(content) {
+    this.content = content
+  }
+
+  getContent() {
+    return this.content
+  }
+
+  saveContentToMemento() {
+    return new Memento(this.content)
+  }
+
+  setContentFromMemento(mement) {
+    return this.content = mement.getContent()
+  }
+ }
+
+ //测试代码
+const editor = new Editor()
+//备忘录
+const careTaker = new CareTaker()
+
+editor.setContent('1')
+editor.setContent('2')
+careTaker.add(editor.saveContentToMemento())
+editor.setContent('3')
+careTaker.add(editor.saveContentToMemento())
+editor.setContent('4')
+console.log(editor.getContent()) // 4
+editor.setContentFromMemento(careTaker.get(1)) //撤销
+console.log(editor.getContent()) // 3 
+editor.setContentFromMemento(careTaker.get(0)) //撤销
+console.log(editor.getContent()) // 2
+```
+
+#### 设计原则验证
+
+- 状态对象于使用者分开，解耦
+- 符合开放封闭原则
+
+### 中介者模式
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210906180112.png)
+
+```js
+class A {
+  constructor() {
+    this.number = 0
+  }
+
+  setNumber(num, m) {
+    this.number = num
+    if(m) {
+      m.setB()
+    }
+  }
+}
+
+class B {
+  constructor() {
+    this.number = 0
+  }
+
+  setNumber(num, m) {
+    this.number = num
+    if(m) {
+      m.setA()
+    }
+  }
+}
+
+//中介者
+class Mediator {
+  constructor(a, b) {
+    this.a = a
+    this.b = b
+  }
+
+  setB() {
+    let num = this.a.number
+    this.b.setNumber(num / 10)
+  }
+
+  setA() {
+    let num = this.b.number
+    this.a.setNumber(num + 5)
+  }
+}
+
+const a = new A()
+const b = new B()
+const m = new Mediator(a, b)
+a.setNumber(100, m)
+console.log(a.number, b.number)
+
+b.setNumber(100, m)
+console.log(a.number, b.number)
+```
+
+#### 设计原则验证
+
+- 讲各关联对象通过中介者
+- 隔离符合开放封闭原则
+
+### 访问者模式
+
+- 将数据操作和数据结构进行分离
+- 使用场景不多
+
+### 解释器模式
+
+- 描述语言语法如何定义，如何解释和编译
+- 用于专业场景（bable）
+
