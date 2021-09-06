@@ -6271,3 +6271,53 @@ Object.setPrototypeOf(AuthController,LoginController)
 
  ES6中为了实现类，新增加了关键字class,extends,super，用来实现传统的面相对象编程。然而，class语法并没有解决所有的问题。class基本上只是现在的prototype机制的一种语法糖。也就是说class并不会向传统的面向类的语言一样在声明是静态复制所有行为。如果你有意或者无意修改或者替换了父“类”中的一个方法，那子“类”和所有实例都会受到影响，因为它们在定义时并没有进行复制，只是使用基于prototype的实时委托。
 
+## 你不知道的JavaScript中卷
+### 类型
+对语言引擎和开发人员来说，*类型*是值的内部特征，它定义了值的行为，以使其区别于其他值。
+#### 内置类型
+JavaScript的七种内置类型：
+- 空值（null）
+- 未定义（undefined）
+- 布尔值（boolean）
+- 数字（number）
+- 字符串（string）
+- 对象（object）
+- 符号（symbol）
+**除了对象之外，其他统称为“基本类型”**
+我们可以用`typeof`运算符查看值的类型，它返回的是类型的字符串值。
+```js
+typeof undefined === 'undefined' //true
+typeof true === 'boolean' //true
+typeof 42 === 'number' //true
+typeof "42" === 'string' //true
+typeof { life:42 } === 'object' //true
+typeof Symbol() === 'symbol' //true
+typeof null === 'object' //true
+typeof [1,2,3] === 'object' //true
+typeof function(){} === 'function' //true
+```
+```js
+var a = null
+(!a && typeof a === 'object') //true
+
+
+//函数不仅是对象，还可以拥有属性
+function a(b,c){
+
+}
+a.length  //函数对象的length属性是其声明的参数的个数。
+```
+#### undefined 和 undeclared
+**变量在未持有值的时候为`undefined`**
+```js
+var a;
+typeof a;//"undefined"
+```
+**已在作用域中声明但还没有赋值的变量，是undefined的。相反，还没有在作用域中声明过的变量，是undeclared**
+```js
+var a
+a //undefined
+b //ReferenceErro:b is not defined
+```
+可以使用`typeof`的安全防范机制（阻止报错）来检查`undeclared`变量，有时是个不错的办法。
+### 值
