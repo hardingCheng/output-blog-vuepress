@@ -3944,3 +3944,620 @@ if (!Object.values) Object.values = function(obj) {
 }
 ```
 
+## String
+### String.prototype.at()
+该at()方法接受一个整数值并返回一个String由位于指定偏移量处的单个 UTF-16 代码单元组成的新值。此方法允许正整数和负整数。负整数从最后一个字符串字符开始计数。
+```js
+at(index)
+// String由位于指定位置的单个 UTF-16 代码单元组成。undefined如果找不到给定的索引，则返回。
+
+index
+	要返回的字符串字符的索引（位置）。当传递一个负索引时，支持从字符串末尾进行相对索引；即如果使用负数，则返回的字符将通过从字符串的末尾开始倒数来找到。
+```
+```js
+// A function which returns the last character of a given string
+function returnLast(arr) {
+  return arr.at(-1);
+}
+
+let invoiceRef = 'myinvoice01';
+
+console.log( returnLast(invoiceRef) );
+// Logs: '1'
+
+invoiceRef = 'myinvoice02';
+
+console.log( returnLast(invoiceRef) );
+// Logs: '2'
+```
+### String.prototype.charAt()
+charAt() 方法从一个字符串中返回指定的字符。
+字符串中的字符从左向右索引，第一个字符的索引值为 0，最后一个字符（假设该字符位于字符串 stringName 中）的索引值为 stringName.length - 1。 如果指定的 index 值超出了该范围，则返回一个空字符串。
+```js
+str.charAt(index)
+//返回指定的字符。
+
+index
+	一个介于0 和字符串长度减1之间的整数。 (0~length-1)如果没有提供索引，charAt() 将使用0。
+```
+```js
+var anyString = "Brave new world";
+
+console.log("The character at index 0   is '" + anyString.charAt(0)   + "'"); //The character at index 0 is 'B'
+console.log("The character at index 999 is '" + anyString.charAt(999) + "'"); //The character at index 999 is ''
+```
+### String.prototype.charCodeAt()
+charCodeAt() 方法返回 0 到 65535 之间的整数，表示给定索引处的 UTF-16 代码单元
+```js
+str.charCodeAt(index)
+// 指定 index 处字符的 UTF-16 代码单元值的一个数字；如果 index 超出范围，charCodeAt() 返回 NaN。
+
+index
+	一个大于等于 0，小于字符串长度的整数。如果不是一个数值，则默认为 0。
+```
+```js
+"ABC".charCodeAt(0) // returns 65:"A"
+
+"ABC".charCodeAt(1) // returns 66:"B"
+
+"ABC".charCodeAt(2) // returns 67:"C"
+
+"ABC".charCodeAt(3) // returns NaN
+```
+### String.prototype.codePointAt()
+codePointAt() 方法返回 一个 Unicode 编码点值的非负整数。
+
+如果在指定的位置没有元素则返回 undefined 。如果在索引处开始没有UTF-16 代理对，将直接返回在那个索引处的编码单元。
+```js
+str.codePointAt(pos)
+// 返回值是在字符串中的给定索引的编码单元体现的数字，如果在索引处没找到元素则返回 undefined 。
+
+pos
+	这个字符串中需要转码的元素的位置。
+```
+```js
+'ABC'.codePointAt(1);          // 66
+'\uD800\uDC00'.codePointAt(0); // 65536
+
+'XYZ'.codePointAt(42); // undefined
+```
+```js
+/*! http://mths.be/codepointat v0.1.0 by @mathias */
+if (!String.prototype.codePointAt) {
+  (function() {
+    'use strict'; // 严格模式，needed to support `apply`/`call` with `undefined`/`null`
+    var codePointAt = function(position) {
+      if (this == null) {
+        throw TypeError();
+      }
+      var string = String(this);
+      var size = string.length;
+      // 变成整数
+      var index = position ? Number(position) : 0;
+      if (index != index) { // better `isNaN`
+        index = 0;
+      }
+      // 边界
+      if (index < 0 || index >= size) {
+        return undefined;
+      }
+      // 第一个编码单元
+      var first = string.charCodeAt(index);
+      var second;
+      if ( // 检查是否开始 surrogate pair
+        first >= 0xD800 && first <= 0xDBFF && // high surrogate
+        size > index + 1 // 下一个编码单元
+      ) {
+        second = string.charCodeAt(index + 1);
+        if (second >= 0xDC00 && second <= 0xDFFF) { // low surrogate
+          // http://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
+          return (first - 0xD800) * 0x400 + second - 0xDC00 + 0x10000;
+        }
+      }
+      return first;
+    };
+    if (Object.defineProperty) {
+      Object.defineProperty(String.prototype, 'codePointAt', {
+        'value': codePointAt,
+        'configurable': true,
+        'writable': true
+      });
+    } else {
+      String.prototype.codePointAt = codePointAt;
+    }
+  }());
+}
+```
+### String.prototype.concat()
+concat() 方法将一个或多个字符串与原字符串连接合并，形成一个新的字符串并返回。
+
+concat 方法将一个或多个字符串与原字符串连接合并，形成一个新的字符串并返回。 concat 方法并不影响原字符串。
+
+如果参数不是字符串类型，它们在连接之前将会被转换成字符串。
+```js
+str.concat(str2, [, ...strN])
+// 一个新的字符串，包含参数所提供的连接字符串。
+
+str2 [, ...strN]
+	需要连接到 str 的字符串。
+```
+```js
+let hello = 'Hello, '
+console.log(hello.concat('Kevin', '. Have a nice day.'))
+// Hello, Kevin. Have a nice day.
+
+let greetList = ['Hello', ' ', 'Venkat', '!']
+"".concat(...greetList)  // "Hello Venkat!"
+
+"".concat({})    // [object Object]
+"".concat([])    // ""
+"".concat(null)  // "null"
+"".concat(true)  // "true"
+"".concat(4, 5)  // "45"
+```
+### String.prototype.endsWith()
+endsWith()方法用来判断当前字符串是否是以另外一个给定的子字符串“结尾”的，根据判断结果返回 true 或 false。
+
+```js
+str.endsWith(searchString[, length])
+// 如果传入的子字符串在搜索字符串的末尾则返回true；否则将返回 false。
+
+searchString
+	要搜索的子字符串。
+length 可选
+	作为 str 的长度。默认值为 str.length。
+```
+```js
+var str = "To be, or not to be, that is the question.";
+
+alert( str.endsWith("question.") );  // true
+alert( str.endsWith("to be") );      // false
+alert( str.endsWith("to be", 19) );  // true
+```
+```js
+if (!String.prototype.endsWith) {
+	String.prototype.endsWith = function(search, this_len) {
+		if (this_len === undefined || this_len > this.length) {
+			this_len = this.length;
+		}
+		return this.substring(this_len - search.length, this_len) === search;
+	};
+}
+```
+### String.fromCodePoint()
+静态 String.fromCharCode() 方法返回由指定的 UTF-16 代码单元序列创建的字符串。
+```js
+String.fromCharCode(65, 66, 67);   // 返回 "ABC"
+String.fromCharCode(0x2014);       // 返回 "—"
+String.fromCharCode(0x12014);      // 也是返回 "—"; 数字 1 被剔除并忽略
+String.fromCharCode(8212);         // 也是返回 "—"; 8212 是 0x2014 的十进制表示
+```
+### String.fromCodePoint()
+String.fromCodePoint() 静态方法返回使用指定的代码点序列创建的字符串。
+```js
+String.fromCodePoint(42);       // "*"
+String.fromCodePoint(65, 90);   // "AZ"
+String.fromCodePoint(0x404);    // "\u0404"
+String.fromCodePoint(0x2F804);  // "\uD87E\uDC04"
+String.fromCodePoint(194564);   // "\uD87E\uDC04"
+String.fromCodePoint(0x1D306, 0x61, 0x1D307) // "\uD834\uDF06a\uD834\uDF07"
+
+String.fromCodePoint('_');      // RangeError
+String.fromCodePoint(Infinity); // RangeError
+String.fromCodePoint(-1);       // RangeError
+String.fromCodePoint(3.14);     // RangeError
+String.fromCodePoint(3e-2);     // RangeError
+String.fromCodePoint(NaN);      // RangeError
+```
+### String.prototype.includes()
+includes() 方法用于判断一个字符串是否包含在另一个字符串中，根据情况返回 true 或 false。
+
+这个方法可以帮你判断一个字符串是否包含另外一个字符串。
+
+includes() 方法是区分大小写的。
+
+```js
+str.includes(searchString[, position])
+// 如果当前字符串包含被搜寻的字符串，就返回 true；否则返回 false。
+
+
+searchString
+	要在此字符串中搜索的字符串。
+position 可选
+	从当前字符串的哪个索引位置开始搜寻子字符串，默认值为 0。
+```
+```js
+var str = 'To be, or not to be, that is the question.';
+
+console.log(str.includes('To be'));       // true
+console.log(str.includes('question'));    // true
+console.log(str.includes('nonexistent')); // false
+console.log(str.includes('To be', 1));    // false
+console.log(str.includes('TO BE'));       // false
+```
+```js
+if (!String.prototype.includes) {
+  String.prototype.includes = function(search, start) {
+    'use strict';
+    if (typeof start !== 'number') {
+      start = 0;
+    }
+
+    if (start + search.length > this.length) {
+      return false;
+    } else {
+      return this.indexOf(search, start) !== -1;
+    }
+  };
+}
+```
+### String.prototype.indexOf()
+indexOf() 方法返回调用它的 String 对象中第一次出现的指定值的索引，从 fromIndex 处进行搜索。如果未找到该值，则返回 -1。
+
+indexOf 和区分大小写
+
+```js
+str.indexOf(searchValue [, fromIndex])
+// 查找的字符串 searchValue 的第一次出现的索引，如果没有找到，则返回 -1。
+
+
+searchValue
+	要被查找的字符串值。
+	如果没有提供确切地提供字符串，searchValue 会被强制设置为 "undefined"， 然后在当前字符串中查找这个值。
+	举个例子：'undefined'.indexOf() 将会返回0，因为 undefined 在位置0处被找到，但是 'undefine'.indexOf() 将会返回 -1 ，因为字符串 'undefined' 未被找到。
+fromIndex 可选
+	数字表示开始查找的位置。可以是任意整数，默认值为 0。
+	如果 fromIndex 的值小于 0，或者大于 str.length ，那么查找分别从 0 和str.length 开始。（译者注：  fromIndex 的值小于 0，等同于为空情况； fromIndex 的值大于或等于 str.length ，那么结果会直接返回 -1 。）
+	举个例子，'hello world'.indexOf('o', -5) 返回 4 ，因为它是从位置0处开始查找，然后 o 在位置4处被找到。另一方面，'hello world'.indexOf('o', 11) （或 fromIndex 填入任何大于11的值）将会返回 -1 ，因为开始查找的位置11处，已经是这个字符串的结尾了。
+```
+```js
+"Blue Whale".indexOf("Blue")       // 返回 0
+"Blue Whale".indexOf("Blute")      // 返回 -1
+"Blue Whale".indexOf("Whale", 0)   // 返回 5
+"Blue Whale".indexOf("Whale", 5)   // 返回 5
+"Blue Whale".indexOf("", -1)       // 返回 0
+"Blue Whale".indexOf("", 9)        // 返回 9
+"Blue Whale".indexOf("", 10)       // 返回 10
+"Blue Whale".indexOf("", 11)       // 返回 10
+```
+### String.prototype.lastIndexOf()
+ lastIndexOf() 方法返回调用String 对象的指定值最后一次出现的索引，在一个字符串中的指定位置 fromIndex处从后向前搜索。如果没找到这个特定值则返回-1 。
+
+该方法将从尾到头地检索字符串 str，看它是否含有子串 searchValue。开始检索的位置在字符串的 fromIndex 处或字符串的结尾（没有指定 fromIndex 时）。如果找到一个 searchValue，则返回 searchValue 的第一个字符在 str 中的位置。str中的字符位置是从 0 开始的。
+
+lastIndexOf 方法区分大小写。例如，下面的表达式返回 -1：
+
+```js
+var anyString = "Brave new world";
+
+console.log("The index of the first w from the beginning is " + anyString.indexOf("w"));
+// Displays 8
+console.log("The index of the first w from the end is " + anyString.lastIndexOf("w"));
+// Displays 10
+
+console.log("The index of 'new' from the beginning is " + anyString.indexOf("new"));
+// Displays 6
+console.log("The index of 'new' from the end is " + anyString.lastIndexOf("new"));
+// Displays 6
+```
+### String.prototype.match()
+ match() 方法检索返回一个字符串匹配正则表达式的结果。
+ 如果正则表达式不包含 g 标志，str.match() 将返回与 RegExp.exec(). 相同的结果。
+ ```js
+ str.match(regexp)
+ //如果使用g标志，则将返回与完整正则表达式匹配的所有结果，但不会返回捕获组。
+ //如果未使用g标志，则仅返回第一个完整匹配及其相关的捕获组（Array）。 在这种情况下，返回的项目将具有如下所述的其他属性。
+```
+```js
+var str = 'For more information, see Chapter 3.4.5.1';
+var re = /see (chapter \d+(\.\d)*)/i;
+var found = str.match(re);
+
+console.log(found);
+
+// logs [ 'see Chapter 3.4.5.1',
+//        'Chapter 3.4.5.1',
+//        '.1',
+//        index: 22,
+//        input: 'For more information, see Chapter 3.4.5.1' ]
+
+// 'see Chapter 3.4.5.1' 是整个匹配。
+// 'Chapter 3.4.5.1' 被'(chapter \d+(\.\d)*)'捕获。
+// '.1' 是被'(\.\d)'捕获的最后一个值。
+// 'index' 属性(22) 是整个匹配从零开始的索引。
+// 'input' 属性是被解析的原始字符串。
+```
+```js
+var str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+var regexp = /[A-E]/gi;
+var matches_array = str.match(regexp);
+
+console.log(matches_array);
+// ['A', 'B', 'C', 'D', 'E', 'a', 'b', 'c', 'd', 'e']
+```
+```js
+var str1 = "NaN means not a number. Infinity contains -Infinity and +Infinity in JavaScript.",
+    str2 = "My grandfather is 65 years old and My grandmother is 63 years old.",
+    str3 = "The contract was declared null and void.";
+str1.match("number");   // "number" 是字符串。返回["number"]
+str1.match(NaN);        // NaN的类型是number。返回["NaN"]
+str1.match(Infinity);   // Infinity的类型是number。返回["Infinity"]
+str1.match(+Infinity);  // 返回["Infinity"]
+str1.match(-Infinity);  // 返回["-Infinity"]
+str2.match(65);         // 返回["65"]
+str2.match(+65);        // 有正号的number。返回["65"]
+str3.match(null);       // 返回["null"]
+```
+### String.prototype.matchAll()
+matchAll() 方法返回一个包含所有匹配正则表达式的结果及分组捕获组的迭代器。
+
+如果使用 matchAll ，就可以不必使用 while 循环加 exec 方式（且正则表达式需使用 /g 标志）。
+```js
+str.matchAll(regexp)
+//一个迭代器（不可重用，结果耗尽需要再次调用方法，获取一个新的迭代器）。
+```
+```js
+Regexp.exec() 和 matchAll()
+在 matchAll 出现之前，通过在循环中调用 regexp.exec() 来获取所有匹配项信息（regexp 需使用 /g 标志）：
+
+const regexp = RegExp('foo[a-z]*','g');
+const str = 'table football, foosball';
+let match;
+
+while ((match = regexp.exec(str)) !== null) {
+  console.log(`Found ${match[0]} start=${match.index} end=${regexp.lastIndex}.`);
+  // expected output: "Found football start=6 end=14."
+  // expected output: "Found foosball start=16 end=24."
+}
+```
+```js
+var regexp = /t(e)(st(\d?))/g;
+var str = 'test1test2';
+str.match(regexp);
+// Array ['test1', 'test2']
+
+
+let array = [...str.matchAll(regexp)];
+array[0];
+// ['test1', 'e', 'st1', '1', index: 0, input: 'test1test2', length: 4]
+array[1];
+// ['test2', 'e', 'st2', '2', index: 5, input: 'test1test2', length: 4]
+```
+### String.prototype.padEnd()
+padEnd()  方法会用一个字符串填充当前字符串（如果需要的话则重复填充），返回填充后达到指定长度的字符串。从当前字符串的末尾（右侧）开始填充。
+
+```js
+str.padEnd(targetLength [, padString])
+//在原字符串末尾填充指定的填充字符串直到目标长度所形成的新字符串。
+```
+```js
+'abc'.padEnd(10);          // "abc       "
+'abc'.padEnd(10, "foo");   // "abcfoofoof"
+'abc'.padEnd(6, "123456"); // "abc123"
+'abc'.padEnd(1);           // "abc"
+```
+```js
+// https://github.com/uxitten/polyfill/blob/master/string.polyfill.js
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/padEnd
+if (!String.prototype.padEnd) {
+    String.prototype.padEnd = function padEnd(targetLength,padString) {
+        targetLength = targetLength>>0; //floor if number or convert non-number to 0;
+        padString = String((typeof padString !== 'undefined' ? padString: ''));
+        if (this.length > targetLength) {
+            return String(this);
+        }
+        else {
+            targetLength = targetLength-this.length;
+            if (targetLength > padString.length) {
+                padString += padString.repeat(targetLength/padString.length); //append to original to ensure we are longer than needed
+            }
+            return String(this) + padString.slice(0,targetLength);
+        }
+    };
+}
+```
+### String.prototype.padStart()
+padStart() 方法用另一个字符串填充当前字符串(如果需要的话，会重复多次)，以便产生的字符串达到给定的长度。从当前字符串的左侧开始填充
+```js
+'abc'.padStart(10);         // "       abc"
+'abc'.padStart(10, "foo");  // "foofoofabc"
+'abc'.padStart(6,"123465"); // "123abc"
+'abc'.padStart(8, "0");     // "00000abc"
+'abc'.padStart(1);          // "abc"
+```
+```js
+// https://github.com/uxitten/polyfill/blob/master/string.polyfill.js
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/padStart
+if (!String.prototype.padStart) {
+    String.prototype.padStart = function padStart(targetLength,padString) {
+        targetLength = targetLength>>0; //floor if number or convert non-number to 0;
+        padString = String((typeof padString !== 'undefined' ? padString : ' '));
+        if (this.length > targetLength) {
+            return String(this);
+        }
+        else {
+            targetLength = targetLength-this.length;
+            if (targetLength > padString.length) {
+                padString += padString.repeat(targetLength/padString.length); //append to original to ensure we are longer than needed
+            }
+            return padString.slice(0,targetLength) + String(this);
+        }
+    };
+}
+```
+### String.prototype.repeat()
+repeat() 构造并返回一个新字符串，该字符串包含被连接在一起的指定数量的字符串的副本。
+```js
+str.repeat(count)
+//  包含指定字符串的指定数量副本的新字符串。
+
+
+count
+	介于 0 和 +Infinity 之间的整数。表示在新构造的字符串中重复了多少遍原字符串。
+```
+```js
+"abc".repeat(-1)     // RangeError: repeat count must be positive and less than inifinity
+"abc".repeat(0)      // ""
+"abc".repeat(1)      // "abc"
+"abc".repeat(2)      // "abcabc"
+"abc".repeat(3.5)    // "abcabcabc" 参数count将会被自动转换成整数.
+"abc".repeat(1/0)    // RangeError: repeat count must be positive and less than inifinity
+
+({toString : () => "abc", repeat : String.prototype.repeat}).repeat(2)
+//"abcabc",repeat是一个通用方法,也就是它的调用者可以不是一个字符串对象.
+```
+```js
+if (!String.prototype.repeat) {
+  String.prototype.repeat = function(count) {
+    'use strict';
+    if (this == null) {
+      throw new TypeError('can\'t convert ' + this + ' to object');
+    }
+    var str = '' + this;
+    count = +count;
+    if (count != count) {
+      count = 0;
+    }
+    if (count < 0) {
+      throw new RangeError('repeat count must be non-negative');
+    }
+    if (count == Infinity) {
+      throw new RangeError('repeat count must be less than infinity');
+    }
+    count = Math.floor(count);
+    if (str.length == 0 || count == 0) {
+      return '';
+    }
+    // 确保 count 是一个 31 位的整数。这样我们就可以使用如下优化的算法。
+    // 当前（2014年8月），绝大多数浏览器都不能支持 1 << 28 长的字符串，所以：
+    if (str.length * count >= 1 << 28) {
+      throw new RangeError('repeat count must not overflow maximum string size');
+    }
+    var rpt = '';
+    for (;;) {
+      if ((count & 1) == 1) {
+        rpt += str;
+      }
+      count >>>= 1;
+      if (count == 0) {
+        break;
+      }
+      str += str;
+    }
+    return rpt;
+  }
+}
+```
+### String.prototype.toLowerCase()
+toLowerCase() 会将调用该方法的字符串值转为小写形式，并返回。
+```js
+console.log('中文简体 zh-CN || zh-Hans'.toLowerCase());
+// 中文简体 zh-cn || zh-hans
+
+console.log( "ALPHABET".toLowerCase() );
+// "alphabet"
+```
+### String.prototype.toUpperCase()
+toUpperCase() 方法将调用该方法的字符串转为大写形式并返回（如果调用该方法的值不是字符串类型会被强制转换）。
+
+toUpperCase() 返回转为大写形式的字符串。此方法不会影响原字符串本身的值，因为JavaScript中字符串的值是不可改变的。
+
+```js
+console.log('alphabet'.toUpperCase()); // 'ALPHABET'
+```
+### String.prototype.trim()
+### String.prototype.trimRight()
+### String.prototype.trimStart()
+trim() 方法会从一个字符串的两端删除空白字符。在这个上下文中的空白字符是所有的空白字符 (space, tab, no-break space 等) 以及所有行终止符字符（如 LF，CR等）。
+
+trimEnd() 方法从一个字符串的末端移除空白字符。trimRight() 是这个方法的别名。
+
+trimStart() 方法从字符串的开头删除空格。trimLeft() 是此方法的别名。
+
+```js
+var orig = '   foo  ';
+console.log(orig.trim()); // 'foo'
+// 另一个 .trim() 例子，只从一边删除
+var orig = 'foo    ';
+console.log(orig.trim()); // 'foo'
+
+
+
+var str = "   foo  ";
+alert(str.length); // 8
+str = str.trimRight();  // 或写成str = str.trimEnd();
+console.log(str.length); // 6
+console.log(str);       // '   foo'
+
+
+
+var str = "   foo  ";
+console.log(str.length); // 8
+str = str.trimStart()    // 等同于 str = str.trimLeft();
+console.log(str.length); // 5
+console.log(str);        // "foo  "
+```
+### String.prototype.split()
+split() 方法使用指定的分隔符字符串将一个String对象分割成子字符串数组，以一个指定的分割字串来决定每个拆分的位置。 
+
+```js
+str.split([separator[, limit]])
+//返回源字符串以分隔符出现位置分隔而成的一个 Array 
+
+
+separator
+	指定表示每个拆分应发生的点的字符串。separator 可以是一个字符串或正则表达式。 如果纯文本分隔符包含多个字符，则必须找到整个字符串来表示分割点。如果在str中省略或不出现分隔符，则返回的数组包含一个由整个字符串组成的元素。如果分隔符为空字符串，则将str原字符串中每个字符的数组形式返回。
+limit
+	一个整数，限定返回的分割片段数量。当提供此参数时，split 方法会在指定分隔符的每次出现时分割该字符串，但在限制条目已放入数组时停止。如果在达到指定限制之前达到字符串的末尾，它可能仍然包含少于限制的条目。新数组中不返回剩下的文本。
+```
+```js
+var myString = "Hello World. How are you doing?";
+var splits = myString.split(" ", 3);
+console.log(splits); //["Hello", "World.", "How"]
+
+
+var myString = "Hello 1 word. Sentence number 2.";
+var splits = myString.split(/(\d)/);
+console.log(splits); //[ "Hello ", "1", " word. Sentence number ", "2", "." ]
+```
+### String.prototype.slice()
+slice() 方法提取某个字符串的一部分，并返回一个新的字符串，且不会改动原字符串。
+
+```js
+str.slice(beginIndex[, endIndex])
+//返回一个从原字符串中提取出来的新字符串
+
+beginIndex
+	从该索引（以 0 为基数）处开始提取原字符串中的字符。如果值为负数，会被当做 strLength + beginIndex 看待，这里的strLength 是字符串的长度（例如， 如果 beginIndex 是 -3 则看作是：strLength - 3）
+endIndex
+	可选。在该索引（以 0 为基数）处结束提取字符串。如果省略该参数，slice() 会一直提取到字符串末尾。如果该参数为负数，则被看作是 strLength + endIndex，这里的 strLength 就是字符串的长度(例如，如果 endIndex 是 -3，则是, strLength - 3)。
+```
+```js
+var str1 = 'The morning is upon us.', // str1 的长度 length 是 23。
+    str2 = str1.slice(1, 8),
+    str3 = str1.slice(4, -2),
+    str4 = str1.slice(12),
+    str5 = str1.slice(30);
+console.log(str2); // 输出：he morn
+console.log(str3); // 输出：morning is upon u
+console.log(str4); // 输出：is upon us.
+console.log(str5); // 输出：""
+
+
+var str = 'The morning is upon us.';
+str.slice(-3);     // 返回 'us.'
+str.slice(-3, -1); // 返回 'us'
+str.slice(0, -1);  // 返回 'The morning is upon us'
+```
+### String.prototype.search()
+如果匹配成功，则 search() 返回正则表达式在字符串中首次匹配项的索引;否则，返回 -1。
+```js
+str.search(regexp)
+```
+```js
+var str = "hey JudE";
+var re = /[A-Z]/g;
+var re2 = /[.]/g;
+console.log(str.search(re)); // returns 4, which is the index of the first capital letter "J"
+console.log(str.search(re2)); // returns -1 cannot find '.' dot punctuation`
+```

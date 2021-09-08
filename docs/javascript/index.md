@@ -6320,4 +6320,131 @@ a //undefined
 b //ReferenceErro:b is not defined
 ```
 可以使用`typeof`的安全防范机制（阻止报错）来检查`undeclared`变量，有时是个不错的办法。
+
 ### 值
+#### 数组
+```js
+var a = [1,'2',[3]]
+a.length  //3
+a[0] === 1 //true
+a[2][0] === 3 //true
+
+
+
+var a = []
+a.length //0
+a[0] = 1
+a[1] = '2'
+a[2] = [3]
+a.length //3
+```
+如果字符串键值能够被强制类型转换为十进制数字的话，它就会被当作数字索引来处理。
+```js
+var a = []
+a['13'] = 42
+a.length //14
+```
+**类数组**
+```js
+var arr = Array.prototype.slice.call(arguments)
+
+var arr = Array.from(arguments)
+```
+#### 字符串
+```js
+var a = "foo"
+var b = ['f','o','o']
+```
+#### 数字
+JavaScript只有一种数值类型：`number(数字)`，包括“整数”和带小数的十进制数。
+JavaScript中的“整数”就是没有小数的十进制数。所以42.0就等于42
+
+```js
+var a = 42
+var b = 42.3
+
+var a = 0.42
+var b = .42
+
+var a = 42.0
+var b = 42.
+
+var a = 5E10
+a //500000000
+a.toExponential() //5e+10
+
+var b = a * a
+b //2.5e+21
+
+var c = 1/as
+c //2e-11
+
+
+var a = 42.59
+//指定小数部分的显示位数
+a.toFixed(0) //43
+a.toFixed(4) //42.5900
+(42).toFixed(3) //42.000
+0.42.toFixed(3) //0.420
+42..toFixed(3)  //42.000
+
+var a = 42.59
+//指定有效数位的显示位数
+a.toPrecision(1) //4e+1
+a.toPrecision(2) //43
+a.toPrecision(6) //42.5900
+```
+
+#### 特殊值
+
+**不是值的值**
+
+undefined 类型只有一个值，即 undef ined。nuL 类型也只有一个值，即 nu。它们的名称既是类型也是值
+
+undefined 和 nuLL 常被用来表示“空的”值或“不是值”的值。二者之间有一些细微的差别。例如
+
+- null 指空值（empty value)
+
+- undefined 指没有值（missing value)
+
+或者
+
+- undefined 指从未赋值
+
+- null指曾赋过值，但是目前没有值
+
+null 是一个特殊关键字，不是标识符，我们不能将其当作变量来使用和赋值。然而  undefined 却是一个标识符，可以被当作变量来使用和赋值。
+
+#### 特殊数组
+
+1. **不是数字的数字**
+
+如果数学运算的操作数不是数字类型（或者无法解析为常规的十进制或十六进制数字就无法返有效的数字，这种情况下返回值为 NaN。
+
+NaN 意指“不是一个数字”（not a number），这个名字容易引起误会，后面将会提到。将它理解为“无效数值”“失败数值”或者“坏数值”可能更准确些。
+
+NaN 是一个“警戒值”（sentinel value，有特殊用途的常规值），用于指出数字类型中的错误情况，即“执行数学运算没有成功，这是失败后返回的结果”
+
+有人也许认为如果要检查变量的值是否为 NaN 可以直接和 NaN 进行比较，就像比较和 undefined 那。实则不然
+
+```js
+var a = 2/'foo'   //NaN
+typeof a === 'number'  //true
+
+
+
+var a = 2/'foo'
+a == NaN  //false
+a === NaN //false
+
+
+//最好的检测
+var a = 2/'foo'
+var b = 'foo'
+
+Number.isNaN(a)  //true
+Number.isNaN(b)  //false
+```
+
+### 原生函数
+
