@@ -103,6 +103,12 @@ module.exports = {
               ]
             },
             {
+              text: '性能优化',
+              items: [
+                { text: '性能优化', link: '/interview/performance-optimization' },
+              ]
+            },
+            {
               text: '其他',
               items: [
                 { text: '其他', link: '/interview/other' },

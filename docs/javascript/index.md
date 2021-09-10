@@ -3652,7 +3652,7 @@ clearInterval(interval)
 interval = null
 ```
 
-#### **事件委托/事件代理**
+#### 事件委托/事件代理
 
 不在事件发生的直接DOM上设置监听函数，而在其父元素上设置监听函数，通过事件冒泡，父元素可以监听到子元素上事件的触发，通过判断事件发生元素DOM的类型（使用target属性），来做出不同的响应。
 
@@ -3836,7 +3836,7 @@ JS`是单线程的，为了防止一个函数执行时间过长阻塞后面的�
 
 JS运行的环境。一般为浏览器或者Node。 在浏览器环境中，有JS 引擎线程和渲染线程，且两个线程互斥。 Node环境中，只有JS 线程。 不同环境执行机制有差异，不同任务进入不同Event Queue队列。 当主程结束，先执行准备好微任务，然后再执行准备好的宏任务，一个轮询结束。
 
-#### **浏览器中的事件环（Event Loop)**
+#### 浏览器中的事件环（Event Loop)
 
 事件环的运行机制是，先会执行栈中的内容，栈中的内容执行后执行微任务，微任务清空后再执行宏任务，先取出一个宏任务，再去执行微任务，然后在取宏任务清微任务这样不停的循环。
 
@@ -3858,7 +3858,7 @@ JS运行的环境。一般为浏览器或者Node。 在浏览器环境中，有J
    语言本身提供的，比如promise.then
    then、queueMicrotask(基于then)、mutationObserver(浏览器提供)、messageChannel 、mutationObersve
 
-#### **Node 环境中的事件环（Event Loop)**
+#### Node 环境中的事件环（Event Loop)
 
 `Node`是基于V8引擎的运行在服务端的`JavaScript`运行环境，在处理高并发、I/O密集(文件操作、网络操作、数据库操作等)场景有明显的优势。虽然用到也是V8引擎，但由于服务目的和环境不同，导致了它的API与原生JS有些区别，其Event Loop还要处理一些I/O，比如新的网络连接等，所以Node的Event Loop(事件环机制)与浏览器的是不太一样。
 
@@ -4596,7 +4596,7 @@ foo() //ReferenceError:a is not defined
 
 排除了一些对this的错误理解并且明白了每个函数的this是在调用时绑定的，完全取决于函数的调用位置（函数的调用方法）。
 
-#### **调用位置**
+#### 调用位置
 
 理解调用位置：调用位置就是函数在代码中被调用的位置（而不是声明位置）。
 
@@ -5425,7 +5425,7 @@ for(var v of myOject){
 }
 ```
 
-### **混合对象"类"**
+### 混合对象"类"
 
 在子类（而不是它们创建的实例对象！）中也可以相对引用它继承的父类，这种`相对`引用通常被称为`super`。
 
@@ -5523,9 +5523,9 @@ Another.greeting
 Another.count
 ```
 
-### **原型**
+### 原型
 
-#### **[[Prototype]]**
+#### [[Prototype]]
 
 `JavaScript`中的对象有一个特殊的`[[Prototype]]`内置属性，其实就是对于其他对象的引用。几乎所有的对象在创建时候`[[Prototype]]`属性都会被赋予一个非空值。
 
@@ -6447,4 +6447,80 @@ Number.isNaN(b)  //false
 ```
 
 ### 原生函数
+常用的原生函数有：
+- String()
+- Number()
+- Boolean()
+- Array()
+- Object()
+- Function()
+- RegExp()
+- Date()
+- Error()
+- Symbol()
 
+```js
+// 构造函数创建出来的是封装了基本类型的值的封装对象
+var s = new String("Hello World!") 
+console.log(s.toString()) //"Hello World!"
+
+typeof a //是“object” 不是 “string”
+
+a instanceof String //true
+
+Object.prototype.toString.call(a) //"[object String]"
+```
+#### 内部属性[[Class]]
+所有`typeof`返回值为`object`的对象，都包含一个内部属性`[[Class]]`。这个属性无法直接访问。
+一般通过`Object.prototype.toString(..)`
+
+```js
+Object.prototype.toString.call([1,2,3]) //"[object Array]"
+Object.prototype.toString.call(/regex-literal/i) //"[object Regex]"
+
+Object.prototype.toString.call(null) //"[object Null]"
+Object.prototype.toString.call(undefined) //"[object Undefined]"
+
+Object.prototype.toString.call("abc") //"[object String]"
+Object.prototype.toString.call(42) //"[object Numeber]"
+Object.prototype.toString.call(true) //"[object Boolean]"
+```
+#### 拆封
+如果想要得到拆封对象中的基本类型值，可以使用`valueOf()`函数：
+```js
+var a = new String('abc')
+var b = new Number(42)
+var c = new Boolean(true)
+
+a.valueOf() //abc
+b.valueOf() //42
+c.valueOf() //true
+```
+在需要用到封装对象中的基本类型值的地方会发生隐式拆封。具体过程（即强制类型转换）。
+```js
+var a = new String('abc')
+var b = a + ""
+
+typeof a //object
+typeof b //string
+```
+
+构造函数`Array(..)`不要求必须带`new`关键字。不带时，它会被自动补上，因此`Array(1,2,3)`和`new Array(1,2,3)`的效果是一样的。
+
+Array 构造函数只帯一个数字参数的时候，该参数会被作为数组的预设长度（length），而非只充当数组中的一个元素。
+
+
+我们将包含至少ー个“空単元”的数组称为“稀疏数组”。
+
+我们通过下述方式来创建包含`undefined`单元(而非“空单元”)的数组“
+```js
+var a = Array.apply(null,{ length : 3})
+a //[undefined,undefined,undefined]
+```
+Array 构造函数只帯一个数字参数的时候，该参数会被作为数组的预设长度（length），而非只充当数组中的一个元素
+
+我们将包含至少ー个“空単元”的数组称为“稀疏数组”。
+
+#### 小结
+
+对于单标量基本类型值，比如“abc“，如果要访问它的 Length 属性或 String. Prototype 方法，Javascript 引키擎会自动对该值进行封装（即用相应类型的封装对象来包装它）来实现对这些属性和方法的访问。
