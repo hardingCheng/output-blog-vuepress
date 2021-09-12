@@ -3880,10 +3880,3 @@ JS运行的环境。一般为浏览器或者Node。 在浏览器环境中，有J
 - `close callbacks`: 执行`close`事件的`callback`，一些关闭的回调函数，如：socket.on('close', ...)
 
 ### 调用栈？？？？
-
-
-
-
-
-
-
