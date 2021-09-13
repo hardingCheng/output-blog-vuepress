@@ -179,3 +179,32 @@ var longestCommonPrefix = function(strs) {
 };
 ```
 
+### 最长回文子串
+
+### 翻转字符串里的单词
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210909110453.png)
+
+####  解析1
+
+```js
+/**
+ * @param {string} s
+ * @return {string}
+ */
+var reverseWords = function(s) {
+  	//直接用API写的
+  	//使用 split 将字符串按空格分割成字符串数组；
+		//使用 reverse 将字符串数组进行反转；
+		//使用 join 方法将字符串数组拼成一个字符串。
+    return s.trim().split(/\s+/).reverse().join(' ')
+};
+```
+
+#### 解析2
+
+```js
+```
+
+
+

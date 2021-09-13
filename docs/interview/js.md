@@ -1,10 +1,12 @@
 JavaScript面试
 
 ## 基础面试问题
-### Var、Let 和 Const 有什么区别
-1. Var
+### var、let 和 const 有什么区别
+1. var
 在ES5中，顶层对象的属性和全局变量是等价的，用`var`声明的变量既是全局变量，也是顶层变量。
 注意：顶层对象，在浏览器环境指的是`window`对象，在`Node`指的是`global`对象。
+- 在变量未赋值时，变量undefined（为使用声明变量时也为undefined）
+- 作用域——var的作用域为方法作用域；只要在方法内定义了，整个方法内的定义变量后的代码都可以使用
 ```js
 var a = 10;
 console.log(window.a) // 10
@@ -47,6 +49,9 @@ console.log(a) // 30
 2. let
 `let`是`ES6`新增的命令，用来声明变量。
 用法类似于`var`，但是所声明的变量，只在`let`命令所在的`代码块内`有效。
+- 在变量为声明前直接使用会报错
+- 作用域——let为块作用域——通常let比var 范围要小
+- let禁止重复声明变量，否则会报错；var可以重复声明
 ```js
 {
     let a = 20
@@ -92,6 +97,8 @@ func()
 3. const
 `const`声明一个只读的常量，一旦声明，常量的值就不能改变。
 这意味着，`const`一旦声明变量，就必须立即初始化，不能留到以后赋值。
+ - const为常量声明方式；声明变量时必须初始化，在后面出现的代码中不能再修改该常量的值
+​ - const实际上保证的，并不是变量的值不得改动，而是变量指向的那个内存地址不得改动
 ```js
 const a = 1
 a = 3
@@ -1758,6 +1765,12 @@ function getDataType (o) {
 我们使用 `typeof` 来判断基本数据类型是 ok 的，不过需要注意当用 `typeof` 来判断 `null` 类型时的问题，如果想要判断一个对象的具体类型可以考虑用 `instanceof`，但是 `instanceof` 也可能判断不准确，比如一个数组，他可以被 `instanceof` 判断为 Object。所以我们要想比较准确的判断对象实例的类型时，可以采取 `Object.prototype.toString.call` 方法。
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210802130036.png)
+
+### Object.assign的理解
+作用：Object.assign可以实现对象的合并。
+- Object.assign会将source里面的可枚举属性复制到target，如果和target的已有属性重名，则会覆盖。
+- 后续的source会覆盖前面的source的同名属性。
+- Object.assign复制的是属性值，如果属性值是一个引用类型，那么复制的其实是引用地址，就会存在引用共享的问题。
 
 ## 常见面试问题
 

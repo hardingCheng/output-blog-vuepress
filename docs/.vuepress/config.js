@@ -95,6 +95,12 @@ module.exports = {
                         ]
                     },
                     {
+                        text: 'html',
+                        items: [
+                            {text: 'html', link: '/interview/html'},
+                        ]
+                    },
+                    {
                         text: 'Vue',
                         items: [
                             {text: 'Vue', link: '/interview/vue'},
