@@ -253,6 +253,7 @@ Array 构造函数只帯一个数字参数的时候，该参数会被作为数�
 对于单标量基本类型值，比如“abc“，如果要访问它的 Length 属性或 String. Prototype 方法，Javascript 引키擎会自动对该值进行封装（即用相应类型的封装对象来包装它）来实现对这些属性和方法的访问。
 
 ## 强制类型转换
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210914080158.png)
 ### 值类型转换
 将值从一种类型转换为另一种类型通常称为`类型转换（type casting）`，这是显式的情况；隐式的情况称为`强制类型转换（coercion）`
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210911101628.png)
@@ -697,6 +698,7 @@ a >= b //true
 因为根据规范` a <= b `被处理为` b < a `，然后将结果反转。因为` b < a `的结果是` false`，所以 `a <= b `的结果是` true`。
 这可能与我们设想的大相径庭，即`<=`应该是“小于或者等于”。实际上`JavaScript`中<=是“不大于”的意思（即`!(a > b)`，处理为`!(b < a）`）。同理` a >= b 处理为 b <= a`。
 
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210914080158.png)
 
 ## 语法
 
