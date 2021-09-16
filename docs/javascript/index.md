@@ -1506,7 +1506,6 @@ const arr = Array(LENGTH).fill('').reduce(acc => acc.concat(WIDTHS), []);
 
 
 柯里化其实就是流水线上的**加工站**，函数组合就是我们的**流水线**。
-
 - 柯里化（Currying）
   - 理解为“加工站”，接受多个参数的函数变换成接受一个单一参数（最初函数的第一个参数）的函数，并且返回接受余下的参数而且返回结果的新函数。
   - 将一个多元函数转为一个单元函数，可以依次调用`f(x,y,z) → f(x)(y)(z)`。
@@ -1530,14 +1529,14 @@ console.log(currySquares(1)(2));
 
 
 - 函数组合（Compose）
-  - 理解为“流水线”，将多个函数组合成一个新的函数，初始数据通过多个函数依次处理，最后整体输出。
-  - 把复杂的逻辑拆分成一个个简单任务，最后组合起来完成任务，使得整个过程的数据流更明确、可控。
-  - 为了保证每个加工站的输出刚好流入下个工作站的输入，必须是单元函数。如果是加工站是多元函数，就需要用到柯里化转为单元函数，再放到流水线上组合使用。
-  - 两个函数组合示例： 注意compose (从右往左的组合顺序执行 )
-
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210916171140.png)
+    - 函数组合可以让我们把**细粒度的函数**重新组合生成一个新的函数。
+    - 理解为“流水线”，将多个函数组合成一个新的函数，初始数据通过多个函数依次处理，最后整体输出。
+    - 把复杂的逻辑拆分成一个个简单任务，最后组合起来完成任务，使得整个过程的数据流更明确、可控。
+    - 为了保证每个加工站的输出刚好流入下个工作站的输入，必须是单元函数。如果是加工站是多元函数，就需要用到柯里化转为单元函数，再放到流水线上组合使用。
+    - 两个函数组合示例： 注意compose (函数组合默认是从右到左执行)
 ```js
 const compose = (f, g) => x => f(g(x))
-
 const f = x => x + 1;
 const g = x => x * 2;
 const fg = compose(f, g);
@@ -1547,6 +1546,17 @@ fg(1) // 3
 - 多个函数组合示例： 如果需要类似管道pipe（从左往右）的数据流，将reduce换成reduceRight即可。
 
 ```js
+function compose(..args){
+    return function(value){
+        return args.reverse().reduce(function (acc,fn){
+            return fn(acc)
+        //acc的初始值
+        },value)
+    }
+}
+
+const compose = (...args) => value => args.reverse().reduce((acc,fn) => fn(acc),value);
+
 const compose = (...fns) => {
   return fns.reduce((acc,cur) => {
     return (...args) => {
@@ -1554,6 +1564,8 @@ const compose = (...fns) => {
     }
   })
 }
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210916214201.png)
+
 // 最后返回的函数先执行
 
 const f = x => {
