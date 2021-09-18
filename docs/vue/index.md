@@ -1,342 +1,490 @@
 # Vue使用技巧
-## Vue技巧
-#### 路由参数解耦
+## Vue
+### Vue.js 响应式原理
+#### 准备工作
+1. **数据驱动**
+- 数据响应式、双向绑定、数据驱动
+    - 数据响应式
+        - 数据模型仅仅是普通的 Javascript 对象，而当我们修改数据时，视图会进行更新，避免了繁琐的 DOM 操作，提高开发效率
+    - 双向绑定
+        - 数据改变，视图改变；视图改变，数据也随之改变
+        - 我们可以使用 v-model 在表单元素上创建双向数据绑定
+    - 数据驱动是 Vue 最独特的特性之一
+        - 开发过程中仅需要关注数据本身，不需要关心数据是如何渲染到视图
+
+2. 响应式原理原理
+**Vue2.x**
+普通的 JavaScript 对象传入 Vue 实例作为 data 选项，Vue 将遍历此对象所有的 property，并使用 Object.defineProperty 把这些 property 全部转为 getter/setter。Object.defineProperty 是 ES5 中一个无法 shim 的特性，这也就是 Vue 不支持 IE8 以及更低版本浏览器的原因。
+
+**Vue3.x**
+data 函数中返回一个普通的 JavaScript 对象时，Vue 会将该对象包裹在一个带有 get 和 set 处理程序的 Proxy 中。
+
+
+3. 发布订阅模式
+我们假定，存在一个“信号中心“某个任务执行完成。就向信号中心发布“(publish）个信号，其他任务可以向信号中心“订阅“(subscribe）这个信号，从而知道什么时候自己可以开始执行。这就叫做发布订阅模" (Publish-subscribe pattern)
+- 发布/订阅模式
+    - 订阅者
+    - 发布者
+    - 信号中心
 ```js
-// 一般在组件内使用路由参数，大多数人会这样做：
-export default {
-    methods: {
-        getParamsId() {
-            return this.$route.params.id
+ // 事件触发器
+    class EventEmitter {
+      constructor () {
+        // { 'click': [fn1, fn2], 'change': [fn] }
+        this.subs = Object.create(null)
+      }
+
+      // 注册事件
+      $on (eventType, handler) {
+        this.subs[eventType] = this.subs[eventType] || []
+        this.subs[eventType].push(handler)
+      }
+
+      // 触发事件
+      $emit (eventType) {
+        if (this.subs[eventType]) {
+          this.subs[eventType].forEach(handler => {
+            handler()
+          })
         }
+      }
     }
-}
-// 在组件中使用 $route 会使之与其对应路由形成高度耦合，从而使组件只能在某些特定的 URL 上使用，限制了其灵活性。
-//
-// 正确的做法是正确的做法是通过 props 解耦
-const router = new VueRouter({
-    routes: [{
-        path:  /user/:id ,
-        component: User,
-        props: true,//开启props
-    }]
-})
-// 将路由的 props 属性设置为 true 后，组件内可通过 props 接收到 params 参数
-export default {
-    props: [ id ],
-    methods: {
-        getParamsId() {
-            return this.id
-        }
-    }
-}
+
+    // 测试
+    let em = new EventEmitter()
+    em.$on('click', () => {
+      console.log('click1')
+    })
+    em.$on('click', () => {
+      console.log('click2')
+    })
+
+    em.$emit('click')
 ```
 
-#### 函数式组件
-:::tip 提示
-函数式组件是无状态，它无法实例化，没有任何的生命周期和方法。创建函数式组件也很简单，只需要在模板添加 `functional` 声明即可。**一般适合只依赖于外部数据的变化而变化的组件，因其轻量，渲染性能也会有所提高。**
-组件需要的一切都是通过 `context` 参数传递。它是一个上下文对象，具体属性查看文档。这里 `props` 是一个包含所有绑定属性的对象。
-:::
-
+2. 观察者模式(Vue使用的)
+- 观察者（订阅者）- Watcher
+    - update (）：当事件发生时，具体要做的事情
+- 目标（发布者）-Dep
+    - subs 数组：存储所有的观察者
+    - addsub：添加观察者
+    - notify：当事件发生，调用所有观察者的 update（）方法
+没有事件中心
 ```js
-//函数式组件
-<template functional>
-    <div class="list">
-        <div class="item" v-for="item in props.list" :key="item.id" @click="props.itemClick(item)">
-            <p>{{item.title}}</p>
-            <p>{{item.content}}</p>
-        </div>
-    </div>
-</template>
-```
-```js
-//父组件调用
-<template>
-    <div>
-        <List :list="list" :itemClick="item => (currentItem = item)" />
-    </div>
-</template>
-
-import List from  @/components/List.vue
-export default {
-    components: {
-        List
-    },
-    data() {
-        return {
-            list: [{
-                title:  title ,
-                content:  content
-            }],
-            currentItem:
+// 发布者-目标
+    class Dep {
+      constructor () {
+        // 记录所有的订阅者
+        this.subs = []
+      }
+      // 添加订阅者
+      addSub (sub) {
+        if (sub && sub.update) {
+          this.subs.push(sub)
         }
+      }
+      // 发布通知
+      notify () {
+        this.subs.forEach(sub => {
+          sub.update()
+        })
+      }
     }
-}
-```
-#### 样式穿透
-:::tip 提示
-在开发中修改第三方组件样式是很常见，但由于 `scoped` 属性的样式隔离，可能需要去除 scoped 或是另起一个 `style` 。这些做法都会带来副作用（组件样式污染、不够优雅），样式穿透在css预处理器中使用才生效。
-我们可以使用 `>>>` 或 `/deep/` 解决这一问题。
-:::
-```css
-<style scoped>
-外层 >>> .el-checkbox {
-  display: block;
-  font-size: 26px;
+    // 订阅者-观察者
+    class Watcher {
+      update () {
+        console.log('update')
+      }
+    }
 
-  .el-checkbox__label {
-    font-size: 16px;
+    // 测试
+    let dep = new Dep()
+    let watcher = new Watcher()
+
+    dep.addSub(watcher)
+
+    dep.notify()
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210918085541.png)
+
+
+#### 模拟Vue响应式
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210918085942.png)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210918215643.png)
+1. Vue
+```js
+class Vue {
+  constructor (options) {
+    // 1. 通过属性保存选项的数据
+    this.$options = options || {}
+    this.$data = options.data || {}
+    this.$el = typeof options.el === 'string' ? document.querySelector(options.el) : options.el
+    // 2. 把data中的成员转换成getter和setter，注入到vue实例中
+    this._proxyData(this.$data)
+    // 3. 调用observer对象，监听数据的变化
+    new Observer(this.$data)
+    // 4. 调用compiler对象，解析指令和差值表达式
+    new Compiler(this)
+  }
+  _proxyData (data) {
+    // 遍历data中的所有属性
+    Object.keys(data).forEach(key => {
+      // 把data的属性注入到vue实例中
+      Object.defineProperty(this, key, {
+        enumerable: true,
+        configurable: true,
+        get () {
+          return data[key]
+        },
+        set (newValue) {
+          if (newValue === data[key]) {
+            return
+          }
+          data[key] = newValue
+        }
+      })
+    })
   }
 }
-</style>
-
-<style scoped>
-/deep/ .el-checkbox {
-  display: block;
-  font-size: 26px;
-  .el-checkbox__label {
-    font-size: 16px;
+```
+2. Observer
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210918090750.png)
+- 功能
+    - 负责把 data 选项中的属性转换成响应式数据
+    - data 中的某个属性也是对象，把该属性转换成响应式数据
+    - 数据变化发送通知
+```js
+class Observer {
+  constructor (data) {
+    this.walk(data)
+  }
+  walk (data) {
+    // 1. 判断data是否是对象
+    if (!data || typeof data !== 'object') {
+      return
+    }
+    // 2. 遍历data对象的所有属性
+    Object.keys(data).forEach(key => {
+      this.defineReactive(data, key, data[key])
+    })
+  }
+  defineReactive (obj, key, val) {
+    let that = this
+    // 负责收集依赖，并发送通知
+    let dep = new Dep()
+    // 如果val是对象，把val内部的属性转换成响应式数据
+    this.walk(val)
+    Object.defineProperty(obj, key, {
+      enumerable: true,
+      configurable: true,
+      get () {
+        // 收集依赖
+        Dep.target && dep.addSub(Dep.target)
+        return val
+      },
+      set (newValue) {
+        if (newValue === val) {
+          return
+        }
+        val = newValue
+        that.walk(newValue)
+        // 发送通知
+        dep.notify()
+      }
+    })
   }
 }
-</style>
 ```
-#### watch高阶使用
-组件创建后watch能够立即执行。立即执行。
+
+3. Compiler
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210918093554.png)
+- 功能
+    - 负责编译模板，解析指令差值表达式
+    - 负责页面的首次染
+    - 当数据变化后重新渲染视图
 ```js
-export default {
-    data() {
-        return {
-            name:  Joe
-        }
-    },
-    watch: {
-        name: {
-            handler:  sayName ,
-            immediate: true  //立即执行
-        }
-    },
-    methods: {
-        sayName() {
-            console.log(this.name)
-        }
+class Compiler {
+  constructor(vm) {
+    this.el = vm.$el;
+    this.vm = vm;
+    this.compile(this.el);
+  }
+  // 编译模板，处理文本节点和元素节点
+  // el 模板
+  compile(el) {
+    // el 所有的子节点
+    let childNodes = el.childNodes;
+    Array.from(childNodes).forEach((node) => {
+      // 处理文本节点 差值表达式也是的
+      if (this.isTextNode(node)) {
+        this.compileText(node);
+      } else if (this.isElementNode(node)) {
+        // 处理元素节点
+        this.compileElement(node);
+      }
+      // 判断node节点，是否有子节点，如果有子节点，要递归调用compile
+      if (node.childNodes && node.childNodes.length) {
+        this.compile(node);
+      }
+    });
+  }
+  // 编译元素节点，处理指令
+  compileElement(node) {
+    // 遍历所有的属性节点
+    Array.from(node.attributes).forEach((attr) => {
+      // 判断是否是指令
+      let attrName = attr.name;
+      if (this.isDirective(attrName)) {
+        // v-text --> text
+        // 属性的名字
+        attrName = attrName.substr(2);
+        // 属性的值
+        let key = attr.value;
+        this.update(node, key, attrName);
+      }
+    });
+  }
+
+  update(node, key, attrName) {
+    //动态的选取方法   根据我们的属性名字attrName
+    let updateFn = this[attrName + "Updater"];
+    updateFn && updateFn.call(this, node, this.vm[key], key);
+  }
+
+  // 处理 v-text 指令
+  textUpdater(node, value, key) {
+    node.textContent = value;
+  }
+  // v-model
+  modelUpdater(node, value, key) {
+    node.value = value;
+    new Watcher(this.vm, key, (newValue) => {
+      node.value = newValue;
+    });
+    // 双向绑定
+    node.addEventListener("input", () => {
+      this.vm[key] = node.value;
+    });
+  }
+
+  // 编译文本节点，处理差值表达式
+  compileText(node) {
+    let reg = /\{\{(.+?)\}\}/;
+    let value = node.textContent;
+    if (reg.test(value)) {
+      let key = RegExp.$1.trim();
+      node.textContent = value.replace(reg, this.vm[key]);
+
+      // 创建watcher对象，当数据改变更新视图
+      new Watcher(this.vm, key, (newValue) => {
+        node.textContent = newValue;
+      });
     }
+  }
+  // 判断元素属性是否是指令
+  isDirective(attrName) {
+    return attrName.startsWith("v-");
+  }
+  // 判断节点是否是文本节点
+  isTextNode(node) {
+    return node.nodeType === 3;
+  }
+  // 判断节点是否是元素节点
+  isElementNode(node) {
+    return node.nodeType === 1;
+  }
 }
 ```
-在监听对象时，对象内部的属性被改变时无法触发 watch ，我们可以为其设置深度监听。深度监听。
+4. Dep(发布者)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210918215847.png)
 ```js
-export default {
-    data: {
-        studen: {
-            name:  Joe ,
-            skill: {
-                run: {
-                    speed:  fast
+class Dep {
+  constructor () {
+    // 存储所有的观察者
+    this.subs = []
+  }
+  // 添加观察者
+  addSub (sub) {
+    if (sub && sub.update) {
+      this.subs.push(sub)
+    }
+  }
+  // 发送通知
+  notify () {
+    this.subs.forEach(sub => {
+      sub.update()
+    })
+  }
+}
+```
+5.Watcher(观察者)
+```js
+class Watcher {
+  constructor (vm, key, cb) {
+    this.vm = vm
+    // data中的属性名称
+    this.key = key
+    // 回调函数负责更新视图
+    this.cb = cb
+
+    // 把watcher对象记录到Dep类的静态属性target
+    Dep.target = this
+    // 触发get方法，在get方法中会调用addSub
+    this.oldValue = vm[key]
+    Dep.target = null
+  }
+  // 当数据发生变化的时候更新视图
+  update () {
+    let newValue = this.vm[this.key]
+    if (this.oldValue === newValue) {
+      return
+    }
+    this.cb(newValue)
+  }
+}
+```
+## Vue Router
+### Hash 和 History 模式区别
+- Hash 模式
+    - https://music.163.com/#/playlist?id=3102961863 
+- History 模式
+    - https://music.163.com/playlist/3102961863
+
+**原理及其区别**
+- `Hash`模式是基于锚点，以及` onhashchange `事件 
+    - URL中排后面的内容作为路径地址
+    - 监听` hashchange `事件
+    - 根据当前路由地址找到对应组件重新渲染 
+
+- `History`模式是基于` HTML5 `中的` History Api`
+    - `history.pushState`IE10 以后才支持
+    - `history.replaceState()`
+
+    - 通过` history.pushState（）`方法改变地址栏
+    - 监听` popstate `事件
+    - 根据当前路由地址找到对应组件重新渲染
+
+#### History模式的使用
+- History 需要服务器的支持
+    - 单页应用中，服务端不存在http://www.testurl.com/login这样的地址会返回找不到该页面
+    - 在服务端应该除了静态资源外都返回单页应用的 index.html
+
+### Vue Router实现原理
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210917223715.png)
+
+- Vue 的构建版本
+    - 运行时版：不支持 template 模板，需要打包的时候提前编译
+    ```js
+    //自己写render函数
+    ```
+    - 完整版：包含运行时和编译器，体积比运行时版大 10K 左右，程序运行的时候把模板转换成 render 函数 
+    ```js
+    //在vue.config.js中开启
+    //runtimeCompiler
+    // 是否使用包含运行时编译器的 Vue 构建版本。设置为 true 后你就可以在 Vue 组件中使用 template 选项了，但是这会让你的应用额外增加 10kb 左右。
+    module.exports = {
+        runtimeCompiler:true
+    }
+    ```
+
+```js
+let _Vue = null
+export default class VueRouter {
+    constructor(options) {
+        this.options = options
+        //根据地址找组件
+        this.routeMap = {}
+        //要是响应式的对象
+        this.data = _Vue.observable({
+            //当前路由地址
+            current:'/'
+        })
+        this.init()
+    }
+
+
+    // 传入Vue的构造函数和可配置的选项
+    static install (Vue){
+        // 1. 判断当前插件是否已经安装
+        if(VueRouter.install.installed){
+            return;
+        }
+        VueRouter.install.installed = true
+        // 2. 把Vue构造函数记录到全局变量(要在VueRouter实例方法中使用这个构造函数)
+        _Vue = Vue
+        // 3. 把Vue实例时候传入的router对象注入到所有Vue实例上
+        // 挂载到原型上，所有的实例都是可以访问到的
+        // _Vue.prototype.$router = this.$options.router (this -> VueRouter,而不是 Vue)
+        // 混入
+        _Vue.mixin({
+            beforeCreate(){
+                //只有为Vue构造函数的时候才执行，其他的组件不执行
+                if(this.$options.router){
+                    //混入使这个this指向Vue
+                    _Vue.prototype.$router = this.$options.router
                 }
             }
-        }
-    },
-    watch: {
-        studen: {
-            handler:  sayName ,
-            deep: true //对于对象设置为深度 监听
-        }
-    },
-    methods: {
-        sayName() {
-            console.log(this.studen)
-        }
-    }
-}
-```
-使用数组可以设置多项，形式包括字符串、函数、对象。触发监听执行多个方法。
-```js
-export default {
-    data: {
-        name:  Joe
-    },
-    watch: {
-        name: [
-             sayName1 ,
-            function(newVal, oldVal) {
-                this.sayName2()
-            },
-            {
-                handler:  sayName3 ,
-                immaediate: true
-            }
-        ]
-    },
-    methods: {
-        sayName1() {
-            console.log( sayName1==> , this.name)
-        },
-        sayName2() {
-            console.log( sayName2==> , this.name)
-        },
-        sayName3() {
-            console.log( sayName3==> , this.name)
-        }
-    }
-}
-```
-watch本身无法监听多个变量。但我们可以将需要监听的多个变量通过计算属性返回对象，再监听这个对象来实现“监听多个变量”。
-```js
-export default {
-    data() {
-        return {
-            msg1:  apple ,
-            msg2:  banana
-        }
-    },
-    compouted: {
-        msgObj() {
-            const { msg1, msg2 } = this
-            return {
-                msg1,
-                msg2
-            }
-        }
-    },
-    watch: {
-        msgObj: {
-            handler(newVal, oldVal) {
-                if (newVal.msg1 != oldVal.msg1) {
-                    console.log( msg1 is change )
-                }
-                if (newVal.msg2 != oldVal.msg2) {
-                    console.log( msg2 is change )
-                }
-            },
-            deep: true
-        }
-    }
-}
-```
-#### 自定义组件双向绑定
-修改组件的 `model` 选项，自定义绑定的变量和事件。
-```js
-<my-switch v-model="num" value="some value"></my-switch>
-export default {
-    model: {
-        prop:  num ,
-        event:  update
-    },
-    props: {
-        value: {
-            type: String,
-            default:''
-        },
-        num: {
-            type: Number,
-            default: 0
-        }
-    },
-    methods: {
-        numChange() {
-            this.$emit( update , this.num++)
-        }
-    }
-}
-```
-#### 监听组件生命周期
-使用 `@hook `即可监听组件生命周期，组件内无需做任何改变。同样的， created 、 updated 等也可以使用此方法
-```js
-<template>
-    <List @hook:mounted="listenMounted" />
-</template>
-```
-#### 程序化的事件侦听器
-可以通过 `$on` 或 `$once` 监听页面生命周期销毁来解决这个问题。
-```js
-export default {
-    mounted() {
-        this.creatInterval( hello )
-        this.creatInterval( world )
-    },
-    creatInterval(msg) {
-        let timer = setInterval(() => {
-            console.log(msg)
-        }, 1000)
-        this.$once( hook:beforeDestroy , function() {
-            clearInterval(timer)
         })
     }
-}
-```
-#### 超级难点 手动挂载组件
 
-```js
-// Message/index.js
-
-import Vue from  vue
-import Index from  ./index.vue
-
-let messageInstance = null
-let MessageConstructor = Vue.extend(Index)
-
-let init = () => {
-    messageInstance = new MessageConstructor()
-    messageInstance.$mount()
-    document.body.appendChild(messageInstance.$el)
-}
-
-let caller = (options) => {
-    if (!messageInstance) {
-        init(options)
+    init() {
+        this.createRouteMap()
+        this.initComponents(_Vue)
+        this.initEvent()
     }
-    messageInstance.add(options)
-}
 
-export default {
-    // 返回 install 函数 用于 Vue.use 注册
-    install(vue) {
-        vue.prototype.$message = caller
+    // 遍历所有的路由规则，把路由规则解析成键值对的形式，存储到routeMap
+    createRouteMap() {
+        this.options.routes.forEach(route => {
+            this.routeMap[route.path] = route.component
+        });
     }
+
+    //创建router-link  router-view组件
+    initComponents(Vue){
+        Vue.component('router-link',{
+            props:{
+                to:String
+            },
+            // template:'<a :href="to"><slot></slot></a>'
+            render(h){
+                return h('a',{
+                    attrs: {
+                        href:this.to
+                    },
+                    on:{
+                        click:this.clickhander
+                    }
+                },[
+                    this.$slots.default
+                ])
+            },
+            methods:{
+                clickhander(e){
+                    history.pushState({},"",this.to)
+                    this.$router.data.current=this.to
+                    e.preventDefault()
+                }
+            }
+        })
+
+        //让this 指向  vuerouter
+        const self = this
+        Vue.component('router-view',{
+            render(h){
+                const component =  self.routeMap[self.data.current]
+                return h(component)
+            }
+        })
+    }
+
+    initEvent(){
+        //history popstate,只改变  地址  不发送请求
+        window.addEventListener("popstate",()=>{
+            // 处理前进和后退   来改变当前地址，去获取相应组件 来进行渲染
+            this.data.current = window.location.pathname
+        })
+    }
+    
 }
-```
-```js
-// main.js
-import Message from  @/components/Message/index.js
-Vue.use(Message)
-
-
-this.$message({
-    type:  success ,
-    content:  成功信息提示 ,
-    duration: 3000
-})
-```
-
-
-
-
-## Vue涉及的一些知识
-### Vite
-#### Vite的特点
-- 快速的冷启动，不需要等待打包。
-- 即时的热模块更新。
-- 真正的按需编译，不用等待整个项目编译完成。
-
-Vue 的代码都是基于 ES Module 规范去写的。一个巨大的依赖图能够通过import 和 export的桥梁在文件之间被完美搭建起来。这些工具在进行本地调试的时候会把模块预先打包成浏览器可读的js bundle格式，为了进行这一过程的优化，就出现了懒加载这种方式，但懒加载并不能解决构建的问题，Webpack依旧需要提前构建异步路由需要的模块。
-
-Vite能够直接利用浏览器本机的ES模块进行开发环境搭建，并且直接放弃捆绑步骤。
-
-无论我们的应用程序大小如何，HMR都能稳定的快速更新。捆绑生产时，Vite附带了一个预配置的构建命令，该命令可以立即进行许多性能优化。此外，Vite还能提供热模块替换，这意味着我们在开发过程中，可以在浏览器中看到代码刷新，甚至可以使用它来编译项目的精简版本，并直接用于生产。通过使用它，我们可以快速启动Vue或React项目，而无需再使用Vue CLI或Create React App。高效、快速就是它的代名词。
-
-#### Vite的作用
-1. 去掉打包步骤
-
-打包的概念是开发者利用打包工具将应用各个模块集合在一起形成 bundle，以一定规则读取模块的代码——以便在不支持模块化的浏览器里使用。
-
-为了在浏览器里加载各模块，打包工具会借助胶水代码用来组装各模块，比如 webpack 使用 map 存放模块 id 和路径，使用 webpack_require 方法获取模块导出。
-
-vite 利用浏览器原生支持模块化导入这一特性，省略了对模块的组装，也就不需要生成 bundle，所以打包这一步就可以省略了。
-
-2. 实现按需打包
-
-webpack 之类的打包工具会将各模块提前打包进 bundle 里，但打包的过程是静态的——不管某个模块的代码是否执行到，这个模块都要打包到 bundle 里，这样的坏处就是随着项目越来越大打包后的 bundle 也越来越大。
-
-开发者为了减少 bundle 大小，会使用动态引入 import() 的方式异步的加载模块（ 被引入模块依然需要提前打包)，又或者使用 tree shaking 等方式尽力的去掉未引用的模块，然而这些方式都不如 vite 的优雅，vite 可以只在需要某个模块的时候动态（借助 import() ）的引入它，而不需要提前打包，虽然只能用在开发环境，不过这就够了。
-
-3. 我们有特定的需求，Vite允许我们自行设置，可以覆盖Rollup和各种Rollup插件的配置。
-#### vite 如何处理 ESM
-vite 在浏览器里使用 ES module 是使用 http 请求拿到模块，所以 vite 必须提供一个 web server 去代理这些模块，上文中提到的 koa 就是负责这个事情，vite 通过对请求路径的劫持获取资源的内容返回给浏览器，不过 vite 对于模块导入做了特殊处理。
+```  
