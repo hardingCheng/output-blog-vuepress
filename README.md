@@ -1,6 +1,4 @@
 # output-blog-vuepress
 output-blog-vuepress
 
-
-docker run -u root --rm -d -p 9080:8080 -p 50000:50000 -v /usr/jenkins/:/var/jenkins_home -v /var/run/docker.sock:/var/run/docker.sock jenkinsci/blueocean 
-
+我自己的一些心得，可能有的知识没有那么深入，就是想积累和广度一下。我希望自己有好的发展。
