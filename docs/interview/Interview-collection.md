@@ -1973,8 +1973,104 @@ JS如果执行时间过长就会阻塞页面。
 
 所以，要尽量避免JS执行时间过长，这样就会造成页面的渲染不连贯，导致页面渲染加载阻塞的感觉。
 
+### Tree Shaking原理
+
 
 ## HTTP
+### Cookie、Session、webStorage、localStorage、sessionStorage
+#### Cookie
+- HTTP 是无状态的协议（对于事务处理没有记忆能力，每次客户端和服务端会话完成时，服务端不会保存任何会话信息）：每个请求都是完全独立的，服务端无法确认当前访问者的身份信息，无法分辨上一次的请求发送者和这一次的发送者是不是同一个人。所以服务器与浏览器为了进行会话跟踪（知道是谁在访问我），就必须主动的去维护一个状态，这个状态用于告知服务端前后两个请求是否来自同一浏览器。而这个状态需要通过 cookie 或者 session 去实现。
+- cookie 存储在客户端： cookie 是服务器发送到用户浏览器并保存在本地的一小块数据，它会在浏览器下次向同一服务器再发起请求时被携带并发送到服务器上。
+- cookie 是不可跨域的： 每个 cookie 都会绑定单一的域名，无法在别的域名下获取使用，一级域名和二级域名之间是允许共享使用的（靠的是 domain）。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210923132748.png)
+
+#### Cookie的使用
+cookie 可通过 document.cookie 获取全部 cookie。它是一段字符串，是键值对的形式。
+```js
+Cookies.set("name", "value", { expires: 7 }); // 设置一个cookie，7天后失效
+
+Cookies.get("name"); // => 'value'
+
+Cookies.remove("name");
+```
+
+#### 使用 Cookie 时需要考虑的问题
+- 因为存储在客户端，容易被客户端篡改，使用前需要验证合法性
+- 不要存储敏感数据，比如用户密码，账户余额
+- 使用 httpOnly 在一定程度上提高安全性
+- 尽量减少 cookie 的体积，能存储的数据量不能超过 4kb
+- 设置正确的 domain 和 path，减少数据传输
+- cookie 无法跨域
+- 一个浏览器针对一个网站最多存 20 个Cookie，浏览器一般只允许存放 300 个Cookie
+- 移动端对 cookie 的支持不是很好，而 session 需要基于 cookie 实现，所以移动端常用的是 token
+
+
+#### Session
+- session 是另一种记录服务器和客户端会话状态的机制
+- session 是基于 cookie 实现的，session 存储在服务器端，sessionId 会被存储到客户端的cookie 中
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210923153926.png)
+
+- session 认证流程
+    - 用户第一次请求服务器的时候，服务器根据用户提交的相关信息，创建对应的 Session
+    - 请求返回时将此 Session 的唯一标识信息 SessionID 返回给浏览器
+    - 浏览器接收到服务器返回的 SessionID 信息后，会将此信息存入到 Cookie 中，同时 Cookie 记录此 SessionID 属于哪个域名
+    - 当用户第二次访问服务器的时候，请求会自动判断此域名下是否存在 Cookie 信息，如果存在自动将 Cookie 信息也发送给服务端，服务端会从 Cookie 中获取 SessionID，再根据 SessionID 查找对应的 Session 信息，如果没有找到说明用户没有登录或者登录失效，如果找到 Session 证明用户已经登录可执行后面操作。
+
+SessionID 是连接 Cookie 和 Session 的一道桥梁。
+
+#### 使用 session 时需要考虑的问题
+- 将 session 存储在服务器里面，当用户同时在线量比较多时，这些 session 会占据较多的内存，需要在服务端定期的去清理过期的 session
+- 当网站采用集群部署的时候，会遇到多台 web 服务器之间如何做 session 共享的问题。
+- 当多个应用要共享 session 时，除了以上问题，还会遇到跨域问题，因为不同的应用可能部署的主机不一样，需要在各个应用做好 cookie 跨域的处理。
+- sessionId 是存储在 cookie 中的，假如浏览器禁止 cookie 或不支持 cookie 怎么办？ 一般会把 sessionId 跟在 url 参数后面即重写 url，所以 session 不一定非得需要靠 cookie 实现
+- 移动端对 cookie 的支持不是很好，而 session 需要基于 cookie 实现，所以移动端常用的是 token
+
+#### Cookie和Session
+- 安全性： Session 比 Cookie 安全，Session 是存储在服务器端的，Cookie 是存储在客户端的。
+- 存取值的类型不同：Cookie 只支持存字符串数据，想要设置其他类型的数据，需要将其转换成字符串，Session 可以存任意数据类型。
+- 有效期不同： Cookie 可设置为长时间保持，比如我们经常使用的默认登录功能，Session 一般失效时间较短，客户端关闭（默认情况下）或者 Session 超时都会失效。
+- 存储大小不同： 单个 Cookie 保存的数据不能超过 4K，Session 可存储数据远高于 Cookie，但是当访问量过多，会占用过多的服务器资源。
+
+#### WebStorage
+- webstorage是本地存储，存储在客户端，包括localStorage和sessionStorage；
+- localStorage生命周期是永久，这意味着除非用户手动去清除localStorage信息，否则这些信息将永远存在。存放数据大小为一般为5MB,而且它仅在客户端（即浏览器）中保存，不参与和服务器的通信；
+- sessionStorage仅在当前会话下有效，关闭页面或浏览器后被清除。存放数据大小为一般为5MB，而且它仅在客户端（即浏览器）中保存，不参与和服务器的通信。源生接口可以接受，亦可再次封装来对Object和Array有更好的支持
+- WebStorage的目标
+    - 提供一种在cookie之外存储会话数据的路径
+    - 提供一种存储大量可以跨会话存在的数据的机制
+    - HTML5的WebStorage提供了两种API：localStorage（本地存储）和sessionStorage（会话存储）
+- 作用域的不同：
+    - 不同浏览器无法共享localStorage或sessionStorage中的信息。
+    - 相同浏览器的不同页面间可 以共享相同的 localStorage（页面属于相同域名和端口），但是不同页面或标签页间无法共享sessionStorage的信息。
+- 存储大小：
+    - localStorage和sessionStorage的存储数据大小一般都是：5MB
+- 存储位置：
+    - localStorage和sessionStorage都保存在客户端，不与服务器进行交互通信
+- 存储内容类型：
+    - localStorage和sessionStorage只能存储字符串类型，对于复杂的对象可以使用ECMAScript提供的JSON对象的stringify和parse来处理
+- 获取方式：
+    - localStorage：window.localStorage;；sessionStorage：window.sessionStorage;
+- WebStorage的优点：
+    - 存储空间更大：cookie为4KB，而WebStorage是5MB
+    - 节省网络流量：WebStorage不会传送到服务器，存储在本地的数据可以直接获取，也不会像cookie一样每次请求都会传送到服务器，所以减少了客户端和服务器端的交互，节省了网络流量对于那种只需要在用户浏览一组页面期间保存而关闭浏览器后就可以丢弃的数据，sessionStorage会非常方便
+    - 快速显示：有的数据存储在WebStorage上，再加上浏览器本身的缓存。获取数据时可以从本地获取会比从服务器端获取快得多，所以速度更快
+    - 安全性：WebStorage不会随着HTTP header发送到服务器端，所以安全性相对于cookie来说比较高一些，不会担心截获，但是仍然存在伪造问题
+    - WebStorage提供了一些方法，数据操作比cookie方便
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210923222357.png)
+#### sessionStorage、localStorage和cookie的区别
+- 相同点是都是保存在浏览器端、且同源的
+- cookie数据始终在同源的http请求中携带（即使不需要），即cookie在浏览器和服务器间来回传递，而sessionStorage和localStorage不会自动把数据发送给服务器，仅在本地保存。cookie数据还有路径（path）的概念，可以限制cookie只属于某个路径下
+- 存储大小限制也不同，cookie数据不能超过4K，同时因为每次http请求都会携带cookie、所以cookie只适合保存很小的数据，如会话标识。sessionStorage和localStorage虽然也有存储大小的限制，但比cookie大得多，可以达到5M或更大
+- 数据有效期不同，sessionStorage：仅在当前浏览器窗口关闭之前有效；localStorage：始终有效，窗口或浏览器关闭也一直保存，因此用作持久数据；cookie：只在设置的cookie过期时间之前有效，即使窗口关闭或浏览器关闭
+- 作用域不同，sessionStorage不在不同的浏览器窗口中共享，即使是同一个页面；  localstorage在所有同源窗口中都是共享的；cookie也是在所有同源窗口中都是共享的
+- webStorage支持事件通知机制，可以将数据更新的通知发送给监听者
+- web Storage的api接口使用更方便
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210923222632.png)
+
+localStorage 适合持久化缓存数据，比如页面的默认偏好配置等；sessionStorage 适合一次性临时数据保存。
+
 ### HTTP与HTTPS有什么区别？
 HTTP与HTTPS的区别， 。
 HTTP：是互联网上应用最为广泛的一种网络协议，是一个客户端和服务器端请求和应答的标准（TCP），用于从WWW服务器传输超文本到本地浏览器的传输协议，它可以使浏览器更加高效，使网络传输减少。
@@ -2060,8 +2156,566 @@ OPTIONS方法用于获取目的资源所支持的通信方式的选项。在 COR
     - HTTP协议类的主要特点：简单快速，灵活，无连接，无状态（无法区分两次连接是否一样）。
 - HTTP报文的组成部分
     - HTTP报文的组成部分
-    - 请求报文：请求行，请求头，空行，请求体；
-    - 响应报文：状态行，响应头，空行，响应体。
-    - 请求行包含：http方法，页面地址，http协议以及版本；
-    - 请求头包含：key-value值，告诉服务器端我要什么内容。
+        - 请求报文：请求行，请求头，空行，请求体；
+        - 响应报文：状态行，响应头，空行，响应体。
+        - 请求行包含：http方法，页面地址，http协议以及版本；
+        - 请求头包含：key-value值，告诉服务器端我要什么内容。
+### 在交互过程中如果数据传送完了，还不想断开连接怎么办，怎么维持？
+在 HTTP 中响应体的 Connection 字段指定为 keep-alive
+
+### DNS过程
+域名解析就是将域名转换为IP地址的过程。（因为想要访问一台服务器，最终是靠IP地址访问的，而不是靠域名访问的，他们的之间的映射关系保存在本地缓存和网络上的各种域名解析服务器中）
+
+- 第一步
+    - 客户端计算机发起 DNS 解析请求，将域名发送给同一网段的 DNS 服务器
+- 第二步
+    - 注册在客户端计算机上的 DNS 服务器会优先从缓存中查找该域名对应的 IP 地址，当缓存中的 IP 地址有效时则直接返回给客户端计算机。若失效或不存在时则将该域名发送给根域的 DNS 服务器，开始查询操作。
+- 第三步
+    - 根域服务器拿到需要解析的域名后，开始在记录中查询该域名对应的顶级域的 DNS 服务器信息，查到后将顶级域的DNS 服务器的 IP 地址回传给客户端委托 DNS 查询的服务器。
+- 第四步
+    - 被委托查询域名信息的 DNS 服务器拿到该域名对应的顶级域的 DNS服务器的 IP（也就是 .com 域对应的 IP） 地址后 ，继续使用该 IP 地址向顶级域服务器发起解析请求。也就是去 .com 域对应的 DNS 服务器去查询。
+- 第五步
+    - .com 域对应的 DNS 服务器收到解析请求后，开始查询域名下一级域对应的 DNS 服务器信息，查询到这一级域对应的 DNS 服务器信息后，将其对应的 IP 地址回传给客户端就近的DNS服务器。
+- 第六步
+    - 整个查询过程就这样一级接一级的查询下去，最终会找到完整域名所对应的服务器 IP 地址。找到后同样会回传给客户端委托查询域名信息的 DNS 服务器，然后该 DNS 服务器会将该 IP 地址发送回客户端计算机，同时将本次的查询结果保存在缓存中，以备下次查询是直接使用（有效期内）。
+
+### Fetch API 与传统 Request 的区别
+HTTP数据请求的方式:XMLHttpRequest、ajax、fetch与axios
+
+- ajax
+    - 传统 Ajax 指的是 XMLHttpRequest（XHR），多个请求之间如果有先后关系的话，就会出现回调地狱。
+- axios
+    - 一个基于Promise 用于浏览器和 nodejs 的 HTTP 客户端，本质上也是对原生XHR的封装，只不过它是Promise的实现版本，符合最新的ES规范，
+    - 支持 Promise API
+    - 客户端支持防止CSRF
+    - 提供了一些并发请求的接口（重要，方便了很多的操作）
+    - 拦截请求和响应
+    - 转换请求和响应数据
+    - 取消请求
+    - 自动转换JSON数据
+- fetch
+    - 语法简洁，更加语义化
+    - 基于标准 Promise 实现，支持 async/await
+    - 同构方便
+    - 更加底层，提供的API丰富（request, response）
+    - 脱离了XHR，是ES规范里新的实现方式
+
+    - fetch只对网络请求报错，对400，500都当做成功的请求，服务器返回 400，500 错误码时并不会 reject，只有网络错误这些导致请求不能完成时，fetch 才会被 reject。
+    - fetch默认不会带cookie，需要添加配置项： fetch(url, {credentials: 'include'})
+    - fetch不支持超时控制，
+    - fetch没有办法原生监测请求的进度，而XHR可以
+
+### 计算机分为哪几层？计算机网络的七个层？
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922213035.png)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922213526.png)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922213617.png)
+
+
+127.0.0.1是本地循环地址，如果本地址无法ping通，则表明本地机tcp/ip协议不能正常工作。
+ping命令是使用的网络层协议ICMP
+
+### TCP三次握手和四次挥手
+为什么要进行三次握手：为了确认对方的发送和接收能力。
+
+一开始双方处于 CLOSED 状态，然后服务端开始监听某个端口进入 LISTEN 状态
+    然后客户端主动发起连接，发送 SYN，然后自己变为 SYN-SENT，seq = x
+    服务端收到之后，返回 SYN seq = y 和 ACK ack = x + 1（对于客户端发来的 SYN），自己变成 SYN-REVD
+    之后客户端再次发送 ACK seq = x + 1, ack = y + 1给服务端，自己变成 EASTABLISHED 状态，服务端收到 ACK，也进入 ESTABLISHED
+
+
+四次以上都可以，只不过 三次就够了
+    一开始都处于 ESTABLISH 状态，然后客户端发送 FIN 报文，带上 seq = p，状态变为 FIN-WAIT-1
+    服务端收到之后，发送 ACK 确认，ack = p + 1，然后进入 CLOSE-WAIT 状态
+    客户端收到之后进入 FIN-WAIT-2  状态
+过了一会等数据处理完，再次发送 FIN、ACK，seq = q，ack = p + 1，进入 LAST-ACK 阶段
+    客户端收到 FIN 之后，客户端收到之后进入 TIME_WAIT（等待 2MSL），然后发送 ACK 给服务端 ack = 1 + 1
+    服务端收到之后进入 CLOSED 状态
+#### 为什么需要等待 2MSL
+因为如果不等待的话，如果服务端还有很多数据包要给客户端发，且此时客户端端口被新应用占据，那么就会接收到无用的数据包，造成数据包混乱，所以说最保险的方法就是等服务器发来的数据包都死翘翘了再启动新应用。
+
+1个 MSL 保证四次挥手中主动关闭方最后的 ACK 报文能最终到达对端
+1个 MSL 保证对端没有收到 ACK 那么进行重传的 FIN 报文能够到达
+
+如果是三次的话，那么服务端的 ACK 和 FIN 合成一个挥手，那么长时间的延迟可能让 TCP 一位 FIN 没有达到服务器端，然后让客户的不断的重发 FIN
+
+### TCP 滑动窗口
+在 TCP 链接中，对于发送端和接收端而言，TCP 需要把发送的数据放到发送缓存区, 将接收的数据放到接收缓存区。而经常会存在发送端发送过多，而接收端无法消化的情况，所以就需要流量控制，就是在通过接收缓存区的大小，控制发送端的发送。如果对方的接收缓存区满了，就不能再继续发送了。而这种流量控制的过程就需要在发送端维护一个发送窗口，在接收端维持一个接收窗口。
+TCP 滑动窗口分为两种: 发送窗口和接收窗口。
+
+### 说说UDP和TCP的区别及应用场景
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922215122.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922215218.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922215348.png)
+
+### tcp 拥塞机制
+原因是有可能整个网络环境特别差，容易丢包，那么发送端就应该注意了。
+
+
+主要用三种方法：
+    - 慢启动阈值 + 拥塞避免
+        - 拥塞窗口（cwnd）
+        - 慢启动阈值（ssthresh）
+            - 然后采用一种比较保守的慢启动算法来慢慢适应这个网络，在开始传输的一段时间，发送端和接收端会首先通过三次握手建立连接，确定各自接收窗口大小，然后初始化双方的拥塞窗口，接着每经过一轮 RTT（收发时延），拥塞窗口大小翻倍，直到达到慢启动阈值。
+            - 然后开始进行拥塞避免，拥塞避免具体的做法就是之前每一轮 RTT，拥塞窗口翻倍，现在每一轮就加一个。
+    - 快速重传
+        - 在 TCP 传输过程中，如果发生了丢包，接收端就会发送之前重复 ACK，比如 第 5 个包丢了，6、7 达到，然后接收端会为 5，6，7 都发送第四个包的 ACK，这个时候发送端受到了 3 个重复的 ACK，意识到丢包了，就会马上进行重传，而不用等到 RTO （超时重传的时间）
+        - 选择性重传：报文首部可选性中加入 SACK 属性，通过 left edge 和 right edge 标志那些包到了，然后重传没到的包
+    - 快速恢复
+        - 如果发送端收到了 3 个重复的 ACK，发现了丢包，觉得现在的网络状况已经进入拥塞状态了，那么就会进入快速恢复阶段：
+            - 会将拥塞阈值降低为 拥塞窗口的一半
+            - 然后拥塞窗口大小变为拥塞阈值
+            - 接着 拥塞窗口再进行线性增加，以适应网络状况
+
+
+### WebSocket与Ajax的区别
+- 本质不同
+    - Ajax 即异步 JavaScript 和 XML，是一种创建交互式网页的应用的网页开发技术
+    - websocket 是 HTML5 的一种新协议，实现了浏览器和服务器的实时通信
+- 生命周期不同：
+    - websocket 是长连接，会话一直保持
+    - ajax 发送接收之后就会断开
+- 适用范围：
+    - websocket 用于前后端实时交互数据
+    - ajax 非实时
+- 发起人：
+    - AJAX 客户端发起
+    - WebSocket 服务器端和客户端相互推送
+
+
+### 跨域的方案
+#### 同源是什么？
+如果两个URL的协议`protocol`、主机名`host`和端口号`port`都相同的话，则这两个URL是同源。
+
+#### 前后端通讯的方式
+- Ajax（同源的通信方式）
+- WebSocket（不受同源策略的限制）
+- CORS（支持跨域通信，也支持同源通信）
+
+#### 跨域是什么？
+
+**当协议、域名与端口号中任意一个不相同时，都算作不同域，不同域之间相互请求资源的表现(非同源策略请求)，称作”跨域“**。
+
+- 造成跨域的几种常见表现
+    - 服务器分开部署（Web服务器 + 数据请求服务器）
+    - 本地开发（本地预览项目 调取 测试服务器的数据）
+    - 调取第三方平台的接口
+
+#### 跨域的解决方案
+- 修改本地HOST
+- JSONP
+- CORS
+- Proxy
+- Nginx反向代理
+- Post Message（利用`iframe`标签，实现不同域的关联）
+- Hash
+- WebSocket
+
+
+1.  **JSONP**
+**原理**
+    - `JSONP`利用`script`标签不存在域的限制，且定义一个`全局执行上下文`中的函数`func`（用来接收服务器端返回的数据信息）来接收数据，从而实现跨域请求。
+
+**弊端：**
+    - 只允许**GET**请求
+    - 不安全：只要浏览器支持，且存在浏览器的全局变量里，则谁都可以调用
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210712090223.png)
+
+**手动封装JSONP**
+
+`callback`必须是一个全局上下文中的函数（防止不是全局的函数，我们需要把这个函数放在全局上，并且从服务器端接收回信息时，要浏览器执行该函数）
+```js
+// 客户端
+function jsonp(url, callback) {
+  // 把传递的回调函数挂载到全局上 uniqueName变量存储全局的回调函数（确保每次的callback都具有唯一性）
+ let uniqueName = `jsonp${new Date().getTime()}`;
+  // 套了一层 anonymous function
+  // 目的让 返回的callback执行且删除创建的标签
+  window[uniqueName] = data => {
+   // 从服务器获取结果并让浏览器执行callback
+    document.body.removeChild(script);
+    delete window[uniqueName];
+    callback && callback(data);
+  }
+  // 处理URL
+  url += `${url.includes('?')} ? '&' : '?}callback=${uniqueName}'`;
+  // 发送请求
+  let script = document.createElement('script');
+  script.src = url;
+  document.body.appendChild(script);
+}
+
+// 执行第二个参数 callback，获取数据
+jsonp('http://127.0.0.1:1001/list?userName="lsh"', (result) => {
+ console.log(result);
+})
+
+
+
+// 服务器端
+// Api请求数据
+app.get('/list', (req, res) => {
+  // req.query 问号后面传递的参数信息
+  // 此时的callback 为传递过来的函数名字 (uniqueName)
+ let { callback } = req.query;
+  // 准备返回的数据（字符串）
+  let res = { code: 0, data: [10,20] };
+  let str = `${callback}($(JSON.stringify(res)))`;
+  // 返回给客户端数据
+  res.send(str);
+})
+
+
+
+// 服务器请求的 url
+Request URL:
+ http://127.0.0.1:1001/list?userName="lsh"&callback=jsonp159876002
+// 服务器返回的函数callback
+ jsonp159876002({"code":0, "data": [10,20]});
+// 客户端接收的数据信息
+{ code: 0, data: Array(2) }
+```
+
+
+
+
+2. CORS（支持跨域通信的Ajax）
+上文提到，不允许跨域的根本原因是因为`Access-Control-Allow-Origin`已被禁止。那么只要让`服务器端设置允许源`就可以了。
+
+**原理**
+    - 解决掉浏览器的默认安全策略，在服务器端设置允许哪些源请求就可以了
+
+```js
+// 服务器端
+app.use((req, res, next) => {
+ // * 允许所有源（不安全/不能携带资源凭证）
+ res.header("Access-Control-Allow-Origin", "*");
+ res.header("Access-Control-Allow-Credentials", true);
+ /* res.header("Access-Control-Allow-Headers", "Content-Type,....");
+ res.header("Access-Control-Allow-Methods", "GET,..."); */
+
+ // 试探请求：在CORS跨域请求中，首先浏览器会自己发送一个试探请求，验证是否可以和服务器跨域通信，服务器返回200，则浏览器继续发送真实的请求
+ req.method === 'OPTIONS' ? res.send('CURRENT SERVICES SUPPORT CROSS DOMAIN REQUESTS!') : next();
+});
+
+
+// 客户端
+let xhr = new XMLHttpRequest;
+xhr.open('get', 'http://127.0.0.1:1001/list');
+xhr.setRequestHeader('Cookie', 'name=jason');
+xhr.withCredentials = true;
+xhr.onreadystatechange = () => {
+  if (xhr.status === 200 && xhr.readyState === 4) {
+    console.log(xhr.responseText);
+  }
+};
+xhr.send();
+
+// CORS【参考资料】http://www.ruanyifeng.com/blog/2016/04/cors.html
+// url（必选），options（可选）
+fetch('/some/url/', {
+      method: 'get',
+ }).then(function (response) {
+
+ }).catch(function (err) {
+     // 出错了，等价于 then 的第二个参数，但这样更好用更直观
+ });
+```
+
+当我们一旦在服务器端设置了允许`任何源`可以请求之后，其实请求是不安全的，并且要求`客户端`不能携带资源凭证（比如上文中的Cookie字段），浏览器端会报错。
+
+告诉我们`Cookie`字段是不安全的也不能被设置的，如果允许源为`'*'`的话也是不允许的。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210712091113.png)
+
+正确写法✅
+
+- 设置单一源（安全/也可以携带资源凭证/只能是单一一个源）
+- 也可以动态设置多个源：每一次请求都会走这个中间件，我们首先设置一个白名单，如果当前客户端请求的源在白名单中，我们把`Allow-Origin`动态设置为当前这个源
+
+```js
+app.use((req, res, next) => {
+  
+  // 也可自定义白名单，检验请求的源是否在白名单里，动态设置
+  /* let safeList = [
+  "http://127.0.0.1:5500",
+  xxx,
+  xxxxx,
+ ]; */
+ res.header("Access-Control-Allow-Origin", "http://127.0.0.1:5500");
+ res.header("Access-Control-Allow-Credentials", true); // 设置是否可携带资源凭证
+
+ /* res.header("Access-Control-Allow-Headers", "Content-Type,....");
+ res.header("Access-Control-Allow-Methods", "GET,..."); */
+
+ // 试探请求：在CORS跨域请求中，首先浏览器会自己发送一个试探请求，验证是否可以和服务器跨域通信，服务器返回200，则浏览器继续发送真实的请求
+ req.method === 'OPTIONS' ? res.send('CURRENT SERVICES SUPPORT CROSS DOMAIN REQUESTS!') : next();
+});
+
+```
+**CORS的好处**
+- 原理简单，容易配置，允许携带资源凭证
+- 仍可以用 `ajax`作为资源请求的方式
+- 可以动态设置多个源，通过判断，将`Allow-Origin`设置为当前源
+
+**CORS的局限性**
+- 只允许某一个源发起请求
+- 如多个源，还需要动态判断
+
+
+
+
+3. Proxy
+**Proxy**翻译为“代理”，是由webpack配置的一个插件，叫"webpack-dev-server"（只能在开发环境中使用）
+**Proxy**在webpack中的配置
+
+```js
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+
+module.exports = {
+  mode: 'production',
+  entry: './src/main.js',
+  output: {...},
+  devServer: {
+    port: '3000',
+    compress: true,
+    open: true,
+    hot: true,
+    proxy: {
+      '/': {
+        target: 'http://127.0.0.1:3001',
+        changeOrigin: true
+      }
+    }
+  },
+  // 配置WEBPACK的插件
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: `./public/index.html`,
+      filename: `index.html`
+    })
+  ]
+};
+```
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210712091604.png)
+
+**Proxy**代理其实相当于由`webpack-dev-server`配置在本地创建了一个port=3000的服务，利用`node`的中间层代理（分发）解决了浏览器的同源策略限制。
+但是它只能在**开发环境**下使用，因为`dev-server`只是一个`webpack`的一个插件；
+如果需要在生产环境下使用，需要我们配置`Nginx`反向代理服务器；
+另外如果是自己实现`node服务层代理`：无论是开发环境还是生产环境都可以处理（node中间层和客户端是同源，中间层帮助我们向服务器请求数据，再把数据返回给客户端）
+
+**Proxy的局限性**
+只能在本地开发阶段使用
+
+
+
+
+4.配置Nginx反向代理
+
+主要作为**生产环境**下跨域的解决方案。
+原理：利用Node中间层的分发机制，将请求的URL转向服务器端的地址
+
+配置反向代理
+```nginx
+server {
+ listen: 80;
+  server_name: 192.168.161.189;
+  # 这个地方有匹配规则
+  loaction: {
+  proxy_pass_http://127.0.0.1:1001; // 请求转向这个URL地址，服务器地址
+    root html;
+    index index.html;
+  }
+}
+```
+
+
+5. POST MESSAG
+
+假设现在有两个页面，分别为A页面`port=1001`、B页面`port=1002`，实现页面A与页面B的页面通信（跨域）
+
+**原理**：
+- 把 B页面当做A的子页面嵌入到A页面里，通过`iframe.contentWindow.postMessage`向B页面传递某些信息
+- 在B页面中通过`window.onmessage`获取A页面传递过来的信息`ev.data`(见下代码)
+- 同理在B页面中通过`ev.source.postMessage`向A页面传递信息
+- 在A页面中通过`window.onmessage`获取B页面传递的信息
+
+主要利用内置的`postMessage`和`onmessage`传递信息和接收信息。
+
+```JS
+// A 页面
+// 把 B页面当做A的子页面嵌入到A页面里
+<iframe id="iframe" src="http://127.0.0.1:1002/B.html" frameborder="0" style="display: none;"></iframe>
+<script>
+  iframe.onload = function () {
+    iframe.contentWindow.postMessage('珠峰培训', 'http://127.0.0.1:1002/');
+  }
+  //=>监听B传递的信息
+  window.onmessage = function (ev) {
+    console.log(ev.data);
+  }
+</script>
+
+
+
+
+// B页面
+<script>
+  //=>监听A发送过来的信息
+  window.onmessage = function (ev) {
+    // console.log(ev.data);
+    //=>ev.source:A
+    ev.source.postMessage(ev.data + '@@@', '*');
+  }
+</script>
+```
+
+5. WebSocket
+```js
+      // Websocket【参考资料】http://www.ruanyifeng.com/blog/2017/05/websocket.html
+      var ws = new WebSocket('wss://echo.websocket.org');
+      // 发送消息
+      ws.onopen = function (evt) {
+          console.log('Connection open ...');
+          ws.send('Hello WebSockets!');
+      };
+      // 接收消息
+      ws.onmessage = function (evt) {
+          console.log('Received Message: ', evt.data);
+          ws.close();
+      };
+      // 关闭连接
+      ws.onclose = function (evt) {
+          console.log('Connection closed.');
+      };
+```
+### XSS 攻击和 CSRF 攻击各自的原理是什么？两者又有什么区别？以及如何防范？
+1、XSS 攻击
+- 概念
+    - XSS（Cross Site Scripting）：跨域脚本攻击。
+- 原理
+    - 不需要你做任何的登录认证，它会通过合法的操作（比如在 url 中输入、在评论框中输入），向你的页面注入脚本（可能是 js、hmtl 代码块等）。
+- 防范
+    - 编码；对于用户输入进行编码。
+    - 过滤；移除用户输入和事件相关的属性。(过滤 script、style、iframe 等节点)
+    - 校正；使用 DOM Parse 转换，校正不配对的 DOM 标签。
+    - HttpOnly
+- 分类
+    - 反射型(非持久)：点击链接，执行脚本
+    - 存储型(持久)：恶意输入保存数据库，其他用户访问，执行脚本
+    - 基于 DOM：恶意修改 DOM 结构，基于客户端
+
+
+2. CSRF 攻击
+- 概念
+    - SRF（Cross-site request forgery）：跨站请求伪造。
+- 原理
+    - 登录受信任网站 A，并在本地生成 Cookie。（如果用户没有登录网站 A，那么网站 B 在诱导的时候，请求网站 A 的 api 接口时，会提示你登录）
+    - 在不登出 A 的情况下，访问危险网站 B（其实是利用了网站 A 的漏洞）。
+- 防范
+    - token 验证；
+    - 隐藏令牌；把 token 隐藏在 http 请求的 head 中。
+    - referer 验证；验证页面来源。
+- 两者区别
+    - CSRF：需要用户先登录网站 A，获取 cookie。XSS：不需要登录。
+    - CSRF：是利用网站 A 本身的漏洞，去请求网站 A 的 api。XSS：是向网站 A 注入 JS 代码，然后执行 JS 里的代码，篡改网站 A 的内容。
+
+### CDN
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210923075356.png)
+#### 简单介绍
+把大量资源集中到单一节点进行分发，恐怕很难有某个机房可以支撑得住这么大的流量。
+
+内容分发网络（Content Dilivery Network）的互联网底层建设(CDN)。内容分发网络（Content Dilivery Network，CDN）是一个专门用来分发内容的分布式应用。
+
+CDN 构建在现有的互联网之上，通过在各地部署数据中心，让不同地域的用户可以就近获取内容。(这里的内容通常指的是文件、图片、视频、声音、应用程序安装包等，它们具有一个显著的特征——无状态，或者说是静态的。)
+
+需要考虑到流量、单点故障、延迟等因素。在离用户更近的地理位置提供资源，可以减少延迟。按照地理位置分散地提供资源，也可以降低中心化带来的服务压力。
+
+技术上全面解决由于网络带宽小、用户访问量大、网点分布不均等原因，提高用户访问网站的响应速度、减少带宽预算分配、改善内容可用性、增强网站安全性
+
+#### 内容分发
+CDN 的工作原理就是将您源站的资源缓存到位于全球各地的 CDN 节点上，用户请求资源时，就近返回节点上缓存的资源，而不需要每个用户的请求都回您的源站获取，避免网络拥塞、缓解源站压力，保证用户访问资源的速度和体验。
+
+CDN 是一个分布式的内容分发网络。当用户请求一个网络资源时，用户请求的是 CDN 提供的资源。和域名系统类似，当用户请求一个资源时，首先会接触到一个类似域名系统中目录的服务，这个服务会告诉用户究竟去哪个 IP 获取这个资源。
+
+
+事实上，很多大型的应用，会把 DNS 解析作为一种负载均衡的手段。当用户请求一个网址的时候，会从该网站提供的智能 DNS 中获取网站的 IP。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210923072131.png)
+- 当用户点击网站页面上的内容URL，先经过本地DNS系统解析，如果本地DNS服务器没有相应域名的缓存，则本地DNS系统会将域名的解析权交给CNAME指向的CDN专用DNS服务器。
+- CDN的DNS服务器将CDN的全局负载均衡设备IP地址返回给用户。
+- 用户向CDN的全局负载均衡设备发起URL访问请求。
+- CDN全局负载（CDN 的智能 DNS ）均衡设备根据用户IP地址，以及用户请求的URL，选择一台用户所属区域的区域负载均衡设备，并将请求转发到此设备上。
+- 区域负载均衡设备会选择一个最优的缓存服务器节点，并从缓存服务器节点处得到缓存服务器的IP地址，最终将得到的IP地址返回给全局负载均衡设备：
+    - 根据用户IP地址，判断哪一个边缘节点距用户最近；
+    - 根据用户所请求的URL中携带的内容名称，判断哪一个边缘节点上有用户所需内容；
+    - 查询各个边缘节点当前的负载情况，判断哪一个边缘节点尚有服务能力。
+- 全局负载均衡设备把服务器的IP地址返回给用户。
+- 用户向缓存服务器发起请求，缓存服务器响应用户请求，将用户所需内容传送到用户终端。如果这台缓存服务器上并没有用户想要的内容，而区域均衡设备依然将它分配给了用户，那么这台服务器就要向它的上一级缓存服务器请求内容，直至追溯到网站的源服务器将内容拉到本地。
+
+在上面整个过程当中，CDN 的智能 DNS 还充当了负载均衡的作用。如果一个节点压力过大，则可以将流量导向其他的节点。
+
+#### CDN组成
+CDN网络的主要有中心节点和边缘节点。
+- 中心节点
+    - 中心节点包括CDN网管中心和全局负载均衡DNS重定向解析系统，负责整个CDN网络的分发及管理
+- 边缘节点
+    - CDN边缘节点主要指异地分发节点，由负载均衡设备、高速缓存服务器两部分组成。
+        - 负载均衡设备负责每个节点中各个Cache的负载均衡，保证节点的工作效率；同时还负责收集节点与周围环境的信息，保持与全局负载均衡DNS的通信，实现整个系统的负载均衡。
+        - 高速缓存服务器（Cache）负责存储客户网站的大量信息，就像一个靠近用户的网站服务器一样响应本地用户的访问请求。通过全局负载均衡DNS的控制，用户的请求被透明地指向离他最近的节点，节点中Cache服务器就像网站的原始服务器一样，响应终端用户的请求。因其距离用户更近，故其响应时间才更快。
+
+#### 回溯
+CDN 想象成一个分布式的分级缓存，再加上数据库的两层设计。
+在 CDN 的设计当中，CDN 实际上提供的是数据的缓存。而原始数据，则由服务的提供者提供。
+
+用户请求静态资源通常用自己的域名（防止跨域和一些安全问题）。为了让用户请求的是自己的网站，而使用的是 CDN 的服务，这里会使用 CNAME 让自己的域名作为 CDN 域名的一个别名。当请求到 CDN 服务的时候，会首先由 CDN 的 DNS 服务帮助用户选择一个最优的节点，这个 DNS 服务还充当了负载均衡的作用。接下来，用户开始向 CDN 节点请求资源。如果这个时候资源已经过期或者还没有在 CDN 节点上，就会从源站读取数据，这个步骤称为CDN 的回源。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210923073122.png)
+
+CDN 节点到源站请求资源，重新设置缓存。通常服务提供方在使用 CDN 的时候，会在自己的某个域名发布静态资源，然后将这个域名交给 CDN。
+
+比如源站在 s.example.com 中发布静态资源，然后在 CDN 管理后台配置了这个源站。在使用 CDN 时，服务提供方会使用另一个域名，比如说 b.example.com。然后配置将 b.example.com 用 CNAME 记录指向 CDN 的智能 DNS。
+
+
+这个时候，如果用户下载b.example.com/a.jpg，CDN 的智能 DNS 会帮用户选择一个最优的 IP 地址（最优的 CDN 节点）响应这次资源的请求。如果这个 CDN 节点没有 a.jpg，CDN 就会到 s.example.com 源站去下载，缓存到 CDN 节点，然后再返回给用户。
+
+CDN 回源有 3 种情况，
+- 一种是 CDN 节点没有对应资源时主动到源站获取资源；
+- 另一种是缓存失效后，CDN 节点到源站获取资源；
+- 还有一种情况是在 CDN 管理后台或者使用开放接口主动刷新触发回源。
+
+
 ## Webpack Vite Rollup
+
+## 工具
+### Git
+#### Git 的工作区域和流程
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210923223618.png)
+
+- Workspace：工作区，就是平时进行开发改动的地方，是当前看到最新的内容，在开发的过程也就是对工作区的操作
+- Index：暂存区，当执行 git add 的命令后，工作区的文件就会被移入暂存区，暂存区标记了当前工作区中那些内容是被 Git 管理的，当完成某个需求或者功能后需要提交代码，第一步就是通过 git add 先提交到暂存区。
+- Repository：本地仓库，位于自己的电脑上，通过 git commit 提交暂存区的内容，会进入本地仓库。
+- Remote：远程仓库，用来托管代码的服务器，远程仓库的内容能够被分布在多个地点的处于协作关系的本地仓库修改，本地仓库修改完代码后通过 git push 命令同步代码到远程仓库。
+```md
+1.在工作区开发，添加，修改文件。
+2.将修改后的文件放入暂存区。
+3.将暂存区域的文件提交到本地仓库。
+4.将本地仓库的修改推送到远程仓库。
+```
+
+#### Git 基本操作
+- git add :添加文件到暂存区
+- git commit :提交暂存的更改，
+- git pull:从远程仓库拉取代码并合并到本地
+- git branch :和分支相关
+
+#### git merge 和 git rebase 的区别
+- git rebase 的使用
+    - rebase 翻译为变基，他的作用和 merge 很相似，用于把一个分支的修改合并到当前分支上。
+- git merge 和 git rebase 的区别
+    - 不同于 git rebase 的是，git merge 在不是 fast-forward（快速合并）的情况下，会产生一条额外的合并记录，类似 Merge branch 'xxx' into 'xxx' 的一条提交信息。
+    - 另外，在解决冲突的时候，用 merge 只需要解决一次冲突即可，简单粗暴，而用 rebase 的时候 ，需要依次解决每次的冲突，才可以提交。
+- 
