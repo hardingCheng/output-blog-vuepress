@@ -71,9 +71,13 @@
 ### script标签defer与async差异
 - defer
     - 如果script标签设置了该属性，则浏览器会异步的下载该文件并且不会影响到后续DOM的渲染；如果有多个设置了defer的script标签存在，则会按照顺序执行所有的script；defer脚本会在文档渲染完毕后，DOMContentLoaded事件调用前执行。
+    - 载入 JavaScript 文件时不阻塞 HTML 的解析，执行阶段被放到 HTML 标签解析完成之后。
+    - 在加载多个JS脚本的时候，async是无顺序的加载，而defer是有顺序的加载。
 - async
     - async的设置，会使得script脚本异步的加载并在允许的情况下执行
     - async的执行，并不会按着script在页面中的顺序来执行，而是谁先加载完谁执行。
+    - 这种方式加载的 JavaScript 依然会阻塞 load 事件
+    - async-script 可能在 DOMContentLoaded 触发之前或之后执行，但一定在 load 触发之前执行。
 
 ## CSS
 
@@ -1269,6 +1273,7 @@ Array.prototype.map.call（hdList,function(){
 ```
 
 ### ES6
+https://juejin.cn/post/6844903959283367950
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210921221425.png)
 
 ### commonJS 和 es6 模块化的区别
@@ -1893,6 +1898,7 @@ macrotask（又称之为宏任务），可以理解是每次执行栈执行的�
 microtask（又称为微任务），可以理解是在当前 task 执行结束后立即执行的任务
     - 也就是说，在当前task任务后，下一个task之前，在渲染之前
     - 所以它的响应速度相比setTimeout（setTimeout是task）会更快，因为无需等渲染
+    - 微任务会全部执行，而宏任务会一个一个来执行
     - 也就是说，在某一个macrotask执行完后，就会将在它执行期间产生的所有microtask都执行完毕（在渲染前）
 
 
@@ -1904,6 +1910,8 @@ microtask（又称为微任务），可以理解是在当前 task 执行结束�
 |            Ajax             |        MutationObserve        |
 |          回调函数           |                               |
 | Node中fs可以进行异步I/O操作 |                               |
+
+process.nextTick1这个地方有点出入，我一般认为```process.nextTick()推入主线程执行栈栈底，作为执行栈最后一个任务执行)
 
 **主线程任务——>微任务——>宏任务**（如果宏任务里还有微任就继续执行宏任务里的微任务，如果宏任务中的微任务中还有宏任务就在依次进行）
 **主线程任务——>微任务——>宏任务——>宏任务里的微任务——>宏任务里的微任务中的宏任务——>直到任务全部完成**
@@ -1973,7 +1981,26 @@ JS如果执行时间过长就会阻塞页面。
 
 所以，要尽量避免JS执行时间过长，这样就会造成页面的渲染不连贯，导致页面渲染加载阻塞的感觉。
 
+### 装箱拆箱，隐式转换
+- 显示装箱
+    - 显示装箱非常简单，就是通过内置对象或者说基本包装类型对基本数据类型进行操作。
+```js
+// 我们的name是一个对象，能够调用相应的方法或者原型链上的方法。
+const name = new String("Uni");
+String.prototype.age = "20";
+console.log(name.age);
+```
+- 隐式装箱
+```js
+const name = "Uni";
+let newName = new Object(name);
+const len = newName.length;
+newName = null;
+
+
+```
 ### Tree Shaking原理
+
 
 
 ## HTTP
@@ -2107,7 +2134,7 @@ SSL 证书需要绑定 `IP`，不能再同一个 ip 上绑定多个域名，ipv4
 - 服务器推送： 服务端推送是一种在客户端请求之前发送数据的机制。网页使用了许多资源：HTML、样式表、脚本、图片等等。在HTTP1.1中这些资源每一个都必须明确地请求。这是一个很慢的过程。浏览器从获取HTML开始，然后在它解析和评估页面的时候，增量地获取更多的资源。因为服务器必须等待浏览器做每一个请求，网络经常是空闲的和未充分使用的。为了改善延迟，HTTP2.0引入了server push，它允许服务端推送资源给浏览器，在浏览器明确地请求之前，免得客户端再次创建连接发送请求到服务器端获取。这样客户端可以直接从本地加载这些资源，不用再通过网络。
 
 
-### HTTP
+### HTTP知识点
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922191832.png)
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210824184941.png)
@@ -2124,6 +2151,10 @@ POST和GET的区别：
     - 对参数的数据类型，GET只接受ASCII字符，而POST没有限制；
     - GET比POST更不安全，因为参数直接暴露在URL中，所以不是用来传递敏感信息的；
     - **GET参数通过URL传递的，POST放在Request body中。**
+    - 重点区别
+        - GET会产生一个TCP数据包，而POST会产生两个TCP数据包。
+        - 对于GET方式的请求，浏览器会把http header和data一并发送出去，服务器响应200(返回数据);
+        - 而对于POST，浏览器先发送header，服务器响应100 continue，浏览器再发送data，服务器响应200 ok(返回数据)。
 
 
 `HTTP`状态码：
@@ -2687,6 +2718,390 @@ CDN 回源有 3 种情况，
 - 另一种是缓存失效后，CDN 节点到源站获取资源；
 - 还有一种情况是在 CDN 管理后台或者使用开放接口主动刷新触发回源。
 
+### 缓存
+#### http 缓存
+浏览器缓存(Brower Caching)是浏览器对之前请求过的文件进行缓存，以便下一次访问时重复使用，节省带宽，提高访问速度，降低服务器压力
+
+http缓存机制主要在http响应头中设定，响应头中相关字段为Expires、Cache-Control、Last-Modified、Etag。
+- 缓存相关 header
+    - Expires：响应头，代表该资源的过期时间。
+    - Cache-Control：请求/响应头，缓存控制字段，精确控制缓存策略。
+    
+    
+    - If-Modified-Since：请求头，资源最近修改时间，由浏览器告诉服务器。
+    - Last-Modified：响应头，资源最近修改时间，由服务器告诉浏览器。
+
+    - Etag：响应头，资源标识，由服务器告诉浏览器。
+    - If-None-Match：请求头，缓存资源标识，由浏览器告诉服务器。
+    
+    - If-Modified-Since 和 Last-Modified
+    - Etag 和 If-None-Match
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210924072012.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210924074826.png)
+
+强缓存和协商缓存最大也是最根本的区别是：强缓存命中的话不会发请求到服务器（比如chrome中的200 from memory cache），协商缓存一定会发请求到服务器，通过资源的请求首部字段验证资源是否命中协商缓存，如果协商缓存命中，服务器会将这个请求返回，但是不会返回这个资源的实体，而是通知客户端可以从缓存中加载这个资源（304 not modified）
+
+
+#### 强缓存
+不需要发送请求到服务端，直接读取浏览器本地缓存，在 Chrome 的 Network 中显示的 HTTP 状态码是 200 ，在 Chrome 中，强缓存又分为 Disk Cache (存放在硬盘中)和 Memory Cache (存放在内存中)，存放的位置是由浏览器控制的。是否强缓存由 Expires、Cache-Control 和 Pragma 3 个 Header 属性共同来控制。
+
+- Expires
+    - Expires：Expires的值是一个 HTTP 日期，在浏览器发起请求时，会根据系统时间和 Expires 的值进行比较，如果系统时间超过了 Expires 的值，缓存失效。由于和系统时间进行比较，所以当系统时间和服务器时间不一致的时候，会有缓存有效期不准的问题。Expires 的优先级在三个 Header 属性中是最低的。
+ - Cache-Control：Cache-Control 是 HTTP/1.1 中新增的属性，在请求头和响应头中都可以使用，常用的属性值如有
+    - max-age：单位是秒，缓存时间计算的方式是距离发起的时间的秒数，超过间隔的秒数缓存失效
+    - no-cache：不使用强缓存，需要与服务器验证缓存是否新鲜。
+    - no-store：禁止使用缓存（包括协商缓存），每次都向服务器请求最新的资源。
+    - private：专用于个人的缓存，中间代理、CDN 等不能缓存此响应
+    - public：响应可以被中间代理、CDN 等缓存
+    - must-revalidate：在缓存过期前可以使用，过期后必须向服务器验证
+    - 浏览器先检查 Cache-Control，如果有，则以 Cache-Control 为准，忽略 Expires。如果没有 Cache-Control，则以 Expires 为准。
+    - Cache-Control 对缓存的控制粒度更细，包括缓存代理服务器的缓存控制。
+- Pragma
+    - Pragma 只有一个属性值，就是 no-cache ，效果和 Cache-Control 中的 no-cache 一致，不使用强缓存，需要与服务器验证缓存是否新鲜，在 3 个头部属性中的优先级最高。
+    - Pragma 和 Cache-Control 同时存在的时候，Pragma 的优先级高于 Cache-Control。
+    - 因为它优先级最高，当存在时一定不会命中强缓存。
+
+#### 协商缓存
+当浏览器的强缓存失效的时候或者请求头中设置了不走强缓存，并且在请求头中设置了If-Modified-Since 或者 If-None-Match 的时候，会将这两个属性值到服务端去验证是否命中协商缓存，如果命中了协商缓存，会返回 304 状态，加载浏览器缓存，并且响应头会设置 Last-Modified 或者 ETag 属性。
+
+-  ETag/If-None-Match
+    -  ETag/If-None-Match 的值是一串 hash 码，代表的是一个资源的标识符，当服务端的文件变化的时候，它的 hash码会随之改变，通过请求头中的 If-None-Match 和当前文件的 hash 值进行比较，如果相等则表示命中协商缓存。ETag 又有强弱校验之分，如果 hash 码是以 "W/" 开头的一串字符串，说明此时协商缓存的校验是弱校验的，只有服务器上的文件差异（根据 ETag 计算方式来决定）达到能够触发 hash 值后缀变化的时候，才会真正地请求资源，否则返回 304 并加载浏览器缓存。
+    -   If-Modified-Since是一个请求首部字段，并且只能用在GET或者HEAD请求中。
+    -   ETag优先级比Last-Modified高，同时存在时会以ETag为准。
+    -   发现有If-None-Match，则比较 If-None-Match 的 Etag 值，忽略If-Modified-Since的比较。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210924073615.png)
+- Last-Modified/If-Modified-Since
+    -  Last-Modified/If-Modified-Since 的值代表的是文件的最后修改时间，第一次请求服务端会把资源的最后修改时间放到 Last-Modified 响应头中，第二次发起请求的时候，请求头会带上上一次响应头中的 Last-Modified 的时间，并放到 If-Modified-Since 请求头属性中，服务端根据文件最后一次修改时间和 If-Modified-Since 的值进行比较，如果相等，返回 304 ，并加载浏览器缓存。
+
+    
+ETag/If-None-Match 的出现主要解决了 Last-Modified/If-Modified-Since 所解决不了的问题：
+    - 某些情况下服务器无法获取资源的最后修改时间
+    - 如果文件的修改频率在秒级以下，Last-Modified/If-Modified-Since 会错误地返回 304。Last-Modified只能精确到秒
+    - 如果文件被修改了，但是内容没有任何变化的时候，Last-Modified/If-Modified-Since 会错误地返回 304。使用ETag可以正确缓存
+
+
+
+不管用 Expires 还是 Cache-Control，他们都只能够控制缓存是否过期，但是在缓存过期之前，浏览器是无法得知服务器上的资源是否变化的。只有当缓存过期后，浏览器才会发请求询问服务器。
+- 我们不让 html 文件缓存，每次访问 html 都去请求服务器。所以浏览器每次都能拿到最新的html资源。
+    -  html 中 a.js 的版本号。
+    - 以版本号来区分，也可以以 MD5hash 值来区分
+
+```js
+<script src="http://test.com/a.js?version=0.0.2"></script>
+
+
+<script src="http://test.com/a.【hash值】.js"></script>
+```
+
+## 页面渲染和性能优化
+### 页面渲染（浏览器从输入 url 到页面渲染的整个流程）
+很多大公司面试喜欢问这样一道面试题，输入URL到看见页面发生了什么？
+```md
+- DNS解析
+- 发起TCP连接
+- 发送HTTP请求
+- 服务器处理请求并返回HTTP报文
+- 浏览器解析渲染页面
+- 连接结束。
+```
+#### DNS解析
+详情请见  面试题目中的DNS过程
+可以优化的点:
+    - DNS缓存:从离浏览器的距离排序的话，有以下几种: 浏览器缓存，系统缓存，路由器缓存，IPS服务器缓存，根域名服务器缓存，顶级域名服务器缓存，主域名服务器缓存。
+    - DNS负载均衡:DNS可以返回一个合适的机器的IP给用户，例如可以根据每台机器的负载量，该机器离用户地理位置的距离等等，这种过程就是DNS负载均衡。
+#### 发起TCP连接
+TCP提供一种可靠的传输，这个过程涉及到三次握手，四次挥手，TCP提供一种面向连接的，可靠的字节流服务。
+- 三次握手
+    - 第一次握手：
+        - 客户端发送syn包(Seq=x)到服务器，并进入SYN_SEND状态，等待服务器确认；
+    - 第二次握手
+        - 服务器收到syn包，必须确认客户的SYN（ack=x+1），同时自己也发送一个SYN包（Seq=y），即SYN+ACK包，此时服务器进入SYN_RECV状态；
+    - 第三次握手
+        - 客户端收到服务器的SYN＋ACK包，向服务器发送确认包ACK(ack=y+1)，此包发送完毕，客户端和服务器进入ESTABLISHED状态，完成三次握手。
+        - 握手过程中传送的包里不包含数据，三次握手完毕后，客户端与服务器才正式开始传送数据。理想状态下，TCP连接一旦建立，在通信双方中的任何一方主动关闭连接之前，TCP 连接都将被一直保持下去。
+    三次握手是为了防止失效的连接请求报文段突然又传送到主机B，因而产生错误。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210924215349.png)
+
+-  四次挥手
+    -  数据传输完毕后，双方都可释放连接。最开始的时候，客户端和服务器都是处于ESTABLISHED状态，假设客户端主动关闭，服务器被动关闭。
+    -  第一次挥手：
+        -  客户端发送一个FIN，用来关闭客户端到服务器的数据传送，也就是客户端告诉服务器：我已经不 会再给你发数据了(当然，在fin包之前发送出去的数据，如果没有收到对应的ack确认报文，客户端依然会重发这些数据)，但是，此时客户端还可 以接受数据。FIN=1，其序列号为seq=u（等于前面已经传送过来的数据的最后一个字节的序号加1），此时，客户端进入FIN-WAIT-1（终止等待1）状态。 TCP规定，FIN报文段即使不携带数据，也要消耗一个序号。
+    - 第二次握手：
+        - 服务器收到FIN包后，发送一个ACK给对方并且带上自己的序列号seq，确认序号为收到序号+1（与SYN相同，一个FIN占用一个序号）。此时，服务端就进入了CLOSE-WAIT（关闭等待）状态。TCP服务器通知高层的应用进程，客户端向服务器的方向就释放了，这时候处于半关闭状态，即客户端已经没有数据要发送了，但是服务器若发送数据，客户端依然要接受。这个状态还要持续一段时间，也就是整个CLOSE-WAIT状态持续的时间。此时，客户端就进入FIN-WAIT-2（终止等待2）状态，等待服务器发送连接释放报文（在这之前还需要接受服务器发送的最后的数据）。
+    - 第三次握手
+        - 服务器发送一个FIN，用来关闭服务器到客户端的数据传送，也就是告诉客户端，我的数据也发送完了，不会再给你发数据了。由于在半关闭状态，服务器很可能又发送了一些数据，假定此时的序列号为seq=w，此时，服务器就进入了LAST-ACK（最后确认）状态，等待客户端的确认。
+    - 第四次握手
+        - 主动关闭方收到FIN后，发送一个ACK给被动关闭方，确认序号为收到序号+1，此时，客户端就进入了TIME-WAIT（时间等待）状态。注意此时TCP连接还没有释放，必须经过2∗MSL（最长报文段寿命）的时间后，当客户端撤销相应的TCB后，才进入CLOSED状态。服务器只要收到了客户端发出的确认，立即进入CLOSED状态。同样，撤销TCB后，就结束了这次的TCP连接。可以看到，服务器结束TCP连接的时间要比客户端早一些。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210924215839.png)
+
+- 为什么客户端最后还要等待2MSL？
+    - MSL（Maximum Segment Lifetime），TCP允许不同的实现可以设置不同的MSL值。
+    - 第一，保证客户端发送的最后一个ACK报文能够到达服务器，因为这个ACK报文可能丢失，站在服务器的角度看来，我已经发送了FIN+ACK报文请求断开了，客户端还没有给我回应，应该是我发送的请求断开报文它没有收到，于是服务器又会重新发送一次，而客户端就能在这个2MSL时间段内收到这个重传的报文，接着给出回应报文，并且会重启2MSL计时器。
+    - 第二，防止类似与“三次握手”中提到了的“已经失效的连接请求报文段”出现在本连接中。客户端发送完最后一个确认报文后，在这个2MSL时间中，就可以使本连接持续的时间内所产生的所有报文段都从网络中消失。这样新的连接中不会出现旧连接的请求报文。
+
+- 为什么建立连接是三次握手，关闭连接确是四次挥手呢？
+    - 建立连接的时候， 服务器在LISTEN状态下，收到建立连接请求的SYN报文后，把ACK和SYN放在一个报文里发送给客户端。
+而关闭连接时，服务器收到对方的FIN报文时，仅仅表示对方不再发送数据了但是还能接收数据，而自己也未必全部数据都发送给对方了，所以己方可以立即关闭，也可以发送一些数据给对方后，再发送FIN报文给对方来表示同意现在关闭连接，因此，己方ACK和FIN一般都会分开发送，从而导致多了一次。
+
+#### 发送HTTP请求
+请看HTTP和缓存的总结：
+- 请求
+    - 请求行
+        - 常见的请求方法区别：这里主要展示POST和GET的区别
+    - 请求报头
+    - 请求正文
+前面基础介绍，在本文档的缓存知识点这个专题下面。
+- 缓存
+    - 强制缓存
+    - 协商缓存
+#### 服务器处理请求并返回HTTP报文
+请看HTTP和缓存的总结：
+- 响应
+    - 状态码 
+    - 响应报头：响应报头字段有: Server, Connection...。
+    - 响应报文：服务器请求的HTML,CSS,JS文件就放在这里面
+
+#### 浏览器解析渲染页面
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210926121230.png)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210926125828.png)
+注意：上图流程中有很多连接线，这表示了Javascript动态修改了DOM属性或是CSS属性会导致重新Layout，但有些改变不会重新Layout，就是上图中那些指到天上的箭头，比如修改后的CSS rule没有被匹配到元素。
+
+这个图就是Webkit解析渲染页面的过程。
+    - 解析HTML形成DOM树
+    - 解析CSS形成CSSOM 树
+    - 合并DOM树和CSSOM树形成渲染树
+    - 浏览器开始渲染并绘制页面：这个过程涉及两个比较重要的概念回流和重绘，DOM结点都是以盒模型形式存在，需要浏览器去计算位置和宽度等，这个过程就是回流。等到页面的宽高，大小，颜色等属性确定下来后，浏览器开始绘制内容，这个过程叫做重绘。浏览器刚打开页面一定要经过这两个过程的，但是这个过程非常非常非常消耗性能，所以我们应该尽量减少页面的回流和重绘
+
+**回流必定会发生重绘，重绘不一定会引发回流。**
+性能优化之回流重绘
+- 回流
+    - 当Render Tree中部分或全部元素的尺寸、结构、或某些属性发生改变时，浏览器重新渲染部分或全部文档的过程称为回流。
+    - 会导致回流的操作：
+        - 页面首次渲染
+        - 浏览器窗口大小发生改变
+        - 元素尺寸或位置发生改变（边距、填充、边框、宽度和高度）
+        - 元素内容变化（文字数量或图片大小等等）（比如用户在input框中输入文字）
+        - 元素字体大小变化
+        - 添加或者删除可见的DOM元素
+        - 激活CSS伪类（例如：:hover）
+        - 查询某些属性或调用某些方法
+        - 设置 style 属性的值
+        ````css
+            1. clientWidth、clientHeight、clientTop、clientLeft
+            2. offsetWidth、offsetHeight、offsetTop、offsetLeft
+            3. scrollWidth、scrollHeight、scrollTop、scrollLeft
+            4. scrollIntoView()、scrollIntoViewIfNeeded()
+            5. getComputedStyle()
+            6. getBoundingClientRect()
+            7. scrollTo()
+        ```
+- 重绘
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210926130248.png)
+    - 当页面中元素样式的改变并不影响它在文档流中的位置时（例如：color、background-color、visibility等），浏览器会将新样式赋予给元素并重新绘制它，这个过程称为重绘。
+- 优化
+    - css方面优化
+        - 避免使用table布局。可能很小的一个小改动会造成整个 table 的重新布局。
+        - 尽可能在DOM树的最末端改变class。
+        - 避免设置多层内联样式。
+        - 动画实现的速度的选择，动画速度越快，回流次数越多，也可以选择使用 requestAnimationFrame。将动画效果应用到position属性为absolute或fixed的元素上。
+        - 避免使用CSS表达式（例如：calc()）。
+        - 使用 transform 替代 top
+        - 使用 visibility 替换 display: none ，因为前者只会引起重绘，后者会引发回流（改变了布局）
+        - CSS 选择符从右往左匹配查找，避免节点层级过多
+        - 将频繁重绘或者回流的节点设置为图层，图层能够阻止该节点的渲染行为影响别的节点。比如对于 video 标签来说，浏览器会自动将该节点变为图层。
+    - js方面的优化
+        - 不要把节点的属性值放在一个循环里当成循环里的变量。
+        - 避免频繁操作样式，最好一次性重写style属性，或者将样式列表定义为class并一次性更改class属性。
+        - 避免频繁操作DOM，创建一个documentFragment，在它上面应用所有DOM操作，最后再把它添加到文档中。
+        - 也可以先为元素设置display: none，操作结束后再把它显示出来。因为在display属性为none的元素上进行的DOM操作不会引发回流和重绘。
+        - 避免频繁读取会引发回流/重绘的属性，如果确实需要多次使用，就用一个变量缓存起来。
+        - 对具有复杂动画的元素使用绝对定位，使它脱离文档流，否则会引起父元素及后续元素频繁回流。
+
+- JS的解析
+    - JS的解析是由浏览器的JS引擎完成的。由于JavaScript是单进程运行，也就是说一个时间只能干一件事，干这件事情时其他事情都有排队，但是有些人物比较耗时（例如IO操作），所以将任务分为同步任务和异步任务，所有的同步任务放在主线程上执行，形成执行栈，而异步任务等待，当执行栈被清空时才去看看异步任务有没有东西要搞，有再提取到主线程执行，这样往复循环，就形成了Event Loop事件循环，下面来看看大人物
+- Event Loop
+    前面的JS中有  Event Loop  这个知识点
+    
+### 提高页面渲染效率
+基于上面介绍的浏览器渲染原理，DOM 和 CSSOM 结构构建顺序，初始化可以对页面渲染做些优化，提升页面性能。
+    - JS优化： <script> 标签加上 defer属性 和 async属性 用于在不阻塞页面文档解析的前提下，控制脚本的下载和执行。
+        - defer属性： 用于开启新的线程下载脚本文件，并使脚本在文档解析完成后执行。
+        - async属性： HTML5新增属性，用于异步下载脚本文件，下载完毕立即解释执行代码。
+    - CSS优化： <link> 标签的 rel属性 中的属性值设置为 preload 能够让你在你的HTML页面中可以指明哪些资源是在页面加载完成后即刻需要的,最优的配置加载顺序，提高渲染性能
+    - HTML文档结构层次尽量少，最好不深于六层；
+    - 脚本尽量后放，放在前即可；
+    - 少量首屏样式内联放在标签内；
+    - 样式结构层次尽量简单；
+    - 在脚本中尽量减少DOM操作，尽量缓存访问DOM的样式信息，避免过度触发回流；
+    - 减少通过JavaScript代码修改元素样式，尽量使用修改class名方式操作样式或动画；
+    - 动画尽量使用在绝对定位或固定定位的元素上；
+    - 隐藏在屏幕外，或在页面滚动时，尽量停止动画；
+    - 尽量缓存DOM查找，查找器尽量简洁；
+    - 涉及多域名的网站，可以开启域名预解析
+
+### 提高首屏展示效率
+基于上面介绍的浏览器渲染原理，DOM 和 CSSOM 结构构建顺序，初始化可以对页面渲染做些优化，提升页面性能。
+
+很多人在构建前端项目时会发现打包出来的chunk.vendors.xxx.js文件实在是太大,导致首屏加载速度很慢
+    - 使用webpack-bundle-analyzer分析前端项目包大小, 找出问题源头.
+```js
+// vue.config.js
+chainWebpack: (config) => {
+  config.plugin('webpack-bundle-analyzer').use(require('webpack-bundle-analyzer').BundleAnalyzerPlugin);
+}
+````
+    - 去掉vuecli打包生成的map文件：这些文件用于错误时给出准确的提示,线上环境是不需要的。
+```js
+// vue.config.js
+productionSourceMap: false
+```
+    - CDN引入需要的资源
+```js
+// vue.config.js
+const cdn = {
+  css: [
+    // antd css 由于引入失败只好放弃了antd的按需引入
+  ],
+  js: [
+    // vue
+    'https://cdn.bootcdn.net/ajax/libs/vue/2.6.10/vue.min.js',
+    // vue-router
+    'https://cdn.bootcdn.net/ajax/libs/vue-router/3.1.3/vue-router.min.js',
+    // vuex
+    'https://cdn.bootcdn.net/ajax/libs/vuex/3.1.2/vuex.min.js',
+    // axios
+    'https://cdn.bootcdn.net/ajax/libs/axios/0.18.0/axios.min.js',
+    // moment
+    'https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.js',
+  ],
+};
+
+chainWebpack: (config) => {
+  // 正式环境配置cdn引入
+  if (process.env.NODE_ENV === 'production') {
+    let externals = {
+      vue: 'Vue',
+      axios: 'axios',
+      'vue-router': 'VueRouter',
+      vuex: 'Vuex',
+      moment: 'moment',
+    };
+    config.externals(externals);
+    // 通过 html-webpack-plugin 将 cdn 注入到 index.html 之中
+    config.plugin('html').tap((args) => {
+      args[0].cdn = cdn;
+      return args;
+    });
+  }
+},
+
+
+//public/index.html
+<% if (process.env.NODE_ENV === 'production') { %>
+<% for(var css of htmlWebpackPlugin.options.cdn.css) { %>
+<link rel="stylesheet" href="<%=css%>" as="style">
+<% } %>
+<% for(var js of htmlWebpackPlugin.options.cdn.js) { %>
+<script src="<%=js%>"></script>
+<% } %>
+<% } %>
+```
+    - 开启gzip打包
+```js
+// vue.config.js
+const path = require('path');
+const PrerenderSPAPlugin = require('prerender-spa-plugin');
+const Renderer = PrerenderSPAPlugin.PuppeteerRenderer;
+configureWebpack: (config) => {
+  // 代码 gzip
+  const productionGzipExtensions = ['html', 'js', 'css'];
+  config.plugins.push(
+    new CompressionWebpackPlugin({
+      filename: '[path].gz[query]',
+      algorithm: 'gzip',
+      test: new RegExp('\\.(' + productionGzipExtensions.join('|') + ')$'),
+      threshold: 10240, // 只有大小大于该值的资源会被处理 10240
+      minRatio: 0.8, // 只有压缩率小于这个值的资源才会被处理
+      deleteOriginalAssets: false, // 删除原文件
+    })
+  );
+},
+
+//同时需要配置nginx才可支持gzip
+// nginx.conf
+http {
+  #nginx开启gzip
+  #前端文件在build的时候已经配置好压缩,需要再配置一下nginx;
+  gzip on; 
+  gzip_static on;
+  gzip_buffers 4 16k;
+  gzip_comp_level 5;
+  gzip_types text/plain application/javascript text/css application/xml text/javascript application/x-httpd-php image/jpeg 
+              image/gif image/png;   
+}
+```
+    - 路由懒加载
+```js
+// router.js
+const routes: Array<RouteConfig> = [
+  {
+    path: '/',
+    name: 'Chat',
+    component: () => import('@/views/GenalChat.vue'),
+  },
+];
+```
+
+
+
+#### 首屏性能衡量的指标
+1. FPS：最能反映页面性能的指标FPS(frame per second)，一般系统设置屏幕的刷新率为60fps。小于24就会出现明显的卡顿
+2. DOMContentLoaded：DOM加载并解析完成会触发DOMContentLoaded事件，如果源码输出的内容太多，客户端解析DOM的时间也会变长，例如增加2000个嵌套层叠可能会相应增加50-200ms，尽量保证首屏输出即可，后续的内容只保留钩子，利用js渲染。
+3. 流畅度：FPS 值越高，视觉呈现越流畅，在等待的过程中可以加入一些视觉缓冲。
+4. 首屏加载时间：通过`window.performance.timing`来计算出来。
+```md
+1. DNS解析耗时: domainLookupEnd - domainLookupStart
+2. TCP连接耗时: connectEnd - connectStart
+3. SSL安全连接耗时: connectEnd - secureConnectionStart
+4. 网络请求耗时(TTFB): responseStart - requestStart
+5. 数据传输耗时: responseEnd - responseStart
+6. DOM解析耗时: domInteractive - responseEnd
+7. 资源加载耗时: loadEventStart - domContentLoadedEventEnd
+8. 首包时间: responseStart - domainLookupStart
+9. 首次渲染时间 / 白屏时间: responseEnd - fetchStart
+10. 首次可交互时间: domInteractive - fetchStart
+11. DOM Ready时间: domContentLoadEventEnd - fetchStart
+12. 页面完全加载时间: loadEventStart - fetchStart
+```
+
+#### 优化的思考角度
+```md
+1. 首屏一定要快
+2. 滚屏一定要流畅
+3. 能不加载的先别加载
+4. 能不执行的先别执行
+5. 渐进展现、圆滑展现
+```
+
+#### 为什么首屏会加载缓慢？
+```md
+我先列一下目前我遇见影响加载的点：
+1. 静态资源的加载未处理，资源加载过多
+2. 调用的接口太多，接口的时间太久（此处前端也没有办法...）
+3. 前端组件根据后端返回按需加载
+```
+
+#### 如何进行优化
+- 懒加载
+    - 优先加载主要模块，让用户第一眼能看到最重要的信息。比如只有某种情况才会加载的模块使用require()，按需加载，这个方法在webpack打包的时候把导入的模块单独打一个包，不会加入到首屏加载的包中，优化体积大小。
+- 懒执行
+    - 一些需要点击或者hover才会触发的模块，就等触发的时候再加载。
+- 图片尺寸的控制和懒加载
+    - 尽量使用webp格式的照片，因为同样的视觉效果，其体积为其他的1/3大小。使用雪碧图来处理首屏上所有的小icon，走cdn缓存等。
+
+
 
 ## Webpack Vite Rollup
 
@@ -2718,4 +3133,3 @@ CDN 回源有 3 种情况，
 - git merge 和 git rebase 的区别
     - 不同于 git rebase 的是，git merge 在不是 fast-forward（快速合并）的情况下，会产生一条额外的合并记录，类似 Merge branch 'xxx' into 'xxx' 的一条提交信息。
     - 另外，在解决冲突的时候，用 merge 只需要解决一次冲突即可，简单粗暴，而用 rebase 的时候 ，需要依次解决每次的冲突，才可以提交。
-- 
