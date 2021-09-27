@@ -673,8 +673,346 @@ vw vh是固定的百分比，这样在小屏上东西太小，大屏上东西太
 
 
 ## JS
+### ES5 继承
+#### 原型链继承
+```js
+function Parent() {
+    this.name = 'arzh'
+}
+
+Parent.prototype.getName = function () {
+    console.log(this.name)
+}
+
+function Child() {
+    
+}
+
+//主要精髓所在
+Child.prototype = new Parent()
+Child.prototype.constructor = Child
+
+var arzhChild2 = new Child()
+arzhChild2.names.push('arzh2')
+console.log(arzhChild2.names) //[ 'arzh', 'arzh1', 'arzh2' ]
+
+var arzhChild3 = new Child()
+arzhChild3.names.push('arzh3')
+console.log(arzhChild3.names) //[ 'arzh', 'arzh1', 'arzh2', 'arzh3' ]
+
+```
+- 缺点
+    - 每个实例对引用类型属性的修改都会被其他的实例共享
+    - 在创建Child实例的时候，无法向Parent传参。这样就会使Child实例没法自定义自己的属性（名字）
+
+#### 构造函数实现继承
+```js
+function Parent() {
+    this.names = ['arzh','arzh1']
+}
+
+function Child() {
+    Parent.call(this)
+}
+
+var arzhChild2 = new Child()
+arzhChild2.names.push('arzh2')
+console.log(arzhChild2.names) //[ 'arzh', 'arzh1', 'arzh2' ]
+
+var arzhChild3 = new Child()
+arzhChild3.names.push('arzh3')
+console.log(arzhChild3.names) //[ 'arzh', 'arzh1', 'arzh3' ]
+```    
+- 优点
+    - 解决了每个实例对引用类型属性的修改都会被其他的实例共享的问题
+    - 子类可以向父类传参
+- 缺点
+    - 无法复用父类的公共函数
+    - 每次子类构造实例都得执行一次父类函数
+
+#### 组合式继承(原型链继承和借用构造函数合并)
+```js
+function Parent(name) {
+    this.name = name
+    this.body = ['foot','hand']
+}
+
+function Child(name, age) {
+    Parent.call(this, name)
+    this.age = age
+}
+
+Child.prototype = new Parent()
+Child.prototype.constructor = Child
+
+var arzhChild1 = new Child('arzh1', '18')
+arzhChild1.body.push('head1')
+console.log(arzhChild1.name,arzhChild1.age) //arzh1 18
+console.log(arzhChild1.body) //[ 'foot', 'hand', 'head1' ]
+
+var arzhChild2 = new Child('arzh2', '20')
+arzhChild2.body.push('head2')
+console.log(arzhChild2.name,arzhChild2.age) //arzh2 20
+console.log(arzhChild2.body) //[ 'foot', 'hand', 'head2' ]
+```
+- 优点 
+    - 解决了每个实例对引用类型属性的修改都会被其他的实例共享的问题
+    - 子类可以向父类传参
+    - 可实现父类方法复用
+- 缺点:
+    - 需执行两次父类构造函数，第一次是Child.prototype = new Parent(),第二次是Parent.call(this, name)造成不必要的浪费
+
+#### 原型式继承
+复制传入的对象到创建对象的原型上，从而实现继承
+```js
+function createObj(o) {
+    function F(){}
+    F.prototype = o;
+    return new F();
+}
+```
+```js
+function Parent4() {
+  this.name = "parent4";
+  this.play = [1, 2, 3];
+}
+function Child4() {
+  Parent4.call(this);
+  this.type = "child4";
+}
+// 就是为了继承父类的原型对象
+// 在原型对象中有constructor属性，因为子类和父类都是一个原型对象，所以属性值都是一样的
+// Child4.prototype.constructor = Child4  加上这句话也不行，因为Child4.prototype = Parent4.prototype是一个对象，你改变Child4.prototype 就等于改变 Parent4.prototype
+Child4.prototype = Parent4.prototype;
+var s5 = new Child4();
+var s6 = new Child4();
+console.log(s5, s6);
+
+console.log(s5 instanceof Child4, s5 instanceof Parent4);
+// 但是使用这种的时候  你去找我这实例是谁产生的，竟然是父类（不是我们想要的）
+console.log(s5.constructor);
+```
+- 缺点
+    -  同原型链继承一样，每个实例对引用类型属性的修改都会被其他的实例共享
+
+#### 寄生式继承
+寄生式继承的思路是创建一个用于封装继承过程的函数，通过传入一个对象，然后复制一个对象的副本，然后对象进行扩展，最后返回这个对象。这个扩展的过程就可以理解是一种继承。这种继承的优点就是对一个简单对象实现继承，如果这个对象不是我们的自定义类型时。缺点是没有办法实现函数的复用。可以在创建对象的时候，把对象方法也通过此种方式继承。
+```js
+function createEnhanceObj(o) {
+    //代替原型式继承的createObj
+    var clone = Object.create(o)
+    clone.getName = function () {
+        console.log('arzh')
+    }
+    return clone;
+}
+```
+```js
+function Parent5() {
+  this.name = "parent5";
+  this.play = [1, 2, 3];
+}
+function Child5() {
+  Parent5.call(this);
+  this.type = "child5";
+}
+// 对象关联 一个新的对象  子类和父类的原型进行隔离
+Child5.prototype = Object.create(Parent5.prototype);
+Child5.prototype.constructor = Child5;
+```
+- 缺点
+    - 同借用构造函数一样，无法复用父类函数，每次创建对象都会创建一遍方法
+
+#### 寄生组合式继承
+不需要为了子类的原型而多new了一次父类的构造函数，如Child.prototype = new Parent() 只需要复制父类原型的一个副本给子类原型即可。
+```js
+function inheritPrototype(Parent, Child){
+	Child.prototype = Object.create(Parent.prototype) //创建父类原型的一个副本,把副本赋值给子类原型
+	Child.prototype.constructor = Child;
+}
+```
+```js
+function Parent(name) {
+    this.name = name
+}
+
+Parent.prototype.getName = function () {
+    console.log(this.name)
+}
+
+function Child(color) {
+    Parent.call(this, 'arzh')
+    this.color = color
+}
+
+Child.prototype = Object.create(Parent.prototype) //创建父类原型的一个副本,把副本赋值给子类原型
+Child.prototype.constructor = Child;
+
+var arzhChild = new Child('red')
+console.log(arzhChild.name) // 'arzh'
+```
+- 优点
+    - 不必为了指定子类型的原型而调用父类型的构造函数
+
+#### ES6继承
+ES6支持通过类来实现继承，方法比较简单.
+```js
+class Point {
+    constructor(x, y) {
+        this.x = x
+        this.y = y
+    }
+    
+    toString() {
+        return this.x + '' + this.y
+    }
+}
+
+class ColorPoint extends Point {
+    constructor(x, y, color) {
+        super(x, y) //调用父类的constructor(x, y)
+        this.color = color
+    }
+    
+    toString() {
+        return this.color + ' ' + super.toString() // 调用父类的toString()
+    }
+}
+
+var colorPoint = new ColorPoint('1', '2', 'red')
+
+console.log(colorPoint.toString())  // red 12
+```
+
+#### ES5继承和ES6继承的差别
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210927093321.png)
+- 差别1：
+    - ES6的构造函数通过原型链连接起来了，构造函数之间有直接的引用关系；
+    - ES5实际上是使用call或者apply借用父类构造函数实现的实例化，构造函数之间没有直接的引用关系
+- 差别2：
+    - ES5的实例化对象是由子类构造函数先创建的，然后父类构造函数是使用call或者apply修改这个对象
+    - ES6的实例化对象是由父类构造函数先创建的（这就是为什么要先调用super），然后子类构造函数修改这个对象
+
+#### ES6实例成员、静态成员、静态方法处理
+- 静态方法
+    - 类相当于实例的原型，所有在类中定义的方法，都会被实例继承。如果在一个方法前，加上static关键字，就表示该方法不会被实例继承，而是直接通过类来调用，这就称为“静态方法”。
+    - 静态方法包含this关键字，这个this指的是类，而不是实例。
+    - 静态方法可以与非静态方法重名。
+    - 父类Foo有一个静态方法，子类Bar可以调用这个方法。静态方法也是可以从super(super.classMethod())对象上调用的。
+```js
+class Foo {
+  static classMethod() {
+    return 'hello';
+  }
+}
+
+Foo.classMethod() // 'hello'
+
+var foo = new Foo();
+foo.classMethod()
+// TypeError: foo.classMethod is not a function
+```
+
+- 实例属性
+    - 定义在constructor()方法里面的this上面
+    - 定义在类的最顶层。
+```js
+class IncreasingCounter {
+  _count = 0;
+  constructor() {
+    this._count1 = 0;
+  }
+  get value() {
+    console.log('Getting the current value!');
+    return this._count;
+  }
+  increment() {
+    this._count++;
+  }
+}
+```
+
+- 静态属性
+    - 静态属性指的是 Class 本身的属性，即Class.propName，而不是定义在实例对象（this）上的属性。
+    -  ES6 明确规定，Class 内部只有静态方法，没有静态属性。
+    -  写法为Foo类定义了一个静态属性prop。
+```js
+// 老写法
+class Foo {
+  // ...
+}
+Foo.prop = 1;
+
+// 新写法
+class Foo {
+  static prop = 1;
+}
+```
+
+- 私有方法
+    - 私有方法和私有属性，是只能在类的内部访问的方法和属性，外部不能访问。
+    - 一种做法是在命名上加以区别。
+        - _bar()方法前面的下划线，表示这是一个只限于内部使用的私有方法。但是，这种命名是不保险的，在类的外部，还是可以调用到这个方法。
+    - 另一种方法就是索性将私有方法移出类，因为类内部的所有方法都是对外可见的。
+    - 一种方法是利用Symbol值的唯一性，将私有方法的名字命名为一个Symbol值。
+```js
+class Widget {
+
+  // 公有方法
+  foo (baz) {
+    this._bar(baz);
+  }
+
+  // 私有方法
+  _bar(baz) {
+    return this.snaf = baz;
+  }
+
+  // ...
+}
+
+
+
+
+class Widget {
+  foo (baz) {
+    bar.call(this, baz);
+  }
+
+  // ...
+}
+function bar(baz) {
+  return this.snaf = baz;
+}
+
+
+
+
+const bar = Symbol('bar');
+const snaf = Symbol('snaf');
+
+export default class myClass{
+
+  // 公有方法
+  foo(baz) {
+    this[bar](baz);
+  }
+
+  // 私有方法
+  [bar](baz) {
+    return this[snaf] = baz;
+  }
+
+  // ...
+};
+
+const inst = new myClass();
+Reflect.ownKeys(myClass.prototype)
+// [ 'constructor', 'foo', Symbol(bar) ]
+```
 
 ### 手写函数（前面有很多）
+在JS基础中有很多这种需要手写的函数和方法等。
 
 ### 变量提升(函数提升)
 - 所谓的变量提升（变量提升），是指在JS代码执行中， JavaScript引擎（V8）把变量的声明部分和函数的声明部分提升到代码开头的行为，变量提升后，会给变量设置默认值undefined，给函数赋值函数体。
@@ -1311,11 +1649,18 @@ if(isDev) {
     - ES6 Module 的特性可以很容易实现 Tree Shaking 和 Code Splitting。
 
 ### 0.1+0.2 !== 0.3
+JS里整数的计算是正确的，但是小数的计算是有误差的。
+简单的说，就是小数的表示肯定有误差，只是误差极小。
 ```js
 0.1 + 0.2 
 0.30000000000000004
 ```
 对小数点以后的数乘以2，取结果的整数部分（不是1就是0），然后再用小数部分再乘以2，再取结果的整数部分……以此类推，直到小数部分为0或者位数已经够了就OK了。然后把取的整数部分按先后次序排列
+对浮点数进行运算的过程中，需要将十进制转换成二进制。
+### Number()的存储空间是多大？假如接口返回一个超过最大字节的数字怎么办？
+Number类型的最大值为2的53次方，即9007199254740992，如果超过这个值，比如900719925474099222，那么得到的值会不精确，也就是900719925474099200
+
+### 浏览器对于小数单位是怎么计算的？
 对浮点数进行运算的过程中，需要将十进制转换成二进制。
 
 ### 发布订阅模式是怎么样的：nodejs 中 EventEmitter 类，主要方法有 on，emit，once，off
@@ -1556,15 +1901,34 @@ p.then(
     - 可暂停函数, yield可暂停，next方法可启动，每次返回的是yield后的表达式结果。
     - yield表达式本身没有返回值，或者说总是返回undefined。next方法可以带一个参数，该参数就会被当作上一个yield表达式的返回值。
 ```js
-function *foo(x) {
-  let y = 2 * (yield (x + 1))
-  let z = yield (y / 3)
-  return (x + y + z)
+function *main() {
+    try{
+        const user = yield ajax('/api/1')
+        console.log(users);
+
+        const posts = yield ajax('/api/2')
+        console.log(posts);
+
+        const urls = yield ajax('/api/3')
+        console.log(urls);
+
+    }catch(e){
+        console.log(e);
+    }
 }
-let it = foo(5)
-console.log(it.next())   // => {value: 6, done: false}
-console.log(it.next(12)) // => {value: 8, done: false}
-console.log(it.next(13)) // => {value: 42, done: true}
+
+const g = main()
+
+function handleResults(results){
+    if(results.done) return
+    results.value.then(data => {
+        handleResults(g.next(data));
+    },error => {
+        g.throw(error);
+    })
+}
+
+handleResults(g.next())
 ```
 
 - async/await
@@ -1745,6 +2109,7 @@ addEventListener第一个参数事件类型，第二个类型即绑定的具体�
     - 只能在回调里处理异常。
 
 Promise 是异步编程的一种解决方案，比传统的异步解决方案【回调函数】和【事件】更合理、更强大。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210926211726.png)
 ```js
 new Promise(请求1)
     .then(请求2(请求结果1))
@@ -1754,7 +2119,10 @@ new Promise(请求1)
     .catch(处理异常(异常信息))
 ```
 Promise 的写法更为直观，并且能够在外层捕获异步函数的异常信息。
-
+- Promise 对象的 then 方法会返回一个全新的 Promise 对象
+- 后面的 then 方法就是在为上ー个 then 返回的 Promise 注册回调
+- 前面 then 方法中回调函数的返回值会作为后面 then 方法回调的参数
+- 如果回调中返回的是 Promise，那后面 then 方法的回调会等待它的结束
 ### 尾递归调用及尾调用优化
 
 #### 尾调用
@@ -1816,7 +2184,7 @@ one函数执行时，会把one函数添加进调用栈中，one函数现在为�
 在two函数中又调用three函数，因为有return当前调用栈中只有three函数。
 当three函数执行完成后，调用栈弹出three函数，此时调用栈当前为空。
 
-### 尾递归
+#### 尾递归
 函数尾调用自身，这个形式称为尾递归。
 ```js
 function foo() {
@@ -1877,6 +2245,8 @@ function factorial(num, num1 = 0, num2 = 1) {
 
 
 Event Loop即事件循环，是指浏览器或Node的一种解决javaScript单线程运行时不会阻塞的一种机制，也就是我们经常使用异步的原理。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210926210917.png)
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922153333.png)
 
@@ -1984,6 +2354,7 @@ JS如果执行时间过长就会阻塞页面。
 ### 装箱拆箱，隐式转换
 - 显示装箱
     - 显示装箱非常简单，就是通过内置对象或者说基本包装类型对基本数据类型进行操作。
+    - 根据基础类型构造一个临时对象，能在基础类型上调用对应对象的原型上的方法。 该临时对象只存在于方法调用那一行代码执行的瞬间，执行方法后立刻被销毁。
 ```js
 // 我们的name是一个对象，能够调用相应的方法或者原型链上的方法。
 const name = new String("Uni");
@@ -1991,14 +2362,37 @@ String.prototype.age = "20";
 console.log(name.age);
 ```
 - 隐式装箱
+    - 创建一个对应类型的实例
+    - 在实例中调用需要的方法或属性
+    - 销毁这个实例
 ```js
+'lxh'.charAt(0);
+
 const name = "Uni";
 let newName = new Object(name);
 const len = newName.length;
 newName = null;
-
-
 ```
+浏览器对于这些常用的一些隐式装箱有着一定的预先处理，为的就是减少性能损耗。
+
+
+
+拆箱，就是装箱的反向操作，指的是将引用类型转换为对应的基本类型。常用的就是引用类型的valueOf和toString两个方法。JS标准规定了ToPrimitive用于拆箱转换。
+JS标准规定了ToPrimitive函数用于拆箱转换。ToPrimitive会首先调用valueOf 和 toString来获取基本数据类型。
+
+复杂数据类型在隐式转换时，先调用 valueOf，再调用 toString
+```js
+const bool = new Boolean(false);
+console.log(bool.valueOf());    // false
+
+if (!bool.valueOf()) {
+    console.log('ok');        // ok
+} else {
+    console.log('okk');
+}
+```
+
+
 ### Tree Shaking原理
 
 
