@@ -630,6 +630,320 @@ function deepClone(obj, cache = new WeakMap()) {
 ```
 
 ### 手写相关函数
+#### 手写Promise
+```js
+/**
+ * 1. Promise就是一个类   在执行这个类的时候 需要传递一个执行器进去  执行器会立即执行
+ * 2. Promise中有三种状态 分别为 成功fulfilled 失败rejected 等待pending  一旦状态确定就不可以更改
+ * 3. resolve,reject函数是用来更改状态的
+ * 4. then方法内部做的事情就是判断 如果状态是成功  调用成功的回调函数 如果状态是失败 调用失败的回调函数。then方法是被定义在原生对象上的方法
+ * 5. then成功回调有一个参数 表示成功之后的值 then失败回调有一个参数  表示失败后的原因
+ */
+const PENDING = 'pending'
+const FULFILLED = 'fulfilled'
+const REJECTED = 'rejected'
+
+class MyPromise {
+    status = PENDING
+    // 成功之后的值
+    value = undefined
+    // 失败之后的原因
+    error = undefined
+    // 成功回调
+    successCallback = []
+    // 失败回调
+    failureCallback = []
+    //传递执行器
+    construct(executor){
+        // 执行器会立即执行  (Promise的立即执行性,除了resolve，reject都执行)
+        try {
+            executor(this.resolve,this.reject)
+            // 捕获执行器错误
+        } catch (error) {
+            this.reject(error)
+        }
+    }
+    resolve = (value) => {
+        // 如果状态不是等待 阻止程序向下执行
+        if(this.status !== PENDING) return   
+        // 更改状态为成功
+        this.status = FULFILLED
+        // 保存成功之后的值
+        this.value = value
+
+        
+        // 异步执行的时候 判断成功回调是否存在 如果存在 调用
+        // this.successCallback && this.successCallback(this.value)
+        while(this.successCallback.length){
+            //从前往后调用
+            this.successCallback.shift()
+        }
+    }
+    reject = (error) => {
+        // 如果状态不是等待 阻止程序向下执行
+        if(this.status !== PENDING) return  
+        // 更改状态为失败
+        this.status = REJECTED
+        // 保存失败之后的原因
+        this.error = error
+
+
+        // 异步执行的时候 判断失败回调是否存在 如果存在 调用
+        // this.failureCallback && this.failureCallback(this.error)
+        while(this.failureCallback.length){
+            //从前往后调用
+            this.failureCallback.shift()
+        }
+    }
+    then(successCallback, failureCallback){
+        /**
+        .then()
+        .then()
+.       .then(value => console.log(value))
+         */
+        // 将 then 方法的参数变成可选参数
+        successCallback  = successCallback ? successCallback : value => value
+        // then链式调用
+        let promise2 = new MyPromise((resolve,reject) => {
+            // 判断状态
+            if(this.status === FULFILLED) {
+                // 变成异步代码   等待所有同步代码完成之后执行  这样做的原因是为了获取 promise2
+                setTimeout(() =>{
+                    // 捕获 then 链式调用的错误  上一个then的错误  传给下一个then的catch
+                    try {
+                        let x = successCallback(this.value)
+                        // 判断 x 的值是普通纸还是promise对象
+                        // 如果是普通值 直接调用resolve
+                        // 如果是promise对象，查看promise对象返回的结果
+                        // 再根据promise对象返回的结果，决定调用resolve还是reject
+                        resolvePromise(promise2,x,resolve,reject)
+                    } catch (error) {
+                        reject(error)
+                    }
+                },0)
+            }else if(this.status === REJECTED) {
+                setTimeout(() =>{
+                    // 捕获 then 链式调用的错误  上一个then的错误  传给下一个then的catch
+                    try {
+                        let x = failureCallback(this.error)
+                        // 判断 x 的值是普通纸还是promise对象
+                        // 如果是普通值 直接调用resolve
+                        // 如果是promise对象，查看promise对象返回的结果
+                        // 再根据promise对象返回的结果，决定调用resolve还是reject
+                        resolvePromise(promise2,x,resolve,reject)
+                    } catch (error) {
+                        reject(error)
+                    }
+                },0) 
+            }else {
+                // 调用then的时候  没有直接调用 resolve 和 reject。异步之后调用
+                // 处理异步状态
+                // 等待状态
+                // 将成功回调和失败回调存储起来
+                // then 方法多次调用添加多个处理函数
+                this.successCallback.push(() => {
+                    setTimeout(() =>{
+                        // 捕获 then 链式调用的错误  上一个then的错误  传给下一个then的catch
+                        try {
+                            let x = successCallback(this.value)
+                            // 判断 x 的值是普通纸还是promise对象
+                            // 如果是普通值 直接调用resolve
+                            // 如果是promise对象，查看promise对象返回的结果
+                            // 再根据promise对象返回的结果，决定调用resolve还是reject
+                            resolvePromise(promise2,x,resolve,reject)
+                        } catch (error) {
+                            reject(error)
+                        }
+                    },0)
+                })
+                this.failureCallback.push(() => {
+                    setTimeout(() =>{
+                        // 捕获 then 链式调用的错误  上一个then的错误  传给下一个then的catch
+                        try {
+                            let x = failureCallback(this.error)
+                            // 判断 x 的值是普通纸还是promise对象
+                            // 如果是普通值 直接调用resolve
+                            // 如果是promise对象，查看promise对象返回的结果
+                            // 再根据promise对象返回的结果，决定调用resolve还是reject
+                            resolvePromise(promise2,x,resolve,reject)
+                        } catch (error) {
+                            reject(error)
+                        }
+                    },0) 
+                })
+            }
+        })
+        return promise2
+    }
+    finally(callback) {
+        //最后一个promise的then
+        return this.then((value) => {
+                                                  //执行这个promise
+            return MyPromise.resolve(callback()).then(() => value)
+        },(error) => {
+            return MyPromise.resolve(callback()).then(() => {throw error})
+        })
+    } 
+    catch(failureCallback){
+        return this.then(undefined,failureCallback)
+    }
+    static all(array){
+        // 结果数组
+        let result = []
+        let index = 0
+        let len = array.length
+
+        return new MyPromise((resolve, reject) =>{
+            function addData(key, value){
+                result[key] = value
+                index++
+                if(index === len){
+                    // 全部成功
+                    resolve(result)
+                }
+            }
+            // for循环瞬间就执行完了
+            // 注意执行的时候  有可能有异步循环
+            for(let i=0;i < len;i++){
+                let current = array[i]
+                if(current instanceof MyPromise){
+                    // 失败就调用reject(error)  
+                    current.then(value => addData(i, value),error => reject(error))
+                }else {
+                    addData(i,array[i])
+                }
+            }
+        })
+    }
+    static resolve(value){
+        if(value instanceof MyPromise){
+            return value
+        }else {
+            return new MyPromise(resolve => resolve(value))
+        }
+    }
+    static reject(error){
+        if(value instanceof MyPromise){
+            return error
+        }else {
+            return new MyPromise((resolve, reject) => reject(error));
+        }
+    }
+    // 接收一个Promise数组，数组中如有非Promise项，则此项当做成功
+    // 哪个Promise最快得到结果，就返回那个结果，无论成功失败
+    static race(array) {
+        return new MyPromise((resolve, reject) => {
+            array.forEach(item => {
+                if (item instanceof MyPromise) {
+                    item.then(res => {
+                        resolve(res)
+                    }, err => {
+                        reject(err)
+                    })
+                } else {
+                    resolve(promise)
+                }
+            })
+        })
+    }
+    // 接收一个Promise数组，数组中如有非Promise项，则此项当做成功
+    // 如果有一个Promise成功，则返回这个成功结果
+    // 如果所有Promise都失败，则报错
+    static any(array) {
+        return new Promise((resolve, reject) => {
+            let count = 0
+            array.forEach((item) => {
+                item.then(val => {
+                    resolve(val)
+                }, err => {
+                    count++
+                    if (count === array.length) {
+                        reject(new AggregateError('All promises were rejected'))
+                    }
+                })
+            })
+        })
+    }
+}
+
+
+function resolvePromise(promise2,x,resolve,reject) {
+    // then 方法链式调用识别 Promise 对象来自自己   不能自己返回自己的promise2 形成死循环调用
+    // 处理自己返回自己
+    if(promise2 === x){
+        // return 阻止向下执行
+        return reject(new TypeError('Chaining cycle detected for promise #<Promise>'))
+    }
+    if(x instanceof MyPromise){
+        // promise对象
+        // x.then((value) => resolve(value),(error) => reject(error))
+        x.then(resolve,reject)
+    }else {
+        // 普通值
+        resolve(x)
+    }
+}
+```
+#### 手写new
+```js
+function myNew(Con, ...args) {
+  // 创建一个空的对象
+  let obj = {};
+  // 隐式原型链接到该函数的原型，obj 可以访问到构造函数原型中的属性
+  obj.__proto__ = Con.prototype;
+  // 绑定 this 实现继承，obj 可以访问到构造函数中的属性
+  let ret = Con.call(obj, ...args);
+  // 优先返回构造函数返回的对象
+  return ret instanceof Object ? ret : obj;
+}
+```
+#### 手写简单的闭包
+```js
+function a() {
+    var i = 0
+
+    function b() {
+        return i++
+    }
+    return b
+}
+
+var x
+x = a()
+
+console.log(x())
+console.log(x())
+console.log(x())
+```
+
+#### 手写trim函数
+```js
+String.prototype.trim = function() {
+    return this.replace(/^\s+|\s+$/gm,'');
+}
+````
+
+#### 手写函数组合函数
+```js
+function compose(..args){
+    return function(value){
+        return args.reverse().reduce(function (acc,fn){
+            return fn(acc)
+        //acc的初始值
+        },value)
+    }
+}
+
+const compose = (...args) => value => args.reverse().reduce((acc,fn) => fn(acc),value);
+
+const compose = (...fns) => {
+  return fns.reduce((acc,cur) => {
+    return (...args) => {
+      return acc(cur(...args))
+    }
+  })
+}
+```
 
 #### 手写柯里化函数
 ```js
@@ -1529,7 +1843,7 @@ console.log(currySquares(1)(2));
 
 
 - 函数组合（Compose）
-![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210916171140.png)
+  ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210916171140.png)
     - 函数组合可以让我们把**细粒度的函数**重新组合生成一个新的函数。
     - 理解为“流水线”，将多个函数组合成一个新的函数，初始数据通过多个函数依次处理，最后整体输出。
     - 把复杂的逻辑拆分成一个个简单任务，最后组合起来完成任务，使得整个过程的数据流更明确、可控。
@@ -1612,7 +1926,7 @@ compose(f, g, t)(1);
 
 #### 什么是纯函数
 
-- 如果函数的调用参数相同, 则永远返回相同的结果. 它不依赖于程序执行期间函数   外部任何状态或数据的变化  , 只  依赖于传入的参数。
+- 如果函数的调用参数相同, 则永远返回相同的结果. 它不依赖于程序执行期间函数   外部任何状态或数据的变化  , 只依赖于传入的参数。
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210915191158.png)
 - 纯函数不会产生任何可观察的副作用, 例如: 网络请求, 输入/输出设备, 或数据突变(mutation)等。
 
@@ -1620,7 +1934,7 @@ compose(f, g, t)(1);
 - 数组中的slice和splice分别是：纯函数和不纯的函数
     - slice返回数组中的指定部分，不会改变数组
     - splice对数组进行操作返回该数组，会改变原数组
-**
+    **
 
 #### 纯函数特点
 
@@ -3096,7 +3410,6 @@ Object类型的**对象实例**拥有`__proto__`属性，后者指向构造函�
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210809210423.png)
 
 - js 每个对象都会拥有`prototype`属性的。这个属性指向一个对象，这个对象的所有属性和方法都会被构造函数的实例所继承。
-
 - 只有对象（任何对象）只有`__proto__`去找它的原型对象。( 实例都包含一个指向构造函数的`原型对象`的内部指针。)。
 - 实例都会有一个`constructor`属性去指向它的构造函数。
 - 在原型对象中使用`.constructor`（构造器）属性来区分，我这个原型对象被那个构造函数引用了。所有原型对象都会自动获得一个constructor（构造函数）属性，这个属性是一个指向prototype属性所在函数的指针。
@@ -3406,7 +3719,7 @@ luna.sleep()
 
 #### new运算符
 
-### new运算符的实现机制
+#### new运算符的实现机制
 
 1. 首先创建了一个新的`空对象`
 2. `设置原型`，将对象的原型设置为函数的`prototype`对象。
@@ -3427,7 +3740,7 @@ luna.sleep()
 function myNew(Con, ...args) {
   // 创建一个空的对象
   let obj = {};
-  // 链接到原型，obj 可以访问到构造函数原型中的属性
+  // 隐式原型链接到该函数的原型，obj 可以访问到构造函数原型中的属性
   obj.__proto__ = Con.prototype;
   // 绑定 this 实现继承，obj 可以访问到构造函数中的属性
   let ret = Con.call(obj, ...args);

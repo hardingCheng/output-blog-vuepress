@@ -2110,6 +2110,24 @@ addEventListener第一个参数事件类型，第二个类型即绑定的具体�
 
 Promise 是异步编程的一种解决方案，比传统的异步解决方案【回调函数】和【事件】更合理、更强大。
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210926211726.png)
+```md
+Promise 是一个类，在执行这个类的时候会传入一个执行器，这个执行器会立即执行
+Promise 会有三种状态
+    Pending 等待
+    Fulfilled 完成
+    Rejected 失败
+
+状态只能由 Pending --> Fulfilled 或者 Pending --> Rejected，且一但发生改变便不可二次修改；
+
+Promise 中使用 resolve 和 reject 两个函数来更改状态；
+
+then 方法内部做但事情就是状态判断
+    如果状态是成功，调用成功回调函数
+    如果状态是失败，调用失败回调函数
+
+```
+
+
 ```js
 new Promise(请求1)
     .then(请求2(请求结果1))
@@ -2123,6 +2141,34 @@ Promise 的写法更为直观，并且能够在外层捕获异步函数的异常
 - 后面的 then 方法就是在为上ー个 then 返回的 Promise 注册回调
 - 前面 then 方法中回调函数的返回值会作为后面 then 方法回调的参数
 - 如果回调中返回的是 Promise，那后面 then 方法的回调会等待它的结束
+
+
+Js引擎为了让microtask尽快的输出，做了一些优化，连续的多个then(3个)如果没有reject或者resolve会交替执行then而不至于让一个堵太久完成用户无响应
+```js
+Promise.resolve().then(() => {
+    console.log(0);
+    return Promise.resolve(4);
+}).then((res) => {
+    console.log(res)
+})
+
+Promise.resolve().then(() => {
+    console.log(1);
+}).then(() => {
+    console.log(2);
+}).then(() => {
+    console.log(3);
+}).then(() => {
+    console.log(5);
+}).then(() =>{
+    console.log(6);
+})
+
+// 大家先思考一下
+
+0  1 2 3 4 5 6
+```
+
 
 ```js
 /**
