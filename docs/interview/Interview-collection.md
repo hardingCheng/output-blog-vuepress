@@ -2124,6 +2124,9 @@ Promise 中使用 resolve 和 reject 两个函数来更改状态；
 then 方法内部做但事情就是状态判断
     如果状态是成功，调用成功回调函数
     如果状态是失败，调用失败回调函数
+    
+promise调用then的前提是该promise的状态为fullfilled
+只有promise调用then的时候，then里面的函数才会被推入微任务中；
 
 ```
 
@@ -2416,15 +2419,132 @@ function resolvePromise(promise2,x,resolve,reject) {
     if(x instanceof MyPromise){
         // promise对象
         // x.then((value) => resolve(value),(error) => reject(error))
-        x.then(resolve,reject)
+        x.then(resolve,reject)ß
     }else {
         // 普通值
         resolve(x)
     }
 }
 ```
-### 尾递归调用及尾调用优化
+### Proxy
+#### Proxy
+Proxy 对象用于创建一个对象的代理，从而实现基本操作的拦截和自定义（如属性查找、赋值、枚举、函数调用等）。
 
+代理提供了一种独特的方法，可以在最底层更改或调整现有对象的行为。
+
+Proxy 是对象的包装，将代理上的操作转发到对象，并可以选择捕获其中的一些操作。
+它可以包装任何类型的对象，包括类和函数。
+
+
+```js
+const p = new Proxy(target, handler)
+
+// target：要使用 Proxy 包装的目标对象（可以是任何类型的对象，包括原生数组，函数，甚至另一个代理）。
+// handler：一个通常以函数作为属性的对象，各属性中的函数分别定义了在执行各种操作时代理 p 的行为。
+```
+```js
+const man = {
+  name: "阿宝哥",
+};
+
+const proxy = new Proxy(man, {
+  // target —— 是目标对象，该对象作为第一个参数传递给 new Proxy，
+  // property —— 目标属性名,
+  // receiver —— 如果目标属性是一个 getter 访问器属性，则 receiver 就是本次读取属性所在的 this 对象。
+  get(target, property, receiver) {
+    console.log(`正在访问${property}属性`);
+    return target[property];
+  },
+  // 13 种捕获器
+  // set()  target —— 是目标对象，该对象作为第一个参数传递给 new Proxy，property —— 目标属性名称， value —— 目标属性要设置的值， receiver —— 与 get 钩子类似，仅与 setter 访问器相关。如果写入操作成功，set 钩子应该返回 true，否则返回 false（触发 TypeError）。
+  // deleteProperty()
+  // ownKeys()
+  // has()
+  // 需要注意的是，所有的捕获器是可选的。如果没有定义某个捕获器，那么就会保留源对象的默认行为。
+});
+
+console.log(proxy.name);
+console.log(proxy.age);
+```
+
+通过 Proxy.revocable() 方法可以用来创建一个可撤销的代理对象。
+```js
+Proxy.revocable(target, handler);
+
+
+const target = {}; 
+const handler = {};
+const { proxy, revoke } = Proxy.revocable(target, handler);
+
+proxy.name = "阿宝哥";
+console.log(proxy.name); // 阿宝哥
+revoke();
+console.log(proxy.name); // TypeError: Revoked
+```
+
+#### Reflect 对象简介
+Reflect 是一个内置的对象，它提供拦截 JavaScript 操作的方法。这些方法与 proxy handlers 的方法相同。Reflect 不是一个函数对象，因此它是不可构造的。
+
+Reflect 是一个内置对象，可简化的创建 Proxy。
+以前的内部方法，比如[[Get]]，[[Set]] 等等都只是规范，不能直接调用。
+Reflect 对象使调用这些内部方法成为可能。它的方法是内部方法的最小包装。
+
+对于每个可被 Proxy 捕获的内部方法，Reflect 都有一个对应的方法 Reflect，其名称和参数与 Proxy 钩子相同。
+
+我们可以用 Reflect 来将操作转发到原始对象。
+
+```js
+const man = {
+  name: "阿宝哥",
+  city: "Xiamen",
+};
+
+console.log(Reflect.set(man, "sex", 1)); // true
+console.log(Reflect.has(man, "name")); // true
+console.log(Reflect.has(man, "age")); // false
+console.log(Reflect.ownKeys(man)); // [ 'name', 'city', 'sex' ]
+// Reflect.get(target, propertyKey[, receiver])：获取对象身上某个属性的值，类似于 target[name]。
+// Reflect.set(target, propertyKey, value[, receiver])：将值赋值给属性的函数。返回一个布尔值，如果更新成功，则返回 true。
+// Reflect.deleteProperty(target, propertyKey)：删除 target 对象的指定属性，相当于执行 delete target[name]。
+// Reflect.has(target, propertyKey)：判断一个对象是否存在某个属性，和 in 运算符的功能完全相同。
+// Reflect.ownKeys(target)：返回一个包含所有自身属性（不包含继承属性）的数组。
+```
+
+#### `Object.defineProperty`和`Proxy`的区别
+- Object.defineProperty
+    - Object.defineProperty只能代理某个属性。
+    - 只能监听对象(Object)，不能监听数组的变化，无法触发push, pop, shift, unshift,splice, sort, reverse。
+    - 必须遍历对象的每个属性
+    - 只能劫持当前对象属性，如果想深度劫持，必须深层遍历嵌套的对象
+    - 对象上新增属性，Object.defineProperty监听不到
+    - 若对象内部属性要全部递归代理，Object.definePropery需要一次完成所有递归，性能比Proxy差。
+    - Proxy不兼容IE，Object.defineProperty不兼容IE8及以下
+```js
+Object.defineProperty(obj,'name',{
+  value:'张三',
+  writable:false,
+  configurable: false,
+  enumerable: false,
+  get() {
+    console.log('get log!');
+    return log;
+  },
+  set(value) {
+    log = value;
+    archive.push({ val: log });
+  }
+})
+```
+- Proxy
+    - Proxy可以直接监听对象而非属性
+    - Proxy直接可以劫持整个对象,并返回一个新对象。
+    - Proxy可以直接监听数组的变化
+    - Proxy有多达13种拦截方法,不限于apply、ownKeys、deleteProperty、has等等是Object.defineProperty不具备的。
+    - 对象上新增属性，Proxy可以监听到
+    - 若对象内部属性要全部递归代理，Proxy可以只在调用的时候递归
+    - Proxy使用上比Object.defineProperty方便多。
+
+### 尾递归调用及尾调用优化
 #### 尾调用
 当一个函数执行时的最后一个步骤是返回另一个函数的调用，这就叫做尾调用。 
 ```js
@@ -2694,7 +2814,65 @@ if (!bool.valueOf()) {
 
 
 ### Tree Shaking原理
+Tree-Shaking 是一种基于 ES Module 规范的 Dead Code Elimination 技术，它会在运行过程中静态分析模块之间的导入导出，确定 ESM 模块中哪些导出值未曾其它模块使用，并将其删除，以此实现打包产物的优化。
 
+Tree Shaking已经成为一种应用广泛的性能优化手段。
+
+```js
+// webpack.config.js
+module.exports = {
+  entry: "./src/index",
+  mode: "production",
+  devtool: false,
+  optimization: {
+    usedExports: true,
+  },
+};
+```
+
+#### 理论基础
+在 CommonJs、AMD、CMD 等旧版本的 JavaScript 模块化方案中，导入导出行为是高度动态，难以预测的。
+```js
+if(process.env.NODE_ENV === 'development'){
+  require('./bar');
+  exports.foo = 'foo';
+}
+```
+而 ESM 方案则从规范层面规避这一行为，它要求所有的导入导出语句只能出现在模块顶层，且导入导出的模块名必须为字符串常量。ESM 下模块之间的依赖关系是高度确定的，与运行状态无关，编译工具只需要对 ESM 模块做静态分析，就可以从代码字面量中推断出哪些模块值未曾被其它模块使用，这是实现 Tree Shaking 技术的必要条件。
+```js
+// index.js
+import {bar} from './bar';
+console.log(bar);
+
+// bar.js
+export const bar = 'bar';
+export const foo = 'foo';
+
+
+//bar.js 模块导出了 bar 、foo ，但只有 bar 导出值被其它模块使用，经过 Tree Shaking 处理后，foo 变量会被视作无用代码删除。
+```
+
+#### 实现原理
+Tree Shaking 是先找出 已使用 的代码，自然剩下的则是 未使用 的代码，最后通过注释的方式分别标注。区分 已使用 和 未使用 的代码后，通过 压缩器 将 未使用 的代码删除。
+
+由于 Tree Shaking 是通过 ES6 Import 和 Export 实现找出 已使用 和 未使用 的代码， 所以 Tree Shaking 使用前提： 是源码必须遵循 ES6 的模块规范 (import & export)，如果是 CommonJS 规范 (require) 则无法使用。
+
+Webpack 中，Tree-shaking 的实现一是先标记出模块导出值中哪些没有被用过(标记的效果就是删除没有被其它模块使用的导出语句)，二是使用 Terser 删掉这些没被用到的导出语句。标记过程大致可划分为三个步骤：
+    - Make 阶段，收集模块导出变量并记录到模块依赖关系图 ModuleGraph 变量中
+    - Seal 阶段，遍历 ModuleGraph 标记模块导出变量有没有被使用
+    - 生成产物时，若变量没有被其它模块使用则删除对应的导出语句
+真正执行“Shaking”操作的是 Terser 插件。未使用的变量和模块经过标记后，已经变成一段 Dead Code —— 不可能被执行到的代码，这个时候只需要用 Terser 提供的 DCE 功能就可以删除这一段定义语句，以此实现完整的 Tree Shaking 效果。
+    
+    - 收集模块导出
+    - 标记模块导出
+    - 生成代码
+    - 删除 Dead Code
+    - 结束
+
+- Dead Code 一般具有以下几个特征
+    - 代码不会被执行，不可到达
+    - 代码执行的结果不会被用到
+    - 代码只会影响死变量（只写不读）
 
 
 ## HTTP
