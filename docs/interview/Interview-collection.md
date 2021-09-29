@@ -271,6 +271,408 @@ element宽度＝内容宽度（width包含了元素内容宽度、边框、内�
 - flex-basis
     - 表示在分配额外空间之前，成员占据的空间，默认值为auto，意思就是你本来占多少就是多少。但也可以自己设置长度(px)。这个值的效果就是确定在释放和分配空间的时候，你的初值是多少。
 
+### Grid
+
+### 常见布局的方案
+#### 单列布局
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210929065711.png)
+- header,content和footer等宽的单列布局
+    - 对于第一种，先通过对header,content,footer统一设置width：1000px;或者max-width：1000px(这两者的区别是当屏幕小于1000px时，前者会出现滚动条，后者则不会，显示出实际宽度);然后设置margin:auto实现居中即可得到。
+- header与footer等宽,content略窄的单列布局
+    - header、footer的内容宽度不设置，块级元素充满整个屏幕，但header、content和footer的内容区设置同一个width，并通过margin:auto实现居中。
+```html
+<div class="header"></div>
+<div class="content"></div>
+<div class="footer"></div>
+
+.header{
+    margin:0 auto; 
+    max-width: 960px;
+    height:100px;
+    background-color: blue;
+}
+.content{
+    margin: 0 auto;
+    max-width: 960px;
+    height: 400px;
+    background-color: aquamarine;
+}
+.footer{
+    margin: 0 auto;
+    max-width: 960px;
+    height: 100px;
+    background-color: aqua;
+}
+```
+```html
+<div class="header">
+    <div class="nav"></div>
+</div>
+<div class="content"></div>
+<div class="footer"></div>
+
+
+.header{
+    margin:0 auto;
+    max-width: 960px;
+    height:100px;
+    background-color: blue;
+}
+.nav{
+    margin: 0 auto;
+    max-width: 800px;
+    background-color: darkgray;
+    height: 50px;
+}
+.content{
+    margin: 0 auto;
+    max-width: 800px;
+    height: 400px;
+    background-color: aquamarine;
+}
+.footer{
+    margin: 0 auto;
+    max-width: 960px;
+    height: 100px;
+    background-color: aqua;
+}
+```
+#### 两列自适应布局
+两列自适应布局是指一列由内容撑开，另一列撑满剩余宽度的布局方式。
+- float+overflow:hidden
+    - 如果是普通的两列布局，浮动+普通元素的margin便可以实现，但如果是自适应的两列布局，利用float+overflow:hidden便可以实现，这种办法主要通过overflow触发BFC,而BFC不会重叠浮动元素。
+    - 使用overflow属性来触发bfc，来阻止浮动造成的文字环绕效果。
+    - 注意点:如果侧边栏在右边时，注意渲染顺序。即在HTML中，先写侧边栏后写主内容
+- Flex布局
+    - Flex布局，也叫弹性盒子布局，区区简单几行代码就可以实现各种页面的的布局。
+- grid布局
+    - Grid布局，是一个基于网格的二维布局系统，目的是用来优化用户界面设计。
+```html
+<div class="parent" style="background-color: lightgrey;">
+    <div class="left" style="background-color: lightblue;">
+        <p>left</p>
+    </div>
+    <div class="right"  style="background-color: lightgreen;">
+        <p>right</p>
+        <p>right</p>
+    </div>        
+</div>
+
+.parent {
+  overflow: hidden;
+  zoom: 1;
+}
+.left {
+  float: left;
+  margin-right: 20px;
+}
+.right {
+  overflow: hidden;
+  zoom: 1;
+}
+```
+```css
+//html部分同上
+.parent {
+  display:flex;
+}  
+.right {
+  margin-left:20px; 
+  flex:1;
+}
+```
+```css
+//html部分同上
+.parent {
+  display:grid;
+  grid-template-columns:auto 1fr;
+  grid-gap:20px
+} 
+```
+#### 三栏布局
+中间列自适应宽度，旁边两侧固定宽度。
+1. 圣杯布局
+比较特殊的三栏布局，同样也是两边固定宽度，中间自适应，唯一区别是dom结构必须是先写中间列部分，这样实现中间列可以优先加载。
+**要注意的是，中间栏要在放在文档流前面以优先渲染。**
+- 缺点
+    - center部分的最小宽度不能小于left部分的宽度，否则会left部分掉到下一行
+    - 如果其中一列内容高度拉长(如下图)，其他两列的背景并不会自动填充。(借助等高布局正padding+负margin可解决）。
+```html
+<div class="container">
+    <div class="center">测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试</div>
+    <div class="left">left</div>
+    <div class="right">right</div>
+</div>
+
+.container {
+    // 导致左右栏也会  跟着走
+    // 分别给左右栏 position: relative;定位到原本的位置
+    padding:0 220px;//为左右栏腾出空间
+  }
+  .left {
+    float: left;
+    width: 200px;
+    height: 400px;
+    background: red;
+    margin-left: -100%;
+    position: relative;
+    left: -220px;
+  }
+  .center {
+    float: left;
+    width: 100%;
+    height: 500px;
+    background: yellow;
+  }
+  .right {
+    float: left;
+    width: 200px;
+    height: 400px;
+    background: blue;
+    margin-left: -200px;
+    position: relative;
+    right: -220px;
+  }
+```
+2. 双飞翼布局
+同样也是三栏布局，在圣杯布局基础上进一步优化，解决了圣杯布局错乱问题，实现了内容与布局的分离。而且任何一栏都可以是最高栏，不会出问题。
+- 缺点
+    - 多加一层 dom 树节点，增加渲染树生成的计算量。
+```html
+ <article class="container">
+    <div class="center">
+      <div class="inner">双飞翼布局</div>
+    </div>
+    <div class="left"></div>
+    <div class="right"></div>
+  </article>
+  
+  
+  
+  .container {
+      //不会引起塌陷
+      min-width: 600px; //确保中间内容可以显示出来，两倍left宽+right宽
+    }
+
+    .left {
+      float: left;
+      width: 200px;
+      height: 400px;
+      background: red;
+      margin-left: -100%;
+    }
+
+    .center {
+      float: left;
+      width: 100%;
+      height: 500px;
+      background: yellow;
+    }
+
+    .center .inner {
+      // 流出左右边栏的宽度
+      margin: 0 200px; //新增部分
+    }
+
+    .right {
+      float: left;
+      width: 200px;
+      height: 400px;
+      background: blue;
+      margin-left: -200px;
+    }
+  </style>
+```
+- 两种布局实现方式对比:
+    - 两种布局方式都是把主列放在文档流最前面，使主列优先加载。
+    - 两种布局方式在实现上也有相同之处，都是让三列浮动，然后通过负外边距形成三列布局。
+    - 两种布局方式的不同之处在于如何处理中间主列的位置： 圣杯布局是利用父容器的左、右内边距+两个从列相对定位； 双飞翼布局是把主列嵌套在一个新的父级块中利用主列的左、右外边距进行布局调整
+3. 绝对定位法
+```html
+<div class="left">Left</div>
+<div class="main">Main</div>
+<div class="right">Right</div>
+
+
+
+//简单的进行CSS reset
+body,html{
+    height:100%;
+    padding: 0px;
+    margin:0px;
+}
+//左右绝对定位
+.left,.right{
+    position: absolute;
+    top:0px;
+    background: red;
+    height:100%;
+}
+.left{
+    left:0;
+    width:100px;
+}
+.right{
+    right:0px;
+    width:200px;
+}
+//中间使用margin空出左右元素所占据的空间
+.main{
+    margin:0px 200px 0px 100px;
+    height:100%;
+    background: blue;
+}
+```
+- 缺点
+    - 如果中间栏含有最小宽度限制，或是含有宽度的内部元素，当浏览器宽度小到一定程度，会发生层重叠的情况。
+
+4. 浮动
+```html
+//注意元素次序
+<div class="left">Left</div>
+<div class="right">Right</div>
+<div class="main">Main</div>
+
+
+body,html {
+    height:100%;
+    padding: 0;
+    margin: 0
+}
+//左栏左浮动
+.left {
+    background: red;
+    width: 100px;
+    float: left;
+    height: 100%;
+}
+//中间自适应
+.main {
+    background: blue;
+    height: 100%;
+    margin:0px 200px 0px 100px;
+}
+//右栏右浮动
+.right {
+    background: red;
+    width: 200px;
+    float: right;
+    height: 100%;
+}
+```
+
+
+#### 等高布局
+等高布局是指子元素在父元素中高度相等的布局方式。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210929073545.png)
+1. 利用正padding+负margin
+可解决圣杯布局的第二点缺点，因为背景是在 padding 区域显示的，设置一个大数值的 padding-bottom，再设置相同数值的负的 margin-bottom，并在所有列外面加上一个容器，并设置 overflow:hidden 把溢出背景切掉。这种可能实现多列等高布局，并且也能实现列与列之间分隔线效果，结构简单，兼容所有浏览器。
+```css
+/* 在圣杯布局的布局的基础上 */
+.center,
+.left,
+.right {
+    padding-bottom: 10000px;
+    margin-bottom: -10000px;
+}
+
+.container {
+    padding-left: 220px;
+    padding-right: 220px;
+    overflow: hidden; 
+}
+```
+2. 模仿表格布局
+
+#### 粘连布局
+有一块内容<main>，当<main>的高康足够长的时候，紧跟在<main>后面的元素<footer>会跟在<main>元素的后面。
+当<main>元素比较短的时候(比如小于屏幕的高度),我们期望这个<footer>元素能够“粘连”在屏幕的底部
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210929090420.png)
+```html
+<div id="wrap">
+    <div class="main">
+      main <br />
+      main <br />
+      main <br />
+    </div>
+  </div>
+  <div id="footer">footer</div>
+  
+  
+  * {
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100%; //高度一层层继承下来
+    }
+
+    #wrap {
+      min-height: 100%;
+      background: pink;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    #wrap .main {
+      padding-bottom: 50px;
+    }
+
+    #footer {
+      height: 50px;
+      line-height: 50px;
+      background: deeppink;
+      text-align: center;
+      margin-top: -50px;
+    }
+
+    .container {
+      padding-left: 220px;
+      padding-right: 220px;
+    }
+
+    .left {
+      float: left;
+      width: 200px;
+      height: 400px;
+      background: red;
+      margin-left: -100%;
+      position: relative;
+      left: -220px;
+    }
+
+    .center {
+      float: left;
+      width: 100%;
+      height: 500px;
+      background: yellow;
+    }
+
+    .right {
+      float: left;
+      width: 200px;
+      height: 400px;
+      background: blue;
+      margin-left: -200px;
+      position: relative;
+      right: -220px;
+    }
+
+    .center,
+    .left,
+    .right {
+      padding-bottom: 10000px;
+      margin-bottom: -10000px;
+    }
+```
+- 实现
+    - footer必须是一个独立的结构，与wrap没有任何嵌套关系
+    - wrap区域的高度通过设置min-height，变为视口高度
+    - footer要使用margin为负来确定自己的位置
+    - 在main区域需要设置 padding-bottom。这也是为了防止负 margin 导致 footer 覆盖任何实际内容。
+
 ### 水平垂直居中
 #### 定宽高
 - 绝对定位和负magin值
@@ -668,9 +1070,110 @@ vw vh是固定的百分比，这样在小屏上东西太小，大屏上东西太
 ### CSS标签meta
 
 ### rpx和px的联系和区别以及计算方法
-？？？？？？？？
+
+### CSS画三角形   画半圆
+#### 三角形
+利用元素的 border 绘制三角形，先来看一下宽高均为 0，border 有宽度
+```html
+<style>
+.triangle {
+    width: 0;
+    height: 0;
+    border: 100px solid transparent;
+    border-bottom: 200px solid #0ff;
+}
+</style>
+
+<div class="triangle"></div>
+```
+#### 梯形
+梯形也是基于 border 来绘制的，只不过绘制梯形时，宽高和border尺寸相同。
+```html
+<style>
+  .trapezoid {
+    width: 50px;
+    height: 50px;
+    background: #ff0;
+    border-top: 50px solid #f00;
+    border-bottom: 50px solid #00f;
+    border-left: 50px solid #0f0;
+    border-right: 50px solid #0ff;
+  }
+</style>
+<div class="trapezoid"></div>
+```
+#### 扇形
+```html
+<style>
+  .sector1 {
+      border-radius:100px 0 0;
+      width: 100px;
+      height: 100px;
+      background: #00f;
+  }
+</style>
+<div class="sector1"></div>
 
 
+
+<style>
+  .sector2 {
+      border: 100px solid transparent;
+      width: 0;
+      border-radius: 100px;
+      border-top-color: #f00;
+  }
+</style>
+<div class="sector2"></div>
+```
+### 椭圆
+border-radius: 水平半径 / 垂直半径;
+```html
+<style>
+  .oval {
+      width: 100px;
+      height: 50px;
+      background: #ff0;
+      border-radius: 50px / 25px;
+  }
+</style>
+<div class="oval"></div>
+
+```
+### 箭头
+```html
+ <style>
+    .arrow{
+        width: 0;
+        height: 0;
+        border: 50px solid;
+        border-color: transparent #0f0 transparent transparent;
+        position: relative;
+    }
+    .arrow::after{
+        content: '';
+        position: absolute;
+        right: -55px;
+        top: -50px;
+        border: 50px solid;
+        border-color: transparent #fff transparent transparent;
+    }
+  
+</style>
+<div class="arrow"></div>
+```
+### 半圆
+```html
+<style>
+  .semicircle{
+    width: 100px;
+    height: 50px;
+    border-radius: 50px 50px 0 0;
+    background-color: rebeccapurple;
+  }
+</style>
+<div class="semicircle"></div>
+```
 
 ## JS
 ### ES5 继承
