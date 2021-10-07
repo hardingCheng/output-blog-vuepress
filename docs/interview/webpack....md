@@ -68,7 +68,7 @@ webpack --config wk.config.js
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210916110723.png)
 
 ### 不同文件进行配置不同的loader
-### css-loader
+#### css-loader
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210917120637.png)
 - 需要一个loader来加载这个css文件，但是loader是什么呢？
     - loader 可以用于对模块的源代码进行转换；
@@ -133,7 +133,7 @@ module.exports = {
     }
 }
 ```
-### style-loader
+#### style-loader
 - 我们已经可以通过css-loader来加载css文件了
     - 但是你会发现这个css在我们的**代码中并没有生效（页面没有效果）。**
     - 因为css-loader只是**负责将.css文件进行解析**，并**不会将解析之后的css插入到页面中；**
@@ -174,7 +174,7 @@ module.exports = {
     }
 }
 ```
-### less(sass和这个差不多)
+#### less(sass和这个差不多)
 会使用less、sass、stylus的预处理器来编写css样式，效率会更高。
 - 那么，如何可以让我们的环境支持这些预处理器呢？
     - 首先我们需要确定，less、sass等编写的css需要通过工具转换成普通的css；
@@ -241,6 +241,187 @@ module.exports = {
             }
         }
         ```
+#### PostCSS
+- 什么是PostCSS呢？
+    - PostCSS是一个通过JavaScript来转换样式的工具；
+    - 这个工具可以帮助我们进行一些CSS的转换和适配，比如自动添加浏览器前缀、css样式的重置；
+    - 但是实现这些工具，我们需要借助于PostCSS对应的插件；
+- 如何使用PostCSS呢？主要就是两个步骤：
+    - 第一步：查找PostCSS在构建工具中的扩展，比如webpack中的postcss-loader；
+    - 第二步：选择可以添加你需要的PostCSS相关的插件；
+- 在webpack中使用postcss就是使用postcss-loader来处理的；
+    - `npm install postcss-loader -D`
+    - 因为postcss需要有对应的插件才会起效果，所以我们需要配置它的plugin；
+```js
+{
+        // 规则使用正则表达式
+        test: /\.css$/, // 匹配资源
+        use: [
+          // { loader: "css-loader" },
+          // 注意: 编写顺序(从下往上, 从右往做, 从后往前)
+          "style-loader",
+          {
+            loader: "css-loader",
+            options: {
+              importLoaders: 1
+            }
+          },
+          {
+            loader: "postcss-loader",
+            options: {
+              postcssOptions: {
+                plugins: [
+                  require('autoprefixer')
+                ]
+              }
+            }
+          }
+        ],
+        // loader: "css-loader"
+      },
+```
+- 单独的postcss配置文件
+    - 将这些配置信息放到一个单独的文件中进行管理：
+        - 根目录下创建postcss.config.js
+```js
+// postcss.config.js
+
+module.exports = {
+  plugins: [
+    require('autoprefixer')
+  ]
+}
+```
+##### postcss-preset-env
+- 事实上，在配置postcss-loader时，我们配置插件并不需要使用autoprefixer。
+- 我们可以使用另外一个插件：postcss-preset-env
+    -  postcss-preset-env也是一个postcss的插件；
+    -  它可以帮助我们将一些现代的CSS特性，转成大多数浏览器认识的CSS，并且会根据目标浏览器或者运行时环 境添加所需的polyfill；
+    -  也包括会自动帮助我们添加autoprefixer（所以相当于已经内置了autoprefixer）；
+- `npm install postcss-preset-env -D`
+```js
+// webpack.config.js
+{
+   loader: "postcss-loader",
+   options: {
+     postcssOptions:{
+     plugins:[
+       require('postcss-preset-env')
+     ]
+   }
+ }
+}
+
+
+// postcss.config.js
+module.exports = {
+  plugins: [
+    'postcss-preset-env'
+  ]
+}
+```
+#### file-loader
+- 要处理jpg、png等格式的图片，我们也需要有对应的loader：file-loader
+    - file-loader的作用就是帮助我们处理import/require()方式引入的一个文件资源，并且会将它放到我们输出的 文件夹中；
+- `npm install file-loader -D`
+- 配置处理图片的Rule：
+```js
+// webpack.config.js
+{
+        test: /\.(png|jpe?g|gif|svg)$/,
+        use: [
+          {
+            loader: 'file-loader',
+          }
+        ]
+      }
+```
+- 文件的名称规则
+    - 有时候我们处理后的文件名称按照一定的规则进行显示：
+        - 比如保留原来的文件名、扩展名，同时为了防止重复，包含一个hash值等；
+    - 这个时候我们可以使用PlaceHolders来完成，webpack给我们提供了大量的PlaceHolders来显示不同的内容
+    - 我们这里介绍几个最常用的placeholder：
+        -   [ext]：  处理文件的扩展名；
+        -   [name]：处理文件的名称；
+        -  [hash]：文件的内容，使用MD4的散列函数处理，生成的一个128位的hash值（32个十六进制）；
+        -  [contentHash]：在file-loader中和[hash]结果是一致的（在webpack的一些其他地方不一样，后面会讲到）；
+        -  [hash:<length>]：截图hash的长度，默认32个字符太长了；
+        -  [path]：文件相对于webpack配置文件的路径；
+    - 设置文件名称
+        - 这个也是vue的写法
+        ```js
+            // webpack.config.js
+            {
+            test: /\.(png|jpe?g|gif|svg)$/,
+            use: [
+              {
+                loader: 'file-loader',
+                options: {
+                  name: "img/[name].[hash:6].[ext]",
+                }
+              }
+            ]
+          }
+        ```
+    - 设置文件的存放路径
+        - 通过 img/ 已经设置了文件夹，这个也是vue、react脚手架中常见的设置方式：
+            - 其实按照这种设置方式就可以了；
+            - 当然我们也可以通过outputPath来设置输出的文件夹；
+        ```js
+            {
+            test: /\.(png|jpe?g|gif|svg)$/,
+            use: [
+              {
+                loader: 'file-loader',
+                options: {
+                  name: "[name].[hash:6].[ext]",
+                  outputPath:'img'
+                }
+              }
+            ]
+          }
+        ```
+#### url-loader
+- url-loader和file-loader的工作方式是相似的，但是可以将较小的文件，转成base64的URI。
+- `npm install url-loader -D`
+- 默认情况下url-loader会将所有的图片文件转成base64编码
+```js
+//webpack.config.js
+{
+    test: /\.(png|jpe?g|gif|svg)$/,
+    use: [
+      {
+        loader: 'url-loader',
+        options: {
+        name: "img/[name].[hash:6].[ext]",
+      }
+    }
+  ]
+}
+```
+- url-loader的limit
+    - 但是开发中我们往往是小的图片需要转换，但是大的图片直接使用图片即可
+        - 这是因为小的图片转换base64之后可以和页面一起被请求，减少不必要的请求过程；
+        -  而大的图片也进行转换，反而会影响页面的请求速度；
+    - 我们如何可以限制哪些大小的图片转换和不转换呢？
+        - url-loader有一个options属性limit，可以用于设置转换的限制；
+        - 下面的代码38kb的图片会进行base64编码，而295kb的不会；
+```js
+{
+        test: /\.(png|jpe?g|gif|svg)$/,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              name: "[name].[hash:6].[ext]",
+              outputPath:"img",
+              limit: 100 * 1024
+            }
+          }
+        ]
+      }
+```
+
 ### 浏览器兼容性
 **开发中，浏览器的兼容性问题**，我们应该如何去解决和处理？
 这里指的兼容性是**针对不同的浏览器支持的特性**：比如css特性、js语法，之间的兼容性；
