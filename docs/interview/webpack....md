@@ -60,13 +60,14 @@ module.exports = {
 webpack --config wk.config.js
 ```
 
-### webpack依赖图
+### webpack依赖图（其实就是流程）
 - webpack到底是如何对我们的项目进行打包的呢？
     - 事实上webpack在处理应用程序时，它会根据命令或者配置文件找到入口文件；
     - 从入口开始，会生成一个  依赖关系图，这个依赖关系图会包含应用程序中所需的所有模块（比如.js文件、css文件、图片、 字体等）；
     - 然后遍历图结构，打包一个个模块（根据文件的不同使用不同的loader来解析）；
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210916110723.png)
- 
+
+### 不同文件进行配置不同的loader
 ### css-loader
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210917120637.png)
 - 需要一个loader来加载这个css文件，但是loader是什么呢？

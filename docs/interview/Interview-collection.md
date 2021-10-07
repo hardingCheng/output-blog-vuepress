@@ -78,9 +78,17 @@
     - async的执行，并不会按着script在页面中的顺序来执行，而是谁先加载完谁执行。
     - 这种方式加载的 JavaScript 依然会阻塞 load 事件
     - async-script 可能在 DOMContentLoaded 触发之前或之后执行，但一定在 load 触发之前执行。
-
+### DOM事件流
+DOM 事件流分为三个阶段：
+- e.preventDefault()
+- 事件捕获阶段 - 事件流由上往下直到目标元素
+    - 事件触发时，先触发目标元素的祖先的事件相应函数，然后触发它父级的，最后触发自己。也就是说由外向内找监听函数并且执行，就是事件捕获。
+- 目标阶段 - 事件到达目标元素
+- 事件冒泡阶段 - 事件流由下往上从目标元素直到最外层祖先元素
+    - 事件冒泡和事件捕获相反。由内向外找监听函数并执行。
+    - e.stopPropagation()
+### target/currentTarget/relateTarget
 ## CSS
-
 ### .position有几种，分别描述？
 - static（静态定位）
     - 对象遵循标准文档流中，top, right, bottom, left 等属性失效。
@@ -96,15 +104,13 @@
 
 ### BFC块级格式化上下文   (边距重叠解决方案）
 
-块级格式化上下文   (边距重叠解决方案）
-
-`BFC`是一个完全独立的空间（布局环境），让空间里的子元素不会影响到外面的布局。
-
-`BFC`是一个完全独立的空间（布局环境），让空间里的子元素不会影响到外面的布局。那么怎么使用`BFC`呢，`BFC`可以看做是一个`CSS`元素属性
+块级格式化上下文   (边距重叠解决方案）。
+`BFC`是一个完全独立的空间（布局环境），让空间里的子元素不会影响到外面的布局。那么怎么使用`BFC`呢，`BFC`可以看做是一个`CSS`元素属性。
+一个环境中的元素不会影响到其它环境中的布局。
 
 > #### BFC的规则
 
-1. 垂直方向的距离由margin决定， 属于同一个`BFC`的两个相邻的标签外边距会发生重叠。（给其中一个元素增加一个父级，然后让他的父级触发BFC）
+1. 垂直方向的距离由margin决定， 属于同一个`BFC`（处于同一个BFC中的元素相互影响）的两个相邻的标签外边距会发生重叠。（给其中一个元素增加一个父级，然后让他的父级触发BFC）
 2. BFC的区域不会与浮动元素的box重叠(浮动元素不会覆盖到触发 BFC 元素上)。清除浮动布局，阻止同级元素被浮动元素覆盖。（非浮动元素触发了BFC,阻止元素被浮动元素覆盖原理）
 3. BFC在页面上是独立的容器，外面的元素不会影响里面的元素，里面的元素也不会影响外面的元素。（父级触发了BFC）
 4. 计算BFC高度的时候，浮动元素也会参与计算，防止使用float脱离文档流，高度塌陷。（父级触发了BFC）
@@ -114,7 +120,8 @@
 1. float的值不是none。
 2. position的值不是static或者relative。绝对定位元素（元素的 `position` 为 `absolute` 或 `fixed`）
 3. display的值是inline-block、table-cell、flex、table-caption或者inline-flex。
-4. overflow的值不是visible。(hidden、scroll、auto、inherit)
+4. 内联块 (元素具有 display: inline-block)。
+5. overflow的值不是visible(hidden、scroll、auto、inherit)
 
 > #### BFC解决了什么问题
 
@@ -138,9 +145,9 @@
         }
         .container {
             background: #000;
-            //给父元素加上这个，触发BFC 解决Float脱离文档流，高度塌陷
-            //display: inline-block;
-            //overflow: auto/hidden/scroll; /** 创建一个BFC **/
+            // 给父元素加上这个，触发BFC 解决Float脱离文档流，高度塌陷
+            // display: inline-block;
+            // overflow: auto/hidden/scroll; /** 创建一个BFC **/
         }
     </style>
 </head>
@@ -154,7 +161,7 @@
 
 ```
 
-2. Margin边距重叠
+2. margin边距重叠
 
 ```html
 <!DOCTYPE html>
@@ -1126,7 +1133,7 @@ vw vh是固定的百分比，这样在小屏上东西太小，大屏上东西太
 </style>
 <div class="sector2"></div>
 ```
-### 椭圆
+#### 椭圆
 border-radius: 水平半径 / 垂直半径;
 ```html
 <style>
@@ -1140,7 +1147,7 @@ border-radius: 水平半径 / 垂直半径;
 <div class="oval"></div>
 
 ```
-### 箭头
+#### 箭头
 ```html
  <style>
     .arrow{
@@ -1162,7 +1169,7 @@ border-radius: 水平半径 / 垂直半径;
 </style>
 <div class="arrow"></div>
 ```
-### 半圆
+#### 半圆
 ```html
 <style>
   .semicircle{
@@ -2586,7 +2593,7 @@ addEventListener第一个参数事件类型，第二个类型即绑定的具体�
 阻止冒泡和捕获用e.stopPropagation(),event.cancelBubble; // IE 6 7 8 的停止冒泡; 
 阻止默认事件用e.preventDefaule(),e.returnValue; 是一个属性，适用于 IE 6 7 8;
 
-### 浏览器的事件冒泡及事件捕获？怎么取消事件冒泡？事件代理？
+### （DOM 事件流）浏览器的事件冒泡及事件捕获？怎么取消事件冒泡？事件代理？
 事件发生时会在元素节点之间按照特定的顺序传播，这个传播过程即DOM事件流。
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922093720.png)
 - 包括三个阶段：
@@ -2610,6 +2617,7 @@ addEventListener第一个参数事件类型，第二个类型即绑定的具体�
 
 
 - 事件委托的原理（重）
+    - 事件委托也叫事件委派，就是利用 DOM 的冒泡事件流，注册最少的监听器，实现对 DOM 节点的所有子元素进行事件群控。
     - 事件委托的原理：不给每个子节点单独设置事件监听器，而是设置在其父节点上，然后利用冒泡原理设置每个子节点。(给 ul 注册点击事件，然后利用事件对象的 target 来找到当前点击的 li ，然后事件冒泡到 ul 上， ul 有注册事件，就会触发事件监听器。)
     - 事件委托的作用
         - 只操作了一次 DOM ，提高了程序的性能。
@@ -3390,6 +3398,7 @@ Webpack 中，Tree-shaking 的实现一是先标记出模块导出值中哪些�
 
 
 ## HTTP
+### Service Worker有哪些作用
 ### Cookie、Session、webStorage、localStorage、sessionStorage
 #### Cookie
 - HTTP 是无状态的协议（对于事务处理没有记忆能力，每次客户端和服务端会话完成时，服务端不会保存任何会话信息）：每个请求都是完全独立的，服务端无法确认当前访问者的身份信息，无法分辨上一次的请求发送者和这一次的发送者是不是同一个人。所以服务器与浏览器为了进行会话跟踪（知道是谁在访问我），就必须主动的去维护一个状态，这个状态用于告知服务端前后两个请求是否来自同一浏览器。而这个状态需要通过 cookie 或者 session 去实现。
@@ -3525,7 +3534,7 @@ HTTPS：是以安全为目标的HTTP通道，简单讲是HTTP的安全版，即H
 
 #### HTTP1.1和HTTP2.0的区别
 - 多路复用：HTTP2.0使用了多路复用的技术，做到同一个连接并发处理多个请求，而且并发请求的数量比HTTP1.1大了好几个数量级。HTTP1.1也可以多建立几个TCP连接，来支持处理更多并发的请求，但是创建TCP连接本身也是有开销的。
-- 头部数据压缩： 在HTTP1.1中，HTTP请求和响应都是由状态行、请求/响应头部、消息主体三部分组成。一般而言，消息主体都会经过gzip压缩，或者本身传输的就是压缩过后的二进制文件，但状态行和头部却没有经过任何压缩，直接以纯文本传输。随着Web功能越来越复杂，每个页面产生的请求数也越来越多，导致消耗在头部的流量越来越多，尤其是每次都要传输UserAgent、Cookie这类不会频繁变动的内容，完全是一种浪费。HTTP1.1不支持header数据的压缩，HTTP2.0使用HPACK算法对header的数据进行压缩，这样数据体积小了，在网络上传输就会更快。
+- 头部数据压缩(采用HPACK压缩算法压缩头部，减小了传输的体积)： 在HTTP1.1中，HTTP请求和响应都是由状态行、请求/响应头部、消息主体三部分组成。一般而言，消息主体都会经过gzip压缩，或者本身传输的就是压缩过后的二进制文件，但状态行和头部却没有经过任何压缩，直接以纯文本传输。随着Web功能越来越复杂，每个页面产生的请求数也越来越多，导致消耗在头部的流量越来越多，尤其是每次都要传输UserAgent、Cookie这类不会频繁变动的内容，完全是一种浪费。HTTP1.1不支持header数据的压缩，HTTP2.0使用HPACK算法对header的数据进行压缩，这样数据体积小了，在网络上传输就会更快。
 - 服务器推送： 服务端推送是一种在客户端请求之前发送数据的机制。网页使用了许多资源：HTML、样式表、脚本、图片等等。在HTTP1.1中这些资源每一个都必须明确地请求。这是一个很慢的过程。浏览器从获取HTML开始，然后在它解析和评估页面的时候，增量地获取更多的资源。因为服务器必须等待浏览器做每一个请求，网络经常是空闲的和未充分使用的。为了改善延迟，HTTP2.0引入了server push，它允许服务端推送资源给浏览器，在浏览器明确地请求之前，免得客户端再次创建连接发送请求到服务器端获取。这样客户端可以直接从本地加载这些资源，不用再通过网络。
 
 
@@ -3736,7 +3745,7 @@ TCP 滑动窗口分为两种: 发送窗口和接收窗口。
 #### 跨域的解决方案
 - 修改本地HOST
 - JSONP
-- CORS
+- CORS(（跨域资源共享 Cross-origin resource sharing）允许浏览器向跨域服务器发出XMLHttpRequest请求，从而克服跨域问题，它需要浏览器和服务器的同时支持。 )
 - Proxy
 - Nginx反向代理
 - Post Message（利用`iframe`标签，实现不同域的关联）
@@ -4194,6 +4203,9 @@ ETag/If-None-Match 的出现主要解决了 Last-Modified/If-Modified-Since 所�
 
 <script src="http://test.com/a.【hash值】.js"></script>
 ```
+#### 缓存场景
+对于大部分的场景都可以使用强缓存配合协商缓存解决，但是在一些特殊的地方可能需要选择特殊的缓存策略。
+
 
 ## 页面渲染和性能优化
 ### 页面渲染（浏览器从输入 url 到页面渲染的整个流程）
@@ -4342,8 +4354,19 @@ TCP提供一种可靠的传输，这个过程涉及到三次握手，四次挥�
     - 涉及多域名的网站，可以开启域名预解析
 
 ### 提高首屏展示效率
-基于上面介绍的浏览器渲染原理，DOM 和 CSSOM 结构构建顺序，初始化可以对页面渲染做些优化，提升页面性能。
+- Vue-Router路由懒加载（利用Webpack的代码切割）
+- 使用CDN加速，将通用的库从vendor进行抽离
+- Nginx的gzip压缩
+- Vue异步组件
+- 服务端渲染SSR
+- 如果使用了一些UI库，采用按需加载
+- Webpack开启gzip压缩
+- 如果首屏为登录页，可以做成多入口
+- Service Worker缓存文件处理
+- 使用link标签的rel属性设置   prefetch（这段资源将会在未来某个导航或者功能要用到，但是本资源的下载顺序权重比较低，prefetch通常用于加速下一次导航）、preload（preload将会把资源得下载顺序权重提高，使得关键数据提前下载好，优化页面打开速度）
 
+
+基于上面介绍的浏览器渲染原理，DOM 和 CSSOM 结构构建顺序，初始化可以对页面渲染做些优化，提升页面性能。
 很多人在构建前端项目时会发现打包出来的chunk.vendors.xxx.js文件实在是太大,导致首屏加载速度很慢
     - 使用webpack-bundle-analyzer分析前端项目包大小, 找出问题源头.
 ```js
@@ -4502,6 +4525,8 @@ const routes: Array<RouteConfig> = [
     - 尽量使用webp格式的照片，因为同样的视觉效果，其体积为其他的1/3大小。使用雪碧图来处理首屏上所有的小icon，走cdn缓存等。
 
 ## Vue
+### React和Vue的区别
+
 ### 简述MVVM
 什么是MVVM？
 视图模型双向绑定，是Model-View-ViewModel的缩写，也就是把MVC中的Controller演变成ViewModel。Model层代表数据模型，View代表UI组件，ViewModel是View和Model层的桥梁，数据会绑定到viewModel层并自动将数据渲染到页面中，视图变化的时候会通知viewModel层更新数据。以前是操作DOM结构更新视图，现在是数据驱动视图。
@@ -4551,28 +4576,40 @@ Vue是一个典型的MVVM框架，模型（Model）只是普通的javascript对�
     - 待属性变动dep.notice()通知时，能调用自身的update()方法，并触发Compile中绑定的回调
 - Compile（指令解析器）: Compile主要做的事情是解析模板指令，将模板中变量替换成数据，然后初始化渲染页面视图，并将每个指令对应的节点绑定更新函数，添加鉴定数据的订阅者，一旦数据有变动，收到通知，更新试图
 
-### vue响应式原理
+### Vue2.x响应式原理
+vue 初始化时会用Object.defineProperty()给data中每一个属性添加getter和setter，同时创建dep和watcher进行依赖收集与派发更新，最后通过diff算法对比新老vnode差异，通过patch即时更新DOM
+
+
 vue2.0中，响应式实现的核心就是 ES5的Object.defineProperty(obj, prop, descriptor). 通过Object.defineProperty()劫持data和props各个属性的getter和setter，getter做依赖收集，setter派发更新。整体来说是一个 数据劫持 + 发布-订阅者模式。
 
 
 具体来说， ① vue初始化阶段(beforeCreate之后create之前)，遍历data/props，调用Object.defineProperty给每个属性加上getter、setter。② 每个组件、每个computed都会实例化一个watcher（当然也包括每个自定义watcher），订阅渲染/计算所用到的所用data/props/computed，一旦数据发生变化，setter被调用，会通知渲染watcher重新计算、更新组件。
 
-### computed与watch
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211007094007.png)
+
+### Vue2.xcomputed与watch
 通俗来讲，既能用 computed 实现又可以用 watch 监听来实现的功能，推荐用 computed， 重点在于 computed 的缓存功能 computed 计算属性是用来声明式的描述一个值依赖了其它的值，当所依赖的值或者变量 改变时，计算属性也会跟着改变； watch 监听的是已经在 data 中定义的变量，当该变量变化时，会触发 watch 中的方法。
 
 - watch 属性监听 是一个对象，键是需要观察的属性，值是对应回调函数，主要用来监听某些特定数据的变化，从而进行某些具体的业务逻辑操作,监听属性的变化，需要在数据变化时执行异步或开销较大的操作时使用
 - computed 计算属性 属性的结果会被缓存，当computed中的函数所依赖的属性没有发生改变的时候，那么调用当前函数的时候结果会从缓存中读取。除非依赖的响应式属性变化时才会重新计算，主要当做属性来使用 computed中的函数必须用return返回最终的结果 computed更高效，优先使用。data 不改变，computed 不更新。
 - 使用场景 computed：当一个属性受多个属性影响的时候使用，例：购物车商品结算功能 watch：当一条数据影响多条数据的时候使用，例：搜索数据
 
-### 组件中的data为什么是一个函数？
+### Vue2.x组件中的data为什么是一个函数？
 一个组件被复用多次的话，也就会创建多个实例。本质上，这些实例用的都是同一个构造函数。 2.如果data是对象的话，对象属于引用类型，会影响到所有的实例。所以为了保证组件不同的实例之间data不冲突，data必须是一个函数。
 
-### 为什么v-for和v-if不建议用在一起
+### Vue2.x为什么v-for和v-if不建议用在一起
 1. 当 v-for 和 v-if 处于同一个节点时，v-for 的优先级比 v-if 更高，这意味着 v-if 将分别重复运行于每个 v-for 循环中。如果要遍历的数组很大，而真正要展示的数据很少时，这将造成很大的性能浪费
 2. 这种场景建议使用 computed，先对数据进行过滤
 
 ### Vue 项目中 key 的作用
 key的作用是为了在diff算法执行时更快的找到对应的节点，提高diff速度，更高效的更新虚拟DOM;
+
+更准确 : 因为带 key 就不是就地复用了,在 sameNode 函数 a.key === b.key 对比中可以避免就地复用的情况。所以会更加准确,如果不加 key,会导致之前节点的状态被保留下来,会产生一系列的 bug。
+
+更快速 : key 的唯一性可以被 Map 数据结构充分利用,相比于遍历查找的时间复杂度 O(n),Map 的时间复杂度仅仅为 O(1)
+
+key 的特殊 attribute 主要用在 Vue 的虚拟 DOM 算法，在新旧 nodes 对比时辨识 VNodes。如果不使用 key，Vue 会使用一种最大限度减少动态元素并且尽可能的尝试就地修改/复用相同类型元素的算法。而使用 key 时，它会基于 key 的变化重新排列元素顺序，并且会移除 key 不存在的元素。
+
 
 - vue和react都是采用diff算法来对比新旧虚拟节点，从而更新节点。
     - 在vue的diff函数中，会根据新节点的key去对比旧节点数组中的key，从而找到相应旧节点。如果没找到就认为是一个新增节点。而如果没有key，那么就会采用遍历查找的方式去找到对应的旧节点。一种一个map映射，另一种是遍历查找。相比而言。map映射的速度更快。
@@ -4582,24 +4619,604 @@ key的作用是为了在diff算法执行时更快的找到对应的节点，提�
 ### Vue2.x双向绑定的实现原理
 当一个Vue实例创建时，Vue会遍历data选项的属性，用 Object.defineProperty 将它们转为 getter/setter并且在内部追踪相关依赖，在属性被访问和修改时通知变化。每个组件实例都有相应的 watcher 程序实例，它会在组件渲染的过程中把属性记录为依赖，之后当依赖项的 setter 被调用时，会通知 watcher重新计算，从而致使它关联的组件得以更新。
 
-### nextTick的实现
+### Vue2.xnextTick的实现
 nextTick是Vue提供的一个全局API,是在下次DOM更新循环结束之后执行延迟回调，在修改数据之后使用$nextTick，则可以在回调中获取更新后的DOM；
 
 在下次 DOM 更新循环结束之后执行延迟回调，在修改数据之后立即使用 nextTick 来获取更新后的 DOM。 nextTick主要使用了宏任务和微任务。 根据执行环境分别尝试采用Promise、MutationObserver、setImmediate，如果以上都不行则采用setTimeout定义了一个异步方法，多次调用nextTick会将方法存入队列中，通过这个异步方法清空当前队列。
 
-### vue的diff算法
+### Vue2.x的diff算法
 渲染真实的DOM开销是很大的，修改了某个数据，如果直接渲染到真实dom上会引起整个DOM树的重绘和重排。
 Virtual Dom 根据真实DOM生成的一个Virtual DOM，当Virtual DOM某个节点的数据改变后生成一个新的Vnode，然后Vnode和oldVnode作对比，发现有不一样的地方就直接修改在真实的DOM上，然后使oldVnode的值为Vnode.
 注意：在采取diff算法比较的时候，只会在同层级进行，不会跨层级比较。
 当数据发生改变时，set方法会让调用Dep.notify()方法通知所有订阅者Watcher，订阅者就会调用patch函数给真实的DOM打补丁，更新响应的试图。
 
+### Vue2.x的computed的实现原理
+computed 本质是一个惰性求值的观察者computed watcher。其内部通过 this.dirty 属性标记计算属性是否需要重新求值。
+Computed本质是一个具备缓存的watcher，依赖的属性发生变化就会更新视图。 适用于计算比较消耗性能的计算场景。当表达式过于复杂时，在模板中放入过多逻辑会让模板难以维护，可以将复杂的逻辑放入计算属性中处理。
+
+- 当 computed 的依赖状态发生改变时,就会通知这个惰性的 watcher,computed watcher 通过 this.dep.subs.length 判断有没有订阅者,
+- 有的话,会重新计算,然后对比新旧值,如果变化了,会重新渲染。 (Vue 想确保不仅仅是计算属性依赖的值发生变化，而是当计算属性最终计算的值发生变化时才会触发渲染 watcher 重新渲染，本质上是一种优化。)
+- 没有的话,仅仅把 this.dirty = true (当计算属性依赖于其他数据时，属性并不会立即重新计算，只有之后其他地方需要读取属性的时候，它才会真正计算，即具备 lazy（懒计算）特性。)
+
+### Vue2.x的Watch的运行原理
+watch没有缓存性，更多的是观察的作用，可以监听某些数据执行回调。当我们需要深度监听对象中的属性时，可以打开deep：true选项，这样便会对对象中的每一项进行监听。这样会带来性能问题，优化的话可以使用字符串形式监听
+注意：Watcher : 观察者对象 , 实例分为渲染 watcher (render watcher),计算属性 watcher (computed watcher),侦听器 watcher（user watcher）三种
+
+Watch没有缓存性，更多的是观察的作用，可以监听某些数据执行回调。当我们需要深度监听对象中的属性时，可以打开deep：true选项，这样便会对对象中的每一项进行监听。这样会带来性能问题，优化的话可以使用字符串形式监听，如果没有写到组件中，不要忘记使用unWatch手动注销哦。
+
+### Vue2.x的声明周期
+- beforeCreate是new Vue()之后触发的第一个钩子，在当前阶段data、methods、computed以及watch上的数据和方法都不能被访问。
+- created在实例创建完成后发生，当前阶段已经完成了数据观测，也就是可以使用数据，更改数据，在这里更改数据不会触发updated函数。可以做一些初始数据的获取，在当前阶段无法与Dom进行交互，如果非要想，可以通过vm.$nextTick来访问Dom。
+- beforeMount发生在挂载之前，在这之前template模板已导入渲染函数编译。而当前阶段虚拟Dom已经创建完成，即将开始渲染。在此时也可以对数据进行更改，不会触发updated。
+- mounted在挂载完成后发生，在当前阶段，真实的Dom挂载完毕，数据完成双向绑定，可以访问到Dom节点，使用$refs属性对Dom进行操作。
+- beforeUpdate发生在更新之前，也就是响应式数据发生更新，虚拟dom重新渲染之前被触发，你可以在当前阶段进行更改数据，不会造成重渲染。
+- updated发生在更新完成之后，当前阶段组件Dom已完成更新。要注意的是避免在此期间更改数据，因为这可能会导致无限循环的更新。
+- beforeDestroy发生在实例销毁之前，在当前阶段实例完全可以被使用，我们可以在这时进行善后收尾工作，比如清除计时器。
+- destroyed发生在实例销毁之后，这个时候只剩下了dom空壳。组件已被拆解，数据绑定被卸除，监听被移出，子实例也统统被销毁。
+### Vue2.0中组件生命周期调用顺序说一下
+组件的调用顺序都是先父后子,渲染完成的顺序是先子后父。
+
+组件的销毁操作是先父后子，销毁完成的顺序是先子后父。
+
+加载渲染过程：
+父beforeCreate->父created->父beforeMount->子beforeCreate->子created->子beforeMount- >子mounted->父mounted
+
+子组件更新过程：
+父beforeUpdate->子beforeUpdate->子updated->父updated
+
+父组件更新过程：
+父 beforeUpdate -> 父 updated
+
+销毁过程：
+父beforeDestroy->子beforeDestroy->子destroyed->父destroyed
+### Vue模版编译原理知道吗，能简单说一下吗？
+Vue的编译过程就是将template转化为render函数的过程。会经历以下阶段：
+- 生成AST树
+- 优化
+- codegen
+
+首先解析模版，生成AST语法树(一种用JavaScript对象的形式来描述整个模板)。 使用大量的正则表达式对模板进行解析，遇到标签、文本的时候都会执行对应的钩子进行相关处理。
+
+Vue的数据是响应式的，但其实模板中并不是所有的数据都是响应式的。有一些数据首次渲染后就不会再变化，对应的DOM也不会变化。那么优化过程就是深度遍历AST树，按照相关条件对树节点进行标记。这些被标记的节点(静态节点)我们就可以跳过对它们的比对，对运行时的模板起到很大的优化作用。
+
+编译的最后一步是将优化后的AST树转换为可执行的代码。
+
+### keep-alive实现原理
+keep-alive可以实现组件缓存，当组件切换时不会对当前组件进行卸载。
+
+keep-alive实例会缓存对应组件的VNode,如果命中缓存，直接从缓存对象返回对应VNode
+
+LRU（Least recently used）算法根据数据的历史访问记录来进行淘汰数据，其核心思想是“如果数据最近被访问过，那么将来被访问的几率也更高”。
+### Vue的数据为什么频繁变化但只会更新一次
+- 检测到数据变化
+- 开启一个队列
+- 在同一事件循环中缓冲所有数据改变
+- 如果同一个 watcher (watcherId相同)被多次触发，只会被推入到队列中一次
+
+不优化，每一个数据变化都会执行: setter->Dep->Watcher->update->run
+优化后：执行顺序update -> queueWatcher -> 维护观察者队列（重复id的Watcher处理） -> waiting标志位处理 -> 处理$nextTick（在为微任务或者宏任务中异步更新DOM）
+
 ### Vue3.0 有哪些新特性
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211006221811.png)
+- Composition API
+    - Vue2中OptionsAPI
+        - 相关业务的代码需要遵循option的配置写到特定的区域，导致后续维护非常的复杂，代码可复用性也不高。最难受的是敲代码的时候不得不上下反复横跳
+    - Vue3中的CompositionAPI
+        - 功能相关的代码都聚合起来了，代码变得井然有序，不再频繁地上下反复横跳。
+        - 而Composition API带来的出色代码组织和复用能力，让你可以把功能相关的代码抽离出去成为一个可复用的函数JS、TS文件，在.vue文件中通过函数的调用把刚刚这些函数的返回值组合起来，最后返回模板真正需要使用到的东西。（React Hook）
+        - 与React Hooks对比
+            - 同样的逻辑组合、复用能力
+            - 只调用一次
+                - 符合 JS 直觉
+                - 没有闭包变量问题
+                - 没有内存/GC 压力
+                - 不存在内联回调导致子组件永远更新的问题
+- Fragment
+    - 这个新特性比较简单，就是在模板中可以写多个根节点。
+        - 减少无意义的根节点元素
+        - 可以平级递归组件
+```js
+<template>
+  <quick-sort :list="left" v-if="left.length"></quick-sort>
+  <span class="item">{{ flag }}</span>
+  <quick-sort :list="right" v-if="right.length"></quick-sort>
+</template>
 
-### Vue3.0 是如何变得更快的
 
-### Vue的性能优化
+<script lang="ts">
+import {defineComponent, ref} from "vue"
 
+export default defineComponent({
+  name: 'quick-sort',
+  props: ["list"],
+  setup(props) {
+    // eslint-disable-next-line vue/no-setup-props-destructure
+    const flag: number = props.list[0]
+    const left = ref<number[]>([])
+    const right = ref<number[]>([])
+
+    setTimeout(() => {
+      props.list.slice(1).forEach((item: number) => {
+        item > flag ? right.value.push(item) : left.value.push(item)
+      })
+    }, 100)
+
+    return {
+      flag,
+      left,
+      right
+    }
+  }
+})
+</script>
+```
+- Suspense
+    - 可以理解为异步组件的爹。用于方便地控制异步组件的一个挂起和完成状态。
+    - Suspense将异步组件包起来，template #default中展示加载完成的异步组件，template #fallback中则展示异步组件挂起状态时需要显示的内容。
+```js
+<template>
+  <h1>Suspense</h1>
+  <Suspense>
+    <template #default>
+      <AsyncComponent :timeout="5000"/>
+    </template>
+
+    <template #fallback>
+      <p class="loading">loading {{ loadingStr }}</p>
+    </template>
+  </Suspense>
+</template>
+
+<script lang="ts">
+import {defineComponent} from "vue"
+import AsyncComponent from "@/components/AsyncComponent.vue"
+import useLoading from "@/composables/useLoading";
+
+export default defineComponent({
+  components: {
+    AsyncComponent
+  },
+  setup() {
+    const {loading: loadingStr} = useLoading()
+    return {loadingStr}
+  }
+})
+</script>
+```
+- Teleport
+    - 组件任意门，让你的组件可以任意地丢到html中的任一个DOM下。
+```js
+<template>
+  <h1>Teleport——任意门</h1>
+  <div class="customButton" @click="handleToggle">偷袭</div>
+  <teleport to="body">
+    <TeleportModal v-if="isOpen" @click="handleToggle"></TeleportModal>
+  </teleport>
+</template>
+
+<script lang="ts">
+import {defineComponent, ref} from "vue"
+import TeleportModal from "@/components/TeleportModal.vue"
+
+export default defineComponent({
+  components: {
+    TeleportModal
+  },
+  setup() {
+    const isOpen = ref(false)
+    const handleToggle = () => {
+      isOpen.value = !isOpen.value
+    }
+
+    return {
+      isOpen,
+      handleToggle
+    }
+  }
+})
+</script>
+```
+- createRenderer API
+    - Vue3中我们可以自由方便地去构建Web（浏览器）平台或非Web平台的自定义渲染器。
+    - 将Virtual DOM和平台相关的渲染分离，通过createRendererAPI我们可以自定义Virtual DOM渲染到某一平台中时的所有操作，比如新增、修改、删除一个“元素”，我们可以这些方法中替换或修改为我们自定义的逻辑，从而打造一个我们自定义的渲染器。
+    - 调用createRenderer以后的返回值是一个renderer，createApp这个方法就是这个renderer的一个属性方法，用它替代原生的createApp方法就可以使用我们自己的自定义渲染器了~
+### Vue3.0 是如何变得更快更小的
+- 如何更快
+    - Object.defineProperty => Proxy（响应式原理）
+        - Proxy不仅消除了Vue2中现有的限制（比如对象新属性的增加、数组元素的直接修改不会触发响应式机制，这也是很多新手以为所谓的bug），而且有着更好的性能：
+        - 在Vue2中对数据的侦听劫持是在组件初始化时去遍历递归一个对象，给其中的每一个属性用Object.defineProperty设置它的getter和setter，然后再把处理好的这些对象挂到组件实例的this上面，所以这种方式的数据侦听是在属性层面的，这也是为什么增加对象属性无法被监听的原因，同时这种初始化的操作对于CPU来说还是比较昂贵的一个操作。对于javascript而言，一个对象肯定越稳定越小性能就越好。
+        - Proxy之后组件的初始化就不需要这么做这么费时的操作了，因为Proxy就是真正意义给一个对象包上一层代理从而去完成数据侦听劫持的操作，所以总的来说这个复杂度是直接少了一个数量级的。只要你对这个代理后的对象访问或修改里面的东西都能被这层代理所感知到，进而去动态地决定返回什么东西给你，并且也不再需要把选项的这些东西再重复挂到组件实例的this上面，因为你访问的时候是有这个信息知道你访问的东西是属于props还是data还是其他的，vue只需要根据这个信息去对应的数据结构里面拿出来就可以了，单就这一点而言你就可以感觉到组件的内存占用已经少了一半。
+        - proxy是在对象层面上的代理，所以你在对象上新增属性是可以被代理到的。
+        - Proxy还可以代理数组，所以就算你直接修改数组里面的元素也是可以被代理到的。
+    - 突破Virtual DOM瓶颈
+        - 所以Virtual DOM的更新性能从与模板整体大小相关，提升到了只与动态内容的数量
+        - 传统的Virtual DOM 树
+            - 当数据发生改变的时候，两棵vdom的树会进行diff比较，找到需要更新的节点再patch为实际的DOM更新到浏览器上。这个过程在Vue2中已经优化到了组件的粒度，通过渲染Watcher去准确找到需要更新的组件，将整个组件内的vdom tree进行diff。
+            - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211007071032.png)
+        - Vue3.0的
+            - Vue3重写了Virtual Dom，以利用模板的静态分析优势去将更新的粒度进一步缩小到动态元素甚至是动态的属性。
+            - 通过compiler对模板的静态分析，在优化模式下将静态的内容进行hosting，也就是把静态节点提升到外面去，实际生成vnode的就只有动态的元素<p class="text">{{ msg }}</p>，再分析这个元素内可能发生变化的东西，对这个元素打上patchFlag，表示这个元素可能发生变化的类型是文本内容textContent还是属性类class等等。
+            - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211007071416.png)
+            - 完全静态的元素已经被提升到render函数上面去了，实际会创建vnode的就只有一个含有动态文本内容的p元素。
+            - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211007071459.png)
+            - v-if / v-for
+                - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211007071825.png)
+                - 将模版基于动态节点指令切割为嵌套的区块
+                - 每个区块内部的节点结构是固定的
+                - 每个区块只需要以一个平面数组追踪自身包含的动态节点
+    - 更多编译时优化
+        - Slot默认编译为函数
+            - 这个让使用插槽的父子组件之间的更新关系不再强耦合
+        - 利用模板静态分析对vnode生成的类型标记——patchFlag
+            - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211007072244.png)
+            - vnode的patchFlag通过 | 操作符去组合起来，vnode的patchFlag和某个特定类型所代表的patchFlag就用 & 操作符计算一下，如果得到的结果为0，则说明这个vnode的这个类型的属性是不会变的，不为0则相反。
+- 如何更小
+    - 最主要的就是充分利用了Tree-shaking（支持摇树优化）的特性
+        - tree shaking以后，进入bundle的只有被引入并且真正会被使用的代码块。在Vue3中许多渐进式的特性都使用了第二种的写法来进行重写，而且模板本身又是Tree shaking友好的。
+        - Vue3最重要的变化之一就是引入了Tree-Shaking，Tree-Shaking带来的bundle体积更小是显而易见的。
+            - 在2.x版本中，很多函数都挂载在全局Vue对象上，比如nextTick、nextTick、set等函数，因此虽然我们可能用不到，但打包时只要引入了vue这些全局函数仍然会打包进bundle中。
+            - 在Vue3中，所有的API都通过ES6模块化的方式引入，这样就能让webpack或rollup等打包工具在打包时对没有用到API进行剔除，最小化bundle体积；
+### Vue3.0的性能优化
+- 源码优化
+    - 更好的代码管理方式：monorepo 根据功能将不同的模块拆分到packages目录下不同的子目录中。这样使得模块拆分更细化，职责划分更明确，模块之间的依赖关系也更加明确，开发人员也更容易阅读、理解和更改所有模块源码，提高代码的可维护性。
+    - 采用typescript开发，也省去了单独维护d.ts文件的麻烦。
+
+- 性能优化
+    - 源码体积优化：移除了一些冷门的feature（比如filter、inline-template等），引入tree-shaking技术减少打包体积。
+    - 数据劫持优化：使用Proxy代替vue2.x中的defineProperty，能够深层监听数组对象的变化。
+    - 编译优化：检测出模板中的静态节点、子树甚至数据对象，并在生成的代码中将它们提升到渲染函数之外。这样可以避免在每次渲染时重新创建这些对象，从而大大提高内存使用率并减少垃圾回收的频率。
+    - 语法API优化：推出composition API优化逻辑组合和优化逻辑复用。
+
+### Vue3.0和Vue2.0的差别
+- 响应式原理不同
+    - 使用proxy代替defineProperty
+    - defineProperty只能响应首次渲染时候的属性，Proxy需要的是整体，不需要关心里面有什么属性，而且Proxy的配置项有13种，可以做更细致的事情，这是之前的defineProperty无法达到的
+- Diff算法的提升
+    - 以往的渲染策略
+        - vue2.x提供类似于HTML的模板语法，但是，它是将模板编译成渲染函数来返回虚拟DOM树。Vue框架通过递归遍历两个虚拟DOM树，并比较每个节点上的每个属性，来确定实际DOM的哪些部分需要更新。
+    - 潜在的问题
+        - 由于现代JavaScript引擎执行的高级优化，这种有点暴力的算法通常非常快速，但是DOM的更新仍然涉及许多不必要的CPU工作
+    - Vue3的突破
+        - 编译器和运行时需要协同工作：编译器分析模板并生成带有优化提示的代码，而运行时尽可能获取提示并采用快速路径。
+            - 首先，在DOM树级别。我们注意到，在没有动态改变节点结构的模板指令（例如v-if和v-for）的情况下，节点结构保持完全静态。如果我们将一个模板分成由这些结构指令分隔的嵌套“块”，则每个块中的节点结构将再次完全静态。当我们更新块中的节点时，我们不再需要递归遍历DOM树 - 该块内的动态绑定可以在一个平面数组中跟踪。这种优化通过将需要执行的树遍历量减少一个数量级来规避虚拟DOM的大部分开销。
+            - 其次，编译器积极地检测模板中的静态节点、子树甚至数据对象，并在生成的代码中将它们提升到渲染函数之外。这样可以避免在每次渲染时重新创建这些对象，从而大大提高内存使用率并减少垃圾回收的频率。
+            - 第三，在元素级别。编译器还根据需要执行的更新类型，为每个具有动态绑定的元素生成一个优化标志。例如，具有动态类绑定和许多静态属性的元素将收到一个标志，提示只需要进行类检查。运行时将获取这些提示并采用专用的快速路径。
+- typeScript的支持
+    - vue2是支持类型的，用的是Facebook的Flow做类型检查，但是因为某些情况下推断有问题，所以改为支持ts。
+- 生命周期不同
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211007085637.png)
+    - 使用setup代替了之前的beforeCreate和created，其他生命周期名字有些变化，功能都是没有变化的
+- vue3对全局API的优化（ tree-shaking ）
+    - 在Vue3中，所有的API都通过ES6模块化的方式引入，这样就能让webpack或rollup等打包工具在打包时对没有用到API进行剔除，最小化bundle体积；
+- v-if 比 v-for优先级高 
+- Composition API
+    - 很多个API组合的一套API
+    - setup
+        - setup替代了以前的 beforeCreate 和 created ，类似于初始化的功
+    - ref 、toRef、 toRefs
+        - ref 就当作简单的响应式变量 
+        - toRef 就是把不是响应式的对象转化成响应式
+        - toRefs 就是把响应式的reactive对象，分解成无数的响应式 ref
+        - 注意
+            - 1. ref 响应式的数据，在函数里读取的时候需要 .value获取
+            - 2. dom里不需要我们.value 框架替我们自动解构了
+            - 3. 组件return的时候将 reactive的对象 toRefs ，可以使代码更简洁，又不会丢失数据的响应式
+    ```js
+    import { ref , toRef , toRefs } from 'vue'
+    setup(){
+     const obj = {age:12}
+     //初始化设置个响应式变量tor,函数中读取值要tor.value
+     let tor = ref(0)
+     //这里将对象转化成响应性，并设置key值,函数中读取值要toR._object
+     let toR = toRef(obj,'toR')
+     const state = reactive({
+    	num:1,
+    	name:'baby张'
+    })
+     return {
+    	tor,
+    	roR,
+    	//toRefs针对的是使用了reactive的响应式对象，可以理解为将对象拆分成多个响应式ref，外界可以读取到响应式的所有属性
+    	...toRefs(state)
+    	}
+     }
+    ```
+    - reactive
+        - reactive 内部是可以使用计算属性等各种方法，它只是把数据实现响应式而已
+        - reactive 后return 的数据最好是用toRefs 转化一下，好处谁用谁知道
+    - watch、watchEffect
+        - watch则是一对多的关系
+        - watch
+            - watch里第一个参数是监听需要的变量，第二个是执行的回调函数，
+        - watchEffect
+            - watchEffect只要里面的变量发生了改变就会执行,并且第一次渲染会立即执行,没有变化前后返回参数，无法监听整个reactive
+        - 区别
+            - watch 需要具体监听参数，watchEffect 不需要传入监听参数
+            - watch 的回调函数跟以前一样有前后对比的参数，watchEffect 啥都没有
+            - watch 只有监听属性变化才执行，watchEffect 第一次会立即执行
+            - watch 和 watchEffect 都无法监听未被绑定的属性
+            - watch 可以直接监听 ref 和 reactive 绑定的对象，watchEffect 不可以（ref的值要.value，reactive的值要具体到内部属性），只会执行第一次
+    ```js
+         //这里的watchEffect只要里面的变量发生了改变就会执行,并且第一次渲染会立即执行,没有变化前后返回参数，无法监听整个reactive
+        watchEffect(() => {
+          refnum.value = state.count;
+          console.log(state, "watchEffect");s
+        });
+        //watch里第一个参数是监听需要的变量，第二个是执行的回调函数，
+        watch(refnum,(a,b)=>{
+          console.log(a,b,'watch,a,b')
+        })
+    ```
+    ```js
+    import { reactive, ref, watch } from "vue";
+    const state = reactive({
+      count: 0,
+    });
+    
+    //侦听时返回值得getter函数
+    watch(
+      () => state.count,
+      (count, prevCount) => {
+        // 1 0
+        console.log(count, prevCount);
+      }
+    );
+    state.count++;
+    
+    const count = ref(0);
+    //直接侦听ref
+    watch(count, (count, prevCount) => {
+      // 2 0
+      console.log(count, prevCount, "watch");
+    });
+    count.value = 2;
+
+
+
+    const state = reactive({
+      count: 1,
+    });
+    const count = ref(2);
+    watch([() => state.count, count], (newVal, oldVal) => {
+      //[3, 2]  [1, 2]
+      //[3, 4]  [3, 2]
+      console.log(newVal, oldVal);
+    });
+    state.count = 3;
+    count.value = 4;
+
+
+
+    import _ from "lodash";
+    const deepObj = reactive({
+      a: {
+        b: {
+          c: "hello",
+        },
+      },
+    });
+    
+    watch(
+      () => _.cloneDeep(deepObj),
+      (val, old) => {
+        // new hello hello
+        console.log(val.a.b.c, old.a.b.c);
+      },
+      { deep: true }
+    );
+    
+    deepObj.a.b.c = "new hello";
+    ```
+    - computed
+        - computed是多对一的关系
+        - computed是一个函数，它接收一个回调函数作为参数，返回一个基于该值的响应式Ref对象。也可以接收一个对象形式（对象中只有set和get）作为参数。
+    ```js
+    <script lang="ts">
+        import { defineComponent, ref, computed } from "vue";
+        export default defineComponent({
+          setup() {
+            const count = ref(0);
+            const increment = () => {
+              count.value++;
+            };
+            const double = computed(() => count.value * 2);
+            // const double = computed({
+            //   get() {
+            //     return count.value * 3;
+            //   },
+            //   set(val) {
+            //     console.log(val);
+            //     count.value = val - 1;
+            //   }
+            // });
+            return {
+              count,
+              increment,
+              double
+            };
+          }
+        });
+        </script>
+    ```
+    - 函数组件
+        - 在 Vue 3 中，所有的函数式组件都是用普通函数创建的
+        - 有两个参数：props 和 context
+        - 以前是在 render 函数中隐式提供 creatElement，现在是组合Api里引入h
+    ```js
+        import { h } from 'vue'
+        const Fun = (props, context) => {
+        //这里h的用法跟以前还是一样的
+          return h(p, context.attrs, context.slots)
+        }
+        export default Fun
+    ```    
+### Vue3.0双向绑定的实现原理    
+
+### Vue3.0响应式数据原理
+Vue3.x改用Proxy替代Object.defineProperty。因为Proxy可以直接监听对象和数组的变化，并且有多达13种拦截方法。并且作为新标准将受到浏览器厂商重点持续的性能优化。
+
+Proxy只会代理对象的第一层。
+判断当前Reflect.get的返回值是否为Object，如果是则再通过reactive方法做代理， 这样就实现了深度观测。
+
+监测数组的时候可能触发多次get/set，那么如何防止触发多次呢？
+我们可以判断key是否为当前被代理对象target自身属性，也可以判断旧值与新值是否相等，只有满足以上两个条件之一时，才有可能执行trigger。
+### Vue3.0的diff算法
+Vue3.x借鉴了 ivi算法和 inferno算法
+在创建VNode时就确定其类型，以及在mount/patch的过程中采用位运算来判断一个VNode的类型，在这个基础之上再配合核心的Diff算法
+该算法中还运用了动态规划的思想求解最长递归子序列。
+### Vue3.0的computed的实现原理
+
+### Vue3.0的Watch的运行原理
+
+### Vue的性能优化？
+- 编码阶段
+    - 尽量减少data中的数据，data中的数据都会增加getter和setter，会收集对应的watcher
+    - v-if和v-for不能连用
+    - 如果需要使用v-for给每项元素绑定事件时使用事件代理
+    - SPA 页面采用keep-alive缓存组件
+    - 在更多的情况下，使用v-if替代v-show
+    - key保证唯一
+    - 使用路由懒加载、异步组件
+    - 防抖、节流
+    - 第三方模块按需导入
+    - 长列表滚动到可视区域动态加载
+    - 图片懒加载
+- SEO优化
+    - 预渲染
+    - 服务端渲染SSR
+- 打包优化
+    - 压缩代码
+    - Tree Shaking/Scope Hoisting
+    - 使用cdn加载第三方模块
+    - 多线程打包happypack
+    - splitChunks抽离公共文件
+    - sourceMap优化
+- 用户体验
+    - 骨架屏
+    - PWA
+- 使用缓存(客户端缓存、服务端缓存)优化、服务端开启gzip压缩等。
+## VueRouter
+### hash路由和history路由实现原理说一下
+- location.hash的值实际就是URL中#后面的东西。
+- history实际采用了HTML5中提供的API来实现，主要有history.pushState()和history.replaceState()。
 ## Webpack Vite Rollup
+### Webpack流程
+- webpack到底是如何对我们的项目进行打包的呢？
+    - 事实上webpack在处理应用程序时，它会根据命令或者配置文件找到入口文件；
+    - 从入口开始，会生成一个  依赖关系图，这个依赖关系图会包含应用程序中所需的所有模块（比如.js文件、css文件、图片、 字体等）；
+    - 然后遍历图结构，打包一个个模块（根据文件的不同使用不同的loader来解析）生成AST语法树，；
+    - 找出每个文件的依赖项（遍历）。
+    - 根据AST语法树，生成浏览器能够运行的代码
+
+
+Webpack 的运行流程是一个串行的过程：
+- 初始化参数：从配置文件和 Shell 语句中读取与合并参数，得出最终的参数
+- 开始编译：用上一步得到的参数初始化 Compiler 对象，加载所有配置的插件，执行对象的 run 方法开始执行编译
+- 确定入口：根据配置中的 entry 找出所有的入口文件
+- 编译模块：从入口文件出发，调用所有配置的 Loader 对模块进行翻译，再找出该模块依赖的模块，再递归本步骤直到所有入口依赖的文件都经过了本步骤的处理
+- 完成模块编译：在经过第4步使用 Loader 翻译完所有模块后，得到了每个模块被翻译后的最终内容以及它们之间的依赖关系
+- 输出资源：根据入口和模块之间的依赖关系，组装成一个个包含多个模块的 Chunk，再把每个 Chunk 转换成一个单独的文件加入到输出列表，这步是可以修改输出内容的最后机会
+- 输出完成：在确定好输出内容后，根据配置确定输出的路径和文件名，把文件内容写入到文件系统
+### Webpack特点
+- 代码分割
+    - Webpack 有两种组织模块依赖的方式，同步和异步。异步依赖作为分割点，形成一个新的块。在优化了依赖树后，每一个异步区块都作为一个文件被打包。
+- Loader(加载器)
+    - Webpack 本身只能处理原生的 JavaScript 模块，但是 loader 转换器可以将各种类型的资源转换成 JavaScript 模块。这样，任何资源都可以成为 Webpack 可以处理的模块。
+- 智能解析
+    - Webpack 有一个智能解析器，几乎可以处理任何第三方库，无论它们的模块形式是 CommonJS、 AMD 还是普通的 JS 文件。
+- 插件系统
+    - Webpack 还有一个功能丰富的插件系统。大多数内容功能都是基于这个插件系统运行的，还可以开发和使用开源的 Webpack 插件，来满足各式各样的需求。
+- 支持热模块替换(HMR)
+- 在开发应用时使用 Webpack，开发库时使用 Rollup。
+### Webpack的loader和plugins的区别
+Loader 本质就是一个函数，在该函数中对接收到的内容进行转换，返回转换后的结果。 因为 Webpack 只认识 JavaScript，所以 Loader 就成了翻译官，对其他类型的资源进行转译的预处理工作。
+
+Plugin 就是插件，基于事件流框架 Tapable，插件可以扩展 Webpack 的功能，在 Webpack 运行的生命周期中会广播出许多事件，Plugin 可以监听这些事件，在合适的时机通过 Webpack 提供的 API 改变输出结果。
+
+Loader 在 module.rules 中配置，作为模块的解析规则，类型为数组。每一项都是一个 Object，内部包含了 test(类型文件)、loader、options (参数)等属性。
+
+Plugin 在 plugins 中单独配置，类型为数组，每一项是一个 Plugin 的实例，参数都通过构造函数传入。
+### 有哪些常见的Loader？你用过哪些Loader？
+- raw-loader：加载文件原始内容（utf-8）
+- file-loader：把文件输出到一个文件夹中，在代码中通过相对 URL 去引用输出的文件 (处理图片和字体)
+- url-loader：与 file-loader 类似，区别是用户可以设置一个阈值，大于阈值会交给 file-loader 处理，小于阈值时返回文件 base64 形式编码 (处理图片和字体)
+- source-map-loader：加载额外的 Source Map 文件，以方便断点调试
+- svg-inline-loader：将压缩后的 SVG 内容注入代码中
+- image-loader：加载并且压缩图片文件
+- json-loader 加载 JSON 文件（默认包含）
+- handlebars-loader: 将 Handlebars 模版编译成函数并返回
+- babel-loader：把 ES6 转换成 ES5
+- ts-loader: 将 TypeScript 转换成 JavaScript
+- awesome-typescript-loader：将 TypeScript 转换成 JavaScript，性能优于 ts-loader
+- sass-loader：将SCSS/SASS代码转换成CSS
+- css-loader：加载 CSS，支持模块化、压缩、文件导入等特性
+- style-loader：把 CSS 代码注入到 JavaScript 中，通过 DOM 操作去加载 CSS
+- postcss-loader：扩展 CSS 语法，使用下一代 CSS，可以配合 autoprefixer 插件自动补齐 CSS3 前缀
+- eslint-loader：通过 ESLint 检查 JavaScript 代码
+- tslint-loader：通过 TSLint检查 TypeScript 代码
+- mocha-loader：加载 Mocha 测试用例的代码
+- coverjs-loader：计算测试的覆盖率
+- vue-loader：加载 Vue.js 单文件组件
+- i18n-loader: 国际化
+- cache-loader: 可以在一些性能开销较大的 Loader 之前添加，目的是将结果缓存到磁盘里
+
+### 有哪些常见的Plugin？你用过哪些Plugin？
+- define-plugin：定义环境变量 (Webpack4 之后指定 mode 会自动配置)
+- ignore-plugin：忽略部分文件
+- html-webpack-plugin：简化 HTML 文件创建 (依赖于 html-loader)
+- web-webpack-plugin：可方便地为单页应用输出 HTML，比 html-webpack-plugin 好用
+- uglifyjs-webpack-plugin：不支持 ES6 压缩 (Webpack4 以前)
+- terser-webpack-plugin: 支持压缩 ES6 (Webpack4)
+- webpack-parallel-uglify-plugin: 多进程执行代码压缩，提升构建速度
+- mini-css-extract-plugin: 分离样式文件，CSS 提取为独立文件，支持按需加载 (替代extract-text-webpack-plugin)
+- serviceworker-webpack-plugin：为网页应用增加离线缓存功能
+- clean-webpack-plugin: 目录清理
+- ModuleConcatenationPlugin: 开启 Scope Hoisting
+- speed-measure-webpack-plugin: 可以看到每个 Loader 和 Plugin 执行耗时 (整个打包耗时、每个 Plugin 和 Loader 耗时)
+- webpack-bundle-analyzer: 可视化 Webpack 输出文件的体积 (业务组件、依赖第三方模块)
+
+### source map是什么？生产环境怎么用？
+source map 是将编译、打包、压缩后的代码映射回源代码的过程。打包压缩后的代码不具备良好的可读性，想要调试源码就需要 soucre map。map文件只要不打开开发者工具，浏览器是不会加载的。
+
+线上环境一般有三种处理方案：
+- hidden-source-map：借助第三方错误监控平台 Sentry 使用
+- nosources-source-map：只会显示具体行数以及查看源代码的错误栈。安全性比 sourcemap 高
+- sourcemap：通过 nginx 设置将 .map 文件只对白名单开放(公司内网)
+
+注意：避免在生产中使用 inline- 和 eval-，因为它们会增加 bundle 体积大小，并降低整体性能。
+
+### 文件监听原理呢？
+
+### 文件指纹是什么？怎么用？
+
+### Webpack 的热更新原理吧
+
+### 如何对bundle体积进行监控和分析？
+
+### 如何优化 Webpack 的构建速度？
+
+### 代码分割，那代码分割的本质是什么？有什么意义呢？
+
+### 是否写过Loader？简单描述一下编写loader的思路？
+
+### 是否写过Plugin？简单描述一下编写Plugin的思路？
+
+### 聊一聊Babel原理吧
+
+### Rollup原理
+Rollup中，一个文件就是一个模块。每一个模块都会根据文件的代码生成一个 AST 语法抽象树，Rollup 需要对每一个 AST 节点进行分析。
+
+分析 AST 节点，就是看看这个节点有没有调用函数或方法。如果有，就查看所调用的函数或方法是否在当前作用域，如果不在就往上找，直到找到模块顶级作用域为止。（rollup 不看你引入了什么函数，而是看你调用了什么函数。如果调用的函数不在此模块中，就从其它模块引入。）
+
+如果本模块都没找到，说明这个函数、方法依赖于其他模块，需要从其他模块引入。
+
+最后将所有引入的代码打包在一起。生成代码。
+### Rollup特点
+- Tree-shaking
+    - 这个特点，是Rollup最初推出时的一大特点。Rollup通过对代码的静态分析，分析出冗余代码，在最终的打包文件中将这些冗余代码删除掉，进一步缩小代码体积。
+- ES2015模块打包支持
+    - Rollup直接不需要通过babel将import转化成Commonjs的require方式，极大地利用ES2015模块的优势。
+- 在开发应用时使用 Webpack，开发库时使用 Rollup。
 
 ## 工具
 ### Git
