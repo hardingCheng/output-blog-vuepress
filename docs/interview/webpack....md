@@ -67,7 +67,7 @@ webpack --config wk.config.js
     - 然后遍历图结构，打包一个个模块（根据文件的不同使用不同的loader来解析）；
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210916110723.png)
 
-### 不同文件进行配置不同的loader
+### Loader
 #### css-loader
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210917120637.png)
 - 需要一个loader来加载这个css文件，但是loader是什么呢？
@@ -421,7 +421,31 @@ module.exports = {
         ]
       }
 ```
+### asset  module  type
+- 当前使用的webpack版本是webpack5
+    - 在webpack5之前，加载这些资源我们需要使用一些loader，比如raw-loader 、url-loader、file-loader；
+    - 在webpack5之后，我们可以直接使用资源模块类型（asset module type），来替代上面的这些loader；
+- 资源模块类型(asset module type)，通过添加 4 种新的模块类型，来替换所有这些 loader：
+    -  asset/resource 发送一个单独的文件并导出 URL。之前通过使用 file-loader 实现；
+    -  asset/inline 导出一个资源的 data URI。之前通过使用 url-loader 实现；
+    -  asset/source 导出资源的源代码。之前通过使用 raw-loader 实现；
+    -  asset 在导出一个 data URI 和发送一个单独的文件之间自动选择。之前通过使用 url-loader，并且配置资源 体积限制实现；
+```js
+// webpack.config.js
 
+{
+    test: /\.(png|jpe?g|gif|svg)$/,
+    type:'asset/resource'
+}
+```
+- 可以自定义文件的输出路径和文件名
+    - 方式一：修改output，添加assetModuleFilename属性
+    - 方式二：在Rule中，添加一个generator属性，并且设置filename
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211008204218.png)
+- url-loader的limit效果
+    - 步骤一：将type修改为asset；
+    - 步骤二：添加一个parser属性，并且制定dataUrl的条件，添加maxSize属性；
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211008211107.png)
 ### 浏览器兼容性
 **开发中，浏览器的兼容性问题**，我们应该如何去解决和处理？
 这里指的兼容性是**针对不同的浏览器支持的特性**：比如css特性、js语法，之间的兼容性；
@@ -456,5 +480,81 @@ module.exports = {
     ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210917144957.png)
 
 - 配置browserslist
-    ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210917145026.png)
-    
+    ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210917145026.png) 
+### Plugin
+- Webpack的另一个核心是Plugin
+    - Loader是用于特定的模块类型进行转换；
+    - Plugin可以用于执行更加广泛的任务，比如打包优化、资源管理、环境变量注入等；
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211008200025.png)
+#### CleanWebpackPlugin
+- 每次修改了一些配置，重新打包时，都需要手动删除dist文件夹：
+    - 借助于一个插件来帮助我们完成，这个插件就是CleanWebpackPlugin；
+    - `npm install clean-webpack-plugin -D` 
+```js
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+//导出配置信息
+module.exports = {
+    plugins:[
+        new CleanWebpackPlugin()
+    ]
+}
+```
+#### HtmlWebpackPlugin
+- 不太规范的地方
+    - HTML文件是编写在根目录下的，而最终打包的dist文件夹中是没有index.html文件的
+    - 在进行项目部署的时，必然也是需要有对应的入口文件index.html；
+    - 也需要对index.html进行打包处理；
+- 对HTML进行打包处理我们可以使用另外一个插件：HtmlWebpackPlugin；
+- `npm install html-webpack-plugin -D`
+```js
+const HtmlWebpackPlugin = require("html-webpack-plugin")
+//导出配置信息
+module.exports = {
+    plugins:[
+        new HtmlWebpackPlugin({
+            title: "Html Webpack Plugin"
+        })
+    ]
+}
+```
+- 生成的index.html分析
+    - 现在自动在dist文件夹中，生成了一个index.html的文件：
+        - 该文件中也自动添加了我们打包的bundle.js文件；
+    - 这个文件是如何生成的呢？
+        - 默认情况下是根据ejs的一个模板来生成的；
+        - 在html-webpack-plugin的源码中，有一个default_index.ejs模块；
+- 自定义HTML模板
+    - 想在自己的模块中加入一些比较特别的内容
+        - 比如添加一个noscript标签，在用户的JavaScript被关闭时，给予响应的提示；
+        - 比如在开发vue或者react项目时，我们需要一个可以挂载后续组件的根标签  <div id="app"></div>；
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211008212633.png)
+- 自定义模板数据填充
+    - 会有一些类似这样的语法<% 变量 %>，这个是EJS模块填充数据的方式。
+    - 配置HtmlWebpackPlugin时，我们可以添加如下配置：
+        - template：指定我们要使用的模块所在的路径；
+        - title：在进行htmlWebpackPlugin.options.title读取时，就会读到该信息；
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211008212745.png)
+
+#### DefinePlugin
+- DefinePlugin
+    - 这个时候编译还是会报错，因为在我们的模块中还使用到一个BASE_URL的常量
+    - 因为在编译template模块时，有一个BASE_URL：
+        - `<link rel="icon"  href="<%=  BASE_URL %>favicon.ico">；`
+        - 但是我们并没有设置过这个常量值，所以会出现没有定义的错误；
+    - 可以使用DefinePlugin插件；
+    - DefinePlugin允许在编译时创建配置的全局常量，是一个webpack内置的插件（不需要单独安装）：
+        - 编译template就可以正确的编译了，会读取到BASE_URL的值；
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211008213039.png)
+#### CopyWebpackPlugin
+- CopyWebpackPlugin
+    - 在vue的打包过程中，如果我们将一些文件放到public的目录下，那么这个目录会被复制到dist文件夹中。
+        - 这个复制的功能，我们可以使用CopyWebpackPlugin来完成；
+    - `npm install copy-webpack-plugin -D`
+    - 接下来配置CopyWebpackPlugin即可
+        - 复制的规则在patterns中设置；
+        -  from：设置从哪一个源中开始复制；
+        -  to：复制到的位置，可以省略，会默认复制到打包的目录下；
+        -  globOptions：设置一些额外的选项，其中可以编写需要忽略的文件：
+            -  .DS_Store：mac目录下回自动生成的一个文件；
+            -  index.html：也不需要复制，因为我们已经通过HtmlWebpackPlugin完成了index.html的生成；
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211008213322.png)
