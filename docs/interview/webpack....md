@@ -558,3 +558,282 @@ module.exports = {
             -  .DS_Store：mac目录下回自动生成的一个文件；
             -  index.html：也不需要复制，因为我们已经通过HtmlWebpackPlugin完成了index.html的生成；
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211008213322.png)
+### 模块化原理
+#### Mode配置
+- Mode配置选项，可以告知webpack使用响应模式的内置优化：
+    -  默认值是production（什么都不设置的情况下）；
+    -  可选值有：'none' | 'development' | 'production'；
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211009112007.png)
+#### Webpack的模块化
+- Webpack打包的代码，允许我们使用各种各样的模块化，但是最常用的是CommonJS、ES Module。
+- CommonJS模块化实现原理；
+```js
+// 定义了一个对象
+// 模块的路径(key): 函数(value)
+var __webpack_modules__ = {
+  "./src/js/format.js":
+    (function (module) {
+      const dateFormat = (date) => {
+        return "2020-12-12";
+      }
+      const priceFormat = (price) => {
+        return "100.00";
+      }
+
+      // 将我们要导出的变量, 放入到module对象中的exports对象
+      module.exports = {
+        dateFormat,
+        priceFormat
+      }
+    })
+}
+// 定义一个对象, 作为加载模块的缓存
+var __webpack_module_cache__ = {};
+// 是一个函数, 当我们加载一个模块时, 都会通过这个函数来加载
+function __webpack_require__(moduleId) {
+  // 1.判断缓存中是否已经加载过
+  if (__webpack_module_cache__[moduleId]) {
+    return __webpack_module_cache__[moduleId].exports;
+  }
+
+  // 2.给module变量和__webpack_module_cache__[moduleId]赋值了同一个对象
+  var module = __webpack_module_cache__[moduleId] = { exports: {} };
+
+  // 3.加载执行模块
+  __webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+
+  // 4.导出module.exports {dateFormat: function, priceForamt: function}
+  return module.exports;
+}
+// 具体开始执行代码逻辑
+!function () {
+  // 1.加载./src/js/format.js
+  const { dateFormat, priceFormat } = __webpack_require__("./src/js/format.js");
+  console.log(dateFormat("abc"));
+  console.log(priceFormat("abc"));
+}();
+```
+- ES Module实现原理；
+```js
+// 1.定义了一个对象, 对象里面放的是我们的模块映射
+var __webpack_modules__ = {
+  "./src/es_index.js":
+    (function (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+      // 调用r的目的是记录时一个__esModule -> true
+      __webpack_require__.r(__webpack_exports__);
+      // _js_math__WEBPACK_IMPORTED_MODULE_0__ == exports
+      var _js_math__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./src/js/math.js");
+      console.log(_js_math__WEBPACK_IMPORTED_MODULE_0__.mul(20, 30));
+      console.log(_js_math__WEBPACK_IMPORTED_MODULE_0__.sum(20, 30));
+    }), 
+  "./src/js/math.js":
+    (function (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+      __webpack_require__.r(__webpack_exports__);
+      // 调用了d函数: 给exports设置了一个代理definition
+      // exports对象中本身是没有对应的函数
+      __webpack_require__.d(__webpack_exports__, {
+        "sum": function () { return sum; },
+        "mul": function () { return mul; }
+      });
+
+      const sum = (num1, num2) => {
+        return num1 + num2;
+      }
+      const mul = (num1, num2) => {
+        return num1 * num2;
+      }
+    })
+};
+// 2.模块的缓存
+var __webpack_module_cache__ = {};
+// 3.require函数的实现(加载模块)
+function __webpack_require__(moduleId) {
+  if (__webpack_module_cache__[moduleId]) {
+    return __webpack_module_cache__[moduleId].exports;
+  }
+  var module = __webpack_module_cache__[moduleId] = {
+    exports: {}
+  };
+  __webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+  return module.exports;
+}
+// 做代理
+!function () {
+  // __webpack_require__这个函数对象添加了一个属性: d -> 值function
+  __webpack_require__.d = function (exports, definition) {
+    for (var key in definition) {
+      if (__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+        Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+      }
+    }
+  };
+}();
+!function () {
+  // __webpack_require__这个函数对象添加了一个属性: o -> 值function
+  __webpack_require__.o = function (obj, prop) { return Object.prototype.hasOwnProperty.call(obj, prop); }
+}();
+!function () {
+  // __webpack_require__这个函数对象添加了一个属性: r -> 值function
+  __webpack_require__.r = function (exports) {
+    if (typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+      Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+    }
+    Object.defineProperty(exports, '__esModule', { value: true });
+  };
+}();
+__webpack_require__("./src/es_index.js");
+```
+- CommonJS加载ES Module的原理；
+- ES Module加载CommonJS的原理；
+```js
+var __webpack_modules__ = ({
+  "./src/index.js":
+    (function (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+      "use strict";
+      __webpack_require__.r(__webpack_exports__);
+      var _js_format__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__("./src/js/format.js");
+      var _js_format__WEBPACK_IMPORTED_MODULE_0___default = __webpack_require__.n(_js_format__WEBPACK_IMPORTED_MODULE_0__);
+      // es module导出内容, CommonJS导入内容
+      const math = __webpack_require__("./src/js/math.js");
+
+      // CommonJS导出内容, es module导入内容
+      console.log(math.sum(20, 30));
+      console.log(math.mul(20, 30));
+      console.log(_js_format__WEBPACK_IMPORTED_MODULE_0___default().dateFormat("aaa"));
+      console.log(_js_format__WEBPACK_IMPORTED_MODULE_0___default().priceFormat("bbb"));
+    }),
+  "./src/js/format.js":
+    (function (module) {
+      const dateFormat = (date) => {
+        return "2020-12-12";
+      }
+      const priceFormat = (price) => {
+        return "100.00";
+      }
+      module.exports = {
+        dateFormat,
+        priceFormat
+      }
+    }),
+
+  "./src/js/math.js":
+    (function (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
+      __webpack_require__.r(__webpack_exports__);
+      __webpack_require__.d(__webpack_exports__, {
+        "sum": function () { return sum; },
+        "mul": function () { return mul; }
+      });
+      const sum = (num1, num2) => {
+        return num1 + num2;
+      }
+
+      const mul = (num1, num2) => {
+        return num1 * num2;
+      }
+    })
+});
+
+var __webpack_module_cache__ = {};
+
+// The require function
+function __webpack_require__(moduleId) {
+  // Check if module is in cache
+  if (__webpack_module_cache__[moduleId]) {
+    return __webpack_module_cache__[moduleId].exports;
+  }
+  // Create a new module (and put it into the cache)
+  var module = __webpack_module_cache__[moduleId] = {
+    // no module.id needed
+    // no module.loaded needed
+    exports: {}
+  };
+
+  // Execute the module function
+  __webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+
+  // Return the exports of the module
+  return module.exports;
+}
+
+!function () {
+  // getDefaultExport function for compatibility with non-harmony modules
+  __webpack_require__.n = function (module) {
+    var getter = module && module.__esModule ?
+      function () { return module['default']; } :
+      function () { return module; };
+    __webpack_require__.d(getter, { a: getter });
+    return getter;
+  };
+}();
+
+/* webpack/runtime/define property getters */
+!function () {
+  // define getter functions for harmony exports
+  __webpack_require__.d = function (exports, definition) {
+    for (var key in definition) {
+      if (__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+        Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+      }
+    }
+  };
+}();
+
+/* webpack/runtime/hasOwnProperty shorthand */
+!function () {
+  __webpack_require__.o = function (obj, prop) { return Object.prototype.hasOwnProperty.call(obj, prop); }
+}();
+
+/* webpack/runtime/make namespace object */
+!function () {
+  // define __esModule on exports
+  __webpack_require__.r = function (exports) {
+    if (typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+      Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+    }
+    Object.defineProperty(exports, '__esModule', { value: true });
+  };
+}();
+
+__webpack_require__("./src/index.js");
+```
+### source-map
+#### 认识source-map
+- 我们的代码通常运行在浏览器上时，是通过打包压缩的：
+    - 也就是真实跑在浏览器上的代码，和我们编写的代码其实是有差异的；
+    - 比如ES6的代码可能被转换成ES5；
+    - 比如对应的代码行号、列号在经过编译后肯定会不一致；
+    - 比如代码进行丑化压缩时，会将编码名称等修改；
+    - 比如我们使用了TypeScript等方式编写的代码，最终转换成JavaScript；
+- 但是，当代码报错需要调试时（debug），调试转换后的代码是很困难的
+- 如何可以调试这种转换后不一致的代码呢？答案就是source-map
+    - source-map是从已转换的代码，映射到原始的源文件；
+    - 使浏览器可以重构原始源并在调试器中显示重建的原始源；
+#### 使用source-map
+- 如何可以使用source-map呢？两个步骤：
+    - 第一步：根据源文件，生成source-map文件，webpack在打包时，可以通过配置生成source-map
+    - 第二步：在转换后的代码，最后添加一个注释，它指向sourcemap；
+    - `//# sourceMappingURL=common.bundle.js.map`
+- 浏览器会根据我们的注释，查找响应的source-map，并且根据source-map还原我们的代码，方便进行调试。
+- 在Chrome中，我们可以按照如下的方式打开source-map：
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211009125923.png)
+#### 分析source-map
+- 最初source-map生成的文件带下是原始文件的10倍，第二版减少了约50%，第三版又减少了50%，所以目前一个 133kb的文件，最终的source-map的大小大概在300kb。
+- 目前的source-map长什么样子呢？
+    - version：当前使用的版本，也就是最新的第三版；
+    - sources：从哪些文件转换过来的source-map和打包的代码（最初始的文件）；
+    - names：转换前的变量和属性名称（因为我目前使用的是development模式，所以不需要保留转换前的名称）
+    - mappings：source-map用来和源文件映射的信息（比如位置信息等），一串base64  VLQ（veriable- length quantity可变长度值）编码；
+    - file：打包后的文件（浏览器加载的文件）；
+    - sourceContent：转换前的具体代码信息（和sources是对应的关系）；
+    - sourceRoot：所有的sources相对的根目录；
+#### 生成source-map
+- 使用webpack打包的时候，生成对应的source-map呢？
+    - webpack为我们提供了非常多的选项（目前是26个），来处理source-map；
+    - https://webpack.docschina.org/configuration/devtool/
+    -  选择不同的值，生成的source-map会稍微有差异，打包的过程也会有**性能的差异**，可以根据不同的情况进行 选择；
+- 下面几个值不会生成source-map
+    - false：不使用source-map，也就是没有任何和source-map相关的内容。
+    - none：production模式下的默认值，不生成source-map。
+    - eval：development模式下的默认值，不生成source-map
+        - 但是它会在eval执行的代码中，添加 //#  sourceURL=；
+        - 它会被浏览器在执行时解析，并且在调试面板中生成对应的一些文件目录，方便我们调试代码；
