@@ -835,5 +835,590 @@ __webpack_require__("./src/index.js");
     - false：不使用source-map，也就是没有任何和source-map相关的内容。
     - none：production模式下的默认值，不生成source-map。
     - eval：development模式下的默认值，不生成source-map
-        - 但是它会在eval执行的代码中，添加 //#  sourceURL=；
+        - 但是它会在eval执行的代码中，添加 `//#  sourceURL=`；
         - 它会被浏览器在执行时解析，并且在调试面板中生成对应的一些文件目录，方便我们调试代码；
+        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211009193042.png)
+#### source-map值
+- source-map值：
+    - 生成一个独立的source-map文件，并且在bundle文件中有一个注释，指向source-map文件；
+    - bundle文件中有如下的注释
+        - 开发工具会根据这个注释找到source-map文件，并且解析；
+            - `//# sourceMappingURL=bundle.js.map`
+            - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211009193206.png)  
+- eval-source-map值
+    - 会生成sourcemap，但是source-map是以DataUrl添加到eval函数的后面
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211009193314.png)
+- inline-source-map值
+    - 会生成sourcemap，但是source-map是以DataUrl添加到bundle文件的后面
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211009193432.png)
+- cheap-source-map
+    - 会生成sourcemap，但是会更加高效一些（cheap低开销），因为它没有生成列映射（Column Mapping）
+    - 因为在开发中，我们只需要行信息通常就可以定位到错误了
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211009193717.png)
+    - 能找到是哪行出错，不能精确到这行的那个地方
+- cheap-module-source-map
+    - 会生成sourcemap，类似于cheap-source-map，但是对源自loader的sourcemap处理会更好。
+        - 其实是如果loader对我们的源码进行了特殊的处理，比如babel；
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211009195216.png)
+- hidden-source-map值
+    - 会生成sourcemap，但是不会对source-map文件进行引用；
+    - 相当于删除了打包文件中对sourcemap的引用注释；
+    - `// 被删除掉的  //# sourceMappingURL=bundle.js.map`
+    - 如果我们手动添加进来，那么sourcemap就会生效了
+- nosources-source-map值
+    - 会生成sourcemap，但是生成的sourcemap只有错误信息的提示，不会生成源代码文件；
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211009195502.png)
+
+- 多个值的组合
+    - webpack提供给我们的26个值，是可以进行多组合的。
+    - 组合的规则如下：
+        - inline-|hidden-|eval：三个值时三选一；
+        - nosources：可选值；
+        - cheap可选值，并且可以跟随module的值；
+    - `[inline-|hidden-|eval-][nosources-][cheap-[module-]]source-map` 
+    - 那么在开发中，最佳的实践是什么呢？
+        - 开发阶段：推荐使用  source-map或者cheap-module-source-map
+            - 这分别是vue和react使用的值，可以获取调试信息，方便快速开发；
+        - 测试阶段：推荐使用  source-map或者cheap-module-source-map
+            - 测试阶段我们也希望在浏览器下看到正确的错误提示；
+        - 发布阶段：false、缺省值（不写）
+### Babel的深入解析
+#### 为什么需要babel？
+- 事实上，在开发中我们很少直接去接触babel，但是babel对于前端开发来说，目前是不可缺少的一部分：
+    - 开发中，我们想要使用ES6+的语法，想要使用TypeScript，开发React项目，它们都是离不开Babel的；
+    - 所以，学习Babel对于我们理解代码从编写到线上的转变过程直观重要；
+- Babel到底是什么呢？
+    - Babel是一个工具链，主要用于旧浏览器或者缓解中将ECMAScript 2015+代码转换为向后兼容版本的 JavaScript；
+    - 包括：语法转换、源代码转换、Polyfill实现目标缓解缺少的功能等；
+    ```js
+    [1,2,3].map(n => n+1)
+    [1,2,3].map(function(n) {
+        return n
+    })
+    ```
+- Babel命令行使用
+    - babel本身可以作为一个独立的工具（和postcss一样），不和webpack等构建工具配置来单独使用。
+    - 如果我们希望在命令行尝试使用babel，需要安装如下库：
+        - @babel/core：babel的核心代码，必须安装；
+        - @babel/cli：可以让我们在命令行使用babel；
+        - `npm install @babel/cli @babel/core`
+    - 使用babel来处理我们的源代码：
+        - src：是源文件的目录；
+        - --out-dir：指定要输出的文件夹dist；
+        - `npx babel src --out-dir dist`
+    - 插件的使用
+        - 比如我们需要转换箭头函数，那么我们就可以使用箭头函数转换相关的插件：
+            - `npm install @babel/plugin-transform-arrow-functions -D`
+            - `npx babel src --out-dir dist --plugins=@babel/plugin-transform-arrow-functions`
+        - 查看转换后的结果：我们会发现 const 并没有转成 var
+            -  这是因为 plugin-transform-arrow-functions，并没有提供这样的功能；
+            -  我们需要使用 plugin-transform-block-scoping 来完成这样的功能；
+            -  `npm install @babel/plugin-transform-block-scoping -D `
+            -  `npx babel src --out-dir dist --plugins=@babel/plugin-transform-block-scoping,@babel/plugin-transform-arrow-functions`
+    - Babel的预设preset
+        - 但是如果要转换的内容过多，一个个设置是比较麻烦的，我们可以使用预设（preset）
+            - 后面我们再具体来讲预设代表的含义
+        - 安装@babel/preset-env预设:
+            - `npm install @babel/preset-env -D`
+        - 执行如下命令
+            - `npx babel src --out-dir dist --presets=@babel/preset-env`
+#### Babel的底层原理
+- babel是如何做到将我们的一段代码（ES6、TypeScript、React）转成另外一段代码（ES5）的呢
+    - 从一种源代码（原生语言）转换成另一种源代码（目标语言），这是什么的工作呢？
+    - 就是编译器，事实上我们可以将babel看成就是一个编译器。
+    - Babel编译器的作用就是将我们的源代码，转换成浏览器可以直接识别的另外一段源代码；
+- Babel也拥有编译器的工作流程：
+    - 解析阶段（Parsing）
+    - 转换阶段（Transformation）
+    - 生成阶段（Code Generation）
+    - https://github.com/jamiebuilds/the-super-tiny-compiler
+#### babel编译器执行原理
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211009204321.png)
+- 源代码
+```js
+const name = "coderwhy";
+const foo = (name) => console.log(name);
+foo(name);
+```
+- 词法分析
+```json
+// tokens.js
+[
+  {
+      "type": "Keyword",
+      "value": "const"
+  },
+  {
+      "type": "Identifier",
+      "value": "foo"
+  },
+  {
+      "type": "Punctuator",
+      "value": "="
+  },
+  {
+      "type": "Punctuator",
+      "value": "("
+  },
+  {
+      "type": "Identifier",
+      "value": "name"
+  },
+  {
+      "type": "Punctuator",
+      "value": ")"
+  },
+  {
+      "type": "Punctuator",
+      "value": "=>"
+  },
+  {
+      "type": "Identifier",
+      "value": "console"
+  },
+  {
+      "type": "Punctuator",
+      "value": "."
+  },
+  {
+      "type": "Identifier",
+      "value": "log"
+  },
+  {
+      "type": "Punctuator",
+      "value": "("
+  },
+  {
+      "type": "Identifier",
+      "value": "name"
+  },
+  {
+      "type": "Punctuator",
+      "value": ")"
+  },
+  {
+      "type": "Punctuator",
+      "value": ";"
+  },
+  {
+      "type": "Identifier",
+      "value": "foo"
+  },
+  {
+      "type": "Punctuator",
+      "value": "("
+  },
+  {
+      "type": "String",
+      "value": "\"coderwhy\""
+  },
+  {
+      "type": "Punctuator",
+      "value": ")"
+  },
+  {
+      "type": "Punctuator",
+      "value": ";"
+  }
+]
+```
+- 语法分析 生成AST
+```json
+{
+  "type": "Program",
+  "body": [
+    {
+      "type": "VariableDeclaration",
+      "declarations": [
+        {
+          "type": "VariableDeclarator",
+          "id": {
+            "type": "Identifier",
+            "name": "foo"
+          },
+          "init": {
+            "type": "ArrowFunctionExpression",
+            "id": null,
+            "params": [
+              {
+                "type": "Identifier",
+                "name": "name"
+              }
+            ],
+            "body": {
+              "type": "CallExpression",
+              "callee": {
+                "type": "MemberExpression",
+                "computed": false,
+                "object": {
+                  "type": "Identifier",
+                  "name": "console"
+                },
+                "property": {
+                  "type": "Identifier",
+                  "name": "log"
+                }
+              },
+              "arguments": [
+                {
+                  "type": "Identifier",
+                  "name": "name"
+                }
+              ]
+            },
+            "generator": false,
+            "expression": true,
+            "async": false
+          }
+        }
+      ],
+      "kind": "const"
+    },
+    {
+      "type": "ExpressionStatement",
+      "expression": {
+        "type": "CallExpression",
+        "callee": {
+          "type": "Identifier",
+          "name": "foo"
+        },
+        "arguments": [
+          {
+            "type": "Literal",
+            "value": "coderwhy",
+            "raw": "\"coderwhy\""
+          }
+        ]
+      }
+    }
+  ],
+  "sourceType": "script"
+}
+```
+- 一系列操作后  生成新的AST
+```json
+{
+  "type": "Program",
+  "body": [
+    {
+      "type": "VariableDeclaration",
+      "declarations": [
+        {
+          "type": "VariableDeclarator",
+          "id": {
+            "type": "Identifier",
+            "name": "foo"
+          },
+          "init": {
+            "type": "FunctionExpression",
+            "id": {
+              "type": "Identifier",
+              "name": "foo"
+            },
+            "params": [
+              {
+                "type": "Identifier",
+                "name": "name"
+              }
+            ],
+            "body": {
+              "type": "BlockStatement",
+              "body": [
+                {
+                  "type": "ReturnStatement",
+                  "argument": {
+                    "type": "CallExpression",
+                    "callee": {
+                      "type": "MemberExpression",
+                      "computed": false,
+                      "object": {
+                        "type": "Identifier",
+                        "name": "console"
+                      },
+                      "property": {
+                        "type": "Identifier",
+                        "name": "log"
+                      }
+                    },
+                    "arguments": [
+                      {
+                        "type": "Identifier",
+                        "name": "name"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "generator": false,
+            "expression": false,
+            "async": false
+          }
+        }
+      ],
+      "kind": "var"
+    },
+    {
+      "type": "ExpressionStatement",
+      "expression": {
+        "type": "CallExpression",
+        "callee": {
+          "type": "Identifier",
+          "name": "foo"
+        },
+        "arguments": [
+          {
+            "type": "Literal",
+            "value": "coderwhy",
+            "raw": "\"coderwhy\""
+          }
+        ]
+      }
+    }
+  ],
+  "sourceType": "script"
+}
+```
+#### babel-loader
+- `npm install babel-loader @babel/core`
+```js
+//webpack.config.js
+{
+        test: /\.jsx?$/,
+        exclude: /node_modules/,
+        use: {
+          loader: "babel-loader",
+          // options: {
+          //   presets: [
+          //     ["@babel/preset-env", {
+          //       // targets: ["chrome 88"]
+          //       // enmodules: true
+          //     }]
+          //   ]
+          //   // plugins: [
+          //   //   "@babel/plugin-transform-arrow-functions",
+          //   //   "@babel/plugin-transform-block-scoping"
+          //   // ]
+          // }
+        }
+}
+```
+#### babel-preset
+一个个去安装使用插件，那么需要手动来管理大量的babel插件，我们可以直接给webpack提供一个 preset，webpack会根据我们的预设来加载对应的插件列表，并且将其传递给babel。
+- 常见的预设有三个
+    -  env
+    -  react
+    -  TypeScript
+- `npm install @babel/preset-env`
+```js
+// webpack.config.js
+{
+        test: /\.jsx?$/,
+        exclude: /node_modules/,
+        use: {
+          loader: "babel-loader",
+          options: {
+            presets: [
+              ["@babel/preset-env",]
+            ]
+          }
+        }
+}
+```
+#### 设置目标浏览器  browserslist
+- 最终打包的JavaScript代码，是需要跑在目标浏览器上的，那么如何告知babel我们的目标浏览器呢？
+    - browserslist工具
+    - target属性
+- 之前我们项目中已经使用了browserslist工具，我们可以对比一下不同的配置，打包的区别：
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211011161757.png)
+
+- 设置目标浏览器  targets
+    - 也可以通过targets来进行配置
+    ```js
+    {
+        test: /\.jsx?$/,
+        exclude: /node_modules/,
+        use: {
+          loader: "babel-loader",
+          options: {
+            presets: [
+              ["@babel/preset-env", {
+                targets: ["chrome 88"]
+              }]
+            ]
+          }
+        }
+      }
+    ```
+    ```js
+      {
+        test: /\.jsx?$/,
+        exclude: /node_modules/,
+        use: {
+          loader: "babel-loader",
+          options: {
+            presets: [
+              ["@babel/preset-env", {
+                targets: "last 2 versions"
+              }]
+            ]
+          }
+        }
+      }
+    ```
+    - 如果两个同时配置了，哪一个会生效呢？
+        - 配置的targets属性会覆盖browserslist；
+        - 但是在开发中，更推荐通过browserslist来配置，因为类似于postcss工具，也会使用browserslist，进行统一浏览器 的适配；
+#### Stage-X的preset
+- 新流程涉及四个不同的 Stage
+    - Stage 0：strawman（稻草人），任何尚未提交作为正式提案的讨论、想法变更或者补充都被认为是第 0 阶段的" 稻草人"；
+    - Stage 1：proposal（提议），提案已经被正式化，并期望解决此问题，还需要观察与其他提案的相互影响；
+    - Stage 2：draft（草稿），Stage 2 的提案应提供规范初稿、草稿。此时，语言的实现者开始观察 runtime 的具体 实现是否合理；
+    - Stage 3：candidate（候补），Stage 3 提案是建议的候选提案。在这个高级阶段，规范的编辑人员和评审人员必 须在最终规范上签字。Stage 3 的提案不会有太大的改变，在对外发布之前只是修正一些问题；
+    - Stage 4：finished（完成），进入 Stage 4  的提案将包含在 ECMAScript 的下一个修订版中；
+#### Babel的Stage-X设置
+- 在babel7之前（比如babel6中），我们会经常看到这种设置方式：
+    - 它表达的含义是使用对应的 babel-preset-stage-x  预设；
+    - 但是从babel7开始，已经不建议使用了，建议使用preset-env来设置；
+```js
+{
+        test: /\.jsx?$/,
+        exclude: /node_modules/,
+        use: {
+          loader: "babel-loader",
+          options: {
+            presets: [
+              "preset-env","preset-react","stage-3"
+            ]
+          }
+        }
+}
+```
+#### Babel的配置文件
+- 可以将babel的配置信息放到一个独立的文件中，babel给我们提供了两种配置文件的编写：
+    - babel.config.json（或者.js，.cjs，.mjs）文件；
+    - .babelrc.json（或者.babelrc，.js，.cjs，.mjs）文件；
+- 它们两个有什么区别呢？目前很多的项目都采用了多包管理的方式（babel本身、element-plus、umi等）；
+    - .babelrc.json：早期使用较多的配置方式，但是对于配置Monorepos项目是比较麻烦的；、 babel.config.json（babel7）：可以直接作用于Monorepos项目的子包，更加推荐；
+```js
+// babel.config.json 
+{
+        "presets": ["@babel/preset-react"],
+        "plugins": [...],
+}
+```
+#### polyfill
+- Polyfill是什么呢？
+    - 翻译：一种用于衣物、床具等的聚酯填充材料,  使这些物品更加温暖舒适；
+    - 理解：更像是应该填充物（垫片），一个补丁，可以帮助我们更好的使用JavaScript；
+- 为什么时候会用到polyfill呢？
+    - 比如我们使用了一些语法特性（例如：Promise,  Generator,  Symbol等以及实例方法例如 Array.prototype.includes等）
+    - 但是某些浏览器压根不认识这些特性，必然会报错；
+    - 我们可以使用polyfill来填充或者说打一个补丁，那么就会包含该特性了；
+- 如何使用polyfill？
+    - babel7.4.0之前，可以使用 @babel/polyfill的包，但是该包现在已经不推荐使用了：
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211011181126.png)
+    -babel7.4.0之后，可以通过单独引入core-js和regenerator-runtime来完成polyfill的使用：
+```js
+npm install core-js regenerator-runtime --save
+
+// 使用core-js regenerator-runtime的时候  我们要为webpack.config.js要排除一些内容
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211011181250.png)
+#### 配置babel.config.js
+- 在babel.config.js文件中进行配置，给preset-env配置一些属性
+    - useBuiltIns：设置以什么样的方式来使用polyfill；
+        - 第一个值：false
+            - 打包后的文件不使用polyfill来进行适配；
+            - 并且这个时候是不需要设置corejs属性的；
+        - 第二个值：usage
+            -  会根据源代码中出现的语言特性，自动检测所需要的polyfill；
+            -  这样可以确保最终包里的polyfill数量的最小化，打包的包相对会小一些；
+            -  可以设置corejs属性来确定使用的corejs的版本；
+        - 第三个值：entry
+            - 如果我们依赖的某一个库本身使用了某些polyfill的特性，但是因为我们使用的是usage，所以之后用户浏览器 可能会报错；
+            - 所以，如果你担心出现这种情况，可以使用 entry；
+            - *并且需要在入口文件中添加  `import 'core-js/stable'; import 'regenerator-runtime/runtime'`;
+            - 这样做会根据  browserslist 目标导入所有的polyfill，但是对应的包也会变大；
+    ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211011182831.png)
+    
+    - corejs：设置corejs的版本，目前使用较多的是3.x的版本，比如我使用的是3.8.x的版本；
+        -  另外corejs可以设置是否对提议阶段的特性进行支持；
+        -  设置 proposals属性为true即可；
+    - Plugin-transform-runtime(编写第三方库的时候)
+        - 认识Plugin-transform-runtime
+            - 使用的polyfill，默认情况是添加的所有特性都是全局的
+                - 如果我们正在编写一个工具库，这个工具库需要使用polyfill；
+                - 别人在使用我们工具时，工具库通过polyfill添加的特性，可能会污染它们的代码；
+                - 所以，当编写工具时，babel更推荐我们使用一个插件： @babel/plugin-transform-runtime来完成polyfill 的功能；
+        - 使用Plugin-transform-runtime
+            - `npm install @babel/plugin-transform-runtime -D`
+    ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211011183309.png)
+    ```js
+    module.exports = {
+      presets: [
+        ["@babel/preset-env", {
+          // false: 不用任何的polyfill相关的代码
+          // usage: 代码中需要哪些polyfill, 就引用相关的api
+          // entry: 手动在入口文件中导入 core-js/regenerator-runtime, 根据目标浏览器引入所有对应的polyfill
+          // useBuiltIns: "entry",
+          // corejs: 3
+        }],
+        ["@babel/preset-react"]
+      ],
+      plugins: [
+        //用这个上面的 useBuiltIns就不需要了
+        ["@babel/plugin-transform-runtime", {
+          corejs: 3
+        }]
+      ]
+    }
+    ```
+    #### React的jsx支持
+    - 编写react代码时，react使用的语法是jsx，jsx是可以直接使用babel来转换的。
+    - react jsx代码进行处理需要如下的插件：
+        -  @babel/plugin-syntax-jsx
+        -  @babel/plugin-transform-react-jsx
+        -  @babel/plugin-transform-react-display-name
+    - `npm install @babel/preset-react -D`
+    ```js
+    //babel.config,js
+    module.exports = {
+      presets: [
+        ["@babel/preset-env", {
+          // false: 不用任何的polyfill相关的代码
+          // usage: 代码中需要哪些polyfill, 就引用相关的api
+          // entry: 手动在入口文件中导入 core-js/regenerator-runtime, 根据目标浏览器引入所有对应的polyfill
+          // useBuiltIns: "entry",
+          // corejs: 3
+        }],
+        ["@babel/preset-react"]
+      ],
+    }
+    ```
+    #### TypeScript的编译
+    - 使用TypeScript来开发，那么TypeScript代码是需要转换成JavaScript代码。
+    - 可以通过TypeScript的compiler来转换成JavaScript：
+        - `npm install typescript -D`
+    - 另外TypeScript的编译配置信息我们通常会编写一个tsconfig.json文件：
+        - `tsc --init`
+        - 生成配置文件如下：
+        ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211011185803.png)
+        - `npx tsc`
+    - 使用ts-loader
+        - 在webpack中使用TypeScript，那么我们可以使用ts-loader来处理ts文件：
+            - `npm install ts-loader -D`
+            - 使用之前需要有`tsconfig.json`文件
+        - 问题：
+            - **不支持Polyfill**
+            - 需要
+     ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211011185803.png)
+    ```js
+    {
+        test: /\.jsx?$/,
+        exclude: /node_modules/,
+        use: "ts-loader",
+      }
+    ```
+    
+    
