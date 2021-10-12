@@ -78,16 +78,7 @@
     - async的执行，并不会按着script在页面中的顺序来执行，而是谁先加载完谁执行。
     - 这种方式加载的 JavaScript 依然会阻塞 load 事件
     - async-script 可能在 DOMContentLoaded 触发之前或之后执行，但一定在 load 触发之前执行。
-### DOM事件流
-DOM 事件流分为三个阶段：
-- e.preventDefault()
-- 事件捕获阶段 - 事件流由上往下直到目标元素
-    - 事件触发时，先触发目标元素的祖先的事件相应函数，然后触发它父级的，最后触发自己。也就是说由外向内找监听函数并且执行，就是事件捕获。
-- 目标阶段 - 事件到达目标元素
-- 事件冒泡阶段 - 事件流由下往上从目标元素直到最外层祖先元素
-    - 事件冒泡和事件捕获相反。由内向外找监听函数并执行。
-    - e.stopPropagation()
-### target/currentTarget/relateTarget
+
 ## CSS
 ### .position有几种，分别描述？
 - static（静态定位）
@@ -95,13 +86,32 @@ DOM 事件流分为三个阶段：
 - relative（相对定位）
     - 对象遵循标准文档流中，依赖top, right, bottom, left 等属性相对于该对象在标准文档流中的位置进行偏移，同时可通过z-index定义层叠关系。
 - absolute（绝对定位）
-    - 对象脱离标准文档流，使用top, right, bottom, left 等属性进行绝对定位（相对于static定位以外的第一个父元素进行绝对定位） 同时可通过z-index定义层叠关系。
+    - 对象脱离标准文档流，使用top, right, bottom, left 等属性进行绝对定位 同时可通过z-index定义层叠关系。
+    - 相对于static定位以外的第一个父元素进行绝对定位
 - fixed（固定定位）
-    - 对象脱离标准文档流，使用top, right, bottom, left 等属性进行绝对定位（相对于浏览器窗口进行绝对定位）同时可通过z-index定义层叠关系。
+    - 对象脱离标准文档流，使用top, right, bottom, left 等属性进行绝对定位,同时可通过z-index定义层叠关系。
+    - fixed 元素总是相对于 body 定位的
 - sticky（粘性定位元素）
     - 可以说是相对定位relative和固定定位fixed的结合
+    - 元素固定的相对偏移是相对于离它最近的具有滚动框的祖先元素，如果祖先元素都不可以滚动，那么是相对于 viewport 来计算元素的偏移量。
     - 在目标区域以内，它的行为就像 position:relative;在滑动过程中，某个元素距离其父元素的距离达到sticky粘性定位的要求时(比如top：100px)；position:sticky这时的效果相当于fixed定位，固定到适当位置。
+### z-index
+- z-index的取值
+    - auto（自动，默认值）
+    - 整数（正整数/负整数/0）
+        - 数值越大，元素也就越靠近观察者；而数值越小，元素看起来也就越远。
+    - inherit（继承）
 
+一共可以有7种层叠等级。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211009152205.png)
+
+- 背景和边框 —— 形成层叠上下文的元素的背景和边框，也是层叠上下文中的最低等级。
+- 负z-index值 —— 层叠上下文内有着 负z-index值 的子元素。
+- 块级盒 —— 文档流中非行内非定位子元素。
+- 浮动盒 —— 非定位浮动元素。
+- 行内盒 —— 文档流中行内级别非定位子元素。
+- z-index: 0 —— 定位元素，这些元素将形成了新的层叠上下文。
+- 正z-index值 —— 定位元素。 层叠上下文中的最高等级。
 ### BFC块级格式化上下文   (边距重叠解决方案）
 
 块级格式化上下文   (边距重叠解决方案）。
@@ -279,8 +289,9 @@ element宽度＝内容宽度（width包含了元素内容宽度、边框、内�
     - 表示在分配额外空间之前，成员占据的空间，默认值为auto，意思就是你本来占多少就是多少。但也可以自己设置长度(px)。这个值的效果就是确定在释放和分配空间的时候，你的初值是多少。
 
 ### Grid
-
 ### 常见布局的方案
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211009164716.png)
+
 #### 单列布局
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210929065711.png)
 - header,content和footer等宽的单列布局
@@ -1074,6 +1085,11 @@ vw vh是固定的百分比，这样在小屏上东西太小，大屏上东西太
     - 继 承：会被子元素继承,且，子元素并不能通过 opacity: 1 来取消隐藏；
     - transition：opacity 可以延时显示和隐藏
 
+
+1.opacity：0，该元素隐藏起来了，但不会改变页面布局，并且，如果该元素已经绑定 一些事件，如click 事件，那么点击该区域，也能触发点击事件的
+2.visibility：hidden，该元素隐藏起来了，但不会改变页面布局，但是不会触发该元素已 经绑定的事件 ，隐藏对应元素，在文档布局中仍保留原来的空间（重绘）
+3.display：none，把元素隐藏起来，并且会改变页面布局，可以理解成在页面中把该元素。 不显示对应的元素，在文档布局中不再分配空间（回流+重绘）
+
 ### CSS标签meta
 
 ### rpx和px的联系和区别以及计算方法
@@ -1183,6 +1199,63 @@ border-radius: 水平半径 / 垂直半径;
 ```
 
 ## JS
+### ● 图片懒加载的原理？？？
+### ● 箭头函数和普通函数有什么区别？如果把箭头函数转换为不用箭头函数的形式，如何转换
+### 闭包
+- 防抖节流
+```js
+// 防抖
+function debounce(fn, delay = 300) {
+  let timer; //闭包引用的外界变量
+  return function () {
+    const args = arguments;
+    if (timer) {
+      clearTimeout(timer);
+    }
+    timer = setTimeout(() => {
+      fn.apply(this, args);
+    }, delay);
+  };
+}
+```
+- 模拟块级作用域
+```js
+function outputNumbers(count) {
+  (function () {
+    for (var i = 0; i < count; i++) {
+      console.log(i);
+    }
+  })();
+}
+outputNumbers(5)
+```
+- 对象中创建私有变量
+```js
+var aaa = (function () {
+  var a = 1;
+  function bbb() {
+    a++;
+    console.log(a);
+  }
+  function ccc() {
+    a++;
+    console.log(a);
+  }
+  return {
+    b: bbb, //json结构
+    c: ccc,
+  };
+})();
+console.log(aaa.a); //undefined
+aaa.b(); //2
+aaa.c(); //3
+```
+### apply call bind 区别
+- 三者都可以改变函数的 this 对象指向。
+- 三者第一个参数都是 this 要指向的对象，如果如果没有这个参数或参数为 undefined 或 null，则默认指向全局 window。
+- 三者都可以传参，但是 apply 是数组，而 call 是参数列表，且 apply 和 call 是一次性传入参数，而 bind 可以分为多次传入。
+- bind 是返回绑定 this 之后的函数，便于稍后调用；apply 、call 则是立即执行 。
+- bind()会返回一个新的函数，如果这个返回的新的函数作为构造函数创建一个新的对象，那么此时 this 不再指向传入给 bind 的第一个参数，而是指向用 new 创建的实例
 ### 编程范式
 在js的章节总结了
 
@@ -1194,6 +1267,242 @@ border-radius: 水平半径 / 垂直半径;
 响应式（Reactive Programming，RP）
 函数响应式（Functional Reactive Programming，FRP）
 
+### this的五种情况
+
+`this`是在执行的时候确定的。不执行，你就不知道在哪里。
+
+1. 作为普通函数执行时，`this`指向`window`。
+2. 当函数作为对象的方法被调用时，`this`就会指向`该对象`。
+3. 构造器调用，`this`指向`返回的这个对象`。
+4. 箭头函数 箭头函数的`this`绑定看的是`this所在函数定义在哪个对象下`，就绑定哪个对象。如果有嵌套的情况，则this绑定到最近的一层对象上。
+5. 基于Function.prototype上的 `apply 、 call 和 bind `调用模式，这三个方法都可以显示的指定调用函数的 this 指向。`apply`接收参数的是数组，`call`接受参数列表，`` bind`方法通过传入一个对象，返回一个` this `绑定了传入对象的新函数。这个函数的 `this`指向除了使用`new `时会被改变，其他情况下都不会改变。若为空默认是指向全局对象window。
+
+**this永远指向的是最后调用它的对象，也就是看它执行的时候是谁调用的**
+
+**当this碰到return时**。如果返回值是一个对象，那么this指向的就是那个返回的对象，如果返回值不是一个对象那么this还是指向函数的实例。
+
+***终极秘籍***：
+
+1. 如果一个函数中有this，但是它没有被上一级的对象所调用，那么this指向的就是window，这里需要说明的是在js的严格版中this指向的不是window，但是我们这里不探讨严格版的问题，你想了解可以自行上网查找。
+2. 如果一个函数中有this，这个函数有被上一级的对象所调用，那么this指向的就是上一级的对象。
+3. 如果一个函数中有this，这个函数中包含多个对象，尽管这个函数是被最外层的对象所调用，this指向的也只是它上一级的对象
+
+
+箭头函数中没有`this`绑定，必须通过查找作用域链来决定其值。如果箭头函数被非箭头函数包含，则`this`绑定的是最近一层非箭头函数的`this`，否则`this`的值则被设置为全局对象。
+而箭头函数的`this`是上层普通函数的`this`或者是全局对象（浏览器中是`window`）
+```js
+var name = 'window';
+var student = {
+    name: '若川',
+    doSth: function(){
+        // var self = this;
+        var arrowDoSth = () => {
+            // console.log(self.name);
+            console.log(this.name);
+        }
+        arrowDoSth();
+    },
+    arrowDoSth2: () => {
+        console.log(this.name);
+    }
+}
+student.doSth(); // '若川'
+student.arrowDoSth2(); // 'window'
+```
+
+
+如果要判断一个运行中函数的 `this` 绑定， 就需要找到这个函数的直接调用位置。找到之后 就可以顺序应用下面这四条规则来判断 `this` 的绑定对象。
+
+- `new` 调用：绑定到新创建的对象，注意：显示`return`函数或对象，返回值不是新创建的对象，而是显式返回的函数或对象。
+- `call` 或者 `apply`（ 或者 `bind`） 调用：严格模式下，绑定到指定的第一个参数。非严格模式下，`null`和`undefined`，指向全局对象（浏览器中是`window`），其余值指向被`new Object()`包装的对象。
+- 对象上的函数调用：绑定到那个对象。
+- 普通函数调用：在严格模式下绑定到 `undefined`，否则绑定到全局对象。
+
+`ES6` 中的箭头函数：不会使用上文的四条标准的绑定规则， 而是根据当前的词法作用域来决定`this`， 具体来说， 箭头函数会继承外层函数，调用的 this 绑定（ 无论 this 绑定到什么），没有外层函数，则是绑定到全局对象（浏览器中是`window`）。这其实和 `ES6` 之前代码中的 `self = this` 机制一样。
+
+`DOM`事件函数：一般指向绑定事件的`DOM`元素，但有些情况绑定到全局对象（比如`IE6~IE8`的`attachEvent`）。
+
+一定要注意，有些调用可能在无意中使用普通函数绑定规则。如果想“ 更安全” 地忽略 `this` 绑 定， 你可以使用一个对象， 比如`ø = Object.create(null)`， 以保护全局对象。
+
+面试官考察`this`指向就可以考察`new、call、apply、bind`，箭头函数等用法。从而扩展到作用域、闭包、原型链、继承、严格模式等。这就是面试官乐此不疲的原因。
+
+
+### 作用域和作用域链
+定义：简单来说作用域就是变量与函数的可访问范围，由当前环境与上层环境的一系列变量对象组成
+1.全局作用域：代码在程序的任何地方都能被访问，window 对象的内置属性都拥有全局作用域。
+2.函数作用域：在固定的代码片段才能被访问
+作用：作用域最大的用处就是隔离变量，不同作用域下同名变量不会有冲突。
+
+作用域链参考链接一般情况下，变量到 创建该变量 的函数的作用域中取值。但是如果在当前作用域中没有查到，就会向上级作用域去查，直到查到全局作用域，这么一个查找过程形成的链条就叫做作用域链。
+
+### 原型 && 原型链
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211012095343.png)
+- 每一个构造函数都有(原型)prototype指向它的原型对象。
+- 原型对象有constructor指向它的构造函数。
+- 构造函数可以通过new 的创建方式创建实例对象
+- 实例对象通过_proto_指向它的原型对象。
+- 原型对象也有自己的原型对象，通过_proto_指向。
+```js
+1. Person.prototype.constructor == Person // **准则1：原型对象（即Person.prototype）的constructor指向构造函数本身**
+2. person01.__proto__ == Person.prototype // **准则2：实例（即person01）的__proto__和原型对象指向同一个地方**
+```
+‌**原型**:  在 JS 中，每当定义一个对象（函数也是对象）时，对象中都会包含一些预定义的属性。其中每个函数对象都有一个prototype 属性，这个属性指向函数的原型对象。
+
+**原型链**：（各个原型之间构成的链，我们称之为原型链。）如果试图引用对象(实例instance)的某个属性,会首先在对象内部寻找该属性,直至找不到,然后才在该对象的原型(instance.prototype)里去找这个属性.如果还找不到则往原型的原型上找，这样一个层层查找形成的一个链式的关系被称为原型链。）
+
+当在一个对象 obj 上访问某个属性时，如果不存在于 obj，那么便会去对象的原型也就是 obj.__proto__ 上去找这个属性。如果有则返回这个属性，没有则去对象 obj 的原型的原型也就是 obj.__proto__.__proto__去找，重复以上步骤。一直到访问纯对象的原型也就是 Object.prototype，没有的话续往上找也就是 Object.prototype.__proto__，其实就是 null，直接返回 undefined。
+
+**特点**:  JavaScript对象是通过引用来传递的，我们创建的每个新对象实体中并没有一份属于自己的原型副本。当我们修改原型时，与之相关的对象也会继承这一改变。
+```js
+// 原型、构造函数、实例、原型链的关系
+// 1、实例 ==> 1. 对象就是一个实例，就有_proto_属性
+//             2. 实例通过_proto_原型链找到prototype原型对象，prototype原型对象的属性被所有实例共享。
+// 2、构造函数 ==> 1.可以通过new运算符生成一个实例。
+//                 2.任何函数都可以作为构造函数。
+//                 3.只要被new运算符使用过的函数就是一个构造函数
+// 3、原型 ==> 1. 函数都有prototype属性，prototype属性的值就是一个初始化的原型对象。
+//             2. 原型对象有个constructor和_proto_属性，constructor是一个构造函数。
+//             3. Fn.prototype.constructor === Fn   // constructor函数指向构造函数本身。通过constructor把原型对象和构造函数关联。
+// 4、原型链 ==>1. 对象有_proto_属性（函数也是对象，所以函数也有_proto_属性）
+//              2. 实例通过_proto_原型链找到prototype原型对象,如果找不到，则通过原型对象的_proto_继续往上找，一直到顶层。
+// 5、关系：==> 1. Fn.prototype.constructor === Fn  // 构造函数原型的constructor属性指向构造函数本身
+//              2. obj3.__proto__.constructor === Fn
+//              3. obj3.__proto__.constructor === Fn.prototype.constructor
+//              4. obj3.__proto__ === Fn.prototype  // 修改prototype的属性， __proto__也会修改，同理也是
+```
+### 原型链，为什么要这么设计
+- 在定义函数时，会执行两个动作：一个动作是创建函数对象，这是因为函数是对象；另一个动作是创建一个完全独立的原型对象；定义的函数的原型属性将指向该原型对象。
+- 那么 prototype 就是调用 `构造函数` 而创建的那个对象`实例`的`的原型对象`。
+- 使用原型对象的好处是可以让所有对象实例共享它所包含的属性和方法。
+- 最主要的就是节省内存，如果属性和方法定义在原型上，那么所有的实例对象就能共享。
+
+### __proto__和prototype的区别和关系?
+- js 每个对象都会拥有`prototype`属性的。这个属性指向一个对象，这个对象的所有属性和方法都会被构造函数的实例所继承。
+- 实例都包含一个指向构造函数的`原型对象`的`__proto__`内部指针。。
+- 实例都会有一个`constructor`属性去指向它的构造函数s
+- 在原型对象中使用`.constructor`（构造器）属性来区分，我这个原型对象被那个构造函数引用了。所有原型对象都会自动获得一个constructor（构造函数）属性，这个属性是一个指向prototype属性所在函数的指针。
+
+```js
+    var o = {};
+    o.__proto__ === Object.prototype  //true
+    o instanceof Object      //true
+    o instanceof Function    //false
+    
+    var o = Object();
+    o.__proto__ === Object.prototype  //true
+    o instanceof Object      //true
+    o instanceof Function    //false
+    
+    var o = new Object();
+    o.__proto__ === Object.prototype  //true
+    o instanceof Object      //true
+    o instanceof Function    //false
+    
+    function Fn(){}
+    var fn = new Fn();
+    fn.__proto__ === Fn.prototype;
+    
+    fn instanceof Fn        //true
+    fn instanceof Object    //true
+    fn instanceof Function  //false
+
+
+   Function.__proto__ === Function.prototype  //true
+   Object.__proto__ === Function.prototype  //true
+   
+   Function.prototype.__proto__ === Object.prototype
+   Object.prototype.__proto__ === null，是原型链有终点。
+   
+   function fn(){}
+   fn.__proto__ === Function.prototype  //true
+   fn.prototype.__proto__ === Object.prototype  //true
+   fn.prototype.constructor === fn  //true
+```
+```js
+函数含有__proto__与prototype属性，__proto__指向Function.prototype,prototype指向Object.prototype，
+```
+
+_proto_是服务于函数对象的，prototype是服务于构造函数的实例化对象的
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922072448.png)
+```js
+console.log(User.__proto__ === Object);//false
+console.log(User.__proto__ === Object.__proto__);//true
+console.log(User.prototype.__proto__ === User.__proto__.__proto__);//true
+console.log(User.prototype.__proto__ === Object.prototype);//true
+  
+```
+_proto_属性的作用主要是用来确定当前对象的继承者，在当前对象找不到指定的属性和对象时，会去proto属性指定的对象中寻找，之后依次类推直到找完所有继承或找到要找的属性为止。
+
+prototype 中定义的属性和方法都是留给自己的 “后代” 用的。
+
+JS中的 proto 入场了，它存在于普通对象和函数对象中，它的作用就是引用父类的 prototype 对象。
+
+### instanceof
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210802103943.png)
+
+1、instanceof的作用是用来做检测类型：
+（1）instanceof可以检测某个对象是不是另一个对象的实例(用于判断某个实例是否属于某构造函数)；
+```js
+var Person = function() {};
+var student = new Person();
+console.log(student instanceof Person);  // true
+```
+（2）instanceof可以检测父类型(在继承关系中用来判断一个实例是否属于它的父类型或者祖先类型的实)；
+```js
+function Person() {};
+function Student() {};
+var p = new Person();
+Student.prototype=p; //继承原型
+var s=new Student();
+console.log(s instanceof Student); //true
+console.log(s instanceof Person); //true
+// 但是，instanceof不适合检测一个对象本身的类型。
+```
+2、instanceof 检测一个对象A是不是另一个对象B的实例的原理：
+其实 `instanceof` 主要的实现原理就是只要右边变量的 `prototype` 在左边变量的原型链上即可。因此，`instanceof` 在查找的过程中会遍历左边变量的原型链，直到找到右边变量的 `prototype`，如果查找失败，则会返回 false，告诉我们左边变量并非是右边变量的实例。
+查看对象B的prototype指向的对象是否在对象A的[[prototype]]链上。如果在，则返回true,如果不在则返回false。不过有一个特殊的情况，当对象B的prototype为null将会报错(类似于空指针异常)。
+```js
+function _instanceof(A, B) {
+    var O = B.prototype;// 取B的显示原型
+    A = A.__proto__;// 取A的隐式原型
+    while (true) {
+        //Object.prototype.__proto__ === null
+        if (A === null)
+            return false;
+        if (O === A)// 这里重点：当 O 严格等于 A 时，返回 true
+            return true;
+        A = A.__proto__;
+    }
+}
+```
+```js
+// instanceof ==> 1. 判断实例对象的__proto__和构造函数的prototype属性指向同一个引用地址
+                    （并不能判断一个对象是不是一个构造函数直接生成的实例），
+//                2. obj3 instanceof Fn  // true
+//                3. obj3 instanceof Object  // true，由于 Fn instanceof Object === true
+//                4. 如何准确判断一个对象是不是一个构造函数直接生成的实例对象(通过constructor)： 
+//                   obj3.__proto__.constructor === Fn.prototype.constructor // true
+//                   obj3.__proto__.constructor === Object.prototype.constructor // false
+```
+
+### `.new`操作符和`new`一个对象发生了什么?
+1.创建一个空对象。
+2.该对象的隐式原型指向该函数的原型。(设置原型，将对象的原型设置为函数的prototype对象。)
+3.这个新对象会绑定到函数调用的this。(让函数的this指向这个对象，执行构造函数的代码（为这个新对象添加属性）)
+4.如果函数没有返回其他对象，那么 new 表达式中的函数调用会自动返回这个新对象。(判断函数的返回值类型，如果是值类型，返回创建的对象。如果是引用类型，就返回这个引用类型的对象。)
+
+```js
+function myNew(Con, ...args) {
+  // 创建一个空的对象
+  let obj = {};
+  // 隐式原型链接到该函数的原型，obj 可以访问到构造函数原型中的属性
+  obj.__proto__ = Con.prototype;
+  // 绑定 this 实现继承，obj 可以访问到构造函数中的属性
+  let ret = Con.call(obj, ...args);
+  // 优先返回构造函数返回的对象
+  return ret instanceof Object ? ret : obj;
+}
+```
 ### ES5 继承
 #### 原型链继承
 ```js
@@ -1540,8 +1849,9 @@ Reflect.ownKeys(myClass.prototype)
 - 在JS的变量提升中，提升的只是变量的声明，所以对于var a = 1，一般把它拆分成var a 和 a = 1。只提升var a，a = 1不变。
 - 有多个同名变量声明时，函数声明会覆盖其他的声明。如果有多个同名函数声明，则是由最后的一个函数声明覆盖之前所有的声明。
 
-
 ### 数据类型
+值类型（7个）：Undefined、Null、Number、String、Boolean、Symbol(ES6)、BigInt(ES10)
+引用类型：Object：Array、Function
 - Javascript 中的数据类型包括原始类型和引用类型。其中原始类型包括 null、undefined、boolean、string、symbol、bigInt、number。
     - 基本类型的访问是按值访问的，就是说你可以操作保存在变量中的实际的值s。
     - 基本类型的变量是存放在栈区的（栈区指内存里的栈内存）
@@ -1559,7 +1869,19 @@ Reflect.ownKeys(myClass.prototype)
 
 当在程序创建一个对象时，这个对象将被保存到运行时数据区中，以便反复利用（因为对象的创建成本通常较大），这个运行时数据区就是堆内存。堆内存中的对象不会随方法的结束而销毁，即使方法调用结束后，只要这个对象还可能被另一个变量所引用，则这个对象就不会被销毁；只有当一个对象没有被任何变量引用它时，系统的垃圾回收机制才会回收它。
 
+### JS垃圾回收机制
+1. 项目中，如果存在大量不被释放的内存（堆/栈/上下文），页面性能会变得很慢。当某些代码操作不能被合理释放，就会造成内存泄漏。我们尽可能减少使用闭包，因为它会消耗内存。
+2. 浏览器垃圾回收机制/内存回收机制:
+   > 浏览器的`Javascript`具有自动垃圾回收机制(`GC:Garbage Collecation`)，垃圾收集器会定期（周期性）找出那些不在继续使用的变量，然后释放其内存。
 
+   **标记清除**:在`js`中，最常用的垃圾回收机制是标记清除：当变量进入执行环境时，被标记为“进入环境”，当变量离开执行环境时，会被标记为“离开环境”。垃圾回收器会销毁那些带标记的值并回收它们所占用的内存空间。
+    **谷歌浏览器**：“查找引用”，浏览器不定时去查找当前内存的引用，如果没有被占用了，浏览器会回收它；如果被占用，就不能回收。
+    **IE浏览器**：“引用计数法”，当前内存被占用一次，计数累加1次，移除占用就减1，减到0时，浏览器就回收它。
+3. 优化手段：内存优化 ; 手动释放：取消内存的占用即可。
+   （1）堆内存：fn = null 【null：空指针对象】
+   （2）栈内存：把上下文中，被外部占用的堆的占用取消即可。
+4. 内存泄漏
+   在 JS 中，常见的内存泄露主要有 4 种,全局变量、闭包、DOM 元素的引用、定时器
 ### 判断数据类型的方法
 typeof可以检测变量的数据类型，返回如下6种字符串number、string、boolean、object、undefined、function。
 ```js
@@ -2087,24 +2409,7 @@ var deepClone = function (target, map = new WeakMap()) {
 };
 ```
 
-### `.new`操作符和`new`一个对象发生了什么?
-1.创建一个空对象。
-2.该对象的隐式原型指向该函数的原型。
-3.这个新对象会绑定到函数调用的this。
-4.如果函数没有返回其他对象，那么 new 表达式中的函数调用会自动返回这个新对象。
 
-```js
-function myNew(Con, ...args) {
-  // 创建一个空的对象
-  let obj = {};
-  // 隐式原型链接到该函数的原型，obj 可以访问到构造函数原型中的属性
-  obj.__proto__ = Con.prototype;
-  // 绑定 this 实现继承，obj 可以访问到构造函数中的属性
-  let ret = Con.call(obj, ...args);
-  // 优先返回构造函数返回的对象
-  return ret instanceof Object ? ret : obj;
-}
-```
 
 ### 类数组对象转换为数组的方法
 - ES6语法 Array.from(arr)
@@ -2134,9 +2439,35 @@ Array.prototype.map.call（hdList,function(){
 ### ES6
 https://juejin.cn/post/6844903959283367950
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210921221425.png)
+#### Set数据结构
+概念：set是ES6新增的数据结构。集合的概念是一组无序且唯一（即不重复）的项组成。set数据结构使用了与有限集合相同的数学概念，应用在计算机的数据结构中，与数组类似，但成员都是唯一的，没有重复的值。
 
-### commonJS 和 es6 模块化的区别
-1. `ES6 Module`静态引入，编译时引入
+特点：key和value相同，没有重复的value。只有健值，没有健名，有点类似数组。
+
+#### WeakSet
+WeakSet 对象允许你将弱引用对象储存在一个集合中。
+WeakSet 与 Set 的区别：
+- WeakSet 只能储存对象引用，不能存放值，而 Set 对象都可以
+- WeakSet 对象中储存的对象值都是被弱引用的，即垃圾回收机制不考虑 WeakSet 对该对象的应用，如果没有其他的变量或属性引用这个对象值，则这个对象将会被垃圾回收掉（不考虑该对象还存在于 WeakSet 中），所以，WeakSet 对象里有多少个成员元素，取决于垃圾回收机制有没有运行，运行前后成员个数可能不一致，遍历结束之后，有的成员可能取不到了（被垃圾回收了），WeakSet 对象是无法被遍历的（ES6 规定 WeakSet 不可遍历），也没有办法拿到它包含的所有元素。
+
+#### Map数据结构
+Map 是一种叫做字典的数据结构,Map和对象最大的不同应该就是键可以是任意类型。
+Map原生提供三个遍历器生成函数和一个遍历方法。
+- keys()：返回键名的遍历器。
+- values()：返回键值的遍历器。
+- entries()：返回所有成员的遍历器。
+- forEach()：遍历Map的所有成员。
+需要特别注意的是，Map的遍历顺序就是插入顺序。
+
+#### WeakMap
+WeakMap 对象是一组键值对的集合，其中的键是弱引用对象，而值可以是任意。
+注意，WeakMap 弱引用的只是键名，而不是键值。键值依然是正常引用。
+
+WeakMap 中，每个键对自己所引用对象的引用都是弱引用，在没有其他引用和该键引用同一对象，这个对象将会被垃圾回收（相应的key则变成无效的），所以，WeakMap 的 key 是不可枚举的。
+
+### CommonJS 和 es6 模块化的区别
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211012163119.png)
+1. `ES6 Module`静态引入，编译时引入（码在编译的过程中可以做的事情包含词法和语法分析、类型检查以及代码优化等等。）
 2. `Commonjs`动态引入，执行时引入
 3. 只有`ES6 Module`才能静态分析，实现`Tree-Shaking` （rollup）
 ```js
@@ -2508,75 +2839,6 @@ readAll() // 2.txt 3.txt
     - 发送http请求
     - 抛出异常，未被当前函数捕获
 
-### 原型链，为什么要这么设计
-- 在定义函数时，会执行两个动作：一个动作是创建函数对象，这是因为函数是对象；另一个动作是创建一个完全独立的原型对象；定义的函数的原型属性将指向该原型对象。
-- 那么 prototype 就是调用 `构造函数` 而创建的那个对象`实例`的`的原型对象`。使用原型对象的好处是可以让所有对象实例共享它所包含的属性和方法。
-- 最主要的就是节省内存，如果属性和方法定义在原型上，那么所有的实例对象就能共享。
-
-
-### __proto__和prototype的区别和关系?
-- js 每个对象都会拥有`prototype`属性的。这个属性指向一个对象，这个对象的所有属性和方法都会被构造函数的实例所继承。
-- 只有对象（任何对象）只有`__proto__`去找它的原型对象。( 实例都包含一个指向构造函数的`原型对象`的内部指针。)。
-- 实例都会有一个`constructor`属性去指向它的构造函数。
-- 在原型对象中使用`.constructor`（构造器）属性来区分，我这个原型对象被那个构造函数引用了。所有原型对象都会自动获得一个constructor（构造函数）属性，这个属性是一个指向prototype属性所在函数的指针。
-
-```js
-    var o = {};
-    o.__proto__ === Object.prototype  //true
-    o instanceof Object      //true
-    o instanceof Function    //false
-    
-    var o = Object();
-    o.__proto__ === Object.prototype  //true
-    o instanceof Object      //true
-    o instanceof Function    //false
-    
-    var o = new Object();
-    o.__proto__ === Object.prototype  //true
-    o instanceof Object      //true
-    o instanceof Function    //false
-    
-    function Fn(){}
-    var fn = new Fn();
-    fn.__proto__ === Fn.prototype;
-    
-    fn instanceof Fn        //true
-    fn instanceof Object    //true
-    fn instanceof Function  //false
-
-
-   Function.__proto__ === Function.prototype  //true
-   Object.__proto__ === Function.prototype  //true
-   
-   Function.prototype.__proto__ === Object.prototype
-   Object.prototype.__proto__ === null，是原型链有终点。
-   
-   function fn(){}
-   fn.__proto__ === Function.prototype  //true
-   fn.prototype.__proto__ === Object.prototype  //true
-   fn.prototype.constructor === fn  //true
-```
-```js
-函数含有__proto__与prototype属性，__proto__指向Function.prototype,prototype指向Object.prototype，
-```
-
-
-
-_proto_是服务于函数对象的，prototype是服务于构造函数的实例化对象的
-![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922072448.png)
-```js
-console.log(User.__proto__ === Object);//false
-console.log(User.__proto__ === Object.__proto__);//true
-console.log(User.prototype.__proto__ === User.__proto__.__proto__);//true
-console.log(User.prototype.__proto__ === Object.prototype);//true
-  
-```
-_proto_属性的作用主要是用来确定当前对象的继承者，在当前对象找不到指定的属性和对象时，会去proto属性指定的对象中寻找，之后依次类推直到找完所有继承或找到要找的属性为止。
-
-prototype 中定义的属性和方法都是留给自己的 “后代” 用的。
-
-JS中的 proto 入场了，它存在于普通对象和函数对象中，它的作用就是引用父类的 prototype 对象。
-
 
 ### 动态创建script标签并插入到页面上，说执行时机
 因为浏览器对动态插入的script标签，默认设置的是async。
@@ -2622,6 +2884,24 @@ addEventListener第一个参数事件类型，第二个类型即绑定的具体�
     - 事件委托的作用
         - 只操作了一次 DOM ，提高了程序的性能。
         - 在JavaScript中，添加到页面上的事件处理程序数量将直接关系到页面的整体运行性能，因为需要不断的操作dom,那么引起浏览器重绘和回流的可能也就越多，页面交互的事件也就变的越长，这也就是为什么要减少dom操作的原因。每一个事件处理函数，都是一个对象，那么多一个事件处理函数，内存中就会被多占用一部分空间。如果要用事件委托，就会将所有的操作放到js程序里面，只对它的父级(如果只有一个父级)这一个对象进行操作，与dom的操作就只需要交互一次，这样就能大大的减少与dom的交互次数，提高性能；
+### target/currentTarget/relateTarget
+- event.target
+    - 返回触发事件的元素
+    - 可以用来实现事件委托 (event delegation)
+- event.currentTarget
+    - 返回绑定事件的元素
+- event.relateTarget
+    - 返回与事件的目标节点相关的节点。
+### window.onload 和 DOMContentLoaded
+```js
+window.addEventListener('load', function(){
+    //页面的全部资源加载完才会执行，包括图片、视频等
+});
+
+document.addEventListener('DOMContentLoaded', function(){
+    //DOM 渲染完即可执行，此时图片、视频还可能没加载完 -> 尽量选择此方法
+});
+```
 ### Promise（写的不好）
 - 回调地狱
     - 代码臃肿
@@ -3150,7 +3430,7 @@ function factorial(num, num1 = 0, num2 = 1) {
 ```
 
 
-### 事件循环（Event Loop）---- （JavaScript的运行机制）
+### 事件循环（Event Loop）---- （JavaScript的运行机制）----JS异步
 #### 线程和进程的区别，JS是单线程的吗？
 进程是资源分配的最小单位，线程是CPU调度的最小单位
 - 进程
@@ -3164,14 +3444,11 @@ function factorial(num, num1 = 0, num2 = 1) {
 - js是单线程
     - js是作为浏览器的脚本语言，主要是实现用户与浏览器的交互，以及操作dom；这决定了它只能是单线程，否则会带来很复杂的同步问题。 
     - 利用多核CPU的计算能力，HTML5提出Web Worker标准，允许JavaScript脚本创建多个线程，但是子线程完全受主线程控制，且不得操作DOM。所以，这个新标准并没有改变JavaScript单线程的本质。
-    
-    
+
     - JS引擎线程
     - 事件触发线程
     - 定时触发器线程
 
-    
-    
 - js解决异步
     - JS 实现异步时通过 **事件循环（Event Loop）**,是JS异步的解决方案。 JS实现异步的具体解决方案
         - 同步代码，直接执行
@@ -3185,24 +3462,20 @@ function factorial(num, num1 = 0, num2 = 1) {
         - Generator
         - `Async/Await`
 
-
+#### Event Loop即事件循环
 Event Loop即事件循环，是指浏览器或Node的一种解决javaScript单线程运行时不会阻塞的一种机制，也就是我们经常使用异步的原理。
-
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210926210917.png)
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922153333.png)
-
 **Event Loop是javascript的执行机制：**
 **执行同步任务** -> **执行异步任务** -> **先执行微任务** -> **后执行宏任务**
-
+事件循环的运行机制是，先会执行栈中的内容，栈中的内容执行后执行微任务，微任务清空后再执行宏任务，先取出一个宏任务，再去执行微任务，然后在取宏任务清微任务这样不停的循环。
 
 **同步任务和异步任务（异步任务分为：宏任务和微任务）**
 同步任务：在主线程上排队执行的任务，只有前一个任务执行完毕，才能执行后一个任务。
-
 异步任务：不进入主线程，而进入**任务队列（task queue）** 只有**任务队列**通知主线程，某个异步任务可以执行了，该任务才会进入主线程执行。
 
 **宏任务和微任务**
-
 macrotask（又称之为宏任务），可以理解是每次执行栈执行的代码就是一个宏任务（包括每次从事件队列中获取一个事件回调并放到执行栈中执行）
     - 每一个task会从头到尾将这个任务执行完毕，不会执行其它
     - 浏览器为了能够使得JS内部task与DOM任务能够有序的执行，会在一个task执行结束后，在下一个 task 执行开始前，对页面进行重新渲染
@@ -3212,23 +3485,30 @@ microtask（又称为微任务），可以理解是在当前 task 执行结束�
     - 所以它的响应速度相比setTimeout（setTimeout是task）会更快，因为无需等渲染
     - 微任务会全部执行，而宏任务会一个一个来执行
     - 也就是说，在某一个macrotask执行完后，就会将在它执行期间产生的所有microtask都执行完毕（在渲染前）
-
-
-
-|           宏任务            |            微任务             |
-| :-------------------------: | :---------------------------: |
-|           定时器            |    Promise（async/await）     |
-|          事件绑定           | process.nexTick（Node独有的） |
-|            Ajax             |        MutationObserve        |
-|          回调函数           |                               |
-| Node中fs可以进行异步I/O操作 |                               |
-
-process.nextTick1这个地方有点出入，我一般认为```process.nextTick()推入主线程执行栈栈底，作为执行栈最后一个任务执行)
+- 浏览器中的任务源(task):
+    - 宏任务(macrotask)：
+        - 宿主环境提供的，比如浏览器
+        - ajax
+        - setTimeout
+        - setInterval
+        - setTmmediate(只兼容ie)
+        - script
+        - requestAnimationFrame
+        - messageChannel
+        - UI渲染
+        - 一些浏览器api
+        - 事件绑定
+        - 回调函数
+        - Node中fs可以进行异步I/O操作
+    - 微任务(microtask)：
+        - Promise（async/await
+        - queueMicrotask
+        - mutationObserver(浏览器提供)
+        - process.nexTick（Node独有的）
+process.nextTick1这个地方有点出入，我一般认为`process.nextTick()`推入主线程执行栈栈底，作为执行栈最后一个任务执行)
 
 **主线程任务——>微任务——>宏任务**（如果宏任务里还有微任就继续执行宏任务里的微任务，如果宏任务中的微任务中还有宏任务就在依次进行）
 **主线程任务——>微任务——>宏任务——>宏任务里的微任务——>宏任务里的微任务中的宏任务——>直到任务全部完成**
-
-
 ```js
 console.log('1');
 setTimeout(function() {
@@ -3256,7 +3536,6 @@ setTimeout(function() {
     })
 })
 console.log('10');
-
 // 1 5 10 6 2 3 4 7 8
 
 第一轮：
@@ -3284,6 +3563,47 @@ console.log('10');
 - 宏任务执行完毕后，立即执行当前微任务队列中的所有微任务（依次执行）
 - 当前宏任务执行完毕，开始检查渲染，然后GUI线程接管渲染
 - 渲染完毕后，JS线程继续接管，开始下一个宏任务（从事件队列中获取）
+
+### setTimeout、Promise、Async/Await 的区别
+- setTimeout
+    - settimeout的回调函数放到宏任务队列里，等到执行栈清空以后执行。
+- Promise
+    - Promise本身是同步的立即执行函数， 当在executor中执行resolve或者reject的时候, 此时是异步操作， 会先执行then/catch等，当主栈完成后，才会去调用resolve/reject中存放的方法执行。
+```js
+console.log('script start')
+let promise1 = new Promise(function (resolve) {
+    console.log('promise1')
+    resolve()
+    console.log('promise1 end')
+}).then(function () {
+    console.log('promise2')
+})
+setTimeout(function(){
+    console.log('settimeout')
+})
+console.log('script end')
+// 输出顺序: script start->promise1->promise1 end->script end->promise2->settimeout
+```
+- async/await
+    - async 函数返回一个 Promise 对象，当函数执行的时候，一旦遇到 await 就会先返回，等到触发的异步操作完成，再执行函数体内后面的语句。可以理解为，是让出了线程，跳出了 async 函数体。
+```js
+async function async1(){
+   console.log('async1 start');
+    await async2();
+    console.log('async1 end')
+}
+async function async2(){
+    console.log('async2')
+}
+
+console.log('script start');
+async1();
+console.log('script end')
+
+// 输出顺序：script start->async1 start->async2->script end->async1 end
+```
+- Async/Await 如何通过同步的方式实现异步
+    - Async/Await就是一个自执行的generate函数。利用generate函数的特性把异步的代码写成“同步”的形式,第一个请求的返回值作为后面一个请求的参数,其中每一个参数都是一个promise对象.
 
 ### 阻塞了 JS 中的主线程会发生什么情况？
 JS如果执行时间过长就会阻塞页面。
@@ -3537,7 +3857,13 @@ HTTPS：是以安全为目标的HTTP通道，简单讲是HTTP的安全版，即H
 - 头部数据压缩(采用HPACK压缩算法压缩头部，减小了传输的体积)： 在HTTP1.1中，HTTP请求和响应都是由状态行、请求/响应头部、消息主体三部分组成。一般而言，消息主体都会经过gzip压缩，或者本身传输的就是压缩过后的二进制文件，但状态行和头部却没有经过任何压缩，直接以纯文本传输。随着Web功能越来越复杂，每个页面产生的请求数也越来越多，导致消耗在头部的流量越来越多，尤其是每次都要传输UserAgent、Cookie这类不会频繁变动的内容，完全是一种浪费。HTTP1.1不支持header数据的压缩，HTTP2.0使用HPACK算法对header的数据进行压缩，这样数据体积小了，在网络上传输就会更快。
 - 服务器推送： 服务端推送是一种在客户端请求之前发送数据的机制。网页使用了许多资源：HTML、样式表、脚本、图片等等。在HTTP1.1中这些资源每一个都必须明确地请求。这是一个很慢的过程。浏览器从获取HTML开始，然后在它解析和评估页面的时候，增量地获取更多的资源。因为服务器必须等待浏览器做每一个请求，网络经常是空闲的和未充分使用的。为了改善延迟，HTTP2.0引入了server push，它允许服务端推送资源给浏览器，在浏览器明确地请求之前，免得客户端再次创建连接发送请求到服务器端获取。这样客户端可以直接从本地加载这些资源，不用再通过网络。
 
+#### Http3.0 相对于 Http2.0的区别
+http 协议是应用层协议，都是建立在传输层之上的。我们也都知道传输层上面不只有 TCP 协议，还有另外一个强大的协议 UDP 协议，2.0 和 1.0 都是基于 TCP 的，因此都会有 TCP 带来的硬伤以及局限性。而 Http3.0 则是建立在 UDP 的基础上。所以其与 Http2.0 之间有质的不同。
 
+- 连接迁移
+- 无队头阻塞
+- 自定义的拥塞控制
+- 前向安全和前向纠错
 ### HTTP知识点
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922191832.png)
 
@@ -3597,22 +3923,6 @@ OPTIONS方法用于获取目的资源所支持的通信方式的选项。在 COR
         - 请求头包含：key-value值，告诉服务器端我要什么内容。
 ### 在交互过程中如果数据传送完了，还不想断开连接怎么办，怎么维持？
 在 HTTP 中响应体的 Connection 字段指定为 keep-alive
-
-### DNS过程
-域名解析就是将域名转换为IP地址的过程。（因为想要访问一台服务器，最终是靠IP地址访问的，而不是靠域名访问的，他们的之间的映射关系保存在本地缓存和网络上的各种域名解析服务器中）
-
-- 第一步
-    - 客户端计算机发起 DNS 解析请求，将域名发送给同一网段的 DNS 服务器
-- 第二步
-    - 注册在客户端计算机上的 DNS 服务器会优先从缓存中查找该域名对应的 IP 地址，当缓存中的 IP 地址有效时则直接返回给客户端计算机。若失效或不存在时则将该域名发送给根域的 DNS 服务器，开始查询操作。
-- 第三步
-    - 根域服务器拿到需要解析的域名后，开始在记录中查询该域名对应的顶级域的 DNS 服务器信息，查到后将顶级域的DNS 服务器的 IP 地址回传给客户端委托 DNS 查询的服务器。
-- 第四步
-    - 被委托查询域名信息的 DNS 服务器拿到该域名对应的顶级域的 DNS服务器的 IP（也就是 .com 域对应的 IP） 地址后 ，继续使用该 IP 地址向顶级域服务器发起解析请求。也就是去 .com 域对应的 DNS 服务器去查询。
-- 第五步
-    - .com 域对应的 DNS 服务器收到解析请求后，开始查询域名下一级域对应的 DNS 服务器信息，查询到这一级域对应的 DNS 服务器信息后，将其对应的 IP 地址回传给客户端就近的DNS服务器。
-- 第六步
-    - 整个查询过程就这样一级接一级的查询下去，最终会找到完整域名所对应的服务器 IP 地址。找到后同样会回传给客户端委托查询域名信息的 DNS 服务器，然后该 DNS 服务器会将该 IP 地址发送回客户端计算机，同时将本次的查询结果保存在缓存中，以备下次查询是直接使用（有效期内）。
 
 ### Fetch API 与传统 Request 的区别
 HTTP数据请求的方式:XMLHttpRequest、ajax、fetch与axios
@@ -4206,9 +4516,25 @@ ETag/If-None-Match 的出现主要解决了 Last-Modified/If-Modified-Since 所�
 #### 缓存场景
 对于大部分的场景都可以使用强缓存配合协商缓存解决，但是在一些特殊的地方可能需要选择特殊的缓存策略。
 
+### DNS过程
+域名解析就是将域名转换为IP地址的过程。（因为想要访问一台服务器，最终是靠IP地址访问的，而不是靠域名访问的，他们的之间的映射关系保存在本地缓存和网络上的各种域名解析服务器中）
+
+- 第一步
+    - 客户端计算机发起 DNS 解析请求，将域名发送给同一网段的 DNS 服务器
+- 第二步
+    - 注册在客户端计算机上的 DNS 服务器会优先从缓存中查找该域名对应的 IP 地址，当缓存中的 IP 地址有效时则直接返回给客户端计算机。若失效或不存在时则将该域名发送给根域的 DNS 服务器，开始查询操作。
+- 第三步
+    - 根域服务器拿到需要解析的域名后，开始在记录中查询该域名对应的顶级域的 DNS 服务器信息，查到后将顶级域的DNS 服务器的 IP 地址回传给客户端委托 DNS 查询的服务器。
+- 第四步
+    - 被委托查询域名信息的 DNS 服务器拿到该域名对应的顶级域的 DNS服务器的 IP（也就是 .com 域对应的 IP） 地址后 ，继续使用该 IP 地址向顶级域服务器发起解析请求。也就是去 .com 域对应的 DNS 服务器去查询。
+- 第五步
+    - .com 域对应的 DNS 服务器收到解析请求后，开始查询域名下一级域对应的 DNS 服务器信息，查询到这一级域对应的 DNS 服务器信息后，将其对应的 IP 地址回传给客户端就近的DNS服务器。
+- 第六步
+    - 整个查询过程就这样一级接一级的查询下去，最终会找到完整域名所对应的服务器 IP 地址。找到后同样会回传给客户端委托查询域名信息的 DNS 服务器，然后该 DNS 服务器会将该 IP 地址发送回客户端计算机，同时将本次的查询结果保存在缓存中，以备下次查询是直接使用（有效期内）。
+
 
 ## 页面渲染和性能优化
-### 页面渲染（浏览器从输入 url 到页面渲染的整个流程）
+### （浏览器从输入 url 到页面渲染的整个流程）页面渲染
 很多大公司面试喜欢问这样一道面试题，输入URL到看见页面发生了什么？
 ```md
 - DNS解析
@@ -4218,6 +4544,17 @@ ETag/If-None-Match 的出现主要解决了 Last-Modified/If-Modified-Since 所�
 - 浏览器解析渲染页面
 - 连接结束。
 ```
+```md
+浏览器地址栏输入 URL 并回车
+浏览器查找当前 URL 是否存在缓存，并比较缓存是否过期
+DNS 解析 URL 对应的 IP
+根据 IP 建立 TCP 连接（三次握手）
+发送 http 请求
+服务器处理请求，浏览器接受 HTTP 响应
+浏览器解析并渲染页面
+关闭 TCP 连接（四次握手）
+```
+
 #### DNS解析
 详情请见  面试题目中的DNS过程
 可以优化的点:
@@ -4261,17 +4598,61 @@ TCP提供一种可靠的传输，这个过程涉及到三次握手，四次挥�
 请看HTTP和缓存的总结：
 - 请求
     - 请求行
+        - 请求行的格式为Method Request-URL HTTP-Version CRLF eg: GET index.html HTTP/1.1
+        - 常用的方法有: GET, POST, PUT, DELETE, OPTIONS, HEAD。
         - 常见的请求方法区别：这里主要展示POST和GET的区别
+            - GET在浏览器回退时是无害的，而POST会再次提交请求。
+            - GET产生的URL地址可以被Bookmark，而POST不可以。
+            - GET请求会被浏览器主动cache，而POST不会，除非手动设置。
+            - GET请求只能进行url编码，而POST支持多种编码方式。
+            - GET请求参数会被完整保留在浏览器历史记录里，而POST中的参数不会被保留。
+            - GET请求在URL中传送的参数是有长度限制的，而POST么有。
+            - 对参数的数据类型，GET只接受ASCII字符，而POST没有限制。
+            - GET比POST更不安全，因为参数直接暴露在URL上，所以不能用来传递敏感信息。
+            - GET参数通过URL传递，POST放在Request body中。
+            - GET会产生一个TCP数据包，而POST会产生两个TCP数据包。
+                - 对于GET方式的请求，浏览器会把http header和data一并发送出去，服务器响应200(返回数据);
+                - 而对于POST，浏览器先发送header，服务器响应100 continue，浏览器再发送data，服务器响应200 ok(返回数据)。
     - 请求报头
+        - 请求报头允许客户端向服务器传递请求的附加信息和客户端自身的信息。
+            - 请求报头中使用了Accept, Accept-Encoding, Accept-Language, Cache-Control, Connection, Cookie等字段。Accept用于指定客户端用于接受哪些类型的信息，Accept-Encoding与Accept类似，它用于指定接受的编码方式。Connection设置为Keep-alive用于告诉客户端本次HTTP请求结束之后并不需要关闭TCP连接，这样可以使下次HTTP请求使用相同的TCP通道，节省TCP连接建立的时间。
+    - 请求正文
+        - 当使用POST, PUT等方法时，通常需要客户端向服务器传递数据。这些数据就储存在请求正文中。在请求包头中有一些与请求正文相关的信息，例如: 现在的Web应用通常采用Rest架构，请求的数据格式一般为json。这时就需要设置Content-Type: application/json。
     - 请求正文
 前面基础介绍，在本文档的缓存知识点这个专题下面。
 - 缓存
     - 强制缓存
+        - 当缓存数据库中有客户端需要的数据，客户端直接将数据从其中拿出来使用（如果数据未失效），当缓存服务器没有需要的数据时，客户端才会向服务端请求。
+        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211012164423.png)
     - 协商缓存
+        - 又称对比缓存。客户端会先从缓存数据库拿到一个缓存的标识，然后向服务端验证标识是否失效，如果没有失效服务端会返回304，这样客户端可以直接去缓存数据库拿出数据，如果失效，服务端会返回新的数据
+        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211012164452.png)
+    - 强制缓存的优先级高于协商缓存，若两种缓存皆存在，且强制缓存命中目标，则协商缓存不再验证标识。
+    - 缓存的优点
+        - 减少了冗余的数据传递，节省宽带流量
+        - 减少了服务器的负担，大大提高了网站性能
+        - 加快了客户端加载网页的速度 这也正是HTTP缓存属于客户端缓存的原因。
 #### 服务器处理请求并返回HTTP报文
 请看HTTP和缓存的总结：
 - 响应
     - 状态码 
+        - 状态码是由3位数组成，第一个数字定义了响应的类别，且有五种可能取值:
+            - 1xx：指示信息–表示请求已接收，继续处理。
+            - 2xx：成功–表示请求已被成功接收、理解、接受。
+            - 3xx：重定向–要完成请求必须进行更进一步的操作。
+            - 4xx：客户端错误–请求有语法错误或请求无法实现。
+            - 5xx：服务器端错误–服务器未能实现合法的请求。
+        - 常见状态码区别
+            - 200 成功:请求成功，通常服务器提供了需要的资源。
+            - 204 无内容:服务器成功处理了请求，但没有返回任何内容。
+            - 301 永久移动:请求的网页已永久移动到新位置。 服务器返回此响应（对 GET 或 HEAD 请求的响应）时，会自动将请求者转到新位置。
+            - 302 临时移动：服务器目前从不同位置的网页响应请求，但请求者应继续使用原有位置来进行以后的请求。
+            - 304 未修改：自从上次请求后，请求的网页未修改过。 服务器返回此响应时，不会返回网页内容。
+            - 400 错误请求：服务器不理解请求的语法。
+            - 401 未授权:请求要求身份验证。 对于需要登录的网页，服务器可能返回此响应。
+            - 403 禁止:服务器拒绝请求。
+            - 404 未找到:请求格式正确，但是由于含有语义错误，无法响应
+            - 500 服务器内部错误:服务器遇到错误，无法完成请求。
     - 响应报头：响应报头字段有: Server, Connection...。
     - 响应报文：服务器请求的HTML,CSS,JS文件就放在这里面
 
@@ -4334,8 +4715,33 @@ TCP提供一种可靠的传输，这个过程涉及到三次握手，四次挥�
 - JS的解析
     - JS的解析是由浏览器的JS引擎完成的。由于JavaScript是单进程运行，也就是说一个时间只能干一件事，干这件事情时其他事情都有排队，但是有些人物比较耗时（例如IO操作），所以将任务分为同步任务和异步任务，所有的同步任务放在主线程上执行，形成执行栈，而异步任务等待，当执行栈被清空时才去看看异步任务有没有东西要搞，有再提取到主线程执行，这样往复循环，就形成了Event Loop事件循环，下面来看看大人物
 - Event Loop
-    前面的JS中有  Event Loop  这个知识点
-    
+    - JavaScript是一门单线程语言，尽管H5中提出了Web-Worker，能够模拟实现多线程，但本质上还是单线程，说它是多线程就是扯淡。
+    - 前面的JS中有  Event Loop  这个知识点
+### 性能优化
+- 性能优化原则
+    - 多使用内存、缓存或其他方法。
+    - 减少 CPU 计算量，减少网络加载耗时。
+    - 适用于所有编程的优化方法 —— 用空间来换时间。
+- 性能优化的方法
+    -  让加载更快
+        -  减少资源体积
+            - 压缩代码： 可以通过压缩代码来减少资源体积，包括 js 文件、 css 文件和图片都可以进行压缩。同时服务器端 可以通过 gzip 算法来对资源进行压缩。
+        - 减少请求次数
+            - 合并代码： 比如说我们写了三四个文件，但通过打包可能就只剩下一个文件
+            - SSR服务器端渲染：
+                - 服务端把网页和数据一起加载，一起渲染。
+                - 早期的 JSP 、ASP 、PHP，现在的 vue SSR 、React SSR
+            - 缓存
+        - 使用更快的网络
+            - 通过 CDN 
+    -  让渲染更快
+        -  html、css、js和图片层面
+            -  css 放在 head ， JS 放在 body 最下面；
+            -  懒加载（图片懒加载，上滑加载更多）。
+        - 从DOM层面
+            - 对 DOM 查询进行缓存；
+            - 从频繁进行 DOM 操作，变为合并到一起进行 DOM 结构插入；
+        - 防抖 debounce 和 节流 throttle
 ### 提高页面渲染效率
 基于上面介绍的浏览器渲染原理，DOM 和 CSSOM 结构构建顺序，初始化可以对页面渲染做些优化，提升页面性能。
     - JS优化： <script> 标签加上 defer属性 和 async属性 用于在不阻塞页面文档解析的前提下，控制脚本的下载和执行。
@@ -4597,7 +5003,7 @@ vue2.0中，响应式实现的核心就是 ES5的Object.defineProperty(obj, prop
 ### Vue2.x组件中的data为什么是一个函数？
 一个组件被复用多次的话，也就会创建多个实例。本质上，这些实例用的都是同一个构造函数。 2.如果data是对象的话，对象属于引用类型，会影响到所有的实例。所以为了保证组件不同的实例之间data不冲突，data必须是一个函数。
 
-### Vue2.x为什么v-for和v-if不建议用在一起
+### Vue2.x v-for和v-if不建议用在一起
 1. 当 v-for 和 v-if 处于同一个节点时，v-for 的优先级比 v-if 更高，这意味着 v-if 将分别重复运行于每个 v-for 循环中。如果要遍历的数组很大，而真正要展示的数据很少时，这将造成很大的性能浪费
 2. 这种场景建议使用 computed，先对数据进行过滤
 
@@ -4687,6 +5093,50 @@ keep-alive可以实现组件缓存，当组件切换时不会对当前组件进�
 keep-alive实例会缓存对应组件的VNode,如果命中缓存，直接从缓存对象返回对应VNode
 
 LRU（Least recently used）算法根据数据的历史访问记录来进行淘汰数据，其核心思想是“如果数据最近被访问过，那么将来被访问的几率也更高”。
+
+### v-if和v-show的区别
+v-show和v-if都是用来显示隐藏元素，v-if还有一个v-else配合使用，两者达到的效果都一样，性能方面去有很大的区别。
+- v-show
+    - 而 v-show 有更高的初始渲染开销。
+    - v-show不管条件是真还是假，第一次渲染的时候都会编译出来，也就是标签都会添加到DOM中。
+    - 之后切换的时候，通过display: none;样式来显示隐藏元素。可以说只是改变css的样式，几乎不会影响什么性能。
+    - 如果需要非常频繁地切换，则使用 v-show 较好；
+- v-if
+    - v-if 有更高的切换开销
+    - 在首次渲染的时候，如果条件为假，什么也不操作，页面当作没有这些元素。
+    - 当条件为真的时候，开始局部编译，动态的向DOM元素里面添加元素。当条件从真变为假的时候，开始局部编译（编译会被缓存起来），卸载这些元素，也就是删除。
+    - 如果在运行时条件很少改变，则使用 v-if 较好。
+- 性能方面
+    - v-if绝对是更消耗性能的，因为v-if在显示隐藏过程中有DOM的添加和删除，v-show就简单多了，只是操作css。
+
+- 闪烁问题
+    - 用v-if或者v-show就会出现div闪现，或者部分闪烁的结果。解决方法：可以在根元素添加v-cloak来解决，并且设置它的css样式即可。
+```js
+<style>
+/* 在引入的css文件中写入这个*/
+    [v-cloak]{
+        display: none;
+    }
+</style>
+<body>
+    <!-- 添加这个v-cloak -->
+    <div id='app' v-cloak>
+        <div v-if="isShow">
+        content
+        </div>
+    </div>
+</body>
+<script>
+    new Vue({
+        el: '#app',
+        data () {
+            return {
+                isShow: false
+            }
+        }
+    })
+</script>
+```
 ### Vue的数据为什么频繁变化但只会更新一次
 - 检测到数据变化
 - 开启一个队列
@@ -5099,6 +5549,15 @@ Vue3.x借鉴了 ivi算法和 inferno算法
 ### hash路由和history路由实现原理说一下
 - location.hash的值实际就是URL中#后面的东西。
 - history实际采用了HTML5中提供的API来实现，主要有history.pushState()和history.replaceState()。
+
+- hash 模式
+    - location.hash 的值实际就是 URL 中#后面的东西 它的特点在于：hash 虽然出现 URL 中，但不会被包含在 HTTP 请求中，对后端完全没有影响，因此改变 hash 不会重新加载页面。
+    - 可以为 hash 的改变添加监听事件
+    - `window.addEventListener("hashchange", funcRef, false);`
+    - 每一次改变 hash（window.location.hash），都会在浏览器的访问历史中增加一个记录利用 hash 的以上特点，就可以来实现前端路由“更新视图但不重新请求页面”的功能了
+- history 模式
+    - 利用了 HTML5 History Interface 中新增的 pushState() 和 replaceState() 方法。
+    - 这两个方法应用于浏览器的历史记录站，在当前已有的 back、forward、go 的基础之上，它们提供了对历史记录进行修改的功能。这两个方法有个共同的特点：当调用他们修改浏览器历史记录栈后，虽然当前 URL 改变了，但浏览器不会刷新页面，这就为单页应用前端路由“更新视图但不重新请求页面”提供了基础。
 ## Webpack Vite Rollup
 ### Webpack流程
 - webpack到底是如何对我们的项目进行打包的呢？
@@ -5174,6 +5633,34 @@ Plugin 在 plugins 中单独配置，类型为数组，每一项是一个 Plugin
 - ModuleConcatenationPlugin: 开启 Scope Hoisting
 - speed-measure-webpack-plugin: 可以看到每个 Loader 和 Plugin 执行耗时 (整个打包耗时、每个 Plugin 和 Loader 耗时)
 - webpack-bundle-analyzer: 可视化 Webpack 输出文件的体积 (业务组件、依赖第三方模块)
+
+### 是否写过Loader？简单描述一下编写loader的思路？
+Loader 支持链式调用，所以开发上需要严格遵循“单一职责”，每个 Loader 只负责自己需要负责的事情。
+
+- Loader 运行在 Node.js 中，我们可以调用任意 Node.js 自带的 API 或者安装第三方模块进行调用
+- Webpack 传给 Loader 的原内容都是 UTF-8 格式编码的字符串，当某些场景下 Loader 处理二进制文件时，需要通过 exports.raw = true 告诉 Webpack 该 Loader 是否需要二进制数据
+- 尽可能的异步化 Loader，如果计算量很小，同步也可以
+- Loader 是无状态的，我们不应该在 Loader 中保留状态
+- 使用 loader-utils 和 schema-utils 为我们提供的实用工具
+- 加载本地 Loader 方法
+    - Npm link
+    - ResolveLoader
+### 是否写过Plugin？简单描述一下编写Plugin的思路？
+webpack在运行的生命周期中会广播出许多事件，Plugin 可以监听这些事件，在特定的阶段钩入想要添加的自定义功能。Webpack 的 Tapable 事件流机制保证了插件的有序性，使得整个系统扩展性良好。
+
+- compiler 暴露了和 Webpack 整个生命周期相关的钩子
+- compilation 暴露了与模块和依赖有关的粒度更小的事件钩子
+- 插件需要在其原型上绑定apply方法，才能访问 compiler 实例
+- 传给每个插件的 compiler 和 compilation对象都是同一个引用，若在一个插件中修改了它们身上的属性，会影响后面的插件
+- 找出合适的事件点去完成想要的功能
+    - emit 事件发生时，可以读取到最终输出的资源、代码块、模块及其依赖，并进行修改(emit 事件是修改 Webpack 输出资源的最后时机)
+    - watch-run 当依赖的文件发生变化时会触发
+- 异步的事件需要在插件处理完任务时调用回调函数通知 Webpack 进入下一个流程，不然会卡住
+
+### webpack Plugin 和 Loader 的区别
+- Loader
+    - 用于对模块源码的转换，loader 描述了 webpack 如何处理非 javascript 模块，并且在 bundle 中引入这些依赖。loader 可以将文件从不同的语言（如 TypeScript）转换为 JavaScript，或者将内联图像转换为 data URL。比如说：CSS-Loader，Style-Loader 等。
+- 
 
 ### source map是什么？生产环境怎么用？
 source map 是将编译、打包、压缩后的代码映射回源代码的过程。打包压缩后的代码不具备良好的可读性，想要调试源码就需要 soucre map。map文件只要不打开开发者工具，浏览器是不会加载的。
@@ -5342,28 +5829,7 @@ VSCode 中有一个插件 Import Cost 可以帮助我们对引入模块的大小
 代码分割：用可接受的服务器性能压力增加来换取更好的用户体验。
 源代码直接上线：虽然过程可控，但是http请求多，性能开销大。
 打包成唯一脚本：一把梭完自己爽，服务器压力小，但是页面空白期长，用户体验不好。
-### 是否写过Loader？简单描述一下编写loader的思路？
-Loader 支持链式调用，所以开发上需要严格遵循“单一职责”，每个 Loader 只负责自己需要负责的事情。
 
-- Loader 运行在 Node.js 中，我们可以调用任意 Node.js 自带的 API 或者安装第三方模块进行调用
-- Webpack 传给 Loader 的原内容都是 UTF-8 格式编码的字符串，当某些场景下 Loader 处理二进制文件时，需要通过 exports.raw = true 告诉 Webpack 该 Loader 是否需要二进制数据
-- 尽可能的异步化 Loader，如果计算量很小，同步也可以
-- Loader 是无状态的，我们不应该在 Loader 中保留状态
-- 使用 loader-utils 和 schema-utils 为我们提供的实用工具
-- 加载本地 Loader 方法
-    - Npm link
-    - ResolveLoader
-### 是否写过Plugin？简单描述一下编写Plugin的思路？
-webpack在运行的生命周期中会广播出许多事件，Plugin 可以监听这些事件，在特定的阶段钩入想要添加的自定义功能。Webpack 的 Tapable 事件流机制保证了插件的有序性，使得整个系统扩展性良好。
-
-- compiler 暴露了和 Webpack 整个生命周期相关的钩子
-- compilation 暴露了与模块和依赖有关的粒度更小的事件钩子
-- 插件需要在其原型上绑定apply方法，才能访问 compiler 实例
-- 传给每个插件的 compiler 和 compilation对象都是同一个引用，若在一个插件中修改了它们身上的属性，会影响后面的插件
-- 找出合适的事件点去完成想要的功能
-    - emit 事件发生时，可以读取到最终输出的资源、代码块、模块及其依赖，并进行修改(emit 事件是修改 Webpack 输出资源的最后时机)
-    - watch-run 当依赖的文件发生变化时会触发
-- 异步的事件需要在插件处理完任务时调用回调函数通知 Webpack 进入下一个流程，不然会卡住
 ### 聊一聊Babel原理吧
 大多数JavaScript Parser遵循 estree 规范，Babel 最初基于 acorn 项目(轻量级现代 JavaScript 解析器) 。
 
@@ -5374,6 +5840,107 @@ Babel大概分为三大部分：
 - 转换：访问 AST 的节点进行变换操作生产新的 AST
     - Taro就是利用 babel 完成的小程序语法转换
 - 生成：以新的 AST 为基础生成代码
+### webpack5 和 webpack4 的区别
+1. Tree Shaking
+- webpack4.0
+tree-shaking 就可以把没有用的那些东西剔除掉，来减少最终的bundle体积。
+```js
+  // webpack.config.js中
+  module.exports = {
+     optimization: {
+       //usedExports : true, 标记没有用的叶子
+       usedExports: true, //只导出被使用的模块
+       //minimize: true, 摇掉那些没有用的叶子
+       minimize : true // 启动压缩
+     }
+  }
+```
+- webpack5.0
+webpack5的 `mode=“production”` 自动开启 `tree-shaking`。
+
+2. 压缩代码
+- webpack4
+    - `webpack4 上需要下载安装 terser-webpack-plugin 插件，并且需要以下配置`
+```js
+const TerserPlugin = require('terser-webpack-plugin')
+
+module.exports = { 
+// ...other config
+optimization: {
+  minimize: !isDev,
+  minimizer: [
+    new TerserPlugin({
+      extractComments: false, 
+      terserOptions: { 
+        compress: { 
+          pure_funcs: ['console.log'] 
+        }
+      }
+    }) ]
+ }
+```
+- webpack5
+内部本身就自带 js 压缩功能，他内置了 terser-webpack-plugin 插件，我们不用再下载安装。而且在 mode=“production” 的时候会自动开启 js 压缩功能。
+开发环境下：
+```js
+  // webpack.config.js中
+  module.exports = {
+     optimization: {
+       usedExports: true, //只导出被使用的模块
+       minimize : true // 启动压缩
+     }
+  }
+```
+
+3. webpack 缓存
+- webpack4.0
+    - `npm install hard-source-webpack-plugin -D`
+```js
+const HardSourceWebpackPlugin = require('hard-source-webpack-plugin') 
+ 
+module.exports = { 
+plugins: [
+  // 其它 plugin... 
+  new HardSourceWebpackPlugin(), 
+] }
+```
+- webpack5 缓存配置
+    - webpack5 内部内置了 cache 缓存机制。直接配置即可。
+    - cache 会在开发模式下被设置成 type： memory 而且会在生产模式把cache 给禁用掉。
+```js
+// webpack.config.js
+module.exports= {
+  // 使用持久化缓存
+  cache: {
+    // type 的可选值为： memory 使用内容缓存，filesystem 使用文件缓存。
+    type: 'filesystem'，
+    cacheDirectory: path.join(__dirname, 'node_modules/.cac/webpack')
+  }
+}
+```
+4. 对loader的优化
+- webpack 4 加载资源需要用不同的 loader
+    - raw-loader 将文件导入为字符串
+    - url-loader 将文件作为 data url 内联到 bundle文件中
+    - file-loader 将文件发送到输出目录中
+- webpack5 的资源模块类型替换 loader
+    - asset/resource 替换 file-loader(发送单独文件)
+    - asset/inline 替换 url-loader （导出 url）
+    - asset/source 替换 raw-loader（导出源代码）
+    - asset
+5. 启动服务的差别
+- webpack4 启动服务
+    - 通过 webpack-dev-server 启动服务
+- webpack5 启动服务
+    - 内置使用 webpack serve 启动，但是他的日志不是很好，所以一般都加都喜欢用 webpack-dev-server 优化。
+6. devtool的差别
+sourceMap需要在 webpack.config.js里面直接配置 devtool 就可以实现了。而 devtool有很多个选项值，不同的选项值，不同的选项产生的 .map 文件不同，打包速度不同。
+一般情况下，我们一般在开发环境配置用“cheap-eval-module-source-map”，在生产环境用‘none’。
+```js
+v4: devtool: 'cheap-eval-module-source-map'
+v5: devtool: 'eval-cheap-module-source-map'
+```
+
 ### Rollup原理
 Rollup中，一个文件就是一个模块。每一个模块都会根据文件的代码生成一个 AST 语法抽象树，Rollup 需要对每一个 AST 节点进行分析。
 
