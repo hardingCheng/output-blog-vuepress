@@ -1202,12 +1202,88 @@ border-radius: 水平半径 / 垂直半径;
 <div class="semicircle"></div>
 ```
 
-### RAF 和 RIC 是什么
+### RAF（requestAnimationFrame） 和 RIC（requestIdleCallback） 是什么
+#### 页面流畅与 FPS
+- 页面是一帧一帧绘制出来的，当每秒绘制的帧数（FPS）达到 60 时，页面是流畅的，小于这个值时，用户会感觉到卡顿。
+- 1s 60帧，所以每一帧分到的时间是 1000/60 ≈ 16 ms。所以我们书写代码时力求不让一帧的工作量超过 16ms。
+#### Frame
+览器每一帧都需要完成哪些工作？
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211013143020.png)
+- 一帧内需要完成如下六个步骤的任务：
+    - 处理用户的交互
+    - JS 解析执行
+    - 帧开始。窗口尺寸变更，页面滚去等的处理
+    - requestAnimationFrame
+    - 布局
+    - 绘制
+#### requestIdleCallback
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211013143303.png)
+- requestIdleCallback：: 会在浏览器空闲时间执行回调，也就是允许开发人员在主事件循环中执行低优先级任务，而不影响一些延迟关键事件。如果有多个回调，会按照先进先出原则执行，但是当传入了 timeout，为了避免超时，有可能会打乱这个顺序。
+- 上面六个步骤完成后没超过 16 ms，说明时间有富余(空闲时间多了)，此时就会执行 requestIdleCallback 里注册的任务。
+- 从上图也可看出，和 requestAnimationFrame 每一帧必定会执行不同，requestIdleCallback 是捡浏览器空闲来执行任务。
+
+
+```js
+requestIdleCallback(myNonEssentialWork, { timeout: 2000 });
+​
+// 任务队列
+const tasks = [
+ () => {
+   console.log("第一个任务");
+ },
+ () => {
+   console.log("第二个任务");
+ },
+ () => {
+   console.log("第三个任务");
+ },
+];
+​
+function myNonEssentialWork (deadline) {
+ // 如果帧内有富余的时间，或者超时
+ while ((deadline.timeRemaining() > 0 || deadline.didTimeout) && tasks.length > 0) {
+   work();
+ }
+​
+ if (tasks.length > 0)
+   requestIdleCallback(myNonEssentialWork);
+ }
+​
+function work () {
+ tasks.shift()();
+ console.log('执行任务');
+}
+
+// 超时的情况，其实就是浏览器很忙，没有空闲时间，此时会等待指定的 timeout 那么久再执行，通过入参 dealine 拿到的 didTmieout 会为 true，同时 timeRemaining () 返回的也是 0。超时的情况下如果选择继续执行的话，肯定会出现卡顿的，因为必然会将一帧的时间拉长。
+```
+- cancelIdleCallback
+    - 与 setTimeout 类似，返回一个唯一 id，可通过 cancelIdleCallback 来取消任务。
+#### requestAnimationFrame 
 requestAnimationFrame： 告诉浏览器在下次重绘之前执行传入的回调函数(通常是操纵 dom，更新动画的函数)；由于是每帧执行一次，那结果就是每秒的执行次数与浏览器屏幕刷新次数一样，通常是每秒 60 次。
 
-requestIdleCallback：: 会在浏览器空闲时间执行回调，也就是允许开发人员在主事件循环中执行低优先级任务，而不影响一些延迟关键事件。如果有多个回调，会按照先进先出原则执行，但是当传入了 timeout，为了避免超时，有可能会打乱这个顺序。
+在没有 requestAnimationFrame 方法的时候，执行动画，我们可能使用 setTimeout 或 setInterval 来触发视觉变化；但是这种做法的问题是：回调函数执行的时间是不固定的，可能刚好就在末尾，或者直接就不执行了，经常会引起丢帧而导致页面卡顿。
 
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211013144154.png)
+归根到底发生上面这个问题的原因在于时机，也就是浏览器要知道何时对回调函数进行响应。setTimeout 或 setInterval 是使用定时器来触发回调函数的，而定时器并无法保证能够准确无误的执行，有许多因素会影响它的运行时机，比如说：当有同步代码执行时，会先等同步代码执行完毕，异步队列中没有其他任务，才会轮到自己执行。并且，我们知道每一次重新渲染的最佳时间大约是 16.6 ms，如果定时器的时间间隔过短，就会造成 过度渲染，增加开销；过长又会延迟渲染，使动画不流畅。
 
+requestAnimationFrame 方法不同与 setTimeout 或 setInterval，它是由系统来决定回调函数的执行时机的，会请求浏览器在下一次重新渲染之前执行回调函数。无论设备的刷新率是多少，requestAnimationFrame 的时间间隔都会紧跟屏幕刷新一次所需要的时间；例如某一设备的刷新率是 75 Hz，那这时的时间间隔就是 13.3 ms（1 秒 / 75 次）。需要注意的是这个方法虽然能够保证回调函数在每一帧内只渲染一次，但是如果这一帧有太多任务执行，还是会造成卡顿的；因此它只能保证重新渲染的时间间隔最短是屏幕的刷新时间。
+
+```js
+let offsetTop = 0;
+const div = document.querySelector(".div");
+const run = () => {
+ div.style.transform = `translate3d(0, ${offsetTop += 10}px, 0)`;
+ window.requestAnimationFrame(run);
+};
+run();
+```
+
+#### 总结
+一些低优先级的任务可使用`requestIdleCallback`等浏览器不忙的时候来执行，同时因为时间有限，它所执行的任务应该尽量是能够量化，细分的微任务（micro task）。
+
+因为它发生在一帧的最后，此时页面布局已经完成，所以不建议在 requestIdleCallback 里再操作 DOM，这样会导致页面再次重绘。DOM 操作建议在 RAF 中进行。同时，操作 DOM 所需要的耗时是不确定的，因为会导致重新计算布局和视图的绘制，所以这类操作不具备可预测性。
+
+Promise 也不建议在这里面进行，因为 Promise 的回调属性 Event loop 中优先级较高的一种微任务，会在requestIdleCallback 结束时立即执行，不管此时是否还有富余的时间，这样有很大可能会让一帧超过 16 ms。
 ## JS
 ### ● 图片懒加载的原理？？？
 ### ● 箭头函数和普通函数有什么区别？如果把箭头函数转换为不用箭头函数的形式，如何转换
@@ -4462,6 +4538,15 @@ CDN 回源有 3 种情况，
 - 还有一种情况是在 CDN 管理后台或者使用开放接口主动刷新触发回源。
 
 ### 缓存
+#### 缓存有哪些好处？
+- 缓解服务器压力，不用每次都去请求某些数据了。
+- 提升性能，打开本地资源肯定会比请求服务器来的快。
+- 减少带宽消耗，当我们使用缓存时，只会产生很小的网络消耗
+#### Web缓存种类
+数据库缓存，CDN缓存，代理服务器缓存，浏览器缓存。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211013135501.png)
+所谓浏览器缓存其实就是指在本地使用的计算机中开辟一个内存区，同时也开辟一个硬盘区作为数据传输的缓冲区，然后用这个缓冲区来暂时保存用户以前访问过的信息。
+
 #### http 缓存
 浏览器缓存(Brower Caching)是浏览器对之前请求过的文件进行缓存，以便下一次访问时重复使用，节省带宽，提高访问速度，降低服务器压力
 
@@ -4469,7 +4554,6 @@ http缓存机制主要在http响应头中设定，响应头中相关字段为Exp
 - 缓存相关 header
     - Expires：响应头，代表该资源的过期时间。
     - Cache-Control：请求/响应头，缓存控制字段，精确控制缓存策略。
-    
     
     - If-Modified-Since：请求头，资源最近修改时间，由浏览器告诉服务器。
     - Last-Modified：响应头，资源最近修改时间，由服务器告诉浏览器。
@@ -4480,15 +4564,37 @@ http缓存机制主要在http响应头中设定，响应头中相关字段为Exp
     - If-Modified-Since 和 Last-Modified
     - Etag 和 If-None-Match
 
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211013140918.png)
+
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210924072012.png)
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210924074826.png)
 
 强缓存和协商缓存最大也是最根本的区别是：强缓存命中的话不会发请求到服务器（比如chrome中的200 from memory cache），协商缓存一定会发请求到服务器，通过资源的请求首部字段验证资源是否命中协商缓存，如果协商缓存命中，服务器会将这个请求返回，但是不会返回这个资源的实体，而是通知客户端可以从缓存中加载这个资源（304 not modified）
 
+#### 缓存位置
+查找浏览器缓存时会按顺序查找: Service Worker-->Memory Cache-->Disk Cache-->Push Cache。
 
+- Service Worker
+    - 是运行在浏览器背后的独立线程，一般可以用来实现缓存功能。
+    - 使用 Service Worker的话，传输协议必须为 HTTPS。
+    - 因为 Service Worker 中涉及到请求拦截，所以必须使用 HTTPS 协议来保障安全。
+    - Service Worker 的缓存与浏览器其他内建的缓存机制不同，它可以让我们自由控制缓存哪些文件、如何匹配缓存、如何读取缓存，并且缓存是持续性的。
+- Memory Cache
+    - 内存中的缓存，主要包含的是当前中页面中已经抓取到的资源，例如页面上已经下载的样式、脚本、图片等。
+    - 读取内存中的数据肯定比磁盘快，内存缓存虽然读取高效，可是缓存持续性很短，会随着进程的释放而释放。
+    - 一旦我们关闭 Tab 页面，内存中的缓存也就被释放了。
+- Disk Cache
+    - 存储在硬盘中的缓存，读取速度慢点，但是什么都能存储到磁盘中，比之 Memory Cache 胜在容量和存储时效性上。
+    - 在所有浏览器缓存中，Disk Cache 覆盖面基本是最大的。
+    - 它会根据 HTTP Herder 中的字段判断哪些资源需要缓存，哪些资源可以不请求直接使用，哪些资源已经过期需要重新请求。
+    - 并且即使在跨站点的情况下，相同地址的资源一旦被硬盘缓存下来，就不会再次去请求数据。绝大部分的缓存都来自 Disk Cache。
+- Push Cache
+    - Push Cache（推送缓存）是 HTTP/2 中的内容，当以上三种缓存都没有命中时，它才会被使用。
+    - 它只在会话（Session）中存在，一旦会话结束就被释放，并且缓存时间也很短暂，在Chrome浏览器中只有5分钟左右，同时它也并非严格执行HTTP头中的缓存指令。
 #### 强缓存
--强缓存命中返回 200 200（from cache）
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211013140918.png)
+- 强缓存命中返回 200 200（from cache）
 
 不需要发送请求到服务端，直接读取浏览器本地缓存，在 Chrome 的 Network 中显示的 HTTP 状态码是 200 ，在 Chrome 中，强缓存又分为 Disk Cache (存放在硬盘中)和 Memory Cache (存放在内存中)，存放的位置是由浏览器控制的。是否强缓存由 Expires、Cache-Control 和 Pragma 3 个 Header 属性共同来控制。
 
@@ -4511,6 +4617,10 @@ http缓存机制主要在http响应头中设定，响应头中相关字段为Exp
 
 
 #### 协商缓存
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211013142135.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211013142155.png)
+
 - 协商缓存命中返回 304
 - 请求头last-modified的日期与响应头的last-modified一致
 - 请求头if-none-match的hash与响应头的etag一致
@@ -4548,6 +4658,11 @@ ETag/If-None-Match 的出现主要解决了 Last-Modified/If-Modified-Since 所�
 ```
 #### 缓存场景
 对于大部分的场景都可以使用强缓存配合协商缓存解决，但是在一些特殊的地方可能需要选择特殊的缓存策略。
+
+#### 刷新对于强缓存和协商缓存的影响
+- 当ctrl+f5强制刷新网页时，直接从服务器加载，跳过强缓存和协商缓存。
+- 当f5刷新网页时，跳过强缓存，但是会检查协商缓存。
+- 浏览器地址栏中写入URL，回车 浏览器发现缓存中有这个文件了，不用继续请求了，直接去缓存拿。
 
 ### DNS过程
 域名解析就是将域名转换为IP地址的过程。（因为想要访问一台服务器，最终是靠IP地址访问的，而不是靠域名访问的，他们的之间的映射关系保存在本地缓存和网络上的各种域名解析服务器中）
