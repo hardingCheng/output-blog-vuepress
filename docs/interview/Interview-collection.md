@@ -281,13 +281,17 @@ element宽度＝内容宽度（width包含了元素内容宽度、边框、内�
 ```
 ### Flex
 #### flex:1
-- flex-grow（扩展量）
+- flex-grow（扩展量）定义项目的的放大比例；
     - 代表含义是对额外空间的占据量，所谓额外空间就是这一行多余的空间，有多余的空间这一属性才有用。默认值是0，意思就是即使有多余空间，它也不要
-- flex-shrink（收缩量）
+    - 默认为0，即 即使存在剩余空间，也不会放大；所有项目的flex-grow为1：等分剩余空间（自动放大占位）；flex-grow为n的项目，占据的空间（放大的比例）是flex-grow为1的n倍。
+- flex-shrink（收缩量）定义项目的缩小比例；
     - 这个属性只有在没有额外空间时起作用，意思是没有额外空间时，成员贡献出空间的大小。默认值为1，如果为0意思是不贡献空间，也就是说即使空间不足，成员大小也不发生改变。
+    - 默认为1，即 如果空间不足，该项目将缩小；
+    - 所有项目的flex-shrink为1：当空间不足时，缩小的比例相同；flex-shrink为0：空间不足时，该项目不会缩小；flex-shrink为n的项目，空间不足时缩小的比例是flex-shrink为1的n倍。
 - flex-basis
     - 表示在分配额外空间之前，成员占据的空间，默认值为auto，意思就是你本来占多少就是多少。但也可以自己设置长度(px)。这个值的效果就是确定在释放和分配空间的时候，你的初值是多少。
-
+    - 定义在分配多余空间之前，项目占据的主轴空间（main size），浏览器根据此属性计算主轴是否有多余空间
+    - 默认值为auto，即 项目原本大小；设置后项目将占据固定空间。
 ### Grid
 ### 常见布局的方案
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211009164716.png)
@@ -1197,6 +1201,12 @@ border-radius: 水平半径 / 垂直半径;
 </style>
 <div class="semicircle"></div>
 ```
+
+### RAF 和 RIC 是什么
+requestAnimationFrame： 告诉浏览器在下次重绘之前执行传入的回调函数(通常是操纵 dom，更新动画的函数)；由于是每帧执行一次，那结果就是每秒的执行次数与浏览器屏幕刷新次数一样，通常是每秒 60 次。
+
+requestIdleCallback：: 会在浏览器空闲时间执行回调，也就是允许开发人员在主事件循环中执行低优先级任务，而不影响一些延迟关键事件。如果有多个回调，会按照先进先出原则执行，但是当传入了 timeout，为了避免超时，有可能会打乱这个顺序。
+
 
 ## JS
 ### ● 图片懒加载的原理？？？
@@ -3715,7 +3725,15 @@ Webpack 中，Tree-shaking 的实现一是先标记出模块导出值中哪些�
     - 代码不会被执行，不可到达
     - 代码执行的结果不会被用到
     - 代码只会影响死变量（只写不读）
-
+### 常用设计模式有哪些并举例使用场景
+- 工厂模式 - 传入参数即可创建实例
+    - 虚拟 DOM 根据参数的不同返回基础标签的 Vnode 和组件 Vnode
+- 单例模式 - 整个程序有且仅有一个实例
+    - vuex 和 vue-router 的插件注册方法 install 判断如果系统存在实例就直接返回掉
+- 发布-订阅模式 (vue 事件机制)
+- 观察者模式 (响应式数据原理)
+- 装饰模式: (@装饰器的用法)
+- 策略模式 策略模式指对象有某个行为,但是在不同的场景中,该行为有不同的实现方案-比如选项的合并策略
 
 ## HTTP
 ### Service Worker有哪些作用
@@ -3988,18 +4006,24 @@ ping命令是使用的网络层协议ICMP
 
 如果是三次的话，那么服务端的 ACK 和 FIN 合成一个挥手，那么长时间的延迟可能让 TCP 一位 FIN 没有达到服务器端，然后让客户的不断的重发 FIN
 
-### TCP 滑动窗口
-在 TCP 链接中，对于发送端和接收端而言，TCP 需要把发送的数据放到发送缓存区, 将接收的数据放到接收缓存区。而经常会存在发送端发送过多，而接收端无法消化的情况，所以就需要流量控制，就是在通过接收缓存区的大小，控制发送端的发送。如果对方的接收缓存区满了，就不能再继续发送了。而这种流量控制的过程就需要在发送端维护一个发送窗口，在接收端维持一个接收窗口。
-TCP 滑动窗口分为两种: 发送窗口和接收窗口。
-
 ### UDP和TCP的区别及应用场景
+#### TCP和UDP的区别
+- TCP是面向链接的，而UDP是面向无连接的。
+- TCP仅支持单播传输，UDP 提供了单播，多播，广播的功能。
+- TCP的三次握手保证了连接的可靠性; UDP是无连接的、不可靠的一种数据传输协议，首先不可靠性体现在无连接上，通信都不需要建立连接，对接收到的数据也不发送确认信号，发送端不知道数据是否会正确接收。
+- UDP的头部开销比TCP的更小，数据传输速率更高，实时性更好。
+
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922215122.png)
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922215218.png)
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922215348.png)
 
-### TCP 拥塞机制
+#### TCP 滑动窗口
+在 TCP 链接中，对于发送端和接收端而言，TCP 需要把发送的数据放到发送缓存区, 将接收的数据放到接收缓存区。而经常会存在发送端发送过多，而接收端无法消化的情况，所以就需要流量控制，就是在通过接收缓存区的大小，控制发送端的发送。如果对方的接收缓存区满了，就不能再继续发送了。而这种流量控制的过程就需要在发送端维护一个发送窗口，在接收端维持一个接收窗口。
+TCP 滑动窗口分为两种: 发送窗口和接收窗口。
+
+#### TCP 拥塞机制
 原因是有可能整个网络环境特别差，容易丢包，那么发送端就应该注意了。
 
 
@@ -4464,6 +4488,8 @@ http缓存机制主要在http响应头中设定，响应头中相关字段为Exp
 
 
 #### 强缓存
+-强缓存命中返回 200 200（from cache）
+
 不需要发送请求到服务端，直接读取浏览器本地缓存，在 Chrome 的 Network 中显示的 HTTP 状态码是 200 ，在 Chrome 中，强缓存又分为 Disk Cache (存放在硬盘中)和 Memory Cache (存放在内存中)，存放的位置是由浏览器控制的。是否强缓存由 Expires、Cache-Control 和 Pragma 3 个 Header 属性共同来控制。
 
 - Expires
@@ -4482,7 +4508,14 @@ http缓存机制主要在http响应头中设定，响应头中相关字段为Exp
     - Pragma 和 Cache-Control 同时存在的时候，Pragma 的优先级高于 Cache-Control。
     - 因为它优先级最高，当存在时一定不会命中强缓存。
 
+
+
 #### 协商缓存
+- 协商缓存命中返回 304
+- 请求头last-modified的日期与响应头的last-modified一致
+- 请求头if-none-match的hash与响应头的etag一致
+    - 这两种情况会返回Status Code: 304
+
 当浏览器的强缓存失效的时候或者请求头中设置了不走强缓存，并且在请求头中设置了If-Modified-Since 或者 If-None-Match 的时候，会将这两个属性值到服务端去验证是否命中协商缓存，如果命中了协商缓存，会返回 304 状态，加载浏览器缓存，并且响应头会设置 Last-Modified 或者 ETag 属性。
 
 -  ETag/If-None-Match
@@ -4983,10 +5016,10 @@ Vue是一个典型的MVVM框架，模型（Model）只是普通的javascript对�
 - Compile（指令解析器）: Compile主要做的事情是解析模板指令，将模板中变量替换成数据，然后初始化渲染页面视图，并将每个指令对应的节点绑定更新函数，添加鉴定数据的订阅者，一旦数据有变动，收到通知，更新试图
 
 ### Vue2.x响应式原理
+- 响应式的主要原理是数据劫持和观察者模式
+- vue2.0中，响应式实现的核心就是 ES5的Object.defineProperty(obj, prop, descriptor). 通过Object.defineProperty()劫持data和props各个属性的getter和setter，getter做依赖收集，setter派发更新。整体来说是一个 数据劫持 + 发布-订阅者模式。
+
 vue 初始化时会用Object.defineProperty()给data中每一个属性添加getter和setter，同时创建dep和watcher进行依赖收集与派发更新，最后通过diff算法对比新老vnode差异，通过patch即时更新DOM
-
-
-vue2.0中，响应式实现的核心就是 ES5的Object.defineProperty(obj, prop, descriptor). 通过Object.defineProperty()劫持data和props各个属性的getter和setter，getter做依赖收集，setter派发更新。整体来说是一个 数据劫持 + 发布-订阅者模式。
 
 
 具体来说， ① vue初始化阶段(beforeCreate之后create之前)，遍历data/props，调用Object.defineProperty给每个属性加上getter、setter。② 每个组件、每个computed都会实例化一个watcher（当然也包括每个自定义watcher），订阅渲染/计算所用到的所用data/props/computed，一旦数据发生变化，setter被调用，会通知渲染watcher重新计算、更新组件。
@@ -5510,6 +5543,18 @@ Proxy只会代理对象的第一层。
 
 监测数组的时候可能触发多次get/set，那么如何防止触发多次呢？
 我们可以判断key是否为当前被代理对象target自身属性，也可以判断旧值与新值是否相等，只有满足以上两个条件之一时，才有可能执行trigger。
+
+
+- Vue3 数据劫持底层主要是使用 ES6 的 Proxy 实现。
+    - Proxy 的优势如下:
+        - Proxy 可以直接监听对象（const proxy = new Proxy(target, handler)）；defineProperty 需要遍历对象属性进行监听。
+        - Proxy 可以直接监听对象新增的属性；defineProperty 只能劫持一开始就存在的属性，新增属性需要手动 Observer。
+        - Proxy 可以直接监听数组的变化；defineProperty 无法监听数组的变化。
+        - Proxy 有多达 13 种拦截方法：不限于 get、set、has、deleteProperty、apply、ownKeys、construct 等等；除开 get 和 set 其他都是 defineProperty 不具备的。
+        - Proxy 返回的是一个新对象，我们可以只操作新的对象达到目的；defineProperty 只能遍历对象属性直接修改；
+    - Proxy 的劣势如下:
+        - ES6 的 Proxy 的存在浏览器兼容性问题。
+        - Proxy 和 Reflect 结合实现 Vue3 底层数据劫持原理。Reflect 设计的目的是为了优化 Object 的一些操作方法以及合理的返回 Object 操作返回的结果，对于一些命令式的 Object 行为，Reflect 对象可以将其变为函数式的行为。比如 （'name' in obj） = Reflect.has(obj, 'name')
 ### Vue3.0的diff算法
 Vue3.x借鉴了 ivi算法和 inferno算法
 在创建VNode时就确定其类型，以及在mount/patch的过程中采用位运算来判断一个VNode的类型，在这个基础之上再配合核心的Diff算法
@@ -5558,6 +5603,20 @@ Vue3.x借鉴了 ivi算法和 inferno算法
 - history 模式
     - 利用了 HTML5 History Interface 中新增的 pushState() 和 replaceState() 方法。
     - 这两个方法应用于浏览器的历史记录站，在当前已有的 back、forward、go 的基础之上，它们提供了对历史记录进行修改的功能。这两个方法有个共同的特点：当调用他们修改浏览器历史记录栈后，虽然当前 URL 改变了，但浏览器不会刷新页面，这就为单页应用前端路由“更新视图但不重新请求页面”提供了基础。
+### vue-router 中路由方法 pushState 和 replaceState 能否触发 popSate 事件
+- 不能
+- HTML5 新接口，可以改变网址(存在跨域限制)而不刷新页面，这个强大的特性后来用到了单页面应用
+- 仅改变网址,网页不会真的跳转,也不会获取到新的内容,本质上网页还停留在原页面
+```js
+window.history.pushState(state, title, targetURL);
+@状态对象：传给目标路由的信息,可为空
+@页面标题：目前所有浏览器都不支持,填空字符串即可
+@可选url：目标url，不会检查url是否存在，且不能跨域。如不传该项,即给当前url添加data
+
+window.history.replaceState(state, title, targetURL);
+@类似于pushState,但是会直接替换掉当前url,而不会在history中留下记录
+```
+- popstate 事件会在点击后退、前进按钮(或调用 history.back()、history.forward()、history.go()方法)时触发
 ## Webpack Vite Rollup
 ### Webpack流程
 - webpack到底是如何对我们的项目进行打包的呢？
@@ -5832,14 +5891,16 @@ VSCode 中有一个插件 Import Cost 可以帮助我们对引入模块的大小
 
 ### 聊一聊Babel原理吧
 大多数JavaScript Parser遵循 estree 规范，Babel 最初基于 acorn 项目(轻量级现代 JavaScript 解析器) 。
+Babel 是一个 JavaScript 编译器。他把最新版的 javascript 编译成当下可以执行的版本，简言之，利用 babel 就可以让我们在当前的项目中随意的使用这些新最新的 es6，甚至 es7 的语法。
 
-Babel大概分为三大部分：
+
+Babel大概分为三大部分：解析（parse），转换（transform），生成（generate）。
 - 解析：将代码转换成 AST
-    - 词法分析：将代码(字符串)分割为token流，即语法单元成的数组
-    - 语法分析：分析token流(上面生成的数组)并生成 AST
+    - 将代码解析成抽象语法树（AST），每个 js 引擎（比如 Chrome 浏览器中的 V8 引擎）都有自己的 AST 解析器，而 Babel 是通过 Babylon 实现的。在解析过程中有两个阶段：词法分析和语法分析，词法分析阶段把字符串形式的代码转换为令牌（tokens）流，令牌类似于 AST 中节点；而语法分析阶段则会把一个令牌流转换成 AST 的形式，同时这个阶段会把令牌中的信息转换成 AST 的表述结构。
 - 转换：访问 AST 的节点进行变换操作生产新的 AST
-    - Taro就是利用 babel 完成的小程序语法转换
+    - 在这个阶段，Babel 接受得到 AST 并通过 babel-traverse 对其进行深度优先遍历，在此过程中对节点进行添加、更新及移除操作。这部分也是 Babel 插件介入工作的部分。
 - 生成：以新的 AST 为基础生成代码
+    - 将经过转换的 AST 通过 babel-generator 再转换成 js 代码，过程就是深度优先遍历整个 AST，然后构建可以表示转换后代码的字符串。
 ### webpack5 和 webpack4 的区别
 1. Tree Shaking
 - webpack4.0
@@ -5977,6 +6038,69 @@ Vite 的热加载原理，其实就是在客户端与服务端建立了一个 we
 Webpack 之所以慢，是因为 Webpack 会将许多资源构成一个或者多个 bundle 。当我们修改模块中的一个子模块b.js，整个bundle.js 都需要重新打包，随着项目规模的扩大，重新打包(热更新)的时间越来越长。
 
 跳过打包的过程，当需要某个模块时再通过请求去获取。Vite 一个由原生 ES Module（esbuild 是一个全新的js打包工具，支持如babel, 压缩等的功能）驱动的 Web 开发构建工具，完全做到按需加载。
+
+### ES6 Module和Commonjs区别
+
+#### commonjs 使用与原理
+
+在使用  规范下，有几个显著的特点。
+
+- 在 `commonjs` 中每一个 js 文件都是一个单独的模块，我们可以称之为 module；
+- 该模块中，包含 CommonJS 规范的核心变量: exports、module.exports、require；
+- exports 和 module.exports 可以负责对模块中的内容进行导出；
+- require 函数可以帮助我们导入其他模块（自定义模块、系统模块、第三方库模块）中的内容；
+
+----------------------------------------------------------------------------------------------------
+
+- 在当前目录下的 `node_modules` 目录查找。
+- 如果没有，在父级目录的 `node_modules` 查找，如果没有在父级目录的父级目录的 `node_modules` 中查找。
+- 沿着路径向上递归，直到根目录下的 `node_modules` 目录。
+- 在查找过程中，会找 `package.json` 下 main 属性指向的文件，如果没有  `package.json` ，在 node 环境下会以此查找 `index.js` ，`index.json` ，`index.node`。
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210831134529.png" style="zoom:33%;" />
+
+
+#### common.js 和 es6 中模块
+CommonJS 是一种模块规范，最初被应用于 Nodejs，成为 Nodejs 的模块规范。运行在浏览器端的 JavaScript 由于也缺少类似的规范，在 ES6 出来之前，前端也实现了一套相同的模块规范 (例如: AMD)，用来对前端模块进行管理。自 ES6 起，引入了一套新的 ES6 Module 规范，在语言标准的层面上实现了模块功能，而且实现得相当简单，有望成为浏览器和服务器通用的模块解决方案。
+
+1. `ES6 Module`静态引入，编译时引入
+2. `Commonjs`动态引入，执行时引入
+3. 只有`ES6 Module`才能静态分析，实现`Tree-Shaking`
+4. CommonJS 模块输出的是一个值的拷贝，ES6 模块输出的是值的引用。
+5. CommonJS 模块是运行时加载，ES6 模块是编译时输出接口（静态编译）。
+6. CommonJs 是单个值导出，ES6 Module 可以导出多个
+7. CommonJs 是动态语法可以写在判断里，ES6 Module 静态语法只能写在顶层
+8. CommonJs 的 this 是当前模块，ES6 Module 的 this 是 undefined
+
+
+
+```js
+//Commonjs
+let apiList = require('../config/api.js')
+if(isDev) {
+ // 动态也引入执行时引入
+ apiList = require('../config/api.js')
+}
+
+//ES6 Module
+import apiList form '../config/api.js'
+if(isDev) {
+ // 编译时报错，只能静态引入
+ import apiList from '../config/api_dev.js'
+}
+```
+
+`Scope Hosting`:(作用域托管)
+
+```js
+// hello.js
+export default 'hello'
+
+// main.js
+import str from './hello.js'
+console.log(str)
+```
+
+
 ## 工具
 ### Git
 #### Git 的工作区域和流程
