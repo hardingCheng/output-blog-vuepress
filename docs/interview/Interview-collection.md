@@ -1,5 +1,14 @@
 # 根据各路大佬面经+自己的心得
 ## HTML
+### DOCTYPE及作用
+`<!DOCTYPE html>`
+- 概念
+    - DTD（document type definition，文档类型定义）声明于文档最前面，用来定义XML或（X）HTML的文件类型。浏览器会使用它来判断文档类型，并根据这个判断决定用什么引擎来解析和渲染他们。
+- 解析引擎的两种模式
+    - 解析引擎有严格模式和混杂模式。严格模式的排版和 JS 运作模式是 以该浏览器支持的最高标准运行。混杂模式，向后兼容，模拟老式浏览器，防止浏览器无法兼容页面。
+- DOCTYPE的作用
+    - DOCTYPE是用来声明文档类型和DTD规范的，其作用一是文件的合法性验证。如果文件代码不合法，那么浏览器解析时会出一些错误。二是浏览器会使用它来判断文档类型，并根据这个判断决定用什么引擎来解析和渲染他们。
+
 ### html 标签的一些共有的属性有哪些？
 - id属性
     - id属性是标签的唯一标识，每个标签的id属性的值必须是唯一的。
@@ -1434,6 +1443,8 @@ student.arrowDoSth2(); // 'window'
 ```
 ‌**原型**:  在 JS 中，每当定义一个对象（函数也是对象）时，对象中都会包含一些预定义的属性。其中每个函数对象都有一个prototype 属性，这个属性指向函数的原型对象。
 
+通过这种方式，所有的实例都可以访问到这个方法，并且这个方法只需要占用一份内存，节省内存，this 的指向还能正确指向类的实例。
+
 **原型链**：（各个原型之间构成的链，我们称之为原型链。）如果试图引用对象(实例instance)的某个属性,会首先在对象内部寻找该属性,直至找不到,然后才在该对象的原型(instance.prototype)里去找这个属性.如果还找不到则往原型的原型上找，这样一个层层查找形成的一个链式的关系被称为原型链。）
 
 当在一个对象 obj 上访问某个属性时，如果不存在于 obj，那么便会去对象的原型也就是 obj.__proto__ 上去找这个属性。如果有则返回这个属性，没有则去对象 obj 的原型的原型也就是 obj.__proto__.__proto__去找，重复以上步骤。一直到访问纯对象的原型也就是 Object.prototype，没有的话续往上找也就是 Object.prototype.__proto__，其实就是 null，直接返回 undefined。
@@ -1462,10 +1473,63 @@ student.arrowDoSth2(); // 'window'
 - 使用原型对象的好处是可以让所有对象实例共享它所包含的属性和方法。
 - 最主要的就是节省内存，如果属性和方法定义在原型上，那么所有的实例对象就能共享。
 
-### __proto__和prototype的区别和关系?
-- js 每个对象都会拥有`prototype`属性的。这个属性指向一个对象，这个对象的所有属性和方法都会被构造函数的实例所继承。
+### 构造函数、原型和原型链
+- 每一个函数对象都有一个prototype属性，指向函数对象的原型，原型对象上有一个constructor属性指向构造函数本身。
+- 引用类型 constructor 属性值是可以修改的，但是对于基本类型来说是只读的，当然 null 和 undefined 没有 constructor 属性。
+- __proto__ 属性在 ES6 时被标准化，但因为性能问题并不推荐使用，推荐使用 Object.getPrototypeOf()。
+- __proto__ 是每个实例上都有的属性，prototype 是构造函数的属性，在实例上并不存在，所以这两个并不一样，但 foo.__proto__ 和 Foo.prototype 指向同一个对象。
+- 每个对象拥有一个原型对象，通过__proto__指针指向上一个原型 ，并从中继承方法和属性，同时原型对象也可能拥有原型，这样一层一层，最终指向 null，这就是原型链。
+
+
+- js 每个对象都会拥有`__proto__`属性的。这个属性指向原型对象，这个对象的所有属性和方法都会被构造函数的实例所继承。
 - 实例都包含一个指向构造函数的`原型对象`的`__proto__`内部指针。。
-- 实例都会有一个`constructor`属性去指向它的构造函数s
+- 实例都会有一个`constructor`属性去指向它的构造函数
+- 在原型对象中使用`.constructor`（构造器）属性来区分，我这个原型对象被那个构造函数引用了。所有原型对象都会自动获得一个constructor（构造函数）属性，这个属性是一个指向prototype属性所在函数的指针。
+### Function、Object、null等等的关系和鸡蛋问题
+每个JS对象一定对应一个原型对象，并从原型对象继承属性和方法。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211014094614.png)
+原型链的尽头指向null，那么Function.prototype、Object.prototype、null、Function.prototype.__proto__、Object.prototype.__proto__、function、object之间的关系是什么。
+
+- 原型链的尽头（root）是Object.prototype。所有对象均从Object.prototype继承属性。
+    - Object/Array/String等等构造函数本质上和Function一样，均继承于Function.prototype。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211014100423.png)
+- Function.prototype和Function.__proto__为同一对象。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211014101327.png)
+- Function.prototype直接继承root（Object.prototype）。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211014101357.png)
+- 通过这点我们可以弄清 继承的原型链：Object.prototype(root)<---Function.prototype<---Function|Object|Array...
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211014101415.png)
+
+
+- Function.prototype是个不同于一般函数（对象）的函数（对象）。
+    - Function.prototype像普通函数一样可以调用，但总是返回undefined。
+    - 普通函数实际上是Function的实例，即普通函数继承于Function.prototype。func.__proto__ === Function.prototype。
+    - Function.prototype继承于Object.prototype，并且没有prototype这个属性。func.prototype是普通对象，Function.prototype.prototype是null。
+    - 所以，Function.prototype其实是个另类的函数，可以独立于/先于Function产生。
+- Object本身是个（构造）函数，是Function的实例，即Object.__proto__就是Function.prototype。
+- 先有Object.prototype（原型链顶端），Function.prototype继承Object.prototype而产生，最后，Function和Object和其它构造函数继承Function.prototype而产生。
+
+
+### __proto__和prototype的区别和关系?
+JS正是通过__proto__和prototype的合作实现了原型链，以及对象的继承。
+- 对象__proto__属性的值就是它所对应的原型对象
+```js
+var one = {x: 1};
+var two = new Object();
+one.__proto__ === Object.prototype // true
+two.__proto__ === Object.prototype // true
+one.toString === one.__proto__.toString // true
+```
+首先来说说prototype属性，不像每个对象都有__proto__属性来标识自己所继承的原型，只有函数才有prototype属性。
+为什么只有函数才有prototype属性？ES规范就这么定的。
+当你创建函数时，JS会为这个函数自动添加prototype属性。
+构造函数，通过prototype来存储要共享的属性和方法。而一旦你把这个函数当作构造函数（constructor）调用（即通过new关键字调用），那么JS就会帮你创建该构造函数的实例，实例继承构造函数prototype的所有属性和方法（实例通过设置自己的__proto__指向承构造函数的prototype来实现这种继承）。
+对象的__proto__指向自己构造函数的prototype。obj.__proto__.__proto__...的原型链由此产生，包括我们的操作符instanceof正是通过探测obj.__proto__.__proto__... === Constructor.prototype来验证obj是否是Constructor的实例。
+
+
+- js 每个对象都会拥有`prototype`属性的。这个属性指向原型对象，这个对象的所有属性和方法都会被构造函数的实例所继承。
+- 实例都包含一个指向构造函数的`原型对象`的`__proto__`内部指针。。
+- 实例都会有一个`constructor`属性去指向它的构造函数
 - 在原型对象中使用`.constructor`（构造器）属性来区分，我这个原型对象被那个构造函数引用了。所有原型对象都会自动获得一个constructor（构造函数）属性，这个属性是一个指向prototype属性所在函数的指针。
 
 ```js
