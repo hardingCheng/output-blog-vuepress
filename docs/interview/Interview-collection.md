@@ -89,6 +89,24 @@
     - async-script 可能在 DOMContentLoaded 触发之前或之后执行，但一定在 load 触发之前执行。
 
 ## CSS
+### 清除浮动
+BFC 清除浮动
+```css
+.parent {
+    overflow: hidden;
+}
+```
+clear 清除浮动
+```css
+.clearfix {
+    zoom: 1;
+}
+.clearfix::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+```
 ### .position有几种，分别描述？
 - static（静态定位）
     - 对象遵循标准文档流中，top, right, bottom, left 等属性失效。
@@ -289,6 +307,22 @@ element高度＝内容高度（height包含了元素内容宽度、边框、内�
 element宽度＝内容宽度（width包含了元素内容宽度、边框、内距）
 ```
 ### Flex
+Flex 是 Flexible Box 的缩写，意为"弹性布局",用来为盒状模型提供最大的灵活性。指定容器 display: flex 即可。 简单的分为容器属性和元素属性。
+- 容器的属性：
+    - flex-direction：决定主轴的方向（即子 item 的排列方法）flex-direction: row | row-reverse | column | column-reverse;
+    - flex-wrap：决定换行规则 flex-wrap: nowrap | wrap | wrap-reverse;
+    - flex-flow： .box { flex-flow: || ; }
+    - justify-content：对其方式，水平主轴对齐方式
+    - align-items：对齐方式，竖直轴线方向
+    - align-content
+- 项目的属性（元素的属性）：
+    - order 属性：定义项目的排列顺序，顺序越小，排列越靠前，默认为 0
+    - flex-grow 属性：定义项目的放大比例，即使存在空间，也不会放大
+    - flex-shrink 属性：定义了项目的缩小比例，当空间不足的情况下会等比例的缩小，如果 定义个 item 的 flow-shrink 为 0，则为不缩小
+    - flex-basis 属性：定义了在分配多余的空间，项目占据的空间。
+    - flex：是 flex-grow 和 flex-shrink、flex-basis 的简写，默认值为 0 1 auto。
+    - align-self：允许单个项目与其他项目不一样的对齐方式，可以覆盖
+    - align-items，默认属 性为 auto，表示继承父元素的 align-items 比如说，用 flex 实现圣杯布局
 #### flex:1
 - flex-grow（扩展量）定义项目的的放大比例；
     - 代表含义是对额外空间的占据量，所谓额外空间就是这一行多余的空间，有多余的空间这一属性才有用。默认值是0，意思就是即使有多余空间，它也不要
@@ -2019,19 +2053,6 @@ Reflect.ownKeys(myClass.prototype)
 
 当在程序创建一个对象时，这个对象将被保存到运行时数据区中，以便反复利用（因为对象的创建成本通常较大），这个运行时数据区就是堆内存。堆内存中的对象不会随方法的结束而销毁，即使方法调用结束后，只要这个对象还可能被另一个变量所引用，则这个对象就不会被销毁；只有当一个对象没有被任何变量引用它时，系统的垃圾回收机制才会回收它。
 
-### JS垃圾回收机制
-1. 项目中，如果存在大量不被释放的内存（堆/栈/上下文），页面性能会变得很慢。当某些代码操作不能被合理释放，就会造成内存泄漏。我们尽可能减少使用闭包，因为它会消耗内存。
-2. 浏览器垃圾回收机制/内存回收机制:
-   > 浏览器的`Javascript`具有自动垃圾回收机制(`GC:Garbage Collecation`)，垃圾收集器会定期（周期性）找出那些不在继续使用的变量，然后释放其内存。
-
-   **标记清除**:在`js`中，最常用的垃圾回收机制是标记清除：当变量进入执行环境时，被标记为“进入环境”，当变量离开执行环境时，会被标记为“离开环境”。垃圾回收器会销毁那些带标记的值并回收它们所占用的内存空间。
-    **谷歌浏览器**：“查找引用”，浏览器不定时去查找当前内存的引用，如果没有被占用了，浏览器会回收它；如果被占用，就不能回收。
-    **IE浏览器**：“引用计数法”，当前内存被占用一次，计数累加1次，移除占用就减1，减到0时，浏览器就回收它。
-3. 优化手段：内存优化 ; 手动释放：取消内存的占用即可。
-   （1）堆内存：fn = null 【null：空指针对象】
-   （2）栈内存：把上下文中，被外部占用的堆的占用取消即可。
-4. 内存泄漏
-   在 JS 中，常见的内存泄露主要有 4 种,全局变量、闭包、DOM 元素的引用、定时器
 ### 判断数据类型的方法
 typeof可以检测变量的数据类型，返回如下6种字符串number、string、boolean、object、undefined、function。
 ```js
@@ -2119,6 +2140,33 @@ new Date instanceof Date; // true
         // expected output: true
     ```
     
+### JS垃圾回收机制
+1. 项目中，如果存在大量不被释放的内存（堆/栈/上下文），页面性能会变得很慢。当某些代码操作不能被合理释放，就会造成内存泄漏。我们尽可能减少使用闭包，因为它会消耗内存。
+2. 浏览器垃圾回收机制/内存回收机制:
+   > 浏览器的`Javascript`具有自动垃圾回收机制(`GC:Garbage Collecation`)，垃圾收集器会定期（周期性）找出那些不在继续使用的变量，然后释放其内存。
+
+   **标记清除**:在`js`中，最常用的垃圾回收机制是标记清除：当变量进入执行环境时，被标记为“进入环境”，当变量离开执行环境时，会被标记为“离开环境”。垃圾回收器会销毁那些带标记的值并回收它们所占用的内存空间。
+    **谷歌浏览器**：“查找引用”，浏览器不定时去查找当前内存的引用，如果没有被占用了，浏览器会回收它；如果被占用，就不能回收。
+    **IE浏览器**：“引用计数法”，当前内存被占用一次，计数累加1次，移除占用就减1，减到0时，浏览器就回收它。
+3. 优化手段：内存优化 ; 手动释放：取消内存的占用即可。
+   （1）堆内存：fn = null 【null：空指针对象】
+   （2）栈内存：把上下文中，被外部占用的堆的占用取消即可。
+4. 内存泄漏
+   在 JS 中，常见的内存泄露主要有 4 种,全局变量、闭包、DOM 元素的引用、定时器
+
+### 创建对象有几种方法
+```js
+// 第一种：字面量
+var o1 = {name: "o1"}
+var o2 = new Object({name: "o2"})
+// 第二种：通过构造函数
+var M = function(name){this.name = name}
+var o3 = new M("o3")
+// 第三种：Object.create()
+var p = {name: "p"}
+var o4 = Object.create(p)
+```
+
 ### 判断一个对象是不是可迭代的,判断一个对象是否为空
 - 判断一个对象是不是可迭代的
     - **每个可迭代对象必然包含一个 [Symbol.iterator]  方法属性**
@@ -2258,6 +2306,22 @@ const compose = (...fns) => {
 }
 ```
 ### var、let 和 const 有什么区别
+- 三者的区别
+    - 区别1
+        - var定义的变量，没有块的概念，可以跨块访问, 不能跨函数访问。
+        - let定义的变量，只能在块作用域里访问，不能跨块访问，也不能跨函数访问。
+        - const用来定义常量，使用时必须初始化(即必须赋值)，只能在块作用域里访问，且不能修改。
+    - 区别2
+        - var可以先使用，后声明，因为存在变量提升；let必须先声明后使用。
+        - var是允许在相同作用域内重复声明同一个变量的，而let与const不允许这一现象。
+        - 在全局上下文中，基于let声明的全局变量和全局对象GO（window）没有任何关系 ;var声明的变量会和GO有映射关系；
+    - 区别3
+        - 解决暂时性死区
+            - 如果区块中存在 let 和 const 命令，这个区块对这些命令声明的变量，从一开始就形成了封闭作用域。假如我们尝试在声明前去使用这类变量，就会报错。
+            - 当我们进入当前作用域时，let 或者 const 声明的变量已经存在了——它们只是不允许被获取而已。要想获取它们，必须得等到代码执行到声明处。
+        - let /const/function会把当前所在的大括号(除函数之外)作为一个全新的块级上下文，应用这个机制，在开发项目的时候，遇到循环事件绑定等类似的需求，无需再自己构建闭包来存储，只要基于let的块作用特征即可解决
+
+
 1. var
 在ES5中，顶层对象的属性和全局变量是等价的，用`var`声明的变量既是全局变量，也是顶层变量。
 注意：顶层对象，在浏览器环境指的是`window`对象，在`Node`指的是`global`对象。
@@ -2753,218 +2817,6 @@ $event.emit("fn1", "fn1参数2", "参数3", "参数4");
 
 ```
 
-### JS 实现异步的 5 种方式
-- 回调函数（Callback）
-    - 回调函数有一个致命的弱点，就是容易写出回调地狱（Callback hell）。
-    - 回调函数的优点是简单、容易理解和实现，缺点是不利于代码的阅读和维护，各个部分之间高度耦合，使得程序结构混乱、流程难以追踪
-    - 此外它不能使用 try catch 捕获错误，不能直接 return。
-```js
-ajax(url, () => {
-    // 处理逻辑
-    ajax(url1, () => {
-        // 处理逻辑
-        ajax(url2, () => {
-            // 处理逻辑
-        })
-    })
-})
-```
-
-- 发布订阅
-    - 存在一个"信号中心"，某个任务执行完成，就向信号中心"发布"（publish）一个信号，其他任务可以向信号中心"订阅"（subscribe）这个信号，从而知道什么时候自己可以开始执行。这就叫做"发布/订阅模式"（publish-subscribe pattern），又称"观察者模式"（observer pattern）。
-    - 有家外卖，你可以点外卖，这就是订阅，当你的外卖做好了，就会有人给你打电话叫你去取外卖，这就是发布
-```js
-class EventEmitter {
-  constructor(defaultMaxListeners = 50) {
-    this.defaultMaxListeners = defaultMaxListeners;
-    this.listener = {};
-  }
-
-  // 订阅
-  on(eventName, fn) {
-    if (!this.listener[eventName]) {
-      this.listener[eventName] = [];
-    }
-    if (this.listener[eventName].length >= this.defaultMaxListeners) {
-      throw `${eventName}超出最大监听${this.defaultMaxListeners}个数限制`;
-    }
-    this.listener[eventName].push(fn);
-  }
-
-  // 取消
-  off(eventName, fn) {
-    let callBacks = this.listener[eventName];
-    if (!callBacks) {
-      return false;
-    }
-    if (!fn) {
-      callBacks = [];
-    } else {
-      let cb;
-      for (let i = 0; i < callBacks.length; i++) {
-        cb = callBacks[i];
-        if (cb === fn || cb.fn === fn) {
-          callBacks.splice(i, 1);
-          i--;
-        }
-      }
-    }
-  }
-
-  // 监听一次
-  once(eventName, fn) {
-    const on = (...args) => {
-      this.off(eventName, on);
-      fn.apply(this, ...args);
-    };
-    // 取消订阅使用
-    on.fn = fn;
-    this.on(eventName, on);
-  }
-
-  // 发布
-  emit(eventName, ...args) {
-    const callBackFn = this.listener[eventName] || [];
-    if (callBackFn.length === 0) {
-      throw `${eventName}不存在`;
-    }
-    callBackFn.forEach((fn) => {
-      fn(args);
-    });
-  }
-}
-
-const $event = new EventEmitter();
-
-function fn1(...args) {
-  console.log("fn111111", ...args);
-}
-function fn2(...args) {
-  console.log("fn2", ...args);
-}
-
-$event.once("fn1", fn2);
-
-// $event.on("fn1", fn1);
-// $event.on("fn1", fn1);
-// $event.on("fn1", fn2);
-
-// $event.on("fn1", fn1);
-// // event.off("fn1", fn1);
-// $event.on("fn2", fn1);
-// $event.on("fn3", fn1);
-// $event.on("fn4", fn1);
-
-$event.emit("fn1", "fn1参数2", "参数3", "参数4");
-// $event.emit("fn1", "fn2 fn2");
-
-```
-- Promise对象
-    - Promise对象是异步编程的一种解决方案，比传统的回调函数和事件更合理更强大。
-    - Promise，简单说就是一个容器，里面保存着某个未来才会结束的事件的结果，相比回调函数，Promise提供统一的API，各种异步操作都可以用同样的方法进行处理。 
-    - Promise对象有三种状态:pending(进行中)，fulfilled(已成功)，rejected(已失败)
-    - 一旦状态改变，就不再变化，任何时候都可以得到这个结果。
-```js
-let p = new Promise((resolve, reject) => {
-  reject('reject')
-  resolve('success')//无效代码不会执行
-})
-p.then(
-  value => {
-    console.log(value)
-  },
-  reason => {
-    console.log(reason)//reject
-  }
-)
-```
-    - promise的链式调用
-        - 每次调用返回的都是一个新的Promise实例(这就是then可用链式调用的原因)
-        - 如果then中返回的是一个结果的话会把这个结果传递下一次then中的成功回调
-        - 如果then中出现异常,会走下一个then的失败回调
-        - 在 then中使用了return，那么 return 的值会被Promise.resolve() 包装(见例1，2)
-        - then中可以不传递参数，如果不传递会透到下一个then中(见例3)
-        - catch 会捕获到没有捕获的异常
-```js
-  // 例1
-  Promise.resolve(1)
-  .then(res => {
-    console.log(res)
-    return 2 //包装成 Promise.resolve(2)
-  })
-  .catch(err => 3)
-  .then(res => console.log(res))
-```
-
-- 生成器Generators/ yield
-    - Generator 函数是 ES6 提供的一种异步编程解决方案
-    - Generator 函数是一个状态机，封装了多个内部状态。
-    - Generator 函数除了状态机，还是一个遍历器对象生成函数。
-    - 可暂停函数, yield可暂停，next方法可启动，每次返回的是yield后的表达式结果。
-    - yield表达式本身没有返回值，或者说总是返回undefined。next方法可以带一个参数，该参数就会被当作上一个yield表达式的返回值。
-```js
-function *main() {
-    try{
-        const user = yield ajax('/api/1')
-        console.log(users);
-
-        const posts = yield ajax('/api/2')
-        console.log(posts);
-
-        const urls = yield ajax('/api/3')
-        console.log(urls);
-
-    }catch(e){
-        console.log(e);
-    }
-}
-
-const g = main()
-
-function handleResults(results){
-    if(results.done) return
-    results.value.then(data => {
-        handleResults(g.next(data));
-    },error => {
-        g.throw(error);
-    })
-}
-
-handleResults(g.next())
-```
-
-- async/await
-    - async/await 函数的实现，就是将 Generator 函数和自动执行器，包装在一个函数里。
-    - async/await是基于Promise实现的，它不能用于普通的回调函数。
-    - async/await与Promise一样，是非阻塞的。
-    - async/await使得异步代码看起来像同步代码，这正是它的魔力所在。
-    - 一个函数如果加上 async ，那么该函数就会返回一个 Promise
-    - Async/Await并发请求 如果请求两个文件，毫无关系，可以通过并发请求
-    - 如果多个异步代码没有依赖性却使用了 await 会导致性能上的降低，代码没有依赖性的话，完全可以使用 Promise.all 的方式。
-```js
-let fs = require('fs')
-function read(file) {
-  return new Promise(function(resolve, reject) {
-    fs.readFile(file, 'utf8', function(err, data) {
-      if (err) reject(err)
-      resolve(data)
-    })
-  })
-}
-function readAll() {
-  read1()
-  read2()//这个函数同步执行
-}
-async function read1() {
-  let r = await read('1.txt','utf8')
-  console.log(r)
-}
-async function read2() {
-  let r = await read('2.txt','utf8')
-  console.log(r)
-}
-readAll() // 2.txt 3.txt
-```
 
 ### 介绍一下函数的作用，纯函数是什么，函数的副作用是什么?
 - 函数是"第一等公民"
@@ -3054,11 +2906,15 @@ document.addEventListener('DOMContentLoaded', function(){
 ```
 ### Promise（写的不好）
 - 回调地狱
-    - 代码臃肿
-    - 可读性差。
-    - 耦合度过高，可维护性差。代码复用性差。
-    - 容易滋生 bug。
-    - 只能在回调里处理异常。
+    - 嵌套层次很深，难以维护
+    - 无法正常使用return和throw
+    - 无法正常检索堆栈信息
+    - 多个回调之间难以建立联系
+
+Promise的概念
+- 主要用于异步计算。promise是用来解决异步函数的顺序问题.
+- 可以将异步操作队列化，按照期望的顺序执行，返回符合预期的结果。
+- 可以在对象之间传递和操作Promise，帮助我们处理队列。
 
 Promise 是异步编程的一种解决方案，比传统的异步解决方案【回调函数】和【事件】更合理、更强大。
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210926211726.png)
@@ -3378,6 +3234,41 @@ function resolvePromise(promise2,x,resolve,reject) {
     }
 }
 ```
+#### Promise有3个状态：
+- pending|【待定】初始状态
+- fulfilled|【实现】操作成功
+- rejected【被否决】操作失败
+
+Promise状态发生改变，就会触发.then（）里的响应函数处理后 续步骤。 Promise状态一经改变，不会再变。 Promise实例一经创建，执行器立即执行。
+
+#### .then()
+.then（）接受两个函数作为参数，分别代表fulilled和rejected .then（）返回一个新的Promise实例，所以它可以链式调用 .当前面的Promise状态改变时，.then（）根据其最终状态，选择特定 的状态响应函数执行 .状态响应函数可以返回新的Promise，或其它值 .如果返回新的Promise，那么下一级.then（）会在新Promise状态改变之后执行 .如果返回其它任何值，则会立刻执行下一级.then（）
+
+#### then（）里有.then（）的情况
+因为.then（）返回的还是Promise实例。 会等里面的.then（）执行完，在执行外面的。
+
+#### Promise.all() 批量执行
+- Promise.all（【p1，p2，p….】）用于将多个Promise实例，包装成一个新的Promise实例。
+- 返回的实例就是普通Promise
+- 它接受一个数组作为参数。
+- 数组里可以是Promise对象，也可以是别的值，只有Promise会等待状态改变。
+- 所有子Promise都完成，该Promise完成，返回值是全部值的数组
+- 有任何一个失败，该Promise失败，返回值是第一个失败的子Promise的结果。 Promise.all() 最常见就是和.map() 连用。 实现队列1.使用.forEach（）2.使用.reduce()
+
+#### Promise.resolve()
+- 返回一个fulfilled的Promise实例，或原始Promise实例。
+- 参数为空，返回一个状态为fulfilled 的Promise实例
+- 参数是一个跟Promise无关的值，同上，不过fulfuilled响应函数会得到这个参数
+- 参数为Promise实例，则返回该实例，不做任何修改
+- 参数为thenable，立刻执行它的.then（）
+
+#### Promise.reject()
+- 返回一个rejected的Promise实例。 Promise.reject()其他特性同Promise.resolve()，但不认thenable
+
+#### Promise.race()
+- 类似Promise.all（），区别在于它有任意一个完成就算完成。 场景用法： 把异步操作和定时器放在一起 如果定时器先触发，就认为超时，告知用户
+
+
 ### Proxy
 #### Proxy
 Proxy 对象用于创建一个对象的代理，从而实现基本操作的拦截和自定义（如属性查找、赋值、枚举、函数调用等）。
@@ -3433,6 +3324,7 @@ console.log(proxy.name); // 阿宝哥
 revoke();
 console.log(proxy.name); // TypeError: Revoked
 ```
+
 
 #### Reflect 对象简介
 Reflect 是一个内置的对象，它提供拦截 JavaScript 操作的方法。这些方法与 proxy handlers 的方法相同。Reflect 不是一个函数对象，因此它是不可构造的。
@@ -3591,14 +3483,17 @@ function factorial(num, num1 = 0, num2 = 1) {
     - 一个进程的内存空间是共享的，每个线程都可以使用这些共享内存。
     - "互斥锁"（Mutual exclusion，缩写 Mutex），防止多个线程同时读写某一块内存区域。
     - 做"信号量"（Semaphore），用来保证多个线程不会互相冲突。
+
+    
 - js是单线程
     - js是作为浏览器的脚本语言，主要是实现用户与浏览器的交互，以及操作dom；这决定了它只能是单线程，否则会带来很复杂的同步问题。 
     - 利用多核CPU的计算能力，HTML5提出Web Worker标准，允许JavaScript脚本创建多个线程，但是子线程完全受主线程控制，且不得操作DOM。所以，这个新标准并没有改变JavaScript单线程的本质。
-
     - JS引擎线程
     - 事件触发线程
     - 定时触发器线程
 
+
+#### js解决异步
 - js解决异步
     - JS 实现异步时通过 **事件循环（Event Loop）**,是JS异步的解决方案。 JS实现异步的具体解决方案
         - 同步代码，直接执行
@@ -3713,6 +3608,218 @@ console.log('10');
 - 宏任务执行完毕后，立即执行当前微任务队列中的所有微任务（依次执行）
 - 当前宏任务执行完毕，开始检查渲染，然后GUI线程接管渲染
 - 渲染完毕后，JS线程继续接管，开始下一个宏任务（从事件队列中获取）
+### JS 实现异步的 5 种方式
+- 回调函数（Callback）
+    - 回调函数有一个致命的弱点，就是容易写出回调地狱（Callback hell）。
+    - 回调函数的优点是简单、容易理解和实现，缺点是不利于代码的阅读和维护，各个部分之间高度耦合，使得程序结构混乱、流程难以追踪
+    - 此外它不能使用 try catch 捕获错误，不能直接 return。
+```js
+ajax(url, () => {
+    // 处理逻辑
+    ajax(url1, () => {
+        // 处理逻辑
+        ajax(url2, () => {
+            // 处理逻辑
+        })
+    })
+})
+```
+
+- 发布订阅
+    - 存在一个"信号中心"，某个任务执行完成，就向信号中心"发布"（publish）一个信号，其他任务可以向信号中心"订阅"（subscribe）这个信号，从而知道什么时候自己可以开始执行。这就叫做"发布/订阅模式"（publish-subscribe pattern），又称"观察者模式"（observer pattern）。
+    - 有家外卖，你可以点外卖，这就是订阅，当你的外卖做好了，就会有人给你打电话叫你去取外卖，这就是发布
+```js
+class EventEmitter {
+  constructor(defaultMaxListeners = 50) {
+    this.defaultMaxListeners = defaultMaxListeners;
+    this.listener = {};
+  }
+
+  // 订阅
+  on(eventName, fn) {
+    if (!this.listener[eventName]) {
+      this.listener[eventName] = [];
+    }
+    if (this.listener[eventName].length >= this.defaultMaxListeners) {
+      throw `${eventName}超出最大监听${this.defaultMaxListeners}个数限制`;
+    }
+    this.listener[eventName].push(fn);
+  }
+
+  // 取消
+  off(eventName, fn) {
+    let callBacks = this.listener[eventName];
+    if (!callBacks) {
+      return false;
+    }
+    if (!fn) {
+      callBacks = [];
+    } else {
+      let cb;
+      for (let i = 0; i < callBacks.length; i++) {
+        cb = callBacks[i];
+        if (cb === fn || cb.fn === fn) {
+          callBacks.splice(i, 1);
+          i--;
+        }
+      }
+    }
+  }
+
+  // 监听一次
+  once(eventName, fn) {
+    const on = (...args) => {
+      this.off(eventName, on);
+      fn.apply(this, ...args);
+    };
+    // 取消订阅使用
+    on.fn = fn;
+    this.on(eventName, on);
+  }
+
+  // 发布
+  emit(eventName, ...args) {
+    const callBackFn = this.listener[eventName] || [];
+    if (callBackFn.length === 0) {
+      throw `${eventName}不存在`;
+    }
+    callBackFn.forEach((fn) => {
+      fn(args);
+    });
+  }
+}
+
+const $event = new EventEmitter();
+
+function fn1(...args) {
+  console.log("fn111111", ...args);
+}
+function fn2(...args) {
+  console.log("fn2", ...args);
+}
+
+$event.once("fn1", fn2);
+
+// $event.on("fn1", fn1);
+// $event.on("fn1", fn1);
+// $event.on("fn1", fn2);
+
+// $event.on("fn1", fn1);
+// // event.off("fn1", fn1);
+// $event.on("fn2", fn1);
+// $event.on("fn3", fn1);
+// $event.on("fn4", fn1);
+
+$event.emit("fn1", "fn1参数2", "参数3", "参数4");
+// $event.emit("fn1", "fn2 fn2");
+
+```
+- Promise对象
+    - Promise对象是异步编程的一种解决方案，比传统的回调函数和事件更合理更强大。
+    - Promise，简单说就是一个容器，里面保存着某个未来才会结束的事件的结果，相比回调函数，Promise提供统一的API，各种异步操作都可以用同样的方法进行处理。 
+    - Promise对象有三种状态:pending(进行中)，fulfilled(已成功)，rejected(已失败)
+    - 一旦状态改变，就不再变化，任何时候都可以得到这个结果。
+```js
+let p = new Promise((resolve, reject) => {
+  reject('reject')
+  resolve('success')//无效代码不会执行
+})
+p.then(
+  value => {
+    console.log(value)
+  },
+  reason => {
+    console.log(reason)//reject
+  }
+)
+```
+    - promise的链式调用
+        - 每次调用返回的都是一个新的Promise实例(这就是then可用链式调用的原因)
+        - 如果then中返回的是一个结果的话会把这个结果传递下一次then中的成功回调
+        - 如果then中出现异常,会走下一个then的失败回调
+        - 在 then中使用了return，那么 return 的值会被Promise.resolve() 包装(见例1，2)
+        - then中可以不传递参数，如果不传递会透到下一个then中(见例3)
+        - catch 会捕获到没有捕获的异常
+```js
+  // 例1
+  Promise.resolve(1)
+  .then(res => {
+    console.log(res)
+    return 2 //包装成 Promise.resolve(2)
+  })
+  .catch(err => 3)
+  .then(res => console.log(res))
+```
+
+- 生成器Generators/ yield
+    - Generator 函数是 ES6 提供的一种异步编程解决方案
+    - Generator 函数是一个状态机，封装了多个内部状态。
+    - Generator 函数除了状态机，还是一个遍历器对象生成函数。
+    - 可暂停函数, yield可暂停，next方法可启动，每次返回的是yield后的表达式结果。
+    - yield表达式本身没有返回值，或者说总是返回undefined。next方法可以带一个参数，该参数就会被当作上一个yield表达式的返回值。
+```js
+function *main() {
+    try{
+        const user = yield ajax('/api/1')
+        console.log(users);
+
+        const posts = yield ajax('/api/2')
+        console.log(posts);
+
+        const urls = yield ajax('/api/3')
+        console.log(urls);
+
+    }catch(e){
+        console.log(e);
+    }
+}
+
+const g = main()
+
+function handleResults(results){
+    if(results.done) return
+    results.value.then(data => {
+        handleResults(g.next(data));
+    },error => {
+        g.throw(error);
+    })
+}
+
+handleResults(g.next())
+```
+
+- async/await
+    - async/await 函数的实现，就是将 Generator 函数和自动执行器，包装在一个函数里。
+    - async/await是基于Promise实现的，它不能用于普通的回调函数。
+    - async/await与Promise一样，是非阻塞的。
+    - async/await使得异步代码看起来像同步代码，这正是它的魔力所在。
+    - 一个函数如果加上 async ，那么该函数就会返回一个 Promise
+    - Async/Await并发请求 如果请求两个文件，毫无关系，可以通过并发请求
+    - 如果多个异步代码没有依赖性却使用了 await 会导致性能上的降低，代码没有依赖性的话，完全可以使用 Promise.all 的方式。
+```js
+let fs = require('fs')
+function read(file) {
+  return new Promise(function(resolve, reject) {
+    fs.readFile(file, 'utf8', function(err, data) {
+      if (err) reject(err)
+      resolve(data)
+    })
+  })
+}
+function readAll() {
+  read1()
+  read2()//这个函数同步执行
+}
+async function read1() {
+  let r = await read('1.txt','utf8')
+  console.log(r)
+}
+async function read2() {
+  let r = await read('2.txt','utf8')
+  console.log(r)
+}
+readAll() // 2.txt 3.txt
+```
 
 ### setTimeout、Promise、Async/Await 的区别
 - setTimeout
@@ -5220,13 +5327,18 @@ vue 初始化时会用Object.defineProperty()给data中每一个属性添加gett
 2. 这种场景建议使用 computed，先对数据进行过滤
 
 ### Vue 项目中 key 的作用
-key的作用是为了在diff算法执行时更快的找到对应的节点，提高diff速度，更高效的更新虚拟DOM;
+- 当 Vue.js 用 v-for 更新已渲染过的元素列表时，它默认用“就地复用”策略。如果数据项的顺序被改变，Vue 将不会移动 DOM 元素来匹配数据项的顺序，而是简单复用此处每个元素，并且确保它在特定索引下显示已被渲染过的每个元素。重复的key会造成渲染错误。
+- key的作用主要是为了让vue可以区分元素，更高效的对比更新虚拟DOM;
+- Vue在patch过程中判断两个节点是否是相同节点,key是一个必要条件，是唯一标识，如不定义key，Vue只能认为比较的两个节点是同一个，这导致了频繁更新元素，使得整个patch过程比较低效，影响性能;
+- 从源码中可以知道，Vue判断两个节点是否相同时主要判断两者的key和元素类型等，因此如果不设置key,它的值就是undefined，则可能永远认为这是两个相同的节点，只能去做更新操作，这造成了大量的dom更新操作，明显是不可取的。
 
-更准确 : 因为带 key 就不是就地复用了,在 sameNode 函数 a.key === b.key 对比中可以避免就地复用的情况。所以会更加准确,如果不加 key,会导致之前节点的状态被保留下来,会产生一系列的 bug。
 
-更快速 : key 的唯一性可以被 Map 数据结构充分利用,相比于遍历查找的时间复杂度 O(n),Map 的时间复杂度仅仅为 O(1)
 
-key 的特殊 attribute 主要用在 Vue 的虚拟 DOM 算法，在新旧 nodes 对比时辨识 VNodes。如果不使用 key，Vue 会使用一种最大限度减少动态元素并且尽可能的尝试就地修改/复用相同类型元素的算法。而使用 key 时，它会基于 key 的变化重新排列元素顺序，并且会移除 key 不存在的元素。
+- key的作用是为了在diff算法执行时更快的找到对应的节点，提高diff速度，更高效的更新虚拟DOM;
+- 更准确 : 因为带 key 就不是就地复用了,在 sameNode 函数 a.key === b.key 对比中可以避免就地复用的情况。所以会更加准确,如果不加 key,会导致之前节点的状态被保留下来,会产生一系列的 bug。
+- 更快速 : key 的唯一性可以被 Map 数据结构充分利用,相比于遍历查找的时间复杂度 O(n),Map 的时间复杂度仅仅为 O(1)
+- key 的特殊 attribute 主要用在 Vue 的虚拟 DOM 算法，在新旧 nodes 对比时辨识 VNodes。如果不使用 key，Vue 会使用一种最大限度减少动态元素并且尽可能的尝试就地修改/复用相同类型元素的算法。而使用 key 时，它会基于 key 的变化重新排列元素顺序，并且会移除 key 不存在的元素。
+
 
 
 - vue和react都是采用diff算法来对比新旧虚拟节点，从而更新节点。
@@ -5742,6 +5854,11 @@ Vue3.x借鉴了 ivi算法和 inferno算法
 
 ### Vue3.0的Watch的运行原理
 
+### Vue项目中实现路由按需加载（路由懒加载）的3中方式
+- vue异步组件
+- es6提案的import()
+- webpack的require.ensure()
+
 ### Vue的性能优化？
 - 编码阶段
     - 尽量减少data中的数据，data中的数据都会增加getter和setter，会收集对应的watcher
@@ -5796,6 +5913,15 @@ window.history.replaceState(state, title, targetURL);
 @类似于pushState,但是会直接替换掉当前url,而不会在history中留下记录
 ```
 - popstate 事件会在点击后退、前进按钮(或调用 history.back()、history.forward()、history.go()方法)时触发
+
+## Vuex
+### 为什么 Vuex的mutation中不能做异步操作？
+Vuex中所有的状态更新的唯一途径都是mutation，异步操作通过 Action 来提交 mutation实现，这样使得我们可以方便地跟踪每一个状态的变化，从而让我们能够实现一些工具帮助我们更好地了解我们的应用。 每个mutation执行完成后都会对应到一个新的状态变更，这样devtools就可以打个快照存下来，然后就可以实现 time-travel 了。如果mutation支持异步操作，就没有办法知道状态是何时更新的，无法很好的进行状态的追踪，给调试带来困难。
+
+### vuex是什么？原理是什么？怎么使用？哪种功能场景使用它？
+- 状态管理库，类似 React 中的 Rudux
+- vuex是一个专门为vue构建的状态集管理，主要是为了解决组件间状态共享的问题，强调的是数据的集中式管理，说白了主要是便于维护便于解耦所以不是所有的项目都适合使用vuex，如果你不是构建大型项目使用vuex反而使你的项目代码繁琐多余
+-  state mutations getters actions modules
 ## Webpack Vite Rollup
 ### Webpack流程
 - webpack到底是如何对我们的项目进行打包的呢？
