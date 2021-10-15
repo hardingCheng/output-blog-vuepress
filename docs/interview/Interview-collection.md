@@ -307,23 +307,74 @@ element高度＝内容高度（height包含了元素内容宽度、边框、内�
 element宽度＝内容宽度（width包含了元素内容宽度、边框、内距）
 ```
 ### Flex
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211009164716.png)
+#### Flex属性
 Flex 是 Flexible Box 的缩写，意为"弹性布局",用来为盒状模型提供最大的灵活性。指定容器 display: flex 即可。 简单的分为容器属性和元素属性。
 - 容器的属性：
     - flex-direction：决定主轴的方向（即子 item 的排列方法）flex-direction: row | row-reverse | column | column-reverse;
+      ```css
+      .ele {
+          flex-direction: row;                // 默认值，主轴为水平方向，起点在左端。
+          flex-direction: row-reverse;        // 主轴为水平方向，起点在右端。
+          flex-direction: column;             // 主轴为垂直方向，起点在上。
+          flex-direction: column-reverse;     // 主轴为垂直方向，起点在下。
+        }
+      ```
     - flex-wrap：决定换行规则 flex-wrap: nowrap | wrap | wrap-reverse;
-    - flex-flow： .box { flex-flow: || ; }
+    ```css
+    .ele {
+         flex-wrap: nowrap;          // 默认，不换行
+         flex-wrap: wrap;            // 换行，第一行在上方。
+         flex-wrap: wrap-reverse     // 换行，第一行在下方。
+    }
+    ```
+    - flex-flow： flex-direction 属性和 flex-wrap 属性的简写形式。默认值为 row nowrap。
+    ```css
+    .ele {
+      flex-flow: <flex-direction> || <flex-wrap>;
+    }
+    ```
     - justify-content：对其方式，水平主轴对齐方式
+    ```css
+    .ele{
+        justify-content: flex-start;      // 默认，左对齐
+        justify-content: flex-end;        // 右对齐
+        justify-content: center;          // 居中
+        justify-content: space-between;   // 两端对齐，项目之间的间隔都相等。
+        justify-content: space-around;    // 每个项目两侧的间隔相等。所以，项目之间的间隔比项目与边框的间隔大一倍。
+    }
+    ```
     - align-items：对齐方式，竖直轴线方向
-    - align-content
+    ```css
+    .ele{
+        align-items: flex-start;    // 交叉轴的起点对齐。
+        align-items: flex-end;      // 交叉轴的终点对齐。
+        align-items: center;        // 交叉轴的中点对齐。
+        align-items: baseline;      // 项目的第一行文字的基线对齐。
+        align-items: stretch;       // 默认，如果项目未设置高度或设为auto，将占满整个容器的高度。
+    }
+    ```
+    - align-content：多根轴线的对齐方式。如果项目只有一根轴线，该属性不起作用。
+    ```css
+    .ele{
+        align-content: flex-start;   // 与交叉轴的起点对齐
+        align-content; flex-end;     // 与交叉轴的终点对齐。
+        align-content: center;       // 与交叉轴的中点对齐。
+        align-content: space-between;// 与交叉轴两端对齐，轴线之间的间隔平均分布。
+        align-content: space-around; // 每根轴线两侧的间隔都相等。所以，轴线之间的间隔比轴线与边框的间隔大一倍。
+        align-content: stretch;     // 默认 轴线占满整个交叉轴。
+    }
+    ``` 
 - 项目的属性（元素的属性）：
-    - order 属性：定义项目的排列顺序，顺序越小，排列越靠前，默认为 0
+    - order 属性：子容器的排列顺序，定义项目的排列顺序，顺序越小，排列越靠前，默认为 0
     - flex-grow 属性：定义项目的放大比例，即使存在空间，也不会放大
     - flex-shrink 属性：定义了项目的缩小比例，当空间不足的情况下会等比例的缩小，如果 定义个 item 的 flow-shrink 为 0，则为不缩小
     - flex-basis 属性：定义了在分配多余的空间，项目占据的空间。
     - flex：是 flex-grow 和 flex-shrink、flex-basis 的简写，默认值为 0 1 auto。
     - align-self：允许单个项目与其他项目不一样的对齐方式，可以覆盖
-    - align-items，默认属 性为 auto，表示继承父元素的 align-items 比如说，用 flex 实现圣杯布局
-#### flex:1
+        - 子容器的 align-self 属性允许单个项目有与其他项目不一样的对齐方式，可覆盖父容器 align-items 属性。默认值为 auto，表示继承父元素的 align-items属性，如果没有父元素，则等同于 stretch。
+#### flex:1 
+- 该属性有两个快捷值：auto (1 1 auto) 和 none (0 0 auto)。
 - flex-grow（扩展量）定义项目的的放大比例；
     - 代表含义是对额外空间的占据量，所谓额外空间就是这一行多余的空间，有多余的空间这一属性才有用。默认值是0，意思就是即使有多余空间，它也不要
     - 默认为0，即 即使存在剩余空间，也不会放大；所有项目的flex-grow为1：等分剩余空间（自动放大占位）；flex-grow为n的项目，占据的空间（放大的比例）是flex-grow为1的n倍。
@@ -336,6 +387,273 @@ Flex 是 Flexible Box 的缩写，意为"弹性布局",用来为盒状模型提�
     - 定义在分配多余空间之前，项目占据的主轴空间（main size），浏览器根据此属性计算主轴是否有多余空间
     - 默认值为auto，即 项目原本大小；设置后项目将占据固定空间。
 ### Grid
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211009164716.png)
+flex 布局虽然强大，但是只能是一维布局，如果要进行二维布局，那么我们还需要使用 grid。
+
+grid 布局又称为“网格布局”，可以实现二维布局方式，和之前的 表格table布局差不多，然而，这是使用 CSS 控制的，不是使用 HTML 控制的，同时还可以依赖于媒体查询根据不同的上下文得新定义布局。和 table 布局不同的是，grid 布局不需要在 HTML 中使用特定的标签布局，所有的布局都是在 CSS 中完成的，你可以随意定义你的 grid 网格。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211015141127.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211015144548.png)
+#### 使用 grid 布局
+使用 grid 布局很简单，通过display属性设置属性值为 grid 或 inline-grid 或者是 subgrid（该元素父元素为网格，继承父元素的行和列的大小） 就可以了。
+
+网格容器中的所有子元素就会自动变成网格项目（grid item），然后设置列（grid-template-columns）和 行（grid-template-rows）的大小，设置` grid-template-columns `有多少个参数生成的 grid 列表就有多少个列。如果没有设置 grid-template-columns，那么默认只有一列，宽度为父元素的 100%。
+
+**注：当元素设置了网格布局，column、float、clear、vertical-align属性无效。**
+
+```html
+<div class="grid-container">
+    <div class="item item1">1</div>
+    <div class="item item2">2</div>
+    <div class="item item3">3</div>
+    <div class="item item4">4</div>
+    <div class="item item5">5</div>
+    <div class="item item6">6</div>
+</div>
+
+
+.grid-container{
+    padding: 20px;
+    display: grid;
+    grid-template-rows: 50px 100px 60px 80px;
+    grid-template-columns: 50px 1fr 1fr 2fr;
+    background: pink;
+}
+.item{
+    border: 2px solid palegoldenrod;
+    color: #fff;
+}
+```
+- css fr 单位是一个自适应单位，fr单位被用于在一系列长度值中分配剩余空间，如果多个已指定了多个部分，则剩下的空间根据各自的数字按比例分配。
+- fr 是基于网格容器可用空间来计算的（flex 也是一样），所以我们可以和其他单位混合使用，如果需要的话
+#### 行或列最小和最大尺寸
+`minmax()`函数来创建行或列的最小或最大尺寸，第一个参数定义网格轨道的最小值，第二个参数定义网格轨道的最大值。可以接受任何长度值，也接受 auto 值。auto 值允许网格轨道基于内容的尺寸拉伸或挤压。
+```css
+.grid-container{
+    padding: 20px;
+    display: grid;
+    grid-template-rows: minmax(100px,200px) minmax(50px,200px);
+    grid-template-columns: 1fr 1fr 2fr;
+    background: pink;
+    height: 300px;
+}
+```
+遇到的问题：
+- 将第一行的高度设置为`minmax(100px,200px)`，第二行的高度设置为`minmax(50px,200px)`，容器总高度设置为`300px`，这时每一列的高度要怎么算呢？
+- 判断总高度是小于第一列高度的最大值和第二列高度的最大值之和的，如果大于最大值之和，那么第一列和第二列的高度都为设置的最大值，如果是小于最小值之和的话，那么第一列和第二列的高度都为设置的最小值。
+- 总高度是小于第一列高度的最大值和第二列高度的最大值之和
+    -  总高度 `300px` - 第一列最小高度 `100px` - 第二列最小高度 `50px` = `150px`
+    -  第一列高度：第一列最小高度 `100px + 150px/2 = 175px`;
+    -  第二列高度：第一列最小高度 `50px + 150px/2 = 125px`;
+#### 重复行或者列
+`repeat()` 属性可以创建重复的网格轨道。这个适用于创建相等尺寸的网格项目和多个网格项目。
+`repeat()` 也接受两个参数：第一个参数定义网格轨道应该重复的次数，第二个参数定义每个轨道的尺寸。
+```css
+.grid-container{
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(2,100px);
+    grid-template-rows: repeat(3,100px);
+    background: pink;
+}
+```
+#### 间距
+- grid-column-gap：创建列与列之间的距离。
+- grid-row-gap：行与行之间的距离。
+- grid-gap 是 grid-row-gap 和 grid-column-gap两个属性的缩写。
+```css
+.grid-container{
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(2,100px);
+    grid-template-rows: repeat(3,100px);
+    grid-column-gap: 50px;
+    grid-row-gap: 15px;
+    background: pink;
+}
+```
+#### 通过网格线定位 grid item
+我们可以通过表格线行或者列来定位 grid item。
+```html
+<div class="grid-container">
+    <div class="item item1">1</div>
+    <div class="item item2">2</div>
+    <div class="item item3">3</div>
+    <div class="item item4">4</div>
+    <div class="item item5">5</div>
+    <div class="item item6">6</div>
+</div>
+
+
+.grid-container{
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(2,100px);
+    grid-template-rows: repeat(3,100px);
+    grid-column-gap: 50px;
+    grid-row-gap: 15px;
+    background: pink;
+}
+.item{
+    border: 2px solid palegoldenrod;
+    color: #fff;
+    text-align: center;
+    font-size: 20px;
+}
+.item1{
+    grid-row-start: 2;
+    grid-row-end: 3;
+    grid-column-start: 2;
+    grid-column-end: 3;
+    background: #fffa90;
+    color: #000;
+}
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211015143416.png)
+
+- `grid-row` 是 `grid-row-start` 和 `grid-row-end` 的简写。`grid-column` 是 `grid-column-start` 和 `grid-column-end` 的简写。
+    - 只提供一个值，指定了 `grid-row-start` 和 `grid-column-start` 的值。
+    - 提供两个值，第一个值是 `grid-row-start` 或者 `grid-column-start` 的值，第二个值是 `grid-row-end` 或者 `grid-column-end` 的值，两者之间必须要用`/`隔开。
+    ```css
+    grid-row: 2; 
+    grid-column: 3 / 4;
+    ```
+    - 四个值可以用 `grid-area` 缩写，分别对应 `grid-row-start`、`grid-column-start`、`grid-row-end`、`grid-column-end`：
+    ```css
+    grid-area: 2 / 2 / 3 / 3;
+    ```
+#### 合并单元行与合并单元列
+这个就和`excel`中的合并单元行/列是相同的（这个需要设置在`grid item`中）
+```css
+grid-column-start: 1;
+grid-column-end: 3;
+grid-row-start: 2;
+grid-row-end: 4;
+```
+
+也可以使用`grid-row`和`grid-column`简写的形式，关键词`span`后面紧随数字，表示合并多少个列或行，`/` 前面是从第几行`/`列开始。
+```css
+grid-row: 2 / span 3; 
+grid-column: span 2;
+```
+```css
+.grid-container{
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(4,100px);
+    grid-template-rows: repeat(3,100px);
+    grid-column-gap: 50px;
+    grid-row-gap: 15px;
+    background: pink;
+
+}
+.item{
+    border: 2px solid palegoldenrod;
+    color: #fff;
+    text-align: center;
+    font-size: 20px;
+
+}
+.item1{
+    grid-column-start: 1;
+    grid-column-end: 3;
+    grid-row-start: 2;
+    grid-row-end: 4;
+}
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211015144225.png)
+
+#### 自定义网格线名称
+在`grid`中，是可以自定义网格线的名称的，然后使用定义好的网格线来进行布局，`[col1-start]` 网格线名称一定要使用 `[]` 括住。
+
+```html
+<div class="grid-container">
+    <div class="item a">a</div>
+    <div class="item b">b</div>
+    <div class="item c">c</div>
+    <div class="item d">d</div>
+    <div class="item e">e</div>
+    <div class="item f">f</div>
+    <div class="item g">g</div>
+    <div class="item h">h</div>
+    <div class="item i">i</div>
+    <div class="item j">j</div>
+</div>
+
+
+.grid-container{
+    text-align: center;
+    height: 400px;
+    padding: 100px;
+    display: grid;
+    grid-column-gap: 5px;
+    grid-row-gap: 5px;
+    background: pink;
+    grid-template-columns: [col1-start] 100px [col1-end] 5px [col2-start] 100px [col2-end] 5px [col3-start]
+    100px [col3-end] 5px [col4-start] 100px [col4-end];
+    grid-template-rows: [row1-start] auto [row1-end] 5px [row2-start] auto [row2-end] 5px [row3-start] auto
+     [row3-end] 5px [row4-start] auto [row4-end] 5px [row5-start] auto [row5-end];
+}
+
+
+.a { grid-column: col1-start / col3-end; grid-row: row1-start;
+    background: #ffffff;}
+.b { grid-column: col4-start / col4-end; grid-row: row1-start / row5-end; background: orange; }
+.c { grid-column: col1-start; grid-row: row2-start; background: #ffffff;}
+.d { grid-column: col2-start; grid-row: row2-start; background: #ffffff;}
+.e { grid-column: col3-start; grid-row: row2-start; background: #ffffff;}
+.f { grid-column: col1-start / col2-end; grid-row: row3-start; background: #ffffff;}
+.g { grid-column: col3-start; grid-row: row3-start; background: #ffffff;}
+.h { grid-column: col1-start; grid-row: row4-start; background: #ffffff;}
+.i { grid-column: col2-start / col3-end; grid-row: row4-start; background: #ffffff;}
+.j { grid-column: col1-start / col3-end; grid-row: row5-start; background: #ffffff;}
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211015144801.png)
+#### 通过网格区域命名和定位网格项目
+- 什么是网格区域：
+    - 网格区域(grid-area)是一个逻辑空间，主要用来放置一个或多个网格单元格（Grid Cell）。他是由四条网格线(Grid line)，网格区域每边一条，四边相交组织的网格轨道(Grid Track)。简单点理解，网格区域是有四条网格线交织组成的网格空间，这个空间中可能是一个网格单元格，也可能是多个网格单元格。
+- 定义网格区域
+    - 在CSS Grid Layout中定义网格区域有两种方式，一种是通过网格线来定义，另一种是通过grid-template-areas来定义。接下来看看两种定义网格区域的方法在具体使用过程中有何不同。
+- 网格线定义网格区域
+    - 使用网格线定义网格区域的方法非常的简单，首先依赖于`grid-template-columns`和`grid-template-rows`显式定义网格线，甚至是由浏览器隐式创建网格线，然后通过`grid-area`属性通过取网格线，组成网格线交织区域，那么这个区域就是所讲的网格区域。在使用`grid-area`属性调用网格线，其遵循的规则是`grid-area: row-start/ column-start / row-end / column-end`。
+- `grid-template-areas`定义网格区域
+    - 除了使用网格线的交组来定义网格区域之外，在 CSS Grid Layout 中还可以通过`grid-template-areas`属性来定义网格区域的名称，然后需要放在对应网格区域的元素，可以通过`grid-area`属性来指定。而且重复区域可以使用同一个名称来实现跨区域。另外对于空的轨道区域，可以使用点号 . 来代表
+```html
+<div class="grid-container">
+    <div class="header ">header</div>
+    <div class="content ">content</div>
+    <div class="sidebar ">sidebar</div>
+    <div class="footer ">footer</div>
+</div>
+
+.grid-container{
+    text-align: center;
+    padding: 20px;
+    display: grid;
+    grid-column-gap: 5px;
+    grid-row-gap: 5px;
+    background: pink;
+    grid-template-areas: "header header header header header"
+                         "sidebar content content content content"
+                         "footer footer footer footer footer";
+
+    grid-template-rows: 50px 150px 50px;
+    grid-template-columns: 200px 200px 200px;
+
+}
+
+.header { grid-area:header; background: #fff}
+.content { grid-area: content; background: #fffa90}
+.sidebar { grid-area: sidebar; background: #5bc0de}
+.footer { grid-area: footer; background: #ffff00}
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211015145529.png)
+在不设置高度的情况下（父容器和 grid-template-rows 的值，或者 grid-template-rows 设置为 auto 时，slider 和 content 的高度是一致的，并且会根据其内的高度自适应）
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211015145708.png)
+
+
 ### 常见布局的方案
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211009164716.png)
 
@@ -3983,6 +4301,19 @@ Webpack 中，Tree-shaking 的实现一是先标记出模块导出值中哪些�
 - 策略模式 策略模式指对象有某个行为,但是在不同的场景中,该行为有不同的实现方案-比如选项的合并策略
 
 ## HTTP
+### cookies、sessionStorage、localStorage 和 indexDB 的区别
+- cookie是网站为了标示用户身份而储存在用户本地的数据
+- 是否在http请求只能够携带
+    - cookie数据始终在同源的http请求中携带，跨域需要设置withCredentials = true
+    - sessionStorage和localStorage不会自动把数据发给服务器，仅在本地保存
+- 存储大小：
+    - cookie数据大小不能超过4k；
+    - sessionStorage和localStorage虽然也有存储大小的限制，但比cookie大得多，可以达到5M或更大，因不同浏览器大小不同；
+- 有效时间：
+    - cookie 设置的cookie过期时间之前一直有效，即使窗口或浏览器关闭
+    - localStorage 硬盘存储持久数据，浏览器关闭后数据不丢失除非主动删除数据
+    - sessionStorage 存在内存中，数据在当前浏览器窗口关闭后自动删除
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211015134146.png)
 ### Service Worker有哪些作用
 ### Cookie、Session、webStorage、localStorage、sessionStorage
 #### Cookie
@@ -6434,3 +6765,32 @@ console.log(str)
 - git merge 和 git rebase 的区别
     - 不同于 git rebase 的是，git merge 在不是 fast-forward（快速合并）的情况下，会产生一条额外的合并记录，类似 Merge branch 'xxx' into 'xxx' 的一条提交信息。
     - 另外，在解决冲突的时候，用 merge 只需要解决一次冲突即可，简单粗暴，而用 rebase 的时候 ，需要依次解决每次的冲突，才可以提交。
+
+## 前端性能优化
+### 前端性能优化
+#### CSS方面优化
+- 多个css合并，尽量减少HTTP请求
+- 将css文件放在页面最上面
+- 移除空的css规则
+- 避免使用CSS表达式
+- 选择器优化嵌套，尽量避免层级过深
+- 充分利用css继承属性，减少代码量
+- 抽象提取公共样式，减少代码量
+- 属性值为0时，不加单位
+- 属性值为小于1的小数时，省略小数点前面的0
+- 使用CSS Sprites将多张图片拼接成一张图片，通过CSS background 属性来访问图片内容 
+#### JS
+- 节流、防抖
+- 长列表滚动到可视区域动态加载（大数据渲染）
+- 图片懒加载（src）
+- DOM 操作优化
+    - 批量添加dom可先createElement创建并添加节点，最后一次性加入dom
+    - 批量绑定事件，使用事件委托绑定父节点实现，利用了事件冒泡的特性
+    - 如果可以使用innerHTML代替appendChild
+    - 在 DOM 操作时添加样式时尽量增加 class 属性，而不是通过 style 操作样式，以减少重排（Reflow）
+#### 网络
+- 减少 HTTP 请求数量
+- 利用浏览器缓存，公用依赖包（如vue、Jquery、ui组件等）单独打包/单文件在一起，避免重复请求
+- 减小cookie大小，尽量用localStorage代替
+- CDN托管静态文件
+- 开启 Gzip 压缩
