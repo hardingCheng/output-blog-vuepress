@@ -1,4 +1,4 @@
-# 根据各路大佬面经+自己的心得
+# 面经+自己的心得
 ## HTML
 ### DOCTYPE及作用
 `<!DOCTYPE html>`
@@ -5605,6 +5605,9 @@ MVVM的优点：
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210918215643.png)
 
 ### vue虚拟DOM的理解
+由于在浏览器中操作 DOM 是很昂贵的。频繁的操作 DOM，会产生一定的性能问题。这就是虚拟 Dom 的产生原因。Vue2 的 Virtual DOM 借鉴了开源库 snabbdom 的实现。Virtual DOM 本质就是用一个原生的 JS 对象去描述一个 DOM 节点，是对真实 DOM 的一层抽象。
+
+
 1. 什么是VDOM
 Virtual DOM 用JS模拟DOM结构用。JavaScript 对象结构表示 DOM 树的结构；然后用这个树构建一个真正的 DOM 树， 插到文档当中 当状态变更的时候，重新构造一棵新的对象树。然后用新的树和旧的树 进行比较，记录两棵树差异 把所记录的差异应用到所构建的真正的 DOM 树上，视图就 更新了。Virtual DOM 本质上就是在 JS 和 DOM 之间做了一个缓存。
 
@@ -5620,7 +5623,14 @@ DOM结构的对比，放在JS层来做
     - h('标签名', {...属性名...}, '.........')
     - patch(container, vnode)
     - patch(vnode, newVnode)
-
+### 虚拟 DOM 有什么优缺点
+- 优点：
+    - 保证性能下限： 框架的虚拟 DOM 需要适配任何上层 API 可能产生的操作，它的一些 DOM 操作的实现必须是普适的，所以它的性能并不是最优的；但是比起粗暴的 DOM 操作性能要好很多，因此框架的虚拟 DOM 至少可以保证在你不需要手动优化的情况下，依然可以提供还不错的性能，即保证性能的下限；
+    - 无需手动操作 DOM： 我们不再需要手动去操作 DOM，只需要写好 View-Model 的代码逻辑，框架会根据虚拟 DOM 和 数据双向绑定，帮我们以可预期的方式更新视图，极大提高我们的开发效率；
+    - 跨平台： 虚拟 DOM 本质上是 JavaScript 对象,而 DOM 与平台强相关，相比之下虚拟 DOM 可以进行更方便地跨平台操作，例如服务器渲染、weex 开发等等。
+- 缺点:
+    - 无法进行极致优化： 虽然虚拟 DOM + 合理的优化，足以应对绝大部分应用的性能需求，但在一些性能要求极高的应用中虚拟 DOM 无法进行针对性的极致优化。
+    - 首次渲染大量 DOM 时，由于多了一层虚拟 DOM 的计算，会比 innerHTML 插入慢。
 ### Vue2.x底层实现原理
 Vue是采用数据劫持结合发布者-订阅者模式的方式，通过Object.defineProperty()来劫持各个属性的setter和getter，在数据变动时发布消息给订阅者，触发相应的监听回调
 Vue是一个典型的MVVM框架，模型（Model）只是普通的javascript对象，修改它则试图（View）会自动更新。这种设计让状态管理变得非常简单而直观
@@ -5677,6 +5687,23 @@ vue 初始化时会用Object.defineProperty()给data中每一个属性添加gett
 - 为了在数据变化时强制更新组件，以避免“就地复用”带来的副作用。
     - 当 Vue.js 用 v-for 更新已渲染过的元素列表时，它默认用“就地复用”策略。如果数据项的顺序被改变，Vue 将不会移动 DOM 元素来匹配数据项的顺序，而是简单复用此处每个元素，并且确保它在特定索引下显示已被渲染过的每个元素。重复的key会造成渲染错误。
 
+```js
+// 判断两个vnode的标签和key是否相同 如果相同 就可以认为是同一节点就地复用
+function isSameVnode(oldVnode, newVnode) {
+  return oldVnode.tag === newVnode.tag && oldVnode.key === newVnode.key;
+}
+
+// 根据key来创建老的儿子的index映射表  类似 {'a':0,'b':1} 代表key为'a'的节点在第一个位置 key为'b'的节点在第二个位置
+function makeIndexByKey(children) {
+  let map = {};
+  children.forEach((item, index) => {
+    map[item.key] = index;
+  });
+  return map;
+}
+// 生成的映射表
+let map = makeIndexByKey(oldCh);
+```
 ### Vue2.x双向绑定的实现原理
 当一个Vue实例创建时，Vue会遍历data选项的属性，用 Object.defineProperty 将它们转为 getter/setter并且在内部追踪相关依赖，在属性被访问和修改时通知变化。每个组件实例都有相应的 watcher 程序实例，它会在组件渲染的过程中把属性记录为依赖，之后当依赖项的 setter 被调用时，会通知 watcher重新计算，从而致使它关联的组件得以更新。
 
@@ -5684,7 +5711,57 @@ vue 初始化时会用Object.defineProperty()给data中每一个属性添加gett
 nextTick是Vue提供的一个全局API,是在下次DOM更新循环结束之后执行延迟回调，在修改数据之后使用$nextTick，则可以在回调中获取更新后的DOM；
 
 在下次 DOM 更新循环结束之后执行延迟回调，在修改数据之后立即使用 nextTick 来获取更新后的 DOM。 nextTick主要使用了宏任务和微任务。 根据执行环境分别尝试采用Promise、MutationObserver、setImmediate，如果以上都不行则采用setTimeout定义了一个异步方法，多次调用nextTick会将方法存入队列中，通过这个异步方法清空当前队列。
+```js
+let callbacks = [];
+let pending = false;
+function flushCallbacks() {
+  pending = false; //把标志还原为false
+  // 依次执行回调
+  for (let i = 0; i < callbacks.length; i++) {
+    callbacks[i]();
+  }
+}
+let timerFunc; //定义异步方法  采用优雅降级
+if (typeof Promise !== "undefined") {
+  // 如果支持promise
+  const p = Promise.resolve();
+  timerFunc = () => {
+    p.then(flushCallbacks);
+  };
+} else if (typeof MutationObserver !== "undefined") {
+  // MutationObserver 主要是监听dom变化 也是一个异步方法
+  let counter = 1;
+  const observer = new MutationObserver(flushCallbacks);
+  const textNode = document.createTextNode(String(counter));
+  observer.observe(textNode, {
+    characterData: true,
+  });
+  timerFunc = () => {
+    counter = (counter + 1) % 2;
+    textNode.data = String(counter);
+  };
+} else if (typeof setImmediate !== "undefined") {
+  // 如果前面都不支持 判断setImmediate
+  timerFunc = () => {
+    setImmediate(flushCallbacks);
+  };
+} else {
+  // 最后降级采用setTimeout
+  timerFunc = () => {
+    setTimeout(flushCallbacks, 0);
+  };
+}
 
+export function nextTick(cb) {
+  // 除了渲染watcher  还有用户自己手动调用的nextTick 一起被收集到数组
+  callbacks.push(cb);
+  if (!pending) {
+    // 如果多次调用nextTick  只会执行一次异步 等异步队列清空之后再把标志变为false
+    pending = true;
+    timerFunc();
+  }
+}
+```
 ### Vue2.x的diff算法
 渲染真实的DOM开销是很大的，修改了某个数据，如果直接渲染到真实dom上会引起整个DOM树的重绘和重排。
 Virtual Dom 根据真实DOM生成的一个Virtual DOM，当Virtual DOM某个节点的数据改变后生成一个新的Vnode，然后Vnode和oldVnode作对比，发现有不一样的地方就直接修改在真实的DOM上，然后使oldVnode的值为Vnode.
@@ -5706,15 +5783,17 @@ watch没有缓存性，更多的是观察的作用，可以监听某些数据执
 Watch没有缓存性，更多的是观察的作用，可以监听某些数据执行回调。当我们需要深度监听对象中的属性时，可以打开deep：true选项，这样便会对对象中的每一项进行监听。这样会带来性能问题，优化的话可以使用字符串形式监听，如果没有写到组件中，不要忘记使用unWatch手动注销哦。
 
 ### Vue2.x的声明周期
-- beforeCreate是new Vue()之后触发的第一个钩子，在当前阶段data、methods、computed以及watch上的数据和方法都不能被访问。
-- created在实例创建完成后发生，当前阶段已经完成了数据观测，也就是可以使用数据，更改数据，在这里更改数据不会触发updated函数。可以做一些初始数据的获取，在当前阶段无法与Dom进行交互，如果非要想，可以通过vm.$nextTick来访问Dom。
-- beforeMount发生在挂载之前，在这之前template模板已导入渲染函数编译。而当前阶段虚拟Dom已经创建完成，即将开始渲染。在此时也可以对数据进行更改，不会触发updated。
-- mounted在挂载完成后发生，在当前阶段，真实的Dom挂载完毕，数据完成双向绑定，可以访问到Dom节点，使用$refs属性对Dom进行操作。
-- beforeUpdate发生在更新之前，也就是响应式数据发生更新，虚拟dom重新渲染之前被触发，你可以在当前阶段进行更改数据，不会造成重渲染。
-- updated发生在更新完成之后，当前阶段组件Dom已完成更新。要注意的是避免在此期间更改数据，因为这可能会导致无限循环的更新。
-- beforeDestroy发生在实例销毁之前，在当前阶段实例完全可以被使用，我们可以在这时进行善后收尾工作，比如清除计时器。
-- destroyed发生在实例销毁之后，这个时候只剩下了dom空壳。组件已被拆解，数据绑定被卸除，监听被移出，子实例也统统被销毁。
-### Vue2.0中组件生命周期调用顺序说一下
+- beforeCreate 在实例初始化之后，数据观测(data observer) 和 event/watcher 事件配置之前被调用。在当前阶段 data、methods、computed 以及 watch 上的数据和方法都不能被访问
+- created 实例已经创建完成之后被调用。在这一步，实例已完成以下的配置：数据观测(data observer)，属性和方法的运算， watch/event 事件回调。这里没有$el,如果非要想与 Dom 进行交互，可以通过 vm.$nextTick 来访问 Dom
+- beforeMount 发生在挂载之前，在这之前template模板已导入渲染函数编译。而当前阶段虚拟Dom已经创建完成，即将开始渲染。在此时也可以对数据进行更改，不会触发updated。
+- mounted 在挂载完成后发生，在当前阶段，真实的Dom挂载完毕，数据完成双向绑定，可以访问到Dom节点，使用$refs属性对Dom进行操作。
+- beforeUpdate 数据更新时调用，发生在虚拟 DOM 重新渲染和打补丁（patch）之前。可以在这个钩子中进一步地更改状态，这不会触发附加的重渲染过程
+- updated 发生在更新完成之后，当前阶段组件 Dom 已完成更新。要注意的是避免在此期间更改数据，因为这可能会导致无限循环的更新，该钩子在服务器端渲染期间不被调用。
+- beforeDestroy 实例销毁之前调用。在这一步，实例仍然完全可用。我们可以在这时进行善后收尾工作，比如清除计时器。
+- destroyed Vue 实例销毁后调用。调用后，Vue 实例指示的所有东西都会解绑定，所有的事件监听器会被移除，所有的子实例也会被销毁。 该钩子在服务器端渲染期间不被调用。### Vue2.0中组件生命周期调用顺序说一下
+- activated keep-alive 专属，组件被激活时调用
+- deactivated keep-alive 专属，组件被销毁时调用
+
 组件的调用顺序都是先父后子,渲染完成的顺序是先子后父。
 
 组件的销毁操作是先父后子，销毁完成的顺序是先子后父。
@@ -5730,11 +5809,19 @@ Watch没有缓存性，更多的是观察的作用，可以监听某些数据执
 
 销毁过程：
 父beforeDestroy->子beforeDestroy->子destroyed->父destroyed
+### 异步请求在哪一步发起？
+可以在钩子函数 created、beforeMount、mounted 中进行异步请求，因为在这三个钩子函数中，data 已经创建，可以将服务端端返回的数据进行赋值。
+
+如果异步请求不需要依赖 Dom 推荐在 created 钩子函数中调用异步请求，因为在 created 钩子函数中调用异步请求有以下优点：
+能更快获取到服务端数据，减少页面 loading 时间；
+ssr 不支持 beforeMount 、mounted 钩子函数，所以放在 created 中有助于一致性；
 ### Vue模版编译原理知道吗，能简单说一下吗？
 Vue的编译过程就是将template转化为render函数的过程。会经历以下阶段：
-- 生成AST树
-- 优化
-- codegen
+```md
+第一步是将 模板字符串 转换成 element ASTs（解析器）
+第二步是对 AST 进行静态节点标记，主要用来做虚拟DOM的渲染优化（优化器）
+第三步是 使用 element ASTs 生成 render 函数代码字符串（代码生成器）
+```
 
 首先解析模版，生成AST语法树(一种用JavaScript对象的形式来描述整个模板)。 使用大量的正则表达式对模板进行解析，遇到标签、文本的时候都会执行对应的钩子进行相关处理。
 
@@ -5742,13 +5829,119 @@ Vue的数据是响应式的，但其实模板中并不是所有的数据都是�
 
 编译的最后一步是将优化后的AST树转换为可执行的代码。
 
+```js
+export function compileToFunctions(template) {
+  // 我们需要把html字符串变成render函数
+  // 1.把html代码转成ast语法树  ast用来描述代码本身形成树结构 不仅可以描述html 也能描述css以及js语法
+  // 很多库都运用到了ast 比如 webpack babel eslint等等
+  let ast = parse(template);
+  // 2.优化静态节点
+  // 这个有兴趣的可以去看源码  不影响核心功能就不实现了
+  //   if (options.optimize !== false) {
+  //     optimize(ast, options);
+  //   }
+
+  // 3.通过ast 重新生成代码
+  // 我们最后生成的代码需要和render函数一样
+  // 类似_c('div',{id:"app"},_c('div',undefined,_v("hello"+_s(name)),_c('span',undefined,_v("world"))))
+  // _c代表创建元素 _v代表创建文本 _s代表文Json.stringify--把对象解析成文本
+  let code = generate(ast);
+  //   使用with语法改变作用域为this  之后调用render函数可以使用call改变this 方便code里面的变量取值
+  let renderFn = new Function(`with(this){return ${code}}`);
+  return renderFn;
+}
+```
 ### keep-alive实现原理
-keep-alive可以实现组件缓存，当组件切换时不会对当前组件进行卸载。
+keep-alive 是 Vue 内置的一个组件，可以实现组件缓存，当组件切换时不会对当前组件进行卸载。
+- 常用的两个属性 include/exclude，允许组件有条件的进行缓存。
+- 两个生命周期 activated/deactivated，用来得知当前组件是否处于活跃状态。
+- keep-alive 的中还运用了 LRU(最近最少使用) 算法，选择最近最久未使用的组件予以淘汰。（LRU（Least recently used）算法根据数据的历史访问记录来进行淘汰数据，其核心思想是“如果数据最近被访问过，那么将来被访问的几率也更高”。
+）
 
-keep-alive实例会缓存对应组件的VNode,如果命中缓存，直接从缓存对象返回对应VNode
+keep-alive实例会缓存对应组件的VNode,如果命中缓存，直接从缓存对象返回对应VNode。
 
-LRU（Least recently used）算法根据数据的历史访问记录来进行淘汰数据，其核心思想是“如果数据最近被访问过，那么将来被访问的几率也更高”。
+```js
+export default {
+  name: "keep-alive",
+  abstract: true, //抽象组件
 
+  props: {
+    include: patternTypes, //要缓存的组件
+    exclude: patternTypes, //要排除的组件
+    max: [String, Number], //最大缓存数
+  },
+
+  created() {
+    this.cache = Object.create(null); //缓存对象  {a:vNode,b:vNode}
+    this.keys = []; //缓存组件的key集合 [a,b]
+  },
+
+  destroyed() {
+    for (const key in this.cache) {
+      pruneCacheEntry(this.cache, key, this.keys);
+    }
+  },
+
+  mounted() {
+    //动态监听include  exclude
+    this.$watch("include", (val) => {
+      pruneCache(this, (name) => matches(val, name));
+    });
+    this.$watch("exclude", (val) => {
+      pruneCache(this, (name) => !matches(val, name));
+    });
+  },
+
+  render() {
+    const slot = this.$slots.default; //获取包裹的插槽默认值
+    const vnode: VNode = getFirstComponentChild(slot); //获取第一个子组件
+    const componentOptions: ?VNodeComponentOptions =
+      vnode && vnode.componentOptions;
+    if (componentOptions) {
+      // check pattern
+      const name: ?string = getComponentName(componentOptions);
+      const { include, exclude } = this;
+      // 不走缓存
+      if (
+        // not included  不包含
+        (include && (!name || !matches(include, name))) ||
+        // excluded  排除里面
+        (exclude && name && matches(exclude, name))
+      ) {
+        //返回虚拟节点
+        return vnode;
+      }
+
+      const { cache, keys } = this;
+      const key: ?string =
+        vnode.key == null
+          ? // same constructor may get registered as different local components
+            // so cid alone is not enough (#3269)
+            componentOptions.Ctor.cid +
+            (componentOptions.tag ? `::${componentOptions.tag}` : "")
+          : vnode.key;
+      if (cache[key]) {
+        //通过key 找到缓存 获取实例
+        vnode.componentInstance = cache[key].componentInstance;
+        // make current key freshest
+        remove(keys, key); //通过LRU算法把数组里面的key删掉
+        keys.push(key); //把它放在数组末尾
+      } else {
+        cache[key] = vnode; //没找到就换存下来
+        keys.push(key); //把它放在数组末尾
+        // prune oldest entry  //如果超过最大值就把数组第0项删掉
+        if (this.max && keys.length > parseInt(this.max)) {
+          pruneCacheEntry(cache, keys[0], keys, this._vnode);
+        }
+      }
+
+      vnode.data.keepAlive = true; //标记虚拟节点已经被缓存
+    }
+    // 返回虚拟节点
+    return vnode || (slot && slot[0]);
+  },
+};
+```
 ### v-if和v-show的区别
 v-show和v-if都是用来显示隐藏元素，v-if还有一个v-else配合使用，两者达到的效果都一样，性能方面去有很大的区别。
 - v-show
@@ -6217,6 +6410,15 @@ Vue3.x借鉴了 ivi算法和 inferno算法
     - 骨架屏
     - PWA
 - 使用缓存(客户端缓存、服务端缓存)优化、服务端开启gzip压缩等。
+### vue 中使用了哪些设计模式
+1. 工厂模式 - 传入参数即可创建实例
+虚拟 DOM 根据参数的不同返回基础标签的 Vnode 和组件 Vnode。
+2. 单例模式 - 整个程序有且仅有一个实例
+vuex 和 vue-router 的插件注册方法 install 判断如果系统存在实例就直接返回掉
+3. 发布-订阅模式 (vue 事件机制)
+4. 观察者模式 (响应式数据原理)
+5. 装饰模式: (@装饰器的用法)
+
 ## VueRouter
 ### hash路由和history路由实现原理说一下
 - location.hash的值实际就是URL中#后面的东西。
@@ -6245,14 +6447,38 @@ window.history.replaceState(state, title, targetURL);
 ```
 - popstate 事件会在点击后退、前进按钮(或调用 history.back()、history.forward()、history.go()方法)时触发
 
+### vue-router 路由钩子函数是什么 执行顺序是什么
+路由钩子的执行流程, 钩子函数种类有:全局守卫、路由守卫、组件守卫。
+
+- 完整的导航解析流程:
+    - 导航被触发。
+    - 在失活的组件里调用 beforeRouteLeave 守卫。
+    - 调用全局的 beforeEach 守卫。
+    - 在重用的组件里调用 beforeRouteUpdate 守卫。重用的组件。
+    - 在路由配置里调用 beforeEnter。
+    - 解析异步路由组件。
+    - 在被激活的组件里调用 beforeRouteEnter。
+    - 调用全局的 beforeResolve 守卫。
+    - 导航被确认。
+    - 调用全局的 afterEach 钩子。
+    - 触发 DOM 更新。
+    - 调用 beforeRouteEnter 守卫中传给 next 的回调函数，创建好的组件实例会作为回调函数的参数传入。
 ## Vuex
-### 为什么 Vuex的mutation中不能做异步操作？
-Vuex中所有的状态更新的唯一途径都是mutation，异步操作通过 Action 来提交 mutation实现，这样使得我们可以方便地跟踪每一个状态的变化，从而让我们能够实现一些工具帮助我们更好地了解我们的应用。 每个mutation执行完成后都会对应到一个新的状态变更，这样devtools就可以打个快照存下来，然后就可以实现 time-travel 了。如果mutation支持异步操作，就没有办法知道状态是何时更新的，无法很好的进行状态的追踪，给调试带来困难。
+### Vuex个人理解
+vuex 是专门为 vue 提供的全局状态管理系统，用于多个组件中数据共享、数据缓存等。（无法持久化、内部核心原理是通过创造一个全局实例 new Vue）
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211015154102.png)
 
 ### vuex是什么？原理是什么？怎么使用？哪种功能场景使用它？
 - 状态管理库，类似 React 中的 Rudux
 - vuex是一个专门为vue构建的状态集管理，主要是为了解决组件间状态共享的问题，强调的是数据的集中式管理，说白了主要是便于维护便于解耦所以不是所有的项目都适合使用vuex，如果你不是构建大型项目使用vuex反而使你的项目代码繁琐多余
 -  state mutations getters actions modules
+
+### 为什么 Vuex的mutation中不能做异步操作？
+Vuex中所有的状态更新的唯一途径都是mutation，异步操作通过 Action 来提交 mutation实现，这样使得我们可以方便地跟踪每一个状态的变化，从而让我们能够实现一些工具帮助我们更好地了解我们的应用。 每个mutation执行完成后都会对应到一个新的状态变更，这样devtools就可以打个快照存下来，然后就可以实现 time-travel 了。如果mutation支持异步操作，就没有办法知道状态是何时更新的，无法很好的进行状态的追踪，给调试带来困难。
+
+### Vuex 页面刷新数据丢失怎么解决
+需要做 vuex 数据持久化 一般使用本地存储的方案来保存数据 可以自己设计存储方案 也可以使用第三方插件
+
 ## Webpack Vite Rollup
 ### Webpack流程
 - webpack到底是如何对我们的项目进行打包的呢？
