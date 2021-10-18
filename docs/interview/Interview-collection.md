@@ -7020,3 +7020,2342 @@ console.log(str)
 - 减小cookie大小，尽量用localStorage代替
 - CDN托管静态文件
 - 开启 Gzip 压缩
+
+## 手写相关函数
+### 手写相关函数1
+#### 手写-如何找到数组中第一个没出现的最小正整数
+```js
+给你一个未排序的整数数组 nums ，请你找出其中没有出现的最小的正整数。
+请你实现时间复杂度为 O(n) 并且只使用常数级别额外空间的解决方案。
+
+示例 1：
+
+输入：nums = [1,2,0]
+输出：3
+
+示例 2：
+
+输入：nums = [3,4,-1,1]
+输出：2
+
+示例 3：
+
+输入：nums = [7,8,9,11,12]
+输出：1
+```
+- 第一版 O(n^2) 的方法
+```js
+const firstMissingPositive = (nums) => {
+  let i = 0;
+  let res = 1;
+  while (i < nums.length) {
+    if (nums[i] == res) {
+      res++;
+      i = 0;
+    } else {
+      i++;
+    }
+  }
+  return res;
+};
+```
+- 第二版 时间空间均为 O(n)
+```js
+const firstMissingPositive = (nums) => {
+  const set = new Set();
+  for (let i = 0; i < nums.length; i++) {
+    set.add(nums[i]);
+  }
+  for (let i = 1; i <= nums.length + 1; i++) {
+    if (!set.has(i)) {
+      return i;
+    }
+  }
+};
+```
+- 最终版 时间复杂度为 O(n) 并且只使用常数级别空间
+```js
+const firstMissingPositive = (nums) => {
+  for (let i = 0; i < nums.length; i++) {
+    while (
+      nums[i] >= 1 &&
+      nums[i] <= nums.length && // 对1~nums.length范围内的元素进行安排
+      nums[nums[i] - 1] !== nums[i] // 已经出现在理想位置的，就不用交换
+    ) {
+      const temp = nums[nums[i] - 1]; // 交换
+      nums[nums[i] - 1] = nums[i];
+      nums[i] = temp;
+    }
+  }
+  // 现在期待的是 [1,2,3,...]，如果遍历到不是放着该放的元素
+  for (let i = 0; i < nums.length; i++) {
+    if (nums[i] != i + 1) {
+      return i + 1;
+    }
+  }
+  return nums.length + 1; // 发现元素 1~nums.length 占满了数组，一个没缺
+};
+```
+#### 手写-怎么在制定数据源里面生成一个长度为 n 的不重复随机数组
+- 第一版 时间复杂度为 O(n^2)
+```js
+function getTenNum(testArray, n) {
+  let result = [];
+  for (let i = 0; i < n; ++i) {
+    const random = Math.floor(Math.random() * testArray.length);
+    const cur = testArray[random];
+    if (result.includes(cur)) {
+      i--;
+      break;
+    }
+    result.push(cur);
+  }
+  return result;
+}
+const testArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+const resArr = getTenNum(testArray, 10);
+```
+- 第二版 标记法 / 自定义属性法 时间复杂度为 O(n)
+```js
+function getTenNum(testArray, n) {
+  let hash = {};
+  let result = [];
+  let ranNum = n;
+  while (ranNum > 0) {
+    const ran = Math.floor(Math.random() * testArray.length);
+    if (!hash[ran]) {
+      hash[ran] = true;
+      result.push(ran);
+      ranNum--;
+    }
+  }
+  return result;
+}
+const testArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+const resArr = getTenNum(testArray, 10);
+```
+- 第三版 交换法 时间复杂度为 O(n)
+```js
+function getTenNum(testArray, n) {
+  const cloneArr = [...testArray];
+  let result = [];
+  for (let i = 0; i < n; i++) {
+    debugger;
+    const ran = Math.floor(Math.random() * (cloneArr.length - i));
+    result.push(cloneArr[ran]);
+    cloneArr[ran] = cloneArr[cloneArr.length - i - 1];
+  }
+  return result;
+}
+const testArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+const resArr = getTenNum(testArray, 14);
+```
+#### 手写-字符串最长的不重复子串
+```js
+const lengthOfLongestSubstring = function (s) {
+  if (s.length === 0) {
+    return 0;
+  }
+
+  let left = 0;
+  let right = 1;
+  let max = 0;
+  while (right <= s.length) {
+    let lr = s.slice(left, right);
+    const index = lr.indexOf(s[right]);
+
+    if (index > -1) {
+      left = index + left + 1;
+    } else {
+      lr = s.slice(left, right + 1);
+      max = Math.max(max, lr.length);
+    }
+    right++;
+  }
+  return max;
+};
+```
+#### 手写-查找数组公共前缀
+```js
+const longestCommonPrefix = function (strs) {
+  const str = strs[0];
+  let index = 0;
+  while (index < str.length) {
+    const strCur = str.slice(0, index + 1);
+    for (let i = 0; i < strs.length; i++) {
+      if (!strs[i] || !strs[i].startsWith(strCur)) {
+        return str.slice(0, index);
+      }
+    }
+    index++;
+  }
+  return str;
+};
+```
+#### 手写-判断括号字符串是否有效
+```js
+const isValid = function (s) {
+  if (s.length % 2 === 1) {
+    return false;
+  }
+  const regObj = {
+    "{": "}",
+    "(": ")",
+    "[": "]",
+  };
+  let stack = [];
+  for (let i = 0; i < s.length; i++) {
+    if (s[i] === "{" || s[i] === "(" || s[i] === "[") {
+      stack.push(s[i]);
+    } else {
+      const cur = stack.pop();
+      if (s[i] !== regObj[cur]) {
+        return false;
+      }
+    }
+  }
+
+  if (stack.length) {
+    return false;
+  }
+
+  return true;
+};
+```
+#### 手写-实现一个对象的 flatten 方法
+```js
+const obj = {
+ a: {
+        b: 1,
+        c: 2,
+        d: {e: 5}
+    },
+ b: [1, 3, {a: 2, b: 3}],
+ c: 3
+}
+
+flatten(obj) 结果返回如下
+// {
+//  'a.b': 1,
+//  'a.c': 2,
+//  'a.d.e': 5,
+//  'b[0]': 1,
+//  'b[1]': 3,
+//  'b[2].a': 2,
+//  'b[2].b': 3
+//   c: 3
+// }
+
+
+
+
+function isObject(val) {
+  return typeof val === "object" && val !== null;
+}
+
+function flatten(obj) {
+  if (!isObject(obj)) {
+    return;
+  }
+  let res = {};
+  const dfs = (cur, prefix) => {
+    if (isObject(cur)) {
+      if (Array.isArray(cur)) {
+        cur.forEach((item, index) => {
+          dfs(item, `${prefix}[${index}]`);
+        });
+      } else {
+        for (let k in cur) {
+          dfs(cur[k], `${prefix}${prefix ? "." : ""}${k}`);
+        }
+      }
+    } else {
+      res[prefix] = cur;
+    }
+  };
+  dfs(obj, "");
+
+  return res;
+}
+flatten();
+```
+#### 手写-将虚拟 Dom 转化为真实 Dom（类似的递归题-必考）
+```js
+// 真正的渲染函数
+function _render(vnode) {
+  // 如果是数字类型转化为字符串
+  if (typeof vnode === "number") {
+    vnode = String(vnode);
+  }
+  // 字符串类型直接就是文本节点
+  if (typeof vnode === "string") {
+    return document.createTextNode(vnode);
+  }
+  // 普通DOM
+  const dom = document.createElement(vnode.tag);
+  if (vnode.attrs) {
+    // 遍历属性
+    Object.keys(vnode.attrs).forEach((key) => {
+      const value = vnode.attrs[key];
+      dom.setAttribute(key, value);
+    });
+  }
+  // 子数组进行递归操作 这一步是关键
+  vnode.children.forEach((child) => dom.appendChild(_render(child)));
+  return dom;
+}
+```
+#### 手写-防抖节流
+```js
+// 防抖
+function debounce(fn, delay = 300) {
+  //默认300毫秒
+  let timer;
+  return function () {
+    const args = arguments;
+    if (timer) {
+      clearTimeout(timer);
+    }
+    timer = setTimeout(() => {
+      fn.apply(this, args); // 改变this指向为调用debounce所指的对象
+    }, delay);
+  };
+}
+
+window.addEventListener(
+  "scroll",
+  debounce(() => {
+    console.log(111);
+  }, 1000)
+);
+
+// 节流
+// 设置一个标志
+function throttle(fn, delay) {
+  let flag = true;
+  return () => {
+    if (!flag) return;
+    flag = false;
+    timer = setTimeout(() => {
+      fn();
+      flag = true;
+    }, delay);
+  };
+}
+
+window.addEventListener(
+  "scroll",
+  throttle(() => {
+    console.log(111);
+  }, 1000)
+);
+```
+#### 手写-发布订阅模式
+```js
+class EventEmitter {
+  constructor() {
+    this.events = {};
+  }
+  // 实现订阅
+  on(type, callBack) {
+    if (!this.events[type]) {
+      this.events[type] = [callBack];
+    } else {
+      this.events[type].push(callBack);
+    }
+  }
+  // 删除订阅
+  off(type, callBack) {
+    if (!this.events[type]) return;
+    this.events[type] = this.events[type].filter((item) => {
+      return item !== callBack;
+    });
+  }
+  // 只执行一次订阅事件
+  once(type, callBack) {
+    function fn() {
+      callBack();
+      this.off(type, fn);
+    }
+    this.on(type, fn);
+  }
+  // 触发事件
+  emit(type, ...rest) {
+    this.events[type] &&
+      this.events[type].forEach((fn) => fn.apply(this, rest));
+  }
+}
+// 使用如下
+// const event = new EventEmitter();
+
+// const handle = (...rest) => {
+//   console.log(rest);
+// };
+
+// event.on("click", handle);
+
+// event.emit("click", 1, 2, 3, 4);
+
+// event.off("click", handle);
+
+// event.emit("click", 1, 2);
+
+// event.once("dbClick", () => {
+//   console.log(123456);
+// });
+// event.emit("dbClick");
+// event.emit("dbClick");
+```
+#### 手写 promise.all 和 race
+```js
+  //静态方法
+  static all(promiseArr) {
+    let result = [];
+    //声明一个计数器 每一个promise返回就加一
+    let count = 0;
+    return new Mypromise((resolve, reject) => {
+      for (let i = 0; i < promiseArr.length; i++) {
+      //这里用 Promise.resolve包装一下 防止不是Promise类型传进来
+        Promise.resolve(promiseArr[i]).then(
+          (res) => {
+            //这里不能直接push数组  因为要控制顺序一一对应(感谢评论区指正)
+            result[i] = res;
+            count++;
+            //只有全部的promise执行成功之后才resolve出去
+            if (count === promiseArr.length) {
+              resolve(result);
+            }
+          },
+          (err) => {
+            reject(err);
+          }
+        );
+      }
+    });
+  }
+  //静态方法
+  static race(promiseArr) {
+    return new Mypromise((resolve, reject) => {
+      for (let i = 0; i < promiseArr.length; i++) {
+        Promise.resolve(promiseArr[i]).then(
+          (res) => {
+            //promise数组只要有任何一个promise 状态变更  就可以返回
+            resolve(res);
+          },
+          (err) => {
+            reject(err);
+          }
+        );
+      }
+    });
+  }
+}
+```
+
+#### 手写Promise
+```js
+/**
+ * 1. Promise就是一个类   在执行这个类的时候 需要传递一个执行器进去  执行器会立即执行
+ * 2. Promise中有三种状态 分别为 成功fulfilled 失败rejected 等待pending  一旦状态确定就不可以更改
+ * 3. resolve,reject函数是用来更改状态的
+ * 4. then方法内部做的事情就是判断 如果状态是成功  调用成功的回调函数 如果状态是失败 调用失败的回调函数。then方法是被定义在原生对象上的方法
+ * 5. then成功回调有一个参数 表示成功之后的值 then失败回调有一个参数  表示失败后的原因
+ */
+const PENDING = 'pending'
+const FULFILLED = 'fulfilled'
+const REJECTED = 'rejected'
+
+class MyPromise {
+    status = PENDING
+    // 成功之后的值
+    value = undefined
+    // 失败之后的原因
+    error = undefined
+    // 成功回调
+    successCallback = []
+    // 失败回调
+    failureCallback = []
+    //传递执行器
+    construct(executor){
+        // 执行器会立即执行  (Promise的立即执行性,除了resolve，reject都执行)
+        try {
+            executor(this.resolve,this.reject)
+            // 捕获执行器错误
+        } catch (error) {
+            this.reject(error)
+        }
+    }
+    resolve = (value) => {
+        // 如果状态不是等待 阻止程序向下执行
+        if(this.status !== PENDING) return   
+        // 更改状态为成功
+        this.status = FULFILLED
+        // 保存成功之后的值
+        this.value = value
+
+        
+        // 异步执行的时候 判断成功回调是否存在 如果存在 调用
+        // this.successCallback && this.successCallback(this.value)
+        while(this.successCallback.length){
+            //从前往后调用
+            this.successCallback.shift()
+        }
+    }
+    reject = (error) => {
+        // 如果状态不是等待 阻止程序向下执行
+        if(this.status !== PENDING) return  
+        // 更改状态为失败
+        this.status = REJECTED
+        // 保存失败之后的原因
+        this.error = error
+
+
+        // 异步执行的时候 判断失败回调是否存在 如果存在 调用
+        // this.failureCallback && this.failureCallback(this.error)
+        while(this.failureCallback.length){
+            //从前往后调用
+            this.failureCallback.shift()
+        }
+    }
+    then(successCallback, failureCallback){
+        /**
+        .then()
+        .then()
+.       .then(value => console.log(value))
+         */
+        // 将 then 方法的参数变成可选参数
+        successCallback  = successCallback ? successCallback : value => value
+        // then链式调用
+        let promise2 = new MyPromise((resolve,reject) => {
+            // 判断状态
+            if(this.status === FULFILLED) {
+                // 变成异步代码   等待所有同步代码完成之后执行  这样做的原因是为了获取 promise2
+                setTimeout(() =>{
+                    // 捕获 then 链式调用的错误  上一个then的错误  传给下一个then的catch
+                    try {
+                        let x = successCallback(this.value)
+                        // 判断 x 的值是普通纸还是promise对象
+                        // 如果是普通值 直接调用resolve
+                        // 如果是promise对象，查看promise对象返回的结果
+                        // 再根据promise对象返回的结果，决定调用resolve还是reject
+                        resolvePromise(promise2,x,resolve,reject)
+                    } catch (error) {
+                        reject(error)
+                    }
+                },0)
+            }else if(this.status === REJECTED) {
+                setTimeout(() =>{
+                    // 捕获 then 链式调用的错误  上一个then的错误  传给下一个then的catch
+                    try {
+                        let x = failureCallback(this.error)
+                        // 判断 x 的值是普通纸还是promise对象
+                        // 如果是普通值 直接调用resolve
+                        // 如果是promise对象，查看promise对象返回的结果
+                        // 再根据promise对象返回的结果，决定调用resolve还是reject
+                        resolvePromise(promise2,x,resolve,reject)
+                    } catch (error) {
+                        reject(error)
+                    }
+                },0) 
+            }else {
+                // 调用then的时候  没有直接调用 resolve 和 reject。异步之后调用
+                // 处理异步状态
+                // 等待状态
+                // 将成功回调和失败回调存储起来
+                // then 方法多次调用添加多个处理函数
+                this.successCallback.push(() => {
+                    setTimeout(() =>{
+                        // 捕获 then 链式调用的错误  上一个then的错误  传给下一个then的catch
+                        try {
+                            let x = successCallback(this.value)
+                            // 判断 x 的值是普通纸还是promise对象
+                            // 如果是普通值 直接调用resolve
+                            // 如果是promise对象，查看promise对象返回的结果
+                            // 再根据promise对象返回的结果，决定调用resolve还是reject
+                            resolvePromise(promise2,x,resolve,reject)
+                        } catch (error) {
+                            reject(error)
+                        }
+                    },0)
+                })
+                this.failureCallback.push(() => {
+                    setTimeout(() =>{
+                        // 捕获 then 链式调用的错误  上一个then的错误  传给下一个then的catch
+                        try {
+                            let x = failureCallback(this.error)
+                            // 判断 x 的值是普通纸还是promise对象
+                            // 如果是普通值 直接调用resolve
+                            // 如果是promise对象，查看promise对象返回的结果
+                            // 再根据promise对象返回的结果，决定调用resolve还是reject
+                            resolvePromise(promise2,x,resolve,reject)
+                        } catch (error) {
+                            reject(error)
+                        }
+                    },0) 
+                })
+            }
+        })
+        return promise2
+    }
+    finally(callback) {
+        //最后一个promise的then
+        return this.then((value) => {
+                                                  //执行这个promise
+            return MyPromise.resolve(callback()).then(() => value)
+        },(error) => {
+            return MyPromise.resolve(callback()).then(() => {throw error})
+        })
+    } 
+    catch(failureCallback){
+        return this.then(undefined,failureCallback)
+    }
+    static all(array){
+        // 结果数组
+        let result = []
+        let index = 0
+        let len = array.length
+
+        return new MyPromise((resolve, reject) =>{
+            function addData(key, value){
+                result[key] = value
+                index++
+                if(index === len){
+                    // 全部成功
+                    resolve(result)
+                }
+            }
+            // for循环瞬间就执行完了
+            // 注意执行的时候  有可能有异步循环
+            for(let i=0;i < len;i++){
+                let current = array[i]
+                if(current instanceof MyPromise){
+                    // 失败就调用reject(error)  
+                    current.then(value => addData(i, value),error => reject(error))
+                }else {
+                    addData(i,array[i])
+                }
+            }
+        })
+    }
+    static resolve(value){
+        if(value instanceof MyPromise){
+            return value
+        }else {
+            return new MyPromise(resolve => resolve(value))
+        }
+    }
+    static reject(error){
+        if(value instanceof MyPromise){
+            return error
+        }else {
+            return new MyPromise((resolve, reject) => reject(error));
+        }
+    }
+    // 接收一个Promise数组，数组中如有非Promise项，则此项当做成功
+    // 哪个Promise最快得到结果，就返回那个结果，无论成功失败
+    static race(array) {
+        return new MyPromise((resolve, reject) => {
+            array.forEach(item => {
+                if (item instanceof MyPromise) {
+                    item.then(res => {
+                        resolve(res)
+                    }, err => {
+                        reject(err)
+                    })
+                } else {
+                    resolve(promise)
+                }
+            })
+        })
+    }
+    // 接收一个Promise数组，数组中如有非Promise项，则此项当做成功
+    // 如果有一个Promise成功，则返回这个成功结果
+    // 如果所有Promise都失败，则报错
+    static any(array) {
+        return new Promise((resolve, reject) => {
+            let count = 0
+            array.forEach((item) => {
+                item.then(val => {
+                    resolve(val)
+                }, err => {
+                    count++
+                    if (count === array.length) {
+                        reject(new AggregateError('All promises were rejected'))
+                    }
+                })
+            })
+        })
+    }
+}
+
+
+function resolvePromise(promise2,x,resolve,reject) {
+    // then 方法链式调用识别 Promise 对象来自自己   不能自己返回自己的promise2 形成死循环调用
+    // 处理自己返回自己
+    if(promise2 === x){
+        // return 阻止向下执行
+        return reject(new TypeError('Chaining cycle detected for promise #<Promise>'))
+    }
+    if(x instanceof MyPromise){
+        // promise对象
+        // x.then((value) => resolve(value),(error) => reject(error))
+        x.then(resolve,reject)
+    }else {
+        // 普通值
+        resolve(x)
+    }
+}
+```
+#### 手写new
+```js
+function myNew(Con, ...args) {
+  // 创建一个空的对象
+  let obj = {};
+  // 隐式原型链接到该函数的原型，obj 可以访问到构造函数原型中的属性
+  obj.__proto__ = Con.prototype;
+  // 绑定 this 实现继承，obj 可以访问到构造函数中的属性
+  let ret = Con.call(obj, ...args);
+  // 优先返回构造函数返回的对象
+  return ret instanceof Object ? ret : obj;
+}
+```
+#### 手写简单的闭包
+```js
+function a() {
+    var i = 0
+
+    function b() {
+        return i++
+    }
+    return b
+}
+
+var x
+x = a()
+
+console.log(x())
+console.log(x())
+console.log(x())
+```
+
+#### 手写trim函数
+```js
+String.prototype.trim = function() {
+    return this.replace(/^\s+|\s+$/gm,'');
+}
+````
+
+#### 手写compose函数组合函数
+```js
+function compose(..args){
+    return function(value){
+        return args.reverse().reduce(function (acc,fn){
+            return fn(acc)
+        //acc的初始值
+        },value)
+    }
+}
+
+const compose = (...args) => value => args.reverse().reduce((acc,fn) => fn(acc),value);
+
+const compose = (...fns) => {
+  if (!fns.length) return (v) => v;
+  if (fns.length === 1) return fns[0];
+  return fns.reduce((acc,cur) => {
+    return (...args) => {
+      return acc(cur(...args))
+    }
+  })
+}
+```
+
+#### 手写柯里化函数
+```js
+// 柯里化后的函数
+let curried = _.curry(getSum)
+// 测试
+curried(1,2,3);
+curried(1)(2)(3);
+curried(1,2)(3);
+```
+
+
+```js
+function curry(fn){
+    return function curriedFn(...args){
+        if(fn.arguments.length > args.length){
+            // 递归调用，直到参数个数相等
+            return curriedFn(...args.concat(Array.from(arguments)))
+        }
+        // 实参和形参个数相同，调用fn，返回结果
+        return fn(...args);
+    }
+}
+````
+
+```md
+实现一个 add 方法
+题目描述:实现一个 add 方法 使计算结果能够满足如下预期： add(1)(2)(3)()=6 add(1,2,3)(4)()=10
+```
+```js
+function add(...args) {
+  let allArgs = [...args];
+  function fn(...newArgs) {
+    allArgs = [...allArgs, ...newArgs];
+    return fn;
+  }
+  fn.toString = function () {
+    if (!allArgs.length) {
+      return;
+    }
+    return allArgs.reduce((sum, cur) => sum + cur);
+  };
+  return fn;
+}
+```
+
+#### 手写bind、call、apply函数
+这道题其实理清楚`apply`,`call`,`bind`的特点就行了。首先`apply`,`call`,`bind`都是强制绑定`this`,而`apply`和`call`都是立即执行，只有`bind`是返回一个函数，所以可以将`apply`和`call`放在一起分析。
+
+通过上面的`apply`,`call`,`bind`用法可以得知：
+
+1. `apply`,`call`,`bind`都是可以改变`this`的指向
+2. `apply`,`call`会执行调用的函数，`bind`返回一个新函数。
+3. `apply`第二个参数要求是数组，`call`，`bind`则没有限制数据类型，它会把剩余的参数一起传给函数，`bind`还会把新函数调用时传入的参数一起合并，传给新函数。
+4. 他们都是绑定在`Function`的`prototype`上。
+
+```js
+// call
+Function.prototype._call = function (context, ...args) {
+   // 判断是否是个函数
+  if (typeof this !== 'function') {
+    throw new Error('not function')
+  }
+  // 不传默认是全局，window
+  context = context || window
+  // args不传时默认是空数组，防止下面用spread操作符时报错
+  args = args ? args : []
+  // 把this存到context.fn，这里的this是调用的函数
+  context.fn = this
+  // 执行调用的函数，this指向context，参数用spread操作符扩展
+  const res = context.fn(...args)
+  // 删除，不污染context
+  delete context.fn
+  // 返回res
+  return res
+}
+
+
+// bind
+Function.prototype._bind = function (context, ...args) {
+   // 判断是否是个函数
+  if (typeof this !== 'function') {
+    throw new Error('not function')
+  }
+  // 不传默认是全局，window
+  context = context || window
+  // 把this存到fn，这里的this是调用的函数
+  let fn = this
+  return function newFn (...fnArgs) {
+    let res
+    // 要考虑新函数是不是会当作构造函数
+    if (this instanceof newFn) {
+      // 如果是构造函数则调用new 并且合并参数args，fnArgs
+      res = new fn(...args, ...fnArgs)
+    } else {
+      // 当作普通函数调用 也可以用上面定义的_call
+      res = fn.call(context, ...args, ...fnArgs)
+    }
+    return res
+  }
+}
+
+
+// apply
+Function.prototype._apply = function (context, args) {
+  // 不传默认是全局，window
+  context = context || window
+  // args不传时默认是空数组，防止下面用spread操作符时报错
+  args = args ? args : []
+  // 把this存到context.fn，这里的this是调用的函数
+  context.fn = this
+  // 执行调用的函数，this指向context，参数用spread操作符扩展
+  const res = context.fn(...args)
+  // 删除，不污染context
+  delete context.fn
+  // 返回res
+  return res
+}
+```
+
+#### 手写jQuery
+
+```js
+class jQuery {
+    constructor(selector) {
+        const result = document.querySelectorAll(selector)
+        const length = result.length
+        for (let i = 0; i < length; i++) {
+            this[i] = result[i]
+        }
+        this.length = length
+        this.selector = selector
+    }
+    get(index) {
+        return this[index]
+    }
+    each(fn) {
+        for (let i = 0; i < this.length; i++) {
+            const elem = this[i]
+            fn(elem)
+        }
+    }
+    on(type, fn) {
+        return this.each(elem => {
+            elem.addEventListener(type, fn, false)
+        })
+    }
+    // 扩展很多 DOM API
+}
+
+// 插件
+jQuery.prototype.dialog = function (info) {
+    alert(info)
+}
+
+// “造轮子”
+class myJQuery extends jQuery {
+    constructor(selector) {
+        super(selector)
+    }
+    // 扩展自己的方法
+    addClass(className) {
+
+    }
+    style(data) {
+        
+    }
+}
+
+// const $p = new jQuery('p')
+// $p.get(1)
+// $p.each((elem) => console.log(elem.nodeName))
+// $p.on('click', () => alert('clicked'))
+
+```
+
+#### 手写Ajax
+
+1. 创建`XMLHttpRequest`对象;
+
+2. 调用`open`方法传入三个参数 请求方式`(GET/POST)、url、同步异步(true/false)`;
+
+3. 监听`onreadystatechange`事件，当`readystate`等于4时返回`responseText`;
+
+4. 调用send方法传递参数。
+
+```js
+ var opt = {
+     url: '',
+     type: 'get',
+     data: {},
+     success: function () {},
+     error: function () {},
+ };
+
+ function ajax(opt) {
+     // 声明XMLHttpRequest对象 并且做兼容处理
+     var xhr = XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
+     var data = opt.data,
+         url = opt.url,
+         type = opt.type.toUpperCase(),
+         dataArr = [];
+     for (var k in data) {
+         dataArr.push(k + '=' + data[k]);
+     }
+     if (type === 'GET') {
+         url = url + '?' + dataArr.join('&');
+         xhr.open(type, true);
+         xhr.send();
+     }
+     if (type === 'POST') {
+         xhr.open(type, url, true);
+         xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+         xhr.send(dataArr.join('&'));
+     }
+     // 只判断响应时间就可以了
+     xhr.onreadystatechange = function () {
+         if (xhr.status >= 200 && xhr.status < 300 || xhr.status === 304) {
+             var res;
+             if (opt.success && opt.success instanceof Function) {
+                 res = xhr.responseText;
+                 if (typeof res === = 'string') {
+                     res = JSON.parse(res);
+                     opt.success.call(xhr, res);
+                 }
+             }
+         } else {
+             if (opt.error && opt.error instanceof Function) {
+                 opt.error.call(xhr, res);
+             }
+         }
+     };
+ }
+```
+
+#### 手写`——proto__`
+
+```js
+Object.defineProperty(Object.prototype, "__proto__", {
+    get: function() {
+        return Object.getPrototypeOf(this);
+    },
+    // ES6中的Object.setPrototypeOf
+    set: function(o) {
+        Object.setPrototypeOf(this, o);
+        return o;
+    }
+})
+```
+
+#### 手写instanceof
+
+```js
+function _instanceof(A, B) {
+    var O = B.prototype;// 取B的显示原型
+    A = A.__proto__;// 取A的隐式原型
+    while (true) {
+        //Object.prototype.__proto__ === null
+        if (A === null)
+            return false;
+        if (O === A)// 这里重点：当 O 严格等于 A 时，返回 true
+            return true;
+        A = A.__proto__;
+    }
+}
+```
+
+#### 手写new运算符
+
+```js
+/**
+ * Con 目标对象
+ * args 参数
+ */
+function myNew(Con, ...args) {
+  // 创建一个空的对象
+  let obj = {};
+  // 链接到原型，obj 可以访问到构造函数原型中的属性
+  obj.__proto__ = Con.prototype;
+  // 绑定 this 实现继承，obj 可以访问到构造函数中的属性
+  let ret = Con.call(obj, ...args);
+  // 优先返回构造函数返回的对象
+  return ret instanceof Object ? ret : obj;
+}
+
+
+function Person(name) {
+  this.name = name;
+}
+Person.prototype.getName = function() {
+  console.log(`your name is ${this.name}`);
+};
+let p2 = myNew(Person, "lisi");
+// your name is lisi
+p2.getName();
+```
+
+#### 手写forEach方法
+
+```js
+Array.prototype.myForEach = function (func, context) {
+  	let arr = Array.prototype.slice.call(this)
+    for (var i = 0; i < arr.length; i++) {
+        func.call(context, arr[i], i, this)
+    }
+}
+```
+
+#### 手写map函数
+```javascript
+Array.prototype.map = function(fn) {
+    const result = [];
+    for (let i=0;i<this.length;i++) {
+        if (!this.hasOwnProperty(i)) continue; // 处理稀疏数组的情况
+        // 运行传递过来的函数  是一个匿名函数
+        result.push(fn(this[i],i,this))
+    }
+    return result
+}
+const arr = [1,2,3,,5]
+const result = arr.map(item => item*2)
+console.log(result)
+
+
+
+//es5实现map函数
+const selfMap = function (fn,context){
+  //当前带有length的对象转化为数组
+  let arr = Array.prototype.slice.call(this)
+  let mappedArr = []
+  for(let i = 0;i < arr.length;i++){
+    if(!arr.hasOwnProperty(i)) continue
+    mappedArr.push(fn.call(context,arr[i],i,this))	
+  }
+  return mappedArr
+}
+值得一提的是，map 的第二个参数为第一个参数回调中的 this 指向，如果第一个参数为箭头函数，那设置第二个 this 会因为箭头函数的词法绑定而失效
+
+
+//使用reduce实现数组map方法
+const selfMap2 = function(fn,context){
+  let arr = Array.prototype.slice.call(this)
+  return arr.reduce((pre,cur,index) => {
+    return [...pre,fn.call(context,cur,index,this)]
+  },[])
+}
+
+```
+
+#### 手写filter函数
+```javascript
+Array.prototype.filter = function (fn){
+    const result = [];
+    for (let i=0;i<this.length;i++) {
+        if (!this.hasOwnProperty(i)) continue; // 处理稀疏数组的情况
+        fn(this[i],i,this) && result.push(this[i])
+    }
+    return result
+}
+const arr = [1,2,3,,5]
+const result = arr.filter(item => item > 2)
+console.log(result)
+
+
+//es5实现
+const seltFilter = function(fn,context){
+  let arr = Array.prototype.slice.call(this)
+  let filteredArr = []
+  for(let i = 0;i < arr.length;i++){
+    if (!this.hasOwnProperty(i)) continue; // 处理稀疏数组的情况
+    fn.call(context,arr[i],i,this) && filteredArr.push(arr[i])
+  }
+}
+
+//使用reduce实现数组filter方法
+const selfFilter2 = function(fn,context){
+  return this.reduce((pre,cur,index) => {
+    return  fn.call(context,arr[i],i,this) ? [...pre,...cur] :[...pre]
+  })
+}
+```
+
+#### 手写reduce函数
+```javascript
+Array.prototype.reduce = function (fn,initValue){
+    let result = initValue?initValue:this[0]
+    for (let i=0;i<this.length;i++) {
+        if (!this.hasOwnProperty(i)) continue; // 处理稀疏数组的情况
+        result = fn(result, this[i], i, this)
+    }
+    return result
+}
+const arr = [1,,2,3,,5]
+const result = arr.reduce((a,b) => a*b,2)
+console.log(result)
+
+
+
+//es5
+const findRealELementIndex = function(arr,initiIndex){
+  let index
+  for(let i = initIndex || 0;i < arr.length;i++){
+    if(!arr.hasOwnProperty(i)) continue
+    index = i
+    break
+  }
+  return index
+}
+const selfReduce = function(fn,initalValue){
+  let arr = Array.prototype.slice.call(this)
+  let res
+  
+  if(initalValue === undefined){
+    res = arr[findRealElementIndex(arr)]
+    for(let i = 0;i < arr.lenght -1;i++){
+      //reduce遍历时候 需要跳过稀疏元素，遍历到最后一个非稀疏元素
+      if(!arr.hasOwnProperty(i)) continue
+      let realElementIndex = findRealElementIndex(arr,i+1)
+      res = fn.call(null,res,arr[realElementIndex],realElementIndex,this)
+    }
+  }else {
+    res = initalValue
+    for(let i = 0;i <arr.length;i++){
+      if(!arr.hasOwnProperty(i)) continue
+      res = fn.call(null,res,arr[i],i,this)
+    }
+  }
+  return res
+}
+
+
+
+//另一种es5的方法
+Array.prototype.myReduce = function (func, initialValue) {
+    var len = this.length,
+        nextValue,
+        i;
+    if (!initialValue) {
+        // 没有传第二个参数
+        nextValue = this[0];
+        i = 1;
+    } else {
+        // 传了第二个参数
+        nextValue = initialValue;
+        i = 0;
+    }
+    for (; i < len; i++) {
+        nextValue = func(nextValue, this[i], i, this);
+    }
+    return nextValue;
+}
+```
+
+#### 手写every函数
+```javascript
+Array.prototype.every = function (fn){
+    let bool = true;
+    for (let i=0;i<this.length;i++) {
+        if (!this.hasOwnProperty(i)) continue; // 处理稀疏数组的情况
+        if (!fn(this[i],i,this)){
+            bool = false
+            break
+        }
+    }
+    return bool
+}
+const arr = [1,2,3,,5]
+const result = arr.every(item => item > 3)
+console.log(result)
+```
+
+#### 手写some函数
+```javascript
+Array.prototype.some = function (fn){
+    let bool = false;
+    for (let i=0;i<this.length;i++) {
+        if (!this.hasOwnProperty(i)) continue; // 处理稀疏数组的情况
+        if (fn(this[i],i,this)){
+            bool = true
+            break
+        }
+    }
+    return bool
+}
+const arr = [1,2,3,,5]
+const result = arr.some(item => item > 3)
+console.log(result)
+
+
+//es5
+const selfSome = function(fn,context){
+  let arr = Array.prototype.slice.call(this)
+  if(!arr.length) return false
+  let flag = false
+  for(let i = 0;i < arr.length;i++){
+    if(!arr.hasOwnProperty(i)) continue
+    let res = fn.call(context,arr[i],i,this)
+    if(res) {
+      flag = true
+      break
+    }
+  }
+  return flag
+}
+
+执行 some 方法的数组如果是一个空数组，最终始终会返回 false，而另一个数组的 every 方法中的数组如果是一个空数组，会始终返回 true
+
+
+```
+
+#### 手写find方法
+```javascript
+// 只查找第一个
+Array.prototype.find = function (fn){
+    let result
+    for (let i=0;i<this.length;i++) {
+        if (!this.hasOwnProperty(i)) continue; // 处理稀疏数组的情况
+        if (fn(this[i],i,this)){
+            result = this[i]
+            break
+        }
+    }
+    return result
+}
+const arr = [1,2,3,,5,4]
+const result = arr.find(item => item > 3)
+console.log(result)
+```
+
+#### 类数组转化为数组的方法
+```js
+// 类数组拥有 length 属性 可以使用下标来访问元素 但是不能使用数组的方法 如何把类数组转化为数组?
+
+const arrayLike=document.querySelectorAll('div')
+
+// 1.扩展运算符
+[...arrayLike]
+// 2.Array.from
+Array.from(arrayLike)
+// 3.Array.prototype.slice
+Array.prototype.slice.call(arrayLike)
+// 4.Array.apply
+Array.apply(null, arrayLike)
+// 5.Array.prototype.concat
+Array.prototype.concat.apply([], arrayLike)
+```
+
+#### 手写拉平数组(数组扁平化)
+```javascript
+// 利用es6语法flat(num)方法将数组拉平
+// 该方法不传参数默认只会拉平一层，如果想拉平多层嵌套的数组，需要传入一个整数，表示要拉平的层级。该返回返回一个新的数组，对原数组没有影响。
+function flattening1(arr,num=1) {
+    if (!Array.isArray(arr)) return
+    return arr.flat(num)
+}
+// 利用 reduce() 方法将数组拉平。
+// 利用 reduce 进行迭代，核心的思想是递归实现。
+function flattening2(arr) {
+    if (!Array.isArray(arr)) return
+    return arr.reduce((a, b)=>{
+        return a.concat(Array.isArray(b)?flattening2(b):b);
+    }, [])
+}
+// 模拟栈实现数组拉平
+// 该方法是模拟栈，在性能上相对最优解。
+function flattening3(arr) {
+    if (!Array.isArray(arr)) return
+    const stack = [...arr]
+    const res = []
+    while (stack.length){
+        let value = stack.shift()
+        Array.isArray(value) ? stack.push(value) : res.push(value)
+    }
+    return res
+}
+
+const arr = [1, 2, 3, 4, [1, 2, 3, [1, 2, 3, [1, 2, 3]]], 5, ["string", { type: "对象" }]];
+const result1 = flattening1(arr,1)
+const result2 = flattening2(arr)
+const result3 = flattening2(arr)
+console.log(result3)
+
+//使用reduce实现数组的flat方法
+```
+
+#### 实现一个对象的 flatten 方法
+```js
+const obj = {
+ a: {
+        b: 1,
+        c: 2,
+        d: {e: 5}
+    },
+ b: [1, 3, {a: 2, b: 3}],
+ c: 3
+}
+
+flatten(obj) 结果返回如下
+// {
+//  'a.b': 1,
+//  'a.c': 2,
+//  'a.d.e': 5,
+//  'b[0]': 1,
+//  'b[1]': 3,
+//  'b[2].a': 2,
+//  'b[2].b': 3
+//   c: 3
+// }
+```
+```js
+function isObject(val) {
+  return typeof val === "object" && val !== null;
+}
+
+function flatten(obj) {
+  if (!isObject(obj)) {
+    return;
+  }
+  let res = {};
+  const dfs = (cur, prefix) => {
+    if (isObject(cur)) {
+      if (Array.isArray(cur)) {
+        cur.forEach((item, index) => {
+          dfs(item, `${prefix}[${index}]`);
+        });
+      } else {
+        for (let k in cur) {
+          dfs(cur[k], `${prefix}${prefix ? "." : ""}${k}`);
+        }
+      }
+    } else {
+      res[prefix] = cur;
+    }
+  };
+  dfs(obj, "");
+
+  return res;
+}
+flatten();
+```
+
+#### 手写图片懒加载&惰性函数
+实现图片懒加载其核心的思想就是将 img 的 src 属性先使用一张本地占位符，或者为空。然后真实的图片路径再定义一个 data-set 属性存起来，待达到一定条件的时将 data-img 的属性值赋给 src。
+如下是通过scroll滚动事件监听来实现的图片懒加载，当图片都加载完毕移除事件监听，并且将移除 html 标签。
+```javascript
+const lazyLoad = function(imgs){
+    let count = 0
+    const deleteImgs = []
+    const handler = () => {
+        imgs.forEach((item,index) => {
+            // getBoundingClientRect用于获取某个元素相对于视窗的位置集合
+            const react = item.getBoundingClientRect()
+            if (react.top<window.innerHeight){
+                item.src = dataset.src
+                count++
+                deleteImgs.push(index)
+                if (count === deleteImgs.length) document.removeEventListener('scroll',lazyLoad)
+            }
+        })
+        imgs = imgs.filter((item,index)=>!deleteImgs.includes(index))
+    }
+    return handler()
+}
+```
+
+scroll滚动事件容易造成性能问题。那可以通过 IntersectionObserver 自动观察 img 标签是否进入可视区域。
+实例化 IntersectionObserver 实例，接受两个参数：callback 是可见性变化时的回调函数，option 是配置对象（该参数可选）。
+当 img 标签进入可视区域时会执行实例化时的回调，同时给回调传入一个 entries 参数，保存着实例观察的所有元素的一些状态，比如每个元素的边界信息，当前元素对应的 DOM 节点，当前元素进入可视区域的比率，每当一个元素进入可视区域，将真正的图片赋值给当前 img 标签，同时解除对其的观察。
+```javascript
+const lazyLoad = function(imgs){
+  const observer = new InteractionObserver((entities)=>{
+      entities.forEach((entity) => {
+          if(entity.intersectionRatio > 0) {
+              entity.target.src = dataset.src
+              observer.unobserve(entity.target)
+          }
+      })
+  })
+  imgs.forEach((img) => observer.observe(img))
+}
+```
+
+#### 手写预加载
+```javascript
+let images = [...document.querySelectorAll('img')]
+const loadedImages = function(...imgs){
+    const imagesArr = []
+    let count = 0
+    for (let i=0;i<images.length;i++) {
+        const img = new Image()
+        img.onload = function(){
+            imgs[i].src = imagesArr[i]
+            count++
+            if (count === imagesArr.length) {
+                console.log("加载完成")
+            }
+        }
+
+    }
+    return {
+        setSrc: function(...args) {
+            imgs.forEach((img) => img.src = '///loading.png')
+            imagesArrr = args
+        }
+    }
+}
+```
+
+#### 手写节流&防抖
+针对高频的触发的函数，我们一般都会思考通过节流或者防抖去实现性能上的优化。
+节流实现原理是通过定时器以和时间差做判断。定时器有延迟的能力，事件一开始不会立即执行，事件结束后还会再执行一次；而时间差事件一开始就立即执行，时间结束之后也会立即停止。
+结合两者的特性封装节流函数：
+```javascript
+//防抖
+function debounce(handle, delay) {
+    var timer = null;
+    return function () {
+        var _self = this, _args = arguments;
+        clearTimeout(timer);
+        timer = setTimeout(function () {
+            handle.apply(_self, _args)
+        }, delay)
+    }
+}
+
+//节流
+function throttle(handler, wait) {
+    var lastTime = 0;
+    return function (e) {
+        var nowTime = new Date().getTime();
+        if (nowTime - lastTime > wait) {
+            handler.apply(this, arguments);
+            lastTime = nowTime;
+        }
+    }
+}
+
+function throttle(fn, gapTime) {
+  let timer = null
+  return function(){
+    var _self = this,_args = argument;
+    if(timer){
+      return 
+    }
+    timer = setTimeout(() => {
+      fn.apply(_self,_args)
+      timer = null
+    })
+  }
+}
+```
+#### JS函数防抖和函数节流
+
+1. 函数防抖(debounce)
+   - **概念：** `在事件被触发n秒后再执行回调，如果在这n秒内又被触发，则重新计时。`
+   - **生活中的实例：** `如果有人进电梯（触发事件），那电梯将在10秒钟后出发（执行事件监听器），这时如果又有人进电梯了（在10秒内再次触发该事件），我们又得等10秒再出发（重新计时）。`**生活中的实例：** `我们知道目前的一种说法是当 1 秒内连续播放 24 张以上的图片时，在人眼的视觉中就会形成一个连贯的动画，所以在电影的播放（以前是，现在不知道）中基本是以每秒 24 张的速度播放的，为什么不 100 张或更多是因为 24 张就可以满足人类视觉需求的时候，100 张就会显得很浪费资源。`
+   - **事件响应函数在一段规定时间（前/后）才执行。如果在规定时间内，再次触发，重新计算时间。**
+   - **触发高频事件后 n 秒内函数只会执行一次，如果 n 秒内高频事件再次被触发，则重新计算时间**
+   - **防抖动是将多次执行变为最后一次执行**
+   - **函数防抖是指频繁触发的情况下，只有足够的空闲时间，才执行代码一次。**
+2. 函数节流(throttle)
+   - **概念：** `规定一个单位时间，在这个单位时间内，只能有一次触发事件的回调函数执行，如果在同一个单位时间内某事件被触发多次，只有一次能生效。`
+   - **生活中的实例：** `我们知道目前的一种说法是当 1 秒内连续播放 24 张以上的图片时，在人眼的视觉中就会形成一个连贯的动画，所以在电影的播放（以前是，现在不知道）中基本是以每秒 24 张的速度播放的，为什么不 100 张或更多是因为 24 张就可以满足人类视觉需求的时候，100 张就会显得很浪费资源。`、
+   - **高频事件触发，但在 n 秒内只会执行一次，所以节流会稀释函数的执行频率**
+   - **节流是将多次执行变成每隔一段时间执行。**
+   - **函数节流是指一定时间内js方法只跑一次。**
+
+对于函数防抖，有以下几种应用场景：
+
+- 防止表单多次提交。
+- 对于输入框连续输入进行AJAX验证时，用函数防抖能有效减少请求次数。搜索框输入查询（监听输入框输入内容，设定每隔一段时间访问接口。
+- 判断`scroll`是否滑到底部，`滚动事件`+`函数防抖`
+- 浏览器窗口缩放时，resize事件。
+- 手机号，邮箱验证输入检测
+
+总的来说，适合多次事件**一次响应**的情况
+
+```js
+// 包含立即执行
+function debounce(fn, wait = 200, immediate = false) {
+  let timer = null, 
+      isEnd = true, // 默认后执行  用变量来判断先后执行
+      result
+  let debounced = function (...args) {
+    if (timer) clearTimeout(timer)
+    if (immediate) { // 立即执行
+      // 改变this指向
+      isEnd && (result = fn.apply(this, args))
+      isEnd = false
+    }
+    // 后执行
+    timer = setTimeout(() => {
+      (!immediate) && (result = fn.apply(this, args))
+      isEnd = true
+    }, wait)
+    return result
+  }
+  debounced.cancel = function () {
+    if (timer) clearTimeout(timer)
+    timer = null
+  }
+  return debounced
+}
+
+
+
+
+//解决函数异步问题 
+//  配合async 和  awit使用
+function debounce(fn, wait, immediate) {
+  let timer = null, result
+  let debounced = function (...args) {
+    // 使用Promise
+    return new Promise(res => {
+      if (timer) clearInterval(timer)
+      if (immediate) {// 立即执行
+        if (!timer) {
+          result = fn.apply(this, args)
+          res(result)
+        }
+        //当我们提交失败了怎么办（哭），在设定的时间间隔内，将timer设置为null, 过了设定的时间间隔，可以再次触发提交按钮的立即执行，这才是完整的。
+        timer = setTimeout(() => {
+          timer = null
+        }, wait);
+      } else {
+        timer = setTimeout(() => {
+          result = fn.apply(this, args)
+          res(result)
+        }, wait);
+      }
+    })
+  }
+  debounced.cancel = function () {
+    if (timer) clearTimeout(timer)
+    timer = null
+  }
+  return debounced
+}
+
+
+var fn = function () {
+  console.log('boom')
+}
+
+setInterval(debounce(fn,500),1000) // 第一次在1500ms后触发，之后每1000ms触发一次
+
+setInterval(debounce(fn,2000),1000) // 不会触发一次（我把函数防抖看出技能读条，如果读条没完成就用技能，便会失败而且重新读条）
+
+```
+
+对于函数节流，有如下几个场景：
+
+- 游戏中的刷新率
+- DOM元素拖拽
+- Canvas画笔功能
+
+总的来说，适合**大量事件**按时间做**平均**分配触发。
+
+```js
+function throttle(fn, gapTime) {
+  let timer = null
+  return function(){
+    var _self = this,_args = argument;
+    if(timer){
+      return 
+    }
+    timer = setTimeout(() => {
+      fn.apply(_self,_args)
+      timer = null
+    })
+  }
+}
+
+let fn = ()=>{
+  console.log('boom')
+}
+
+setInterval(throttle(fn,1000),10)
+
+```
+
+函数防抖和函数节流是**在时间轴上控制函数的执行次数**。防抖可以类比为`电梯不断上乘客`,节流可以看做`幻灯片限制频率播放电影`。
+
+#### 冒泡排序--时间复杂度 n^2
+```js
+function bubbleSort(arr) {
+  // 缓存数组长度
+  const len = arr.length;
+  // 外层循环用于控制从头到尾的比较+交换到底有多少轮
+  for (let i = 0; i < len; i++) {
+    // 内层循环用于完成每一轮遍历过程中的重复比较+交换
+    for (let j = 0; j < len - 1; j++) {
+      // 若相邻元素前面的数比后面的大
+      if (arr[j] > arr[j + 1]) {
+        // 交换两者
+        [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+      }
+    }
+  }
+  // 返回数组
+  return arr;
+}
+// console.log(bubbleSort([3, 6, 2, 4, 1]));
+```
+#### 选择排序--时间复杂度 n^2
+```js
+function selectSort(arr) {
+  // 缓存数组长度
+  const len = arr.length;
+  // 定义 minIndex，缓存当前区间最小值的索引，注意是索引
+  let minIndex;
+  // i 是当前排序区间的起点
+  for (let i = 0; i < len - 1; i++) {
+    // 初始化 minIndex 为当前区间第一个元素
+    minIndex = i;
+    // i、j分别定义当前区间的上下界，i是左边界，j是右边界
+    for (let j = i; j < len; j++) {
+      // 若 j 处的数据项比当前最小值还要小，则更新最小值索引为 j
+      if (arr[j] < arr[minIndex]) {
+        minIndex = j;
+      }
+    }
+    // 如果 minIndex 对应元素不是目前的头部元素，则交换两者
+    if (minIndex !== i) {
+      [arr[i], arr[minIndex]] = [arr[minIndex], arr[i]];
+    }
+  }
+  return arr;
+}
+// console.log(quickSort([3, 6, 2, 4, 1]));
+```
+#### 插入排序--时间复杂度 n^2
+```js
+function insertSort(arr) {
+  for (let i = 1; i < arr.length; i++) {
+    let j = i;
+    let target = arr[j];
+    while (j > 0 && arr[j - 1] > target) {
+      arr[j] = arr[j - 1];
+      j--;
+    }
+    arr[j] = target;
+  }
+  return arr;
+}
+// console.log(insertSort([3, 6, 2, 4, 1]));
+```
+#### 快排--时间复杂度 nlogn~ n^2 之间
+```js
+function quickSort(arr) {
+  if (arr.length < 2) {
+    return arr;
+  }
+  const cur = arr[arr.length - 1];
+  const left = arr.filter((v, i) => v <= cur && i !== arr.length - 1);
+  const right = arr.filter((v) => v > cur);
+  return [...quickSort(left), cur, ...quickSort(right)];
+}
+// console.log(quickSort([3, 6, 2, 4, 1]));
+```
+#### 归并排序--时间复杂度 nlog(n)
+```js
+function merge(left, right) {
+  let res = [];
+  let i = 0;
+  let j = 0;
+  while (i < left.length && j < right.length) {
+    if (left[i] < right[j]) {
+      res.push(left[i]);
+      i++;
+    } else {
+      res.push(right[j]);
+      j++;
+    }
+  }
+  if (i < left.length) {
+    res.push(...left.slice(i));
+  } else {
+    res.push(...right.slice(j));
+  }
+  return res;
+}
+
+function mergeSort(arr) {
+  if (arr.length < 2) {
+    return arr;
+  }
+  const mid = Math.floor(arr.length / 2);
+
+  const left = mergeSort(arr.slice(0, mid));
+  const right = mergeSort(arr.slice(mid));
+  return merge(left, right);
+}
+// console.log(mergeSort([3, 6, 2, 4, 1]));
+```
+#### 二分查找--时间复杂度 log2(n)
+```js
+function search(arr, target, start, end) {
+  let targetIndex = -1;
+
+  let mid = Math.floor((start + end) / 2);
+
+  if (arr[mid] === target) {
+    targetIndex = mid;
+    return targetIndex;
+  }
+
+  if (start >= end) {
+    return targetIndex;
+  }
+
+  if (arr[mid] < target) {
+    return search(arr, target, mid + 1, end);
+  } else {
+    return search(arr, target, start, mid - 1);
+  }
+}
+// const dataArr = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+// const position = search(dataArr, 6, 0, dataArr.length - 1);
+// if (position !== -1) {
+//   console.log(`目标元素在数组中的位置:${position}`);
+// } else {
+//   console.log("目标元素不在数组中");
+// }
+```
+#### 大数相加
+```js
+// 题目描述:实现一个add方法完成两个大数相加
+let a = "9007199254740991";
+let b = "1234567899999999999";
+
+function add(a ,b){
+   //...
+}
+```
+```js
+function add(a ,b){
+   //取两个数字的最大长度
+   let maxLength = Math.max(a.length, b.length);
+   //用0去补齐长度
+   a = a.padStart(maxLength , 0);//"0009007199254740991"
+   b = b.padStart(maxLength , 0);//"1234567899999999999"
+   //定义加法过程中需要用到的变量
+   let t = 0;
+   let f = 0;   //"进位"
+   let sum = "";
+   for(let i=maxLength-1 ; i>=0 ; i--){
+      t = parseInt(a[i]) + parseInt(b[i]) + f;
+      f = Math.floor(t/10);
+      sum = t%10 + sum;
+   }
+   if(f!==0){
+      sum = '' + f + sum;
+   }
+   return sum;
+}
+```
+#### LRU 算法
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211018153230.png)
+```js
+//  一个Map对象在迭代时会根据对象中元素的插入顺序来进行
+// 新添加的元素会被插入到map的末尾，整个栈倒序查看
+class LRUCache {
+  constructor(capacity) {
+    this.secretKey = new Map();
+    this.capacity = capacity;
+  }
+  get(key) {
+    if (this.secretKey.has(key)) {
+      let tempValue = this.secretKey.get(key);
+      this.secretKey.delete(key);
+      this.secretKey.set(key, tempValue);
+      return tempValue;
+    } else return -1;
+  }
+  put(key, value) {
+    // key存在，仅修改值
+    if (this.secretKey.has(key)) {
+      this.secretKey.delete(key);
+      this.secretKey.set(key, value);
+    }
+    // key不存在，cache未满
+    else if (this.secretKey.size < this.capacity) {
+      this.secretKey.set(key, value);
+    }
+    // 添加新key，删除旧key
+    else {
+      this.secretKey.set(key, value);
+      // 删除map的第一个元素，即为最长未使用的
+      this.secretKey.delete(this.secretKey.keys().next().value);
+    }
+  }
+}
+// let cache = new LRUCache(2);
+// cache.put(1, 1);
+// cache.put(2, 2);
+// console.log("cache.get(1)", cache.get(1))// 返回  1
+// cache.put(3, 3);// 该操作会使得密钥 2 作废
+// console.log("cache.get(2)", cache.get(2))// 返回 -1 (未找到)
+// cache.put(4, 4);// 该操作会使得密钥 1 作废
+// console.log("cache.get(1)", cache.get(1))// 返回 -1 (未找到)
+// console.log("cache.get(3)", cache.get(3))// 返回  3
+// console.log("cache.get(4)", cache.get(4))// 返回  4
+```
+
+#### 树形结构转成列表
+```js
+[
+    {
+        id: 1,
+        text: '节点1',
+        parentId: 0,
+        children: [
+            {
+                id:2,
+                text: '节点1_1',
+                parentId:1
+            }
+        ]
+    }
+]
+转成
+[
+    {
+        id: 1,
+        text: '节点1',
+        parentId: 0 //这里用0表示为顶级节点
+    },
+    {
+        id: 2,
+        text: '节点1_1',
+        parentId: 1 //通过这个字段来确定子父级
+    }
+    ...
+]
+```
+```js
+function treeToList(data) {
+  let res = [];
+  const dfs = (tree) => {
+    tree.forEach((item) => {
+      if (item.children) {
+        dfs(item.children);
+        delete item.children;
+      }
+      res.push(item);
+    });
+  };
+  dfs(data);
+  return res;
+}
+```
+#### 列表转成树形结构
+```js
+[
+    {
+        id: 1,
+        text: '节点1',
+        parentId: 0 //这里用0表示为顶级节点
+    },
+    {
+        id: 2,
+        text: '节点1_1',
+        parentId: 1 //通过这个字段来确定子父级
+    }
+    ...
+]
+
+转成
+[
+    {
+        id: 1,
+        text: '节点1',
+        parentId: 0,
+        children: [
+            {
+                id:2,
+                text: '节点1_1',
+                parentId:1
+            }
+        ]
+    }
+]
+```
+```js
+function listToTree(data) {
+  let temp = {};
+  let treeData = [];
+  for (let i = 0; i < data.length; i++) {
+    temp[data[i].id] = data[i];
+  }
+  for (let i in temp) {
+    if (+temp[i].parentId != 0) {
+      if (!temp[temp[i].parentId].children) {
+        temp[temp[i].parentId].children = [];
+      }
+      temp[temp[i].parentId].children.push(temp[i]);
+    } else {
+      treeData.push(temp[i]);
+    }
+  }
+  return treeData;
+}
+```
+
+#### 实现模板字符串解析功能
+```js
+let template = '我是{{name}}，年龄{{age}}，性别{{sex}}';
+let data = {
+  name: '姓名',
+  age: 18
+}
+render(template, data); // 我是姓名，年龄18，性别undefined
+```
+```js
+function render(template, data) {
+  let computed = template.replace(/\{\{(\w+)\}\}/g, function (match, key) {
+    return data[key];
+  });
+  return computed;
+}
+```
+
+#### 将虚拟 Dom 转化为真实 Dom
+```js
+{
+  tag: 'DIV',
+  attrs:{
+  id:'app'
+  },
+  children: [
+    {
+      tag: 'SPAN',
+      children: [
+        { tag: 'A', children: [] }
+      ]
+    },
+    {
+      tag: 'SPAN',
+      children: [
+        { tag: 'A', children: [] },
+        { tag: 'A', children: [] }
+      ]
+    }
+  ]
+}
+把上诉虚拟Dom转化成下方真实Dom
+<div id="app">
+  <span>
+    <a></a>
+  </span>
+  <span>
+    <a></a>
+    <a></a>
+  </span>
+</div>
+```
+```js
+// 真正的渲染函数
+function _render(vnode) {
+  // 如果是数字类型转化为字符串
+  if (typeof vnode === "number") {
+    vnode = String(vnode);
+  }
+  // 字符串类型直接就是文本节点
+  if (typeof vnode === "string") {
+    return document.createTextNode(vnode);
+  }
+  // 普通DOM
+  const dom = document.createElement(vnode.tag);
+  if (vnode.attrs) {
+    // 遍历属性
+    Object.keys(vnode.attrs).forEach((key) => {
+      const value = vnode.attrs[key];
+      dom.setAttribute(key, value);
+    });
+  }
+  // 子数组进行递归操作
+  vnode.children.forEach((child) => dom.appendChild(_render(child)));
+  return dom;
+}
+```
+#### 分片思想解决大数据量渲染问题
+```js
+// 题目描述:渲染百万条结构简单的大数据时 怎么使用分片思想优化渲染
+
+
+let ul = document.getElementById("container");
+// 插入十万条数据
+let total = 100000;
+// 一次插入 20 条
+let once = 20;
+//总页数
+let page = total / once;
+//每条记录的索引
+let index = 0;
+//循环加载数据
+function loop(curTotal, curIndex) {
+  if (curTotal <= 0) {
+    return false;
+  }
+  //每页多少条
+  let pageCount = Math.min(curTotal, once);
+  window.requestAnimationFrame(function () {
+    for (let i = 0; i < pageCount; i++) {
+      let li = document.createElement("li");
+      li.innerText = curIndex + i + " : " + ~~(Math.random() * total);
+      ul.appendChild(li);
+    }
+    loop(curTotal - pageCount, curIndex + pageCount);
+  });
+}
+loop(total, index);
+```
+#### Object.is 实现
+```md
+Object.is不会转换被比较的两个值的类型，这点和===更为相似，他们之间也存在一些区别。
+    1. NaN在===中是不相等的，而在Object.is中是相等的
+    2. +0和-0在===中是相等的，而在Object.is中是不相等的
+```
+```js
+Object.is = function (x, y) {
+  if (x === y) {
+    // 当前情况下，只有一种情况是特殊的，即 +0 -0
+    // 如果 x !== 0，则返回true
+    // 如果 x === 0，则需要判断+0和-0，则可以直接使用 1/+0 === Infinity 和 1/-0 === -Infinity来进行判断
+    return x !== 0 || 1 / x === 1 / y;
+  }
+
+  // x !== y 的情况下，只需要判断是否为NaN，如果x!==x，则说明x是NaN，同理y也一样
+  // x和y同时为NaN时，返回true
+  return x !== x && y !== y;
+};
+```
+#### 动态规划求解硬币找零问题
+```md
+给定不同面额的硬币 coins 和一个总金额 amount。编写一个函数来计算可以凑成总金额所需的最少的硬币个数。如果没有任何一种硬币组合能组成总金额，返回 -1
+
+示例1：
+输入: coins = [1, 2, 5], amount = 11
+输出: 3
+解释: 11 = 5 + 5 + 1
+
+示例2：
+输入: coins = [2], amount = 3
+输出: -1
+```
+```js
+const coinChange = function (coins, amount) {
+  // 用于保存每个目标总额对应的最小硬币个数
+  const f = [];
+  // 提前定义已知情况
+  f[0] = 0;
+  // 遍历 [1, amount] 这个区间的硬币总额
+  for (let i = 1; i <= amount; i++) {
+    // 求的是最小值，因此我们预设为无穷大，确保它一定会被更小的数更新
+    f[i] = Infinity;
+    // 循环遍历每个可用硬币的面额
+    for (let j = 0; j < coins.length; j++) {
+      // 若硬币面额小于目标总额，则问题成立
+      if (i - coins[j] >= 0) {
+        // 状态转移方程
+        f[i] = Math.min(f[i], f[i - coins[j]] + 1);
+      }
+    }
+  }
+  // 若目标总额对应的解为无穷大，则意味着没有一个符合条件的硬币总数来更新它，本题无解，返回-1
+  if (f[amount] === Infinity) {
+    return -1;
+  }
+  // 若有解，直接返回解的内容
+  return f[amount];
+}
+```
+#### 写版本号排序的方法
+```md
+题目描述:有一组版本号如下['0.1.1', '2.3.3', '0.302.1', '4.2', '4.3.5', '4.3.4.5']。现在需要对其进行排序，排序的结果为 ['4.3.5','4.3.4.5','2.3.3','0.302.1','0.1.1']
+```
+```js
+arr.sort((a, b) => {
+  let i = 0;
+  const arr1 = a.split(".");
+  const arr2 = b.split(".");
+
+  while (true) {
+    const s1 = arr1[i];
+    const s2 = arr2[i];
+    i++;
+    if (s1 === undefined || s2 === undefined) {
+      return arr2.length - arr1.length;
+    }
+
+    if (s1 === s2) continue;
+
+    return s2 - s1;
+  }
+});
+console.log(arr);
+```
+#### 实现 LazyMan
+```md
+实现一个LazyMan，可以按照以下方式调用:
+LazyMan(“Hank”)输出:
+Hi! This is Hank!
+
+LazyMan(“Hank”).sleep(10).eat(“dinner”)输出
+Hi! This is Hank!
+//等待10秒..
+Wake up after 10
+Eat dinner~
+
+LazyMan(“Hank”).eat(“dinner”).eat(“supper”)输出
+Hi This is Hank!
+Eat dinner~
+Eat supper~
+
+LazyMan(“Hank”).eat(“supper”).sleepFirst(5)输出
+//等待5秒
+Wake up after 5
+Hi This is Hank!
+Eat supper
+```
+```js
+class _LazyMan {
+  constructor(name) {
+    this.tasks = [];
+    const task = () => {
+      console.log(`Hi! This is ${name}`);
+      this.next();
+    };
+    this.tasks.push(task);
+    setTimeout(() => {
+      // 把 this.next() 放到调用栈清空之后执行
+      this.next();
+    }, 0);
+  }
+  next() {
+    const task = this.tasks.shift(); // 取第一个任务执行
+    task && task();
+  }
+  sleep(time) {
+    this._sleepWrapper(time, false);
+    return this; // 链式调用
+  }
+  sleepFirst(time) {
+    this._sleepWrapper(time, true);
+    return this;
+  }
+  _sleepWrapper(time, first) {
+    const task = () => {
+      setTimeout(() => {
+        console.log(`Wake up after ${time}`);
+        this.next();
+      }, time * 1000);
+    };
+    if (first) {
+      this.tasks.unshift(task); // 放到任务队列顶部
+    } else {
+      this.tasks.push(task); // 放到任务队列尾部
+    }
+  }
+  eat(name) {
+    const task = () => {
+      console.log(`Eat ${name}`);
+      this.next();
+    };
+    this.tasks.push(task);
+    return this;
+  }
+}
+function LazyMan(name) {
+  return new _LazyMan(name);
+}
+```
+#### 类的继承方式(优缺点)
+
+1. **借助构造函数实现继承**
+
+使用`借用构造函数`的方式，这种方式是通过在子类型的函数中调用超类型的构造函数来实现的，这一种方法解决了不能向超类型传递参数的缺点，但是它存在的一个问题就是无法实现函数方法的复用，并且超类型原型定义的方法子类型也没有办法访问到。
+
+```js
+			function Parent1 () {
+          this.name = 'parent1';
+      }
+			// 子类无法继承父类原型链上的方法
+      Parent1.prototype.say = function () {};
+      function Child1 () {
+          //修改执行上下文
+          Parent1.call(this);
+          this.type = 'child1';
+      }
+      console.log(new Child1(), new Child1().say());
+```
+
+2. **借助原型链实现继承**
+
+以`原型链的方式来实现继承`，但是这种实现方式存在的缺点是，在包含有引用类型的数据时，会被所有的实例对象所共享，容易造成修改的混乱。还有就是在创建子类型的时候不能向超类型传递参数。
+
+```js
+     function Parent2 () {
+          this.name = 'parent2';
+          this.play = [1, 2, 3];
+      }
+      function Child2 () {
+          this.type = 'child2';
+      }
+      Child2.prototype = new Parent2();
+
+      var s1 = new Child2();
+      var s2 = new Child2();
+			// s1.__proto__ === s2.__proto__  true
+      console.log(s1.play, s2.play);
+      // 原型链继承的同一个对象引用，创建对个实例，实例使用的都是一个对象，修改一个另一个也跟着变，因为是一个。
+			s1.play.push(4);
+```
+
+3. **组合方式**（构造函数+原型链）
+
+`组合继承`，组合继承是将原型链和借用构造函数组合起来使用的一种方式。通过借用构造函数的方式来实现类型的属性的继承，通过将子类型的原型设置为超类型的实例来实现方法的继承。这种方式解决了上面的两种模式单独使用时的问题，但是由于我们是以超类型的实例来作为子类型的原型，所以调用了两次超类的构造函数，造成了子类型的原型中多了很多不必要的属性。
+
+```js
+      // 解决了上面两种的每个问题
+			// 父类多次实例化问题
+			function Parent3 () {
+          this.name = 'parent3';
+          this.play = [1, 2, 3];
+      }
+      function Child3 () {
+          Parent3.call(this);
+          this.type = 'child3';
+      }
+			// 就是为了继承父类的原型对象
+      Child3.prototype = new Parent3();
+      var s3 = new Child3();
+      var s4 = new Child3();
+      s3.play.push(4);
+      console.log(s3.play, s4.play);
+```
+
+4. **组合继承优化1**
+```js
+			function Parent4 () {
+          this.name = 'parent4';
+          this.play = [1, 2, 3];
+      }
+      function Child4 () {
+          Parent4.call(this);
+          this.type = 'child4';
+      }
+			// 就是为了继承父类的原型对象
+			// 在原型对象中有constructor属性，因为子类和父类都是一个原型对象，所以属性值都是一样的
+			// Child4.prototype.constructor = Child4  加上这句话也不行，因为Child4.prototype = Parent4.prototype是一个对象，你改变Child4.prototype 就等于改变 Parent4.prototype
+      Child4.prototype = Parent4.prototype;
+      var s5 = new Child4();
+      var s6 = new Child4();
+      console.log(s5, s6);
+
+      console.log(s5 instanceof Child4, s5 instanceof Parent4);
+			// 但是使用这种的时候  你去找我这实例是谁产生的，竟然是父类（不是我们想要的）
+      console.log(s5.constructor);
+```
+
+5. **组合继承优化2**
+
+`原型式继承`，原型式继承的主要思路就是基于已有的对象来创建新的对象，实现的原理是，向函数中传入一个对象，然后返回一个以这个对象为原型的对象。这种继承的思路主要不是为了实现创造一种新的类型，只是对某个对象实现一种简单继承，ES5 中定义的 Object.create() 方法就是原型式继承的实现。缺点与原型链方式相同。
+
+```js
+			function Parent5 () {
+          this.name = 'parent5';
+          this.play = [1, 2, 3];
+      }
+      function Child5 () {
+          Parent5.call(this);
+          this.type = 'child5';
+      }
+			// 对象关联 一个新的对象  子类和父类的原型进行隔离
+      Child5.prototype = Object.create(Parent5.prototype);
+			Child5.prototype.constructor = Child5
+```
+
+（1）第一种是以`原型链的方式来实现继承`，但是这种实现方式存在的缺点是，在包含有引用类型的数据时，会被所有的实例对象所共享，容易造成修改的混乱。还有就是在创建子类型的时候不能向超类型传递参数。
+
+（2）第二种方式是使用`借用构造函数`的方式，这种方式是通过在子类型的函数中调用超类型的构造函数来实现的，这一种方法解决了不能向超类型传递参数的缺点，但是它存在的一个问题就是无法实现函数方法的复用，并且超类型原型定义的方法子类型也没有办法访问到。
+
+（3）第三种方式是`组合继承`，组合继承是将原型链和借用构造函数组合起来使用的一种方式。通过借用构造函数的方式来实现类型的属性的继承，通过将子类型的原型设置为超类型的实例来实现方法的继承。这种方式解决了上面的两种模式单独使用时的问题，但是由于我们是以超类型的实例来作为子类型的原型，所以调用了两次超类的构造函数，造成了子类型的原型中多了很多不必要的属性。
+
+（4）第四种方式是`原型式继承`，原型式继承的主要思路就是基于已有的对象来创建新的对象，实现的原理是，向函数中传入一个对象，然后返回一个以这个对象为原型的对象。这种继承的思路主要不是为了实现创造一种新的类型，只是对某个对象实现一种简单继承，ES5 中定义的 Object.create() 方法就是原型式继承的实现。缺点与原型链方式相同。
+
+（5）第五种方式是`寄生式继承`，寄生式继承的思路是创建一个用于封装继承过程的函数，通过传入一个对象，然后复制一个对象的副本，然后对象进行扩展，最后返回这个对象。这个扩展的过程就可以理解是一种继承。这种继承的优点就是对一个简单对象实现继承，如果这个对象不是我们的自定义类型时。缺点是没有办法实现函数的复用。
+
+（6）第六种方式是`寄生式组合继承`，组合继承的缺点就是使用超类型的实例做为子类型的原型，导致添加了不必要的原型属性。寄生式组合继承的方式是使用超类型的原型的副本来作为子类型的原型，这样就避免了创建不必要的属性。
