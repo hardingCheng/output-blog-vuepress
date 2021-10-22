@@ -3878,6 +3878,7 @@ function factorial(num, num1 = 0, num2 = 1) {
         - `Async/Await`
 
 #### Event Loop即事件循环
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211022171914.png)
 Event Loop即事件循环，是指浏览器或Node的一种解决javaScript单线程运行时不会阻塞的一种机制，也就是我们经常使用异步的原理。
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210926210917.png)
 
