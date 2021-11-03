@@ -76,7 +76,9 @@
     - 跨窗口通信 PostMessage
     - Form Data 对象
     - 绘画 canvas
-
+- 移除的元素
+    - 纯表现的元素：basefont、big、center、font、 s、strike、tt、u
+    - 对可用性产生负面影响的元素：frame、frameset、noframes
 ### script标签defer与async差异
 - defer
     - 如果script标签设置了该属性，则浏览器会异步的下载该文件并且不会影响到后续DOM的渲染；如果有多个设置了defer的script标签存在，则会按照顺序执行所有的script；defer脚本会在文档渲染完毕后，DOMContentLoaded事件调用前执行。
@@ -87,8 +89,27 @@
     - async的执行，并不会按着script在页面中的顺序来执行，而是谁先加载完谁执行。
     - 这种方式加载的 JavaScript 依然会阻塞 load 事件
     - async-script 可能在 DOMContentLoaded 触发之前或之后执行，但一定在 load 触发之前执行。
+### viewport
+```html
+<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+<!-- 
+    width    设置viewport宽度，为一个正整数，或字符串‘device-width’
+    device-width  设备宽度
+    height   设置viewport高度，一般设置了宽度，会自动解析出高度，可以不用设置
+    initial-scale    默认缩放比例（初始缩放比例），为一个数字，可以带小数
+    minimum-scale    允许用户最小缩放比例，为一个数字，可以带小数
+    maximum-scale    允许用户最大缩放比例，为一个数字，可以带小数
+    user-scalable    是否允许手动缩放
+-->
+```
 
 ## CSS
+### 移除inline-block间隙 ????????
+- 移除空格
+- 使用margin负值
+- 使用font-size:0
+- letter-spacing
+- word-spacing
 ### 清除浮动
 BFC 清除浮动
 ```css
@@ -142,8 +163,7 @@ clear 清除浮动
 ### BFC块级格式化上下文   (边距重叠解决方案）
 
 块级格式化上下文   (边距重叠解决方案）。
-`BFC`是一个完全独立的空间（布局环境），让空间里的子元素不会影响到外面的布局。那么怎么使用`BFC`呢，`BFC`可以看做是一个`CSS`元素属性。
-一个环境中的元素不会影响到其它环境中的布局。
+`BFC`是一个完全独立的空间（布局环境），让空间里的子元素不会影响到外面的布局。那么怎么使用`BFC`呢，`BFC`可以看做是一个`CSS`元素属性。简单来说，BFC 实际上是一块区域，在这块区域中遵循一定的规则，有一套独特的渲染规则。一个环境中的元素不会影响到其它环境中的布局。
 
 > #### BFC的规则
 
@@ -152,6 +172,11 @@ clear 清除浮动
 3. BFC在页面上是独立的容器，外面的元素不会影响里面的元素，里面的元素也不会影响外面的元素。（父级触发了BFC）
 4. 计算BFC高度的时候，浮动元素也会参与计算，防止使用float脱离文档流，高度塌陷。（父级触发了BFC）
 
+
+1. BFC 区域内的元素外边距会发生重叠。
+2. BFC 区域内的元素不会与浮动元素重叠。
+3. 计算 BFC 区域的高度时，浮动元素也参与计算。
+4. BFC 区域就相当于一个容器，内部的元素不会影响到外部，同样外部的元素也不会影响到内部。
 > #### BFC触发
 
 1. float的值不是none。
@@ -161,9 +186,12 @@ clear 清除浮动
 5. overflow的值不是visible(hidden、scroll、auto、inherit)
 
 > #### BFC解决了什么问题
+1. 消除父子元素边距重叠，父元素设置overflow: hidden
+2. 消除相邻元素垂直方向的边距重叠：第二个子元素套一层，并设置overflow: hidden，构建BFC使其不影响外部元素。
+3. 清除浮动：父元素设置overflow: hidden触发BFC实现清除浮动，防止父元素高度塌陷，后面的元素被覆盖，实现文字环绕等等。
+
 
 1. 使用float脱离文档流，高度塌陷
-
 ```html
 <!DOCTYPE html>
 <html lang="en">
@@ -1645,9 +1673,28 @@ run();
 因为它发生在一帧的最后，此时页面布局已经完成，所以不建议在 requestIdleCallback 里再操作 DOM，这样会导致页面再次重绘。DOM 操作建议在 RAF 中进行。同时，操作 DOM 所需要的耗时是不确定的，因为会导致重新计算布局和视图的绘制，所以这类操作不具备可预测性。
 
 Promise 也不建议在这里面进行，因为 Promise 的回调属性 Event loop 中优先级较高的一种微任务，会在requestIdleCallback 结束时立即执行，不管此时是否还有富余的时间，这样有很大可能会让一帧超过 16 ms。
+### 怎样处理 移动端 1px 被 渲染成 2px问题？
+- 局部处理
+    - meta标签中的 viewport属性 ，initial-scale 设置为 1
+    - rem按照设计稿标准走，外加利用transfrome 的scale(0.5) 缩小一倍即可；
+- 全局处理
+    - mate标签中的 viewport属性 ，initial-scale 设置为 0.5
+    - rem 按照设计稿标准走即可
+### CSS优化
+- 多个css合并，尽量减少HTTP请求
+- 将css文件放在页面最上面
+- 移除空的css规则
+- 避免使用CSS表达式
+- 选择器优化嵌套，尽量避免层级过深
+- 充分利用css继承属性，减少代码量
+- 抽象提取公共样式，减少代码量
+- 属性值为0时，不加单位
+- 属性值为小于1的小数时，省略小数点前面的0
+- css雪碧图
 ## JS
 ### ● 图片懒加载的原理？？？
 ### ● 箭头函数和普通函数有什么区别？如果把箭头函数转换为不用箭头函数的形式，如何转换
+### JS的一些取反的特殊值
 ### JS编译原理
 ```js
 var name;    //编译阶段处理
@@ -3049,7 +3096,7 @@ WeakMap 对象是一组键值对的集合，其中的键是弱引用对象，而
 
 WeakMap 中，每个键对自己所引用对象的引用都是弱引用，在没有其他引用和该键引用同一对象，这个对象将会被垃圾回收（相应的key则变成无效的），所以，WeakMap 的 key 是不可枚举的。
 
-### CommonJS 和 es6 模块化的区别
+### CommonJS 和 ESmodules 模块化的区别
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211012163119.png)
 1. `ES6 Module`静态引入，编译时引入（码在编译的过程中可以做的事情包含词法和语法分析、类型检查以及代码优化等等。）
 2. `Commonjs`动态引入，执行时引入
@@ -3071,18 +3118,23 @@ if(isDev) {
 ```
 
 - CommonJS 的特性如下：
-    - CommonJS 模块由 JS 运行时实现。
-    - CommonJs 是单个值导出，本质上导出的就是 exports 属性。
-    - CommonJS 是可以动态加载的，对每一个加载都存在缓存，可以有效的解决循环引用问题。
-    - CommonJS 模块同步加载并执行模块文件。
+    - 一个文件就是一个模块,每个模块都有单独的作用域
+    - 通过module.exports导出成员。通过require函数载入模块
+    - commonjs是以同步的方式加载模块 node的执行机制是在启动时去加载模块 在执行阶段不需要加载模块
+    - CommonJS 模块输出的是一个值的拷贝，一旦输出一个值，模块内部的变化就影响不到这个值
+    - CommonJS 模块加载的顺序，按照其在代码中出现的顺序
+    - 由于 CommonJS 是同步加载模块的，在服务器端，文件都是保存在硬盘上，所以同步加载没有问题，但是对于浏览器端，需要将文件从服务器端请求过来，那么同步加载就不适用了，所以，CommonJS 是不适用于浏览器端的。
+    - CommonJS 模块可以多次加载，但是只会在第一次加载时运行一次，然后运行结果就被缓存了，以后再加载，就直接读取缓存结果。要想让模块再次运行，必须清除缓存
 
 - Es module 的特性如下：
     - ES6 Module 静态的，不能放在块级作用域内，代码发生在编译时。
     - ES6 Module 的值是动态绑定的，可以通过导出方法修改，可以直接访问修改结果。
+    - 导出的并不是成员的值 而是内存地址 内部发生改变外部也会改变，外部导入的是只读成员不能修改
     - ES6 Module 可以导出多个属性和方法，可以单个导入导出，混合导入导出。
     - ES6 模块提前加载并执行模块文件，
     - ES6 Module 导入模块在严格模式下。
     - ES6 Module 的特性可以很容易实现 Tree Shaking 和 Code Splitting。
+    - ES module中可以导入CommonJS模块。CommonJS中不能导入ES module模块。
 
 ### 0.1+0.2 !== 0.3
 JS里整数的计算是正确的，但是小数的计算是有误差的。
@@ -4514,12 +4566,65 @@ http 协议是应用层协议，都是建立在传输层之上的。我们也都
 - 自定义的拥塞控制
 - 前向安全和前向纠错
 ### HTTP知识点
+#### HTTP 请求报文结构/HTTP 响应报文结构
+- HTTP协议的主要特点
+    - HTTP协议类的主要特点：简单快速，灵活，无连接，无状态（无法区分两次连接是否一样）。
+- HTTP报文的组成部分
+    - HTTP报文的组成部分
+        - 请求报文：请求行，请求头，空行，请求体；
+        - 响应报文：状态行，响应头，空行，响应体。
+        - 请求行包含：http方法，页面地址，http协议以及版本；
+        - 请求头包含：key-value值，告诉服务器端我要什么内容。
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922191832.png)
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210824184941.png)
+```md
+首行是Request-Line包括：请求方法，请求URI，协议版本，CRLF
+首行之后是若干行请求头，包括general-header，request-header或者entity-header，每个一行以CRLF结束
+请求头和消息实体之间有一个CRLF分隔
+根据实际请求需要可能包含一个消息实体 一个请求报文例子如下：
+```
+```md
+GET /Protocols/rfc2616/rfc2616-sec5.html HTTP/1.1
+Host: www.w3.org
+Connection: keep-alive
+Cache-Control: max-age=0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36
+Referer: https://www.google.com.hk/
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: zh-CN,zh;q=0.8,en;q=0.6
+Cookie: authorstyle=yes
+If-None-Match: "2cc8-3e3073913b100"
+If-Modified-Since: Wed, 01 Sep 2004 13:24:52 GMT
+
+name=qiu&age=25
+```
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210824184846.png)
+```md
+首行是状态行包括：HTTP版本，状态码，状态描述，后面跟一个CRLF
+首行之后是若干行响应头，包括：通用头部，响应头部，实体头部
+响应头部和响应实体之间用一个CRLF空行分隔
+最后是一个可能的消息实体 响应报文例子如下：
+```
+```md
+HTTP/1.1 200 OK
+Date: Tue, 08 Jul 2014 05:28:43 GMT
+Server: Apache/2
+Last-Modified: Wed, 01 Sep 2004 13:24:52 GMT # 最后修改时间，用于协商缓存
+ETag: "40d7-3e3073913b100" # 文件hash，用于协商缓存
+Accept-Ranges: bytes
+Content-Length: 16599
+Cache-Control: max-age=21600 # 强缓存（浏览器端）最大过期时间
+Expires: Tue, 08 Jul 2014 11:28:43 GMT # 强缓存（浏览器端）过期时间
+P3P: policyref="http://www.w3.org/2001/05/P3P/p3p.xml"
+Content-Type: text/html; charset=iso-8859-1
 
+{"name": "qiu", "age": 25}
+```
+
+#### POST和GET的区别：
 POST和GET的区别：
     - **GET在浏览器回退时是无害的，而POST会再次提交请求；**
     - GET产生的URL地址可以被收藏，而POST不可以；
@@ -4535,7 +4640,7 @@ POST和GET的区别：
         - 对于GET方式的请求，浏览器会把http header和data一并发送出去，服务器响应200(返回数据);
         - 而对于POST，浏览器先发送header，服务器响应100 continue，浏览器再发送data，服务器响应200 ok(返回数据)。
 
-
+#### HTTP常见状态码及其含义
 `HTTP`状态码：
     - `1xx`:指示信息，表示请求已接收，继续处理；
     - `2xx`:成功，表示请求已被成功接收；
@@ -4561,15 +4666,6 @@ OPTIONS方法用于获取目的资源所支持的通信方式的选项。在 COR
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922193301.png)
 
 
-
-- HTTP协议的主要特点
-    - HTTP协议类的主要特点：简单快速，灵活，无连接，无状态（无法区分两次连接是否一样）。
-- HTTP报文的组成部分
-    - HTTP报文的组成部分
-        - 请求报文：请求行，请求头，空行，请求体；
-        - 响应报文：状态行，响应头，空行，响应体。
-        - 请求行包含：http方法，页面地址，http协议以及版本；
-        - 请求头包含：key-value值，告诉服务器端我要什么内容。
 ### 在交互过程中如果数据传送完了，还不想断开连接怎么办，怎么维持？
 在 HTTP 中响应体的 Connection 字段指定为 keep-alive
 
@@ -4611,24 +4707,26 @@ HTTP数据请求的方式:XMLHttpRequest、ajax、fetch与axios
 ping命令是使用的网络层协议ICMP
 
 ### TCP三次握手和四次挥手
-为什么要进行三次握手：为了确认对方的发送和接收能力。
-
-- 第一次握手：建立连接时，客户端发送syn包（syn=j）到服务器，并进入SYN_SENT状态，等待服务器确认；SYN：同步序列编号（Synchronize Sequence Numbers）。
-- 第二次握手：服务器收到syn包并确认客户的SYN（ack=j+1），同时也发送一个自己的SYN包（syn=k），即SYN+ACK包，此时服务器进入SYN_RECV状态；
-- 第三次握手：客户端收到服务器的SYN+ACK包，向服务器发送确认包ACK(ack=k+1），此包发送完毕，客户端和服务器进入ESTABLISHED（TCP连接成功）状态，完成三次握手。
-
-握手过程中传送的包里不包含数据，三次握手完毕后，客户端与服务器才正式开始传送数据。
-四次以上都可以，只不过 三次就够了
+- 为什么要进行三次握手：为了确认对方的发送和接收能力。
+    - 第一次握手：建立连接时，客户端发送syn包（syn=j）到服务器，并进入SYN_SENT状态，等待服务器确认；SYN：同步序列编号（Synchronize Sequence Numbers）。
+    - 第二次握手：服务器收到syn包并确认客户的SYN（ack=j+1），同时也发送一个自己的SYN包（syn=k），即SYN+ACK包，此时服务器进入SYN_RECV状态；
+    - 第三次握手：客户端收到服务器的SYN+ACK包，向服务器发送确认包ACK(ack=k+1），此包发送完毕，客户端和服务器进入ESTABLISHED（TCP连接成功）状态，完成三次握手。
+    - 握手过程中传送的包里不包含数据，三次握手完毕后，客户端与服务器才正式开始传送数据。四次以上都可以，只不过 三次就够了
 
 
-四次握手：
-- **客户端进程发出连接释放报文**，并且停止发送数据。释放数据报文首部，FIN=1，其序列号为seq=u（等于前面已经传送过来的数据的最后一个字节的序号加1），此时，客户端进入FIN-WAIT-1（终止等待1）状态。 TCP规定，FIN报文段即使不携带数据，也要消耗一个序号。
-- **服务器收到连接释放报文，发出确认报文**，ACK=1，ack=u+1，并且带上自己的序列号seq=v，此时，服务端就进入了CLOSE-WAIT（关闭等待）状态。TCP服务器通知高层的应用进程，客户端向服务器的方向就释放了，这时候处于半关闭状态，即客户端已经没有数据要发送了，但是服务器若发送数据，客户端依然要接受。这个状态还要持续一段时间，也就是整个CLOSE-WAIT状态持续的时间。
-- 客户端收到服务器的确认请求后，此时，客户端就进入FIN-WAIT-2（终止等待2）状态，等待服务器发送连接释放报文（在这之前还需要接受服务器发送的最 后的数据）。
-- **服务器将最后的数据发送完毕后，就向客户端发送连接释放报文**，FIN=1，ack=u+1，由于在半关闭状态，服务器很可能又发送了一些数据，假定此时的序列号为seq=w，此时，服务器就进入了LAST-ACK（最后确认）状态，等待客户端的确认。
-- **客户端收到服务器的连接释放报文后，必须发出确认**，ACK=1，ack=w+1，而自己的序列号是seq=u+1，此时，客户端就进入了TIME-WAIT（时间等待）状态。注意此时TCP连接还没有释放，必须经过2∗∗MSL（最长报文段寿命）的时间后，当客户端撤销相应的TCB后，才进入CLOSED状态。
-- 服务器只要收到了客户端发出的确认，立即进入CLOSED状态。同样，撤销TCB后，就结束了这次的TCP连接。可以看到，服务器结束TCP连接的时间要比客户端早一些。
+- 四次握手：
+    - **客户端进程发出连接释放报文**，并且停止发送数据。释放数据报文首部，FIN=1，其序列号为seq=u（等于前面已经传送过来的数据的最后一个字节的序号加1），此时，客户端进入FIN-WAIT-1（终止等待1）状态。 TCP规定，FIN报文段即使不携带数据，也要消耗一个序号。
+    - **服务器收到连接释放报文，发出确认报文**，ACK=1，ack=u+1，并且带上自己的序列号seq=v，此时，服务端就进入了CLOSE-WAIT（关闭等待）状态。TCP服务器通知高层的应用进程，客户端向服务器的方向就释放了，这时候处于半关闭状态，即客户端已经没有数据要发送了，但是服务器若发送数据，客户端依然要接受。这个状态还要持续一段时间，也就是整个CLOSE-WAIT状态持续的时间。
+    - 客户端收到服务器的确认请求后，此时，客户端就进入FIN-WAIT-2（终止等待2）状态，等待服务器发送连接释放报文（在这之前还需要接受服务器发送的最 后的数据）。
+    - **服务器将最后的数据发送完毕后，就向客户端发送连接释放报文**，FIN=1，ack=u+1，由于在半关闭状态，服务器很可能又发送了一些数据，假定此时的序列号为seq=w，此时，服务器就进入了LAST-ACK（最后确认）状态，等待客户端的确认。
+    - **客户端收到服务器的连接释放报文后，必须发出确认**，ACK=1，ack=w+1，而自己的序列号是seq=u+1，此时，客户端就进入了TIME-WAIT（时间等待）状态。注意此时TCP连接还没有释放，必须经过2∗∗MSL（最长报文段寿命）的时间后，当客户端撤销相应的TCB后，才进入CLOSED状态。
+    - 服务器只要收到了客户端发出的确认，立即进入CLOSED状态。同样，撤销TCB后，就结束了这次的TCP连接。可以看到，服务器结束TCP连接的时间要比客户端早一些。
+    - 为什么不是两次？
+        - 两次情况客户端说完结束就立马断开不再接收，无法确认服务端是否接收到断开消息，但且服务端可能还有消息未发送完。
+    - 为什么不是三次？
+        - 3次情况服务端接收到断开消息，向客户端发送确认接受消息，客户端未给最后确认断开的回复。
 
+    
 #### 为什么需要等待 2MSL
 因为如果不等待的话，如果服务端还有很多数据包要给客户端发，且此时客户端端口被新应用占据，那么就会接收到无用的数据包，造成数据包混乱，所以说最保险的方法就是等服务器发来的数据包都死翘翘了再启动新应用。
 
@@ -6915,6 +7013,84 @@ sourceMap需要在 webpack.config.js里面直接配置 devtool 就可以实现�
 ```js
 v4: devtool: 'cheap-eval-module-source-map'
 v5: devtool: 'eval-cheap-module-source-map'
+```
+### Webpack 打包加速的方法
+- devtool 的 sourceMap较为耗时
+- 开发环境不做无意义的操作：代码压缩、目录内容清理、计算文件hash、提取CSS文件等
+- 第三方依赖外链script引入：vue、ui组件、JQuery等
+- HotModuleReplacementPlugin：热更新增量构建
+- DllPlugin& DllReferencePlugin：动态链接库，提高打包效率，仅打包一次第三方模块，每次构建只重新打包业务代码。
+- thread-loader,happypack：多线程编译，加快编译速度
+- noParse：不需要解析某些模块的依赖
+- babel-loader开启缓存cache
+- splitChunks（老版本用CommonsChunkPlugin）：提取公共模块，将符合引用次数(minChunks)的模块打包到一起，利用浏览器缓存
+- Tree Shaking 摇树：基于ES6提供的模块系统对代码进行静态分析, 并在压缩阶段将代码中的死代码（dead code)移除，减少代码体积。
+### Webpack 打包体积优化思路 
+- webpack-bundle-analyzer插件可以可视化的查看webpack打包出来的各个文件体积大小，以便我们定位大文件，进行体积优化
+- 提取第三方库或通过引用外部文件的方式引入第三方库
+- 代码压缩插件UglifyJsPlugin
+- 服务器启用gzip压缩
+- 按需加载资源文件 require.ensure
+- 剥离css文件，单独打包
+- 去除不必要插件，开发环境与生产环境用不同配置文件
+- SpritesmithPlugin雪碧图，将多个小图片打包成一张，用background-image，backgroud-pisition，width，height控制显示部分
+- url-loader 文件大小小于设置的尺寸变成base-64编码文本，大与尺寸由file-loader拷贝到目标目录
+### Tree Shaking 摇树
+虽然依赖了某个模块，但其实只使用其中的某些功能。通过 tree-shaking，将没有使用的模块摇掉，这样来达到删除无用代码的目的。基于ES6提供的模块系统对代码进行静态分析,并将代码中的死代码（dead code)移除的一种技术。因此，利用Tree Shaking技术可以很方便地实现我们代码上的优化，减少代码体积。
+
+- 摇树删除代码的原理
+    -  webpack基于ES6提供的模块系统，对代码的依赖树进行静态分析，把import & export标记为3类：
+        -  所有import标记为/* harmony import */
+        -  被使用过的export标记为/harmony export([type])/，其中[type]和webpack内部有关，可能是binding，immutable等；
+        -  没有被使用的export标记为/* unused harmony export [FuncName] */，其中[FuncName]为export的方法名，之后使用Uglifyjs（或者其他类似的工具）进行代码精简，把没用的都删除。
+- 为何基于es6模块实现（ES6 module 特点：）：
+    - 只能作为模块顶层的语句出现
+    - import的模块名只能是字符串常量
+    - import binding是immutable的
+
+- 条件：
+    - 首先源码必须遵循 ES6 的模块规范 (import & export)，如果是 CommonJS 规范 (require) 则无法使用。
+    - 编写的模块代码不能有副作用，如果在代码内部改变了外部的变量则不会被移除。
+```js
+// 在开发模式下，设置 usedExports: true ，打包时只会标记出哪些模块没有被使用，不会删除，因为可能会影响 source-map的标记位置的准确性。
+{
+    mode: 'develpoment',
+    optimization: {
+        // 优化导出的模块
+        usedExports: true
+    },
+}
+// 在生产模式下默认开启 usedExports: true ，打包压缩时就会将没用到的代码移除
+{
+    mode: 'production',
+    //  这个属性的作用就是集中配置webpack内部的优化功能
+    optimizition: {
+        // 只导出外部使用的模块成员 负责标记枯树叶
+        usedExports: true,
+        minimize: true, // 自动压缩代码 负责摇掉枯树叶
+        /**
+         * webpack打包默认会将一个模块单独打包到一个闭包中
+         * webpack3中新增的API 将所有模块都放在一个函数中 ，尽可能将所有模块合并在一起，
+         * 提升效率，减少体积  达到作用域提升的效果
+         */
+        concatenateModules: true,
+    },
+
+}
+```
+- 使用摇树的注意事项：
+    - 使用 ES6 模块语法编写代码
+    - 工具类函数尽量以单独的形式输出，不要集中成一个对象或者类
+    - 声明 sideEffects
+    - 自己在重构代码时也要注意副作用
+
+- tree-shaking & babel 使用babel-loader处理js代码会导致tree-shaking失效的原因
+    - treeshaking 使用的前提必须是ES module组织的代码，也就是说交给ESMOdule处理的代码必须是ESM。当我们使用babel-loader处理js代码之后就有可能将ESM 转换 成commonjs规范（preset-env插件工作的时候就会将esm => coommonjs）
+    - 收到配置preset-env的modules：false,确保不会开启自动转换的插件(在最新版本的babel-loader中自动帮我们关闭了转换成commonjs规范的功能)
+```js
+presets: [
+    ['@babel/preset-env', {module: 'commonjs'}]
+]
 ```
 
 ### Rollup原理
