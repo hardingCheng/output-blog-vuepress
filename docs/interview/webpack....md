@@ -33,6 +33,121 @@ webpack 的安装目前分为两个：**webpack**、**webpack-cli**
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210916153607.png)
 
  ## webpack配置
+ ```js
+ const resolveApp = require("./paths");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const VueLoaderPlugin = require("vue-loader/lib/plugin");
+const TerserPlugin = require("terser-webpack-plugin");
+
+// 合并配置文件
+const { merge } = require("webpack-merge");
+
+const prodConfig = require("./webpack.prod");
+const devConfig = require("./webpack.dev");
+
+const commonConfig = {
+  entry: {
+    main: { import: "./src/main.js", dependOn: "shared" },
+    index: { import: "./src/index.js", dependOn: "shared" },
+    lodash: "lodash",
+    dayjs: "dayjs",
+    shared: ["lodash", "dayjs"]
+  },
+  output: {
+    path: resolveApp("./build"),
+    filename: "[name].bundle.js",
+    chunkFilename: "chunk_[id]_[name].js"
+  },
+  resolve: {
+    extensions: [".wasm", ".mjs", ".js", ".json", ".jsx", ".ts", ".vue"],
+    alias: {
+      "@": resolveApp("./src"),
+      pages: resolveApp("./src/pages"),
+    },
+  },
+  optimization: {
+    // 对代码进行压缩相关的操作
+    minimizer: [
+      new TerserPlugin({
+        extractComments: false,
+      }),
+    ],
+    // natural: 使用自然数(不推荐),
+    // named: 使用包所在目录作为name(在开发环境推荐)
+    // deterministic: 生成id, 针对相同文件生成的id是不变
+    // chunkIds: "deterministic",
+    splitChunks: {
+      // async异步导入
+      // initial同步导入
+      // all 异步/同步导入
+      chunks: "all",
+      // 最小尺寸: 如果拆分出来一个, 那么拆分出来的这个包的大小最小为minSize
+      minSize: 20000,
+      // 将大于maxSize的包, 拆分成不小于minSize的包
+      maxSize: 20000,
+      // minChunks表示引入的包, 至少被导入了几次
+      minChunks: 1,
+      cacheGroups: {
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          filename: "[id]_vendors.js",
+          // name: "vendor-chunks.js",
+          priority: -10
+        },
+        // bar: {
+        //   test: /bar_/,
+        //   filename: "[id]_bar.js"
+        // }
+        default: {
+          minChunks: 2,
+          filename: "common_[id].js",
+          priority: -20
+        }
+      }
+    },
+    // true/multiple
+    // single
+    // object: name
+    runtimeChunk: {
+      name: function(entrypoint) {
+        return `why-${entrypoint.name}`
+      }
+    }
+  },
+  module: {
+    rules: [
+      {
+        test: /\.jsx?$/i,
+        use: "babel-loader",
+      },
+      {
+        test: /\.vue$/i,
+        use: "vue-loader",
+      },
+      {
+        test: /\.css/i,
+        use: ["style-loader", "css-loader"],
+      },
+    ],
+  },
+  plugins: [
+    new HtmlWebpackPlugin({
+      template: "./index.html",
+    }),
+    new VueLoaderPlugin(),
+  ],
+};
+
+module.exports = function(env) {
+  const isProduction = env.production;
+  process.env.NODE_ENV = isProduction ? "production" : "development";
+
+  const config = isProduction ? prodConfig : devConfig;
+  const mergeConfig = merge(commonConfig, config);
+
+  return mergeConfig;
+};
+ ```
  ### webpack文件配置
  - 在通常情况下，webpack需要打包的项目是非常复杂的，并且我们需要一系列的配置来满足要求，默认配置必然是不可以的。
  - 我们可以在根目录下创建一个webpack.config.js文件，来作为webpack的配置文件
@@ -1772,11 +1887,111 @@ if(module.hot){
     - webpack.comm.conf.js
     - webpack.dev.conf.js
     - webpack.prod.conf.js
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211103111249.png)
 #### 认识代码分离
 - 代码分离（Code Splitting）是webpack一个非常重要的特性：
     - 它主要的目的是将代码分离到不同的bundle中，之后我们可以按需加载，或者并行加载这些文件；
     - 比如默认情况下，所有的JavaScript代码（业务代码、第三方依赖、暂时没有用到的模块）在首页全部都加载，就会影响首页的加载速度；
     - 代码分离可以分出出更小的bundle，以及控制资源加载优先级，提供代码的加载性能；
+    - 只要是异步导入的代码，webpack都会进行代码分离
+- webpack中常用的代码分离有三种：
+    - 入口起点：使用entry配置手动分离代码；
+        - 入口起点的含义非常简单，就是配置多入口：
+            - 比如配置一个index.js和main.js的入口；
+            - 他们分别有自己的代码逻辑；
+            - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211103120714.png)
+    - 防止重复：使用Entry Dependencies或者SplitChunksPlugin去重和分离代码；
+        - 假如我们的index.js和main.js都依赖两个库：lodash、dayjs
+            - 如果我们单纯的进行入口分离，那么打包后的两个bunlde都有会有一份lodash和dayjs；
+            - 事实上我们可以对他们进行共享；
+                - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211103121033.png)
+                - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211103121523.png)
+        -  另外一种分包的模式是splitChunk，它是使用SplitChunksPlugin来实现的：
+            -  因为该插件webpack已经默认安装和集成，所以我们并不需要单独安装和直接使用该插件；
+            -  只需要提供SplitChunksPlugin相关的配置信息即可；
+            -  Webpack提供了SplitChunksPlugin默认的配置，我们也可以手动来修改它的配置：
+                -  比如默认配置中，chunks仅仅针对于异步（async）请求，我们可以设置为initial或者all；
+            - SplitChunks自定义配置解析
+                - Chunks:
+                    - 默认值是async
+                    - 另一个值是initial，表示对通过的代码进行处理
+                    - all表示对同步和异步代码都进行处理
+                - minSize
+                    - 拆分包的大小, 至少为minSize；
+                    - 如果一个包拆分出来达不到minSize,那么这个包就不会拆分；
+                - maxSize
+                    - 将大于maxSize的包，拆分为不小于minSize的包；
+                - minChunks
+                    - 至少被引入的次数，默认是1；
+                    - 如果我们写一个2，但是引入了一次，那么不会被单独拆分；
+                - name：设置拆包的名称
+                    - 可以设置一个名称，也可以设置为false；
+                    - 设置为false后，需要在cacheGroups中设置名称；
+                - cacheGroups
+                    - 用于对拆分的包就行分组，比如一个lodash在拆分之后，并不会立即打包，而是会等到有没有其他符合规包一起来打包；
+                    - test属性：匹配符合规则的包；
+                    - name属性：拆分包的name属性；
+                    - filename属性：拆分包的名称，可以自己使用placeholder属性；
+                - chunkIds
+                    - optimization.chunkIds配置用于告知webpack模块的id采用什么算法生成。
+                    - 在 output 输出的时候 `filename: "[name].bundle.js"` 也相关,
+                    - 有三个比较常见的值：
+                        - natural：按照数字的顺序使用id；
+                        - named：development下的默认值，一个可读的名称的id；
+                        - deterministic：确定性的，在不同的编译中不变的短数字id
+                            - 在webpack4中是没有这个值的；
+                            - 那个时候如果使用natural，那么在一些编译发生变化时，就会有问题；
+                    - 最佳实践：
+                        - 开发过程中，我们推荐使用named；
+                        - 打包过程中，我们推荐使用deterministic；
+                - runtimeChunk
+                    - 配置runtime相关的代码是否抽取到一个单独的chunk中：
+                        - runtime相关的代码指的是在运行环境中，对模块进行解析、加载、模块信息相关的代码；
+                        - 比如我们的component、bar两个通过import函数相关的代码加载，就是通过runtime代码完成的；
+                    - 抽离出来后，有利于浏览器缓存的策略：
+                        - 比如我们修改了业务代码（main），那么runtime和component、bar的chunk是不需要重新加载的；
+                        - 比如我们修改了component、bar的代码，那么main中的代码是不需要重新加载的；
+                    - 设置的值：
+                        - true/multiple：针对每个入口打包一个runtime文件；
+                        - single：打包一个runtime文件；
+                        - 对象：name属性决定runtimeChunk的名称；
+                        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211103134003.png)
+      ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211103121329.png)
+    - 动态导入：通过模块的内联函数调用来分离代码；
+        - 另外一个代码拆分的方式是动态导入时，webpack提供了两种实现动态导入的方式：
+            - 第一种，使用ECMAScript中的 import()语法来完成，也是目前推荐的方式；
+            - 第二种，使用webpack遗留的 require.ensure，目前已经不推荐使用；
+        - 比如我们有一个模块 bar.js：
+            - 该模块我们希望在代码运行过程中来加载它（比如判断一个条件成立时加载）；
+            - 因为我们并不确定这个模块中的代码一定会用到，所以最好拆分成一个独立的js文件；
+            - 这样可以保证不用到该内容时，浏览器不需要加载和处理该文件的js代码；
+            - 这个时候我们就可以使用动态导入；
+        - 注意：使用动态导入bar.js：
+            - 在webpack中，通过动态导入获取到一个对象；
+            - 真正导出的内容，在改对象的default属性中，所以我们需要做一个简单的解构；
+        - 动态导入的文件命名
+            - 因为动态导入通常是一定会打包成独立的文件的，所以并不会再cacheGroups中进行配置；
+            - 那么它的命名我们通常会在output中，通过 chunkFilename 属性来命名；
+                - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211103123555.png)
+            - 但是，你会发现默认情况下我们获取到的 [name]是和id的名称保持一致的
+                - 如果我们希望修改name的值，可以通过magic comments（魔法注释）的方式；
+                    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211103123706.png)
+            - 代码的懒加载
+                - 动态import使用最多的一个场景是懒加载（比如路由懒加载）：
+                    - 封装一个component.js，返回一个component对象；
+                    - 我们可以在一个按钮点击时，加载这个对象；
+                        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211103124249.png)
+#### Prefetch和Preload
+- webpack v4.6.0+增加了对预获取和预加载的支持。
+- 在声明import 时，使用下面这些内置指令，来告知浏览器：
+    - prefetch(预获取)：将来某些导航下可能需要的资源
+    - preload(预加载)：当前导航下可能需要资源
+        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211103134243.png)
+    - 与prefetch 指令相比，preload 指令有许多不同之处：
+        - preload chunk 会在父chunk 加载时，以并行方式开始加载。prefetch chunk 会在父chunk 加载结束后开始加载。
+        - preload chunk 具有中等优先级，并立即下载。prefetch chunk 在浏览器闲置时下载。
+        - preload chunk 会在父chunk 中立即请求，用于当下时刻。prefetch chunk 会用于未来的某个时刻。       
+### CDN
 
 
 
