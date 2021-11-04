@@ -673,6 +673,40 @@ module.exports = {
             -  .DS_Store：mac目录下回自动生成的一个文件；
             -  index.html：也不需要复制，因为我们已经通过HtmlWebpackPlugin完成了index.html的生成；
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211008213322.png)
+#### MiniCssExtractPlugin
+- MiniCssExtractPlugin可以帮助我们将css提取到一个独立的css文件中，该插件需要在webpack4+才可以使用。
+- 首先，我们需要安装mini-css-extract-plugin：`npm install mini-css-extract-plugin -D`
+    - 配置rules和plugins：
+        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211104181915.png)
+
+### Hash、ContentHash、ChunkHash
+- 在我们给打包的文件进行命名的时候，会使用placeholder，placeholder中有几个属性比较相似：
+    - hash、chunkhash、contenthash
+    - hash本身是通过MD4的散列函数处理后，生成一个128位的hash值（32个十六进制）；
+- hash值的生成和整个项目有关系：
+    - 比如我们现在有两个入口index.js和main.js；
+    - 它们分别会输出到不同的bundle文件中，并且在文件名称中我们有使用hash；
+    - 这个时候，如果修改了index.js文件中的内容，那么hash会发生变化；
+    - 那就意味着两个文件的名称都会发生变化；
+    - 如果都使用hash的话，因为这是工程级别的，即每次修改任何一个文件，所有文件名的hash至都将改变。所以一旦修改了任何一个文件，整个项目的文件缓存都将失效。
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211104182914.png)
+- chunkhash可以有效的解决上面的问题，它会根据不同的入口进行借来解析来生成hash值：
+    - 比如我们修改了index.js，那么main.js的chunkhash是不会发生改变的；
+    - chunkhash根据不同的入口文件(Entry)进行依赖文件解析、构建对应的chunk，生成对应的哈希值。在生产环境里把一些公共库和程序入口文件区分开，单独打包构建，接着我们采用chunkhash的方式生成哈希值，那么只要我们不改动公共库的代码，就可以保证其哈希值不会受影响。
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211104183111.png)
+    - 可以清晰地看见每个chunk模块的hash是不一样的了。
+    - 因为我们是将样式作为模块import到JavaScript文件中的，所以它们的chunkhash是一致的，如test1.js和test1.css：
+        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211104183248.png)
+    - 这样就会有个问题，只要对应css或则js改变，与其关联的文件hash值也会改变，但其内容并没有改变呢，所以没有达到缓存意义。固contenthash的用途随之而来。
+- contenthash表示生成的文件hash名称，只和内容有关系：
+    - 比如我们的index.js，引入了一个style.css，style.css有被抽取到一个独立的css文件中；
+    - 这个css文件在命名时，如果我们使用的是chunkhash；
+    - 那么当index.js文件的内容发生变化时，css文件的命名也会发生变化；
+    - 这个时候我们可以使用contenthash；
+    - contenthash是针对文件内容级别的，只有你自己模块的内容变了，那么hash值才改变，所以我们可以通过contenthash解决上诉问题。
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211104183430.png)
+
+
 ### 模块化原理
 #### Mode配置
 - Mode配置选项，可以告知webpack使用响应模式的内置优化：
@@ -1992,6 +2026,44 @@ if(module.hot){
         - preload chunk 具有中等优先级，并立即下载。prefetch chunk 在浏览器闲置时下载。
         - preload chunk 会在父chunk 中立即请求，用于当下时刻。prefetch chunk 会用于未来的某个时刻。       
 ### CDN
-
-
-
+#### 什么是CDN？
+- CDN称之为内容分发网络（Content Delivery Network或Content Distribution Network，缩写：CDN）
+    - 它是指通过相互连接的网络系统，利用最靠近每个用户的服务器；
+    - 更快、更可靠地将音乐、图片、视频、应用程序及其他文件发送给用户；
+    - 来提供高性能、可扩展性及低成本的网络内容传递给用户；
+- 在开发中，我们使用CDN主要是两种方式：
+    - 方式一：打包的所有静态资源，放到CDN服务器，用户所有资源都是通过CDN服务器加载的；
+    - 方式二：一些第三方资源放到CDN服务器上；
+#### 购买CDN服务器
+- 如果所有的静态资源都想要放到CDN服务器上，我们需要购买自己的CDN服务器；
+    - 目前阿里、腾讯、亚马逊、Google等都可以购买CDN服务器；
+    - 我们可以直接修改publicPath，在打包时添加上自己的CDN地址； 
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211104170437.png)
+#### 第三方库的CDN服务器
+- 通常一些比较出名的开源框架都会将打包后的源码放到一些比较出名的、免费的CDN服务器上：
+    - 国际上使用比较多的是unpkg、JSDelivr、cdnjs；
+    - 国内也有一个比较好用的CDN是bootcdn；
+- 在项目中，我们如何去引入这些CDN呢？
+    - 第一，在打包的时候我们不再需要对类似于lodash或者dayjs这些库进行打包；
+    - 第二，在html模块中，我们需要自己加入对应的CDN服务器地址；
+- 第一步，我们可以通过webpack配置，来排除一些库的打包：
+- 第二步，在html模块中，加入CDN服务器地址：
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211104171138.png)
+    - 手工在index.html模板代码中，需要引用的CDN的库 
+        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211104172154.png)
+### shimming
+#### 认识shimming
+- shimming是一个概念，是某一类功能的统称：
+    - shimming翻译过来我们称之为 垫片，相当于给我们的代码填充一些垫片来处理一些问题；
+    - 比如我们现在依赖一个第三方的库，这个第三方的库本身依赖lodash，但是默认没有对lodash进行导入（认为全局存在lodash），那么我们就可以通过ProvidePlugin来实现shimming的效果；
+- 注意：webpack并不推荐随意的使用shimming
+    - Webpack背后的整个理念是使前端开发更加模块化；
+    - 也就是说，需要编写具有封闭性的、不存在隐含依赖（比如全局变量）的彼此隔离的模块；
+#### Shimming预支全局变量
+- 目前我们的lodash、dayjs都使用了CDN进行引入，所以相当于在全局是可以使用_和dayjs的
+    - 假如一个文件中我们使用了axios，但是没有对它进行引入，那么下面的代码是会报错的；
+- 我们可以通过使用ProvidePlugin来实现shimming的效果：
+    - ProvidePlugin能够帮助我们在每个模块中，通过一个变量来获取一个package；
+    - 如果webpack看到这个模块，它将在最终的bundle中引入这个模块；
+    - 另外ProvidePlugin是webpack默认的一个插件，所以不需要专门导入；
+    - ![](media/16360204530486.jpg)
