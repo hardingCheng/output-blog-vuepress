@@ -104,12 +104,137 @@
 ```
 
 ## CSS
-### 移除inline-block间隙 ????????
-- 移除空格
-- 使用margin负值
-- 使用font-size:0
-- letter-spacing
-- word-spacing
+### line-height单位的区别
+1.normal
+2.inherit
+3.number
+4.number + px/em/rem/……
+5.% 同number+px/em/rem单位效果一样，后代元素会直接继承父元素的line-height计算结果值
+
+- normal同number效果一样，会在每个后代元素下重新计算出实际值，系数约1.2
+- %同number+px/em/rem单位效果一样，后代元素会直接继承父元素的line-height计算结果值
+- 当一个元素是使用带单位的值声明的，那么它的后代元素会继承其父元素line-height计算结果值:行高属性是用类似px、em、rem等单位来声明时，它的值会先被计算，然后计算后的值会传到任何继承它的后代元素。
+- 当一个元素是使用不带单位的数字，声明的值会被继承，也就是说这个值会在子元素中用来与子元素本身的font-size重新计算子元素的line-height。
+- 所以我们通常想要的效果是使用不带单位的line-height,我们可以在父元素上设定一个无单位数字line-height,其子元素会默认继承。如果想在子元素上有额外的样式，则在子元素上写line-height覆盖即可。
+### 移除inline-block间隙
+1. 移除空格
+元素间的间隙出现的原因是元素标签之间的空格，把空格去掉间隙自然就会消失。  
+```html
+<div class="demo">
+    <span>我是一个span</span><span>我是一个span</span><span>我是一个span</span><span>我是一个span</span>
+</div>
+
+
+
+<div class="demo">
+        <span>我是一个span
+        </span><span>我是一个span
+        </span><span>我是一个span
+        </span><span>我是一个span</span>
+    </div>
+    
+
+<div class="demo">
+        <span>我是一个span</span><!-- 
+        --><span>我是一个span</span><!-- 
+        --><span>我是一个span</span><!-- 
+        --><span>我是一个span</span>
+    </div>
+```  
+2.取消标签闭合
+```html
+<div class="demo">
+        <span>我是一个span
+        <span>我是一个span
+        <span>我是一个span
+        <span>我是一个span</span>
+    </div>
+.demo span{
+     background:#ddd;
+     display: inline-block;
+}
+```
+2.使用margin负值
+```css
+.parent .child + .child {
+  margin-left: -2px
+}
+```
+3.使用font-size:0
+在父容器上使用font-size:0;可以消除间隙，可以这样写:
+```html
+// html
+<div class='third'>
+    <div class='first-div'></div>
+    <div class='second-div'></div>
+    <div class='third-div'></div>
+</div>
+  
+// css
+.third {
+  font-size: 0;  // 这里
+}
+
+.first-div, .second-div, .third-div {
+  display: inline-block;  // 这里
+  height: 100px;
+  margin: 0;
+}
+
+.first-div, .third-div {
+  background: pink;
+  width: 50px;
+}
+
+.second-div {
+  background: red;
+  width: calc(100% - 100px);
+}
+```
+4.letter-spacing和/line-height
+```html
+// html
+<div class='third'>
+    <div class='first-div'></div>
+    <div class='second-div'></div>
+    <div class='third-div'></div>
+</div>
+<div class='third'>
+    <div class='first-div'></div>
+    <div class='second-div'></div>
+    <div class='third-div'></div>
+</div>
+
+// css
+.third {
+  letter-spacing: -15px;  // 在chrome下测试这个值只要 <= -5 
+  line-height: 13px;  // 在chrome下测试这个值只要 <= 13 
+} 
+
+.first-div, .second-div, .third-div {
+  display: inline-block;
+  height: 100px;
+}
+
+.first-div, .third-div {
+  background: pink;
+  width: 50px;
+}
+
+.second-div {
+  background: red;
+  width: calc(100% - 100px);
+}
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106101630.png)
+5.word-spacing
+最优解在这，设置父元素，display:table和word-spacing
+```css
+.parent{
+  display: table;
+  word-spacing:-1em; /*兼容其他浏览器，题主还未验证*/
+}
+```
 ### 清除浮动
 BFC 清除浮动
 ```css
@@ -1430,17 +1555,29 @@ body,html {
     max-width: 100%;
 }
 ```
-### rem、em、vw、wh 的值各是什么意思
+### px、rpx、em、rem、dpr、vw、wh 的值各是什么意思 ???????
+- px:像素
+    - css中的px是一个相对（抽象）单位是虚拟像素，因为不同的设备在大小宽高相同时，他们的物理像素大小也可能是不同的，物理像素高的设备单位面积内存放的像素点就高，因此画质看起来就更精细，通常情况下在pc端中，css中的px就接近于实际的像素大小，但是在移动设备上，根据不用机型的分辨率大小，css中的一个px可能就会对应不同数量的物理像素点
 - rem: 根据根元素(即 html)的 font-size
+    - rem和em类似都是相对长度单位，但是rem只会相对于html根元素的字体大小，也就是说如果根元素字体设置为18px，那么全局内rem的值换算都为1rem = 18px
+    - 有时我们为了换算方便会将根元素的字体大小先设置为62.5%，然后根据需要进行调整，原因是62.5%*16px = 10px，此时也就是1rem = 10px
 - em: 根据「自身元素」的 font-size
+    - 使用em单位的元素如果自身设置了字体大小，那么就相对于自身计算，如果自身没有设置字体大小那么就会继承父元素的字体大小，如果父元素没有设置，就会依次向上寻找（因为字体大小是会被继承的），如果页面中没有设置字体大小，那么就会以浏览器的默认字体大小16px为基准
 - vw: viewport width
 - vh: viewport height
-
-
-vw vh是固定的百分比，这样在小屏上东西太小，大屏上东西太大。就算配合媒体查询，你每个地方都写媒体查询太累了。
-
-而rem是根据html字体大小动态变化的一个单位，意味着只需要给html字体大小写一份媒体查询，然后其他使用rem的地方都可以调整为合适的大小。
-
+    - vh指的是视窗高度 vh类似于一种百分比的单位，他相对于视窗的高度，将视窗的高度分为100份，10vh也就是占用视窗的10%
+- vm:
+    - vm是在视口中选取 宽度或者高度最小的那一个，然后想vw、vh一样将其分为100等份
+- rpx：
+    - rpx 响应式px单位
+    - rpx本质上是和宽度相关的单位，屏幕越宽实际像素值就越大，这是根据屏幕宽度缩放的单位，如果你不想根据屏幕缩放，那么不要使用rpx
+    - 使用rpx单位元素的大小的计算公式为
+        - 750 * 元素在设计稿中的宽度 / 设计稿基准宽度
+        - 若设计稿宽度为 750px，元素 A 在设计稿上的宽度为 100px，那么元素 A 在 uni-app 里面的宽度应该设为：750 * 100 / 750，结果为：100rpx
+        - 若设计稿宽度为 640px，元素 A 在设计稿上的宽度为 100px，那么元素 A 在 uni-app 里面的宽度应该设为：750 * 100 / 640，结果为：117rpx
+    - rpx本质上是和宽度相关的单位，屏幕越宽实际像素值就越大，这是根据屏幕宽度缩放的单位，如果你不想根据屏幕缩放，那么不要使用rpx
+    - 如果你的字体使用了rpx就需要注意了，你的字体也会跟着屏幕的宽度变化而变化
+    - rpx不支持切换横竖屏时进行计算大小，因此如果你使用了rpx，建议锁定屏幕方向
 ### 伪类与伪元素
 - 伪类
     - 伪类用于当已有元素处于的某个状态时，为其添加对应的样式，这个状态是根据用户行为而动态变化的。比如说，当用户悬停在指定的元素时，我们可以通过:hover 来描述这个元素的状态。虽然它和普通的 css 类相似，可以为已有的元素添加样式，但是它只有处于 dom 树无法描述的状态下才能为元素添加样式，所以将其称为伪类。
@@ -1483,9 +1620,7 @@ vw vh是固定的百分比，这样在小屏上东西太小，大屏上东西太
 2.visibility：hidden，该元素隐藏起来了，但不会改变页面布局，但是不会触发该元素已 经绑定的事件 ，隐藏对应元素，在文档布局中仍保留原来的空间（重绘）
 3.display：none，把元素隐藏起来，并且会改变页面布局，可以理解成在页面中把该元素。 不显示对应的元素，在文档布局中不再分配空间（回流+重绘）
 
-### CSS标签meta
-
-### rpx和px的联系和区别以及计算方法
+### CSS标签meta  ？？？？？？？？？
 
 ### CSS画三角形   画半圆
 #### 三角形
@@ -1680,6 +1815,63 @@ Promise 也不建议在这里面进行，因为 Promise 的回调属性 Event lo
 - 全局处理
     - mate标签中的 viewport属性 ，initial-scale 设置为 0.5
     - rem 按照设计稿标准走即可
+
+### 网页视口尺寸
+- 屏幕
+    - 屏幕尺寸
+        - 屏幕尺寸是屏幕的宽度和高度：显示器或移动屏幕。window.screen是保存屏幕尺寸信息的对象。
+            - screen.width：屏幕的宽 、 screen.height：屏幕的高。
+            - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106104805.png)
+    - 可用屏幕尺寸
+        - 可用的屏幕大小由活动屏幕的宽度和高度组成，没有操作系统工具栏。
+        - screen.availWidth：可利用的宽，等于屏幕的宽、screen.availHeight：可利用的高，等于屏幕的高减去 mac 顶部栏或 windows 底部栏。
+        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106104855.png)
+    - 屏幕距离
+        - screenTop：浏览器窗口左上角到屏幕上边缘的距离。
+        - screenLeft：浏览器窗口左上角到屏幕左边缘的距离。
+        - Firefox 浏览器不支持上述属性，但是可以使用👇:
+            - screenX：等于 screenLeft。
+            - screenY：等于 screenTop。
+        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106105729.png)
+- window窗口
+    - 窗口的外部大小由整个浏览器窗口的宽度和高度组成，包含地址栏，选项卡栏和其他浏览器面板。
+        - window.outerWidth：浏览器窗口的宽、window.outerHeight：浏览器窗口的高。
+        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106105935.png)
+- 客户区
+    - 元素的客户区大小（client dimension），指的是元素内容及其内边距所占据的空间大小
+    - clientWidth：内容可视区的宽度、clientHeight：内容可视区的高度。
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106110042.png)
+    - 如果有滚动条clientWidth = 元素宽 + padding（左右） - 滚动条
+    - 如果没有滚动条clientWidth = 元素宽 + padding（左右）
+    - 获取页面大小:let pageWidth = document.documentElement.clientWidth || document.body.clientWidth（ie7之前的版本）;
+- 网页大小
+    - 网页大小由呈现的页面内容的宽度和高度组成。
+    - scrollWidth：实际内容的宽度。没有垂直滚动条时与clientWidth相同。否则是等于实际内容的宽度 + padding。scrollWidth也包括 ::before 和 ::after这样的伪元素。
+    - scrollHeight：实际内容的高度。没有垂直滚动条时与clientHeight相同。否则是等于实际内容的高度 + padding。scrollHeight也包括 ::before 和 ::after这样的伪元素。
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106110220.png)
+- 滚动距离
+    - scrollLeft：元素最左端和窗口中可见内容的最左端之间的距离。即当前左滚的距离
+    - scrollTop：元素最顶端和窗口中可见内容的最顶端之间的距离。即当前上滚的距离
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106110333.png)
+    - 如果有滚动条scrollLeft = 隐藏内容宽度 + border
+    - 如果没有滚动条scrollLeft = 0
+- 偏移量
+    - 偏移量包括元素在屏幕上占用的所有可见的空间。元素的可见大小由其高度、宽度决定，包括所有内边距、滚动条和边框大小（注意，不包括外边距）。
+    - offsetHeight：元素在垂直方向上占用的空间大小，包括元素的高度、（可见的）水平滚动条的高度、上边框高度和下边框高度。
+    - offsetWidth：元素在水平方向上占用的空间大小。包括元素的宽度、（可见的）垂直滚动条的宽度、左边框宽度和右边框宽度。
+    - offsetLeft：当前元素内容区域（包括border）左边缘到 offsetParent 内容区域（不包括border）左边缘的距离。
+    - offsetTop：当前元素内容区域（包括border）顶部到 offsetParent 内容区域（不包括border）顶部的距离。
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106110734.png)
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106110836.png)
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106111014.png)
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106111112.png)
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106111243.png)
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106111342.png)
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106111403.png)
+    - 
+
+
+
 ### CSS优化
 - 多个css合并，尽量减少HTTP请求
 - 将css文件放在页面最上面
@@ -1692,9 +1884,276 @@ Promise 也不建议在这里面进行，因为 Promise 的回调属性 Event lo
 - 属性值为小于1的小数时，省略小数点前面的0
 - css雪碧图
 ## JS
-### ● 图片懒加载的原理？？？
-### ● 箭头函数和普通函数有什么区别？如果把箭头函数转换为不用箭头函数的形式，如何转换
+### 图片懒加载的原理？？？
+### 箭头函数和普通函数有什么区别？如果把箭头函数转换为不用箭头函数的形式，如何转换?
 ### JS的一些取反的特殊值
+### CSS和JS为什么会放在头部或者底部？
+- 因为页面在加载时，浏览器会识别该文档CSS，并行下载，不会停止对当前文档的加载。放在头部可以保证在加载html生成DOM tree的时候，就可以同时对DOM tree进行渲染，可以防止闪跳，白屏或者布局混乱。
+- 外部引入js文件阻塞其他资源下载，也会阻塞该js引入位置以下的页面的内容呈现，而且js可能会改变DOM tree的结构，需要一个稳定的DOM tree，所以要放置在页面的最下面。
+### ==和===
+== 代表相同， ===代表严格相同（数据类型和值都相等）。 
+
+当进行双等号比较时候，先检查两个操作数数据类型，如果相同，则进行===比较，如果不同，则愿意为你进行一次类型转换，转换成相同类型后再进行比较，而===比较时，如果类型不同，直接就是false。
+
+- 双等号==
+    - 如果两个值类型相同，再进行三个等号(===)的比较；
+    - 如果两个值类型不同，也有可能相等，需根据以下规则进行类型转换在比较
+    - 查看是否是 undefined 和 null 比较
+        - ✅ 返回 true
+        - ⬇️ 如果不是继续下一条规则
+    - 是否在比较 string 和 number
+        - ✅ 如果是，那么将 string 转为 number 并回到最初重新比较 ♻️
+        - ⬇️ 如果不是继续下一条规则
+    - 查看我们比较的项中是否有 boolean
+        - ✅ 如果有，那么将 boolean 转为 number 并回到最初重新比较 ♻️
+        - ⬇️ 如果不是继续下一条规则
+    - 查看是否有一项是 object
+        - ✅ 如果有，那么将 object 转为其原始值 primitive 并回到最初重新比较 ♻️
+        - ❌ 如果还不是，只能返回 false 了💩
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106160907.png)
+
+- 类型转换
+    - 获取对象原始值
+        - 接着我们再来研究一下对象怎么转换为原始值的：转换类型的这个方法在 JS 源代码中是 ToPrimitive 这个方法，该方法有一个可选参数 PreferredType，这个参数的作用是指定期望类型；如果第一个参数对应的对象可以被转换为不止一种类型，那么后者可以作为一种暗示，表示该对象应该转换为那种类型
+    - 默认情况下（期望类型默认为 number）
+        - 调用 valueOf 方法：
+            - ✅ 如果返回的是原始值，那么就用这个
+            - ⬇️ 如果返回的不是原始值，那么跳到下一步
+        - 调用 toString 方法：
+            - ✅ 如果返回的是原始值，那么就用这个
+            - ❌ 否则报错💩
+    - 如果期望类型为 string：
+        - 调用 toString 方法：
+            - ✅ 如果返回的是原始值，那么就用这个
+            - ⬇️ 如果返回的不是原始值，那么跳到下一步
+        - 调用 valueOf 方法：
+            - ✅ 如果返回的是原始值，那么就用这个
+            - ❌ 否则报错💩
+    - 如果对象是 Date 类型（期望类型为 string）：
+        - 调用 toString 方法：
+            - ✅ 如果返回的是原始值，那么就用这个
+            - ⬇️ 如果返回的不是原始值，那么跳到下一步
+        - 调用 valueOf 方法：
+            - ✅ 如果返回的是原始值，那么就用这个
+            - ❌ 否则报错💩
+    - 简单的说就是默认调用 valueOf 方法，然后是 toString 方法；如果对象是 Date 类型或对象的期望类型为 string，那么先调用 toString 方法😪
+
+
+- 转换为 number
+    - 转换成 number 类型的规则：
+        - undefined 👉 NaN 如果是 undefined 则直接转换成 NaN
+        - null 👉 0 如果是 null 则转换成 0
+        - boolean 👉 0/1 如果是 boolean 则转换成 0 或 1
+        - string 👉 0/NaN/(parse to number) 如果是 string 则转换成对应的 number，空字符串转换为 0，无法转换的则为 NaN
+        - object 👉 首先获取原始值然后再转为 number
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106161657.png)
+
+- 转换为 string
+    - 转为 string 的规则为：
+        -  undefined 👉 'undefined'
+        -  null 👉 'null'
+        -  number 👉 'number'
+        -  boolean 👉 'true'/'false'
+        -  object 👉 首先获取原始值，然后转为 string
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106161750.png)
+
+
+- 转为 boolean
+    - ❌下面这些在 JS 中都为 falsy 除此之外的都是 truthy
+        - undefined 👉 falsy
+        - null 👉 falsy
+        - 0 👉 falsy
+        - "" 👉 falsy
+        - NaN 👉 falsy
+    - 转换规则如下：
+        - undefined 👉 false
+        - null 👉 false
+        - number 👉 当为 0 时 false 否则为 true
+        - string 👉 当为空字符串时为 false 否则为 true
+        - object 👉 true
+        - array 👉 true
+        - Date 👉 true
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106161911.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106161929.png)
+
+### 变量提升(函数提升)
+- 所谓的变量提升（变量提升），是指在JS代码执行中， JavaScript引擎（V8）把变量的声明部分和函数的声明部分提升到代码开头的行为，变量提升后，会给变量设置默认值undefined，给函数赋值函数体。
+- 在JS的变量提升中，提升的只是变量的声明，所以对于var a = 1，一般把它拆分成var a 和 a = 1。只提升var a，a = 1不变。
+- 有多个同名变量声明时，函数声明会覆盖其他的声明。如果有多个同名函数声明，则是由最后的一个函数声明覆盖之前所有的声明。
+### js声明变量的方式
+JavaScript中可以通过var、let、const、function、import、class这几种方式来声明变量。
+1. var
+```js
+var x = 'global'; //全局变量
+function local(){
+  var x = 'local variable'; //局部变量
+  console.log(x)
+}
+local() // 'local variable'
+console.log(x) // 'global'
+```
+2. let声明变量(let命令用于声明变量,let声明的变量是可变的)
+```js
+let lt= 520;
+var lzp= 1314;
+
+lt = 410;
+lzp = 1122; 
+console.log(lt) // 410
+```
+3. const声明变量(const命令用于声明变量，const声明的变量是不可变的。)
+```js
+const lzp= 410;
+lzp = 1122; // 报错
+```
+4. function声明变量
+ES6允许我们为函数的参数设置默认值，即直接写在参数定义的后面。当参数值为undefined的时候，默认值生效。
+```js
+function log(x , y = "lutian"){
+  console.log(x,y);
+}
+log('love'); //love lutian
+log('love','only'); //love only
+```
+5. import声明变量
+ES6 模块不是对象，而是通过export命令显式指定输出的代码，再通过import命令输入。
+Module 语法是 JavaScript 模块的标准写法，使用import取代require
+```js
+import { func1, func2 } from 'moduleA';
+import { Button } from 'antd';
+
+// 在导入导出时可以根据需求起别名，方便理解和开发
+import {longlonglongName as name} from './moduleA.js';
+```
+6. class声明变量
+ES6 的class可以看作只是一个语法糖，它的绝大部分功能，ES5 都可以做到，新的class写法只是让对象原型的写法更加清晰、更像面对象编程的语法。 ES5类的定义
+```js
+function Person(x, y) {
+  this.name = x;
+  this.age = y;
+}
+
+Person.prototype.getInfo = function () {
+  return '(' + this.name + ', ' + this.age + ')';
+};
+
+var info = new Person('lutian', 18);
+
+
+
+
+class Person {
+  constructor(name, age) {
+    this.name = name;
+    this.age = age;
+  }
+
+  getInfo() {
+    return '(' + this.name + ', ' + this.age + ')';
+  }
+}
+
+typeof Person // "function"
+Person === Person.prototype.constructor // true
+```
+
+### 函数声明和函数表达式的区别
+- 函数声明function fn() {...}
+- 函数表达式const fn = function() {..}
+- 函数声明会在代码执行前预加载,而函数表达式不会
+
+
+### 为什么要用 setTimeout 模拟 setInterval ？
+setInterval 是一个宏任务。用多了你就会发现它并不是准确无误，极端情况下还会出现一些令人费解的问题。
+
+- 推入任务队列后的时间不准确
+    - 在 setInterval 被推入任务队列时，如果在它前面有很多任务或者某个任务等待时间较长比如网络请求等，那么这个定时器的执行时间和我们预定它执行的时间可能并不一致。
+```js
+let startTime = new Date().getTime();
+let count = 0;
+//耗时任务
+setInterval(function() {
+  let i = 0;
+  while (i++ < 1000000000);
+}, 0);
+setInterval(function() {
+  count++;
+  console.log(
+    "与原设定的间隔时差了：",
+    new Date().getTime() - (startTime + count * 1000),
+    "毫秒"
+  );
+}, 1000);
+// 输出：
+// 与原设定的间隔时差了： 699 毫秒
+// 与原设定的间隔时差了： 771 毫秒
+// 与原设定的间隔时差了： 887 毫秒
+// 与原设定的间隔时差了： 981 毫秒
+// 与原设定的间隔时差了： 1142 毫秒
+// 与原设定的间隔时差了： 1822 毫秒
+// 与原设定的间隔时差了： 1891 毫秒
+// 与原设定的间隔时差了： 2001 毫秒
+// 与原设定的间隔时差了： 2748 毫秒
+// ...
+
+```
+- 函数操作耗时过长导致的不准确
+    - 考虑极端情况，假如定时器里面的代码需要进行大量的计算(耗费时间较长)，或者是 DOM 操作。这样一来，花的时间就比较长，有可能前一次代码还没有执行完，后一次代码就被添加到队列了。也会到时定时器变得不准确，甚至出现同一时间执行两次的情况。
+    - 最常见的出现的就是，当我们需要使用 ajax 轮询服务器是否有新数据时，必定会有一些人会使用 setInterval，然而无论网络状况如何，它都会去一遍又一遍的发送请求，最后的间隔时间可能和原定的时间有很大的出入。
+```js
+// 做一个网络轮询，每一秒查询一次数据。
+let startTime = new Date().getTime();
+let count = 0;
+
+setInterval(() => {
+    let i = 0;
+    while (i++ < 10000000); // 假设的网络延迟
+    count++;
+    console.log(
+        "与原设定的间隔时差了：",
+        new Date().getTime() - (startTime + count * 1000),
+        "毫秒"
+    );
+}, 1000)
+输出：
+// 与原设定的间隔时差了： 567 毫秒
+// 与原设定的间隔时差了： 552 毫秒
+// 与原设定的间隔时差了： 563 毫秒
+// 与原设定的间隔时差了： 554 毫秒(2次)
+// 与原设定的间隔时差了： 564 毫秒
+// 与原设定的间隔时差了： 602 毫秒
+// 与原设定的间隔时差了： 573 毫秒
+// 与原设定的间隔时差了： 633 毫秒
+```
+- setInterval 缺点 与 setTimeout 的不同
+    - 再次强调，定时器指定的时间间隔，表示的是何时将定时器的代码添加到消息队列，而不是何时执行代码。所以真正何时执行代码的时间是不能保证的，取决于何时被主线程的事件循环取到，并执行。
+    - 每个 setTimeout 产生的任务会直接 push 到任务队列中；而 setInterval 在每次把任务 push 到任务队列前，都要进行一下判断(看上次的任务是否仍在队列中，如果有则不添加，没有则添加)。
+    - setInterval 有两个缺点：
+        - 使用 setInterval 时，某些间隔会被跳过；
+        - 可能多个定时器会连续执行；
+        - 一般用 setTimeout 模拟 setInterval，来规避掉上面的缺点。
+- setTimeout 模拟 setInterval
+```js
+// 写一个 interval 方法
+let timer = null
+interval(func, wait){
+    let interv = function(){
+        func.call(null);
+        timer=setTimeout(interv, wait);
+    };
+    timer= setTimeout(interv, wait);
+ },
+
+// 和 setInterval() 一样使用它
+interval(function() {}, 20);
+
+// 终止定时器
+if (timer) {
+  window.clearSetTimeout(timer);
+  timer = null;
+}
+```
 ### JS编译原理
 ```js
 var name;    //编译阶段处理
@@ -1719,6 +2178,13 @@ name='jack';    //执行阶段处理
 
 作用域和作用域的嵌套，就产生了作用域链，另外要记住的一个特性就是作用域链的查找，向外不向内，想想探出头去，而不是看着锅里，就可以了
 ### 闭包
+- 能够访问其他函数内部变量的函数，被称为 闭包
+- 闭包应用场景:作为参数被传入,作为返回值被返回
+- 自由变量的查找,要在函数定义的地方(而非执行的地方)
+- 影响:变量会常驻内存,得不到释放。闭包不要乱用
+
+
+
 - 防抖节流
 ```js
 // 防抖
@@ -1790,7 +2256,7 @@ aaa.c(); //3
 
 1. 作为普通函数执行时，`this`指向`window`。
 2. 当函数作为对象的方法被调用时，`this`就会指向`该对象`。
-3. 构造器调用，`this`指向`返回的这个对象`。
+3. 构造器调用，`this`指向`返回的这个实例化对象`。
 4. 箭头函数 箭头函数的`this`绑定看的是`this所在函数定义在哪个对象下`，就绑定哪个对象。如果有嵌套的情况，则this绑定到最近的一层对象上。
 5. 基于Function.prototype上的 `apply 、 call 和 bind `调用模式，这三个方法都可以显示的指定调用函数的 this 指向。`apply`接收参数的是数组，`call`接受参数列表，`` bind`方法通过传入一个对象，返回一个` this `绑定了传入对象的新函数。这个函数的 `this`指向除了使用`new `时会被改变，其他情况下都不会改变。若为空默认是指向全局对象window。
 
@@ -2407,11 +2873,6 @@ Reflect.ownKeys(myClass.prototype)
 ### 手写函数（前面有很多）
 在JS基础中有很多这种需要手写的函数和方法等。
 
-### 变量提升(函数提升)
-- 所谓的变量提升（变量提升），是指在JS代码执行中， JavaScript引擎（V8）把变量的声明部分和函数的声明部分提升到代码开头的行为，变量提升后，会给变量设置默认值undefined，给函数赋值函数体。
-- 在JS的变量提升中，提升的只是变量的声明，所以对于var a = 1，一般把它拆分成var a 和 a = 1。只提升var a，a = 1不变。
-- 有多个同名变量声明时，函数声明会覆盖其他的声明。如果有多个同名函数声明，则是由最后的一个函数声明覆盖之前所有的声明。
-
 ### 数据类型
 值类型（7个）：Undefined、Null、Number、String、Boolean、Symbol(ES6)、BigInt(ES10)
 引用类型：Object：Array、Function
@@ -2610,6 +3071,44 @@ var o4 = Object.create(p)
     - for...of语句在可迭代对象（包括 Array，Map，Set，String，TypedArray，arguments对象等 ）上创建一个迭代循环，并为每个不同属性的值执行语句。
     - 与forEach()不同的是，它可以正确响应break、continue和return语句。
 
+### for ... of相关问题
+- for .. in (以及forEach for )是常规的同步遍历
+- for .. of常用于异步的遍历
+```js
+function test(item) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve(item * item)
+    }, 1000)
+  })
+}
+
+const arr = [100, 200, 300]
+
+// 使用同步遍历的时候 是在1000ms后全部把结果打印出来了，而不是隔一秒打印s
+arr.forEach(async (i) => {
+  console.log(await test(i))
+})
+
+
+
+
+function test(item) {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve(item * item)
+    }, 1000)
+  })
+}
+
+const arr = [100, 200, 300]
+// 使用for...of 遍历会 1000ms 打印一次
+!(async function () {
+  for (let item of arr) {
+    console.log(await test(item))
+  }
+})()
+```
 
 ### 闭包的应用场景
 - 闭包是指有权访问另一个函数作用域中的变量的函数
@@ -3040,8 +3539,6 @@ var deepClone = function (target, map = new WeakMap()) {
 };
 ```
 
-
-
 ### 类数组对象转换为数组的方法
 - ES6语法 Array.from(arr)
 ```js
@@ -3066,7 +3563,6 @@ Array.prototype.map.call（hdList,function(){
 //...
 }）
 ```
-
 ### ES6
 https://juejin.cn/post/6844903959283367950
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210921221425.png)
@@ -3291,6 +3787,9 @@ addEventListener第一个参数事件类型，第二个类型即绑定的具体�
     - 事件冒泡阶段
         - 事件冒泡：事件按照从最特定的事件目标到最不特定的事件目标(document对象)的顺序触发，当一个元素接收到事件的时候会把他接收到的事件传给自己的父级，一直到window 。
         - 事件从目标节点自下而上向Document节点传播的阶段。
+        - 不出产生冒泡的事件：abort、blur、focus、load、unload、mouseenter、mouseleave、resize和自定义事件
+        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211105181843.png)
+        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211105181903.png)
 
 - 注意:
     - JS代码只能执行捕获或者冒泡其中的一个阶段
@@ -4031,6 +4530,15 @@ console.log('10');
 - 宏任务执行完毕后，立即执行当前微任务队列中的所有微任务（依次执行）
 - 当前宏任务执行完毕，开始检查渲染，然后GUI线程接管渲染
 - 渲染完毕后，JS线程继续接管，开始下一个宏任务（从事件队列中获取）
+
+### DOM渲染的时机
+- JS是单线程的，而且和DOM渲染共用一个线程
+- JS执行的时候，得留一-些时机供DOM渲染
+- 每次Call Stack（执行栈）清空(即每次轮询结束)， 即同步任务执行完
+- 都是DOM重新渲染的机会，DOM结构如有改变则重新渲染
+- 然后再去触发下一次Event Loop（事件循环）
+
+
 ### JS 实现异步的 5 种方式
 - 回调函数（Callback）
     - 回调函数有一个致命的弱点，就是容易写出回调地狱（Callback hell）。
@@ -4334,67 +4842,6 @@ if (!bool.valueOf()) {
 }
 ```
 
-
-### Tree Shaking原理
-Tree-Shaking 是一种基于 ES Module 规范的 Dead Code Elimination 技术，它会在运行过程中静态分析模块之间的导入导出，确定 ESM 模块中哪些导出值未曾其它模块使用，并将其删除，以此实现打包产物的优化。
-
-Tree Shaking已经成为一种应用广泛的性能优化手段。
-
-```js
-// webpack.config.js
-module.exports = {
-  entry: "./src/index",
-  mode: "production",
-  devtool: false,
-  optimization: {
-    usedExports: true,
-  },
-};
-```
-
-#### 理论基础
-在 CommonJs、AMD、CMD 等旧版本的 JavaScript 模块化方案中，导入导出行为是高度动态，难以预测的。
-```js
-if(process.env.NODE_ENV === 'development'){
-  require('./bar');
-  exports.foo = 'foo';
-}
-```
-而 ESM 方案则从规范层面规避这一行为，它要求所有的导入导出语句只能出现在模块顶层，且导入导出的模块名必须为字符串常量。ESM 下模块之间的依赖关系是高度确定的，与运行状态无关，编译工具只需要对 ESM 模块做静态分析，就可以从代码字面量中推断出哪些模块值未曾被其它模块使用，这是实现 Tree Shaking 技术的必要条件。
-```js
-// index.js
-import {bar} from './bar';
-console.log(bar);
-
-// bar.js
-export const bar = 'bar';
-export const foo = 'foo';
-
-
-//bar.js 模块导出了 bar 、foo ，但只有 bar 导出值被其它模块使用，经过 Tree Shaking 处理后，foo 变量会被视作无用代码删除。
-```
-
-#### 实现原理
-Tree Shaking 是先找出 已使用 的代码，自然剩下的则是 未使用 的代码，最后通过注释的方式分别标注。区分 已使用 和 未使用 的代码后，通过 压缩器 将 未使用 的代码删除。
-
-由于 Tree Shaking 是通过 ES6 Import 和 Export 实现找出 已使用 和 未使用 的代码， 所以 Tree Shaking 使用前提： 是源码必须遵循 ES6 的模块规范 (import & export)，如果是 CommonJS 规范 (require) 则无法使用。
-
-Webpack 中，Tree-shaking 的实现一是先标记出模块导出值中哪些没有被用过(标记的效果就是删除没有被其它模块使用的导出语句)，二是使用 Terser 删掉这些没被用到的导出语句。标记过程大致可划分为三个步骤：
-    - Make 阶段，收集模块导出变量并记录到模块依赖关系图 ModuleGraph 变量中
-    - Seal 阶段，遍历 ModuleGraph 标记模块导出变量有没有被使用
-    - 生成产物时，若变量没有被其它模块使用则删除对应的导出语句
-真正执行“Shaking”操作的是 Terser 插件。未使用的变量和模块经过标记后，已经变成一段 Dead Code —— 不可能被执行到的代码，这个时候只需要用 Terser 提供的 DCE 功能就可以删除这一段定义语句，以此实现完整的 Tree Shaking 效果。
-    
-    - 收集模块导出
-    - 标记模块导出
-    - 生成代码
-    - 删除 Dead Code
-    - 结束
-
-- Dead Code 一般具有以下几个特征
-    - 代码不会被执行，不可到达
-    - 代码执行的结果不会被用到
-    - 代码只会影响死变量（只写不读）
 ### 常用设计模式有哪些并举例使用场景
 - 工厂模式 - 传入参数即可创建实例
     - 虚拟 DOM 根据参数的不同返回基础标签的 Vnode 和组件 Vnode
@@ -4406,6 +4853,11 @@ Webpack 中，Tree-shaking 的实现一是先标记出模块导出值中哪些�
 - 策略模式 策略模式指对象有某个行为,但是在不同的场景中,该行为有不同的实现方案-比如选项的合并策略
 
 ## HTTP
+### 浏览器的最大请求并发数
+并发数量简单通俗的讲就是，当浏览器网页的时候同时工作的进行数量。
+HTTP客户端一般对同一个服务器的并发连接个数都是有限制的。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106162358.png)
+
 ### cookies、sessionStorage、localStorage 和 indexDB 的区别
 - cookie是网站为了标示用户身份而储存在用户本地的数据
 - 是否在http请求只能够携带
@@ -5095,6 +5547,8 @@ server {
           console.log('Connection closed.');
       };
 ```
+#### 使用Access-Control-Allow-Origin为什么可以解决跨域问题?
+#### 使用access-control-allow-origin解决跨域问题的流程是怎样的?
 ### XSS 攻击和 CSRF 攻击各自的原理是什么？两者又有什么区别？以及如何防范？
 1、XSS 攻击
 - 概念
@@ -5246,6 +5700,7 @@ http缓存机制主要在http响应头中设定，响应头中相关字段为Exp
     - Push Cache（推送缓存）是 HTTP/2 中的内容，当以上三种缓存都没有命中时，它才会被使用。
     - 它只在会话（Session）中存在，一旦会话结束就被释放，并且缓存时间也很短暂，在Chrome浏览器中只有5分钟左右，同时它也并非严格执行HTTP头中的缓存指令。
 #### 强缓存
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211104153519.png)
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211013140918.png)
 - 强缓存命中返回 200 200（from cache）
 
@@ -5270,6 +5725,7 @@ http缓存机制主要在http响应头中设定，响应头中相关字段为Exp
 
 
 #### 协商缓存
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211104153603.png)
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211013142135.png)
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211013142155.png)
@@ -5278,7 +5734,7 @@ http缓存机制主要在http响应头中设定，响应头中相关字段为Exp
 - 请求头last-modified的日期与响应头的last-modified一致
 - 请求头if-none-match的hash与响应头的etag一致
     - 这两种情况会返回Status Code: 304
-
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211104153626.png)
 当浏览器的强缓存失效的时候或者请求头中设置了不走强缓存，并且在请求头中设置了If-Modified-Since 或者 If-None-Match 的时候，会将这两个属性值到服务端去验证是否命中协商缓存，如果命中了协商缓存，会返回 304 状态，加载浏览器缓存，并且响应头会设置 Last-Modified 或者 ETag 属性。
 
 -  ETag/If-None-Match
@@ -5733,7 +6189,7 @@ const routes: Array<RouteConfig> = [
 
 ## Vue
 ### React和Vue的区别
-
+### vue框架有哪些有点和缺点？
 ### 简述MVVM
 什么是MVVM？
 视图模型双向绑定，是Model-View-ViewModel的缩写，也就是把MVC中的Controller演变成ViewModel。Model层代表数据模型，View代表UI组件，ViewModel是View和Model层的桥梁，数据会绑定到viewModel层并自动将数据渲染到页面中，视图变化的时候会通知viewModel层更新数据。以前是操作DOM结构更新视图，现在是数据驱动视图。
@@ -5960,6 +6416,57 @@ Watch没有缓存性，更多的是观察的作用，可以监听某些数据执
 
 销毁过程：
 父beforeDestroy->子beforeDestroy->子destroyed->父destroyed
+### Vue2.x是如何实现数组响应式的？
+vue 的开发者对数组改变数据的 7 个方法做了一些改动。
+```js
+...
+// 取出 Array的原型prototype 存储在 arrayProto变量中，
+const arrayProto = Array.prototype
+// 在这个原型基础之上create一个新的对象 arrayMethods
+export const arrayMethods = Object.create(arrayProto)
+ 
+const methodsToPatch = [
+  'push',
+  'pop',
+  'shift',
+  'unshift',
+  'splice',
+  'sort',
+  'reverse'
+]
+ 
+/**
+ * Intercept mutating methods and emit events
+ */
+ // 接下来遍历数组这7个方法，在这些方法原有功能的基础上，额外添加了通知 更新(ob.dep.notify())的操作
+methodsToPatch.forEach(function (method) {
+  // cache original method  存储原本的方法
+  const original = arrayProto[method]
+  // def为引入的方法，作用是通知更新
+  def(arrayMethods, method, function mutator (...args) {
+    // 先是正常调用当前方法
+    const result = original.apply(this, args)
+    const ob = this.__ob__
+    let inserted
+    switch (method) {
+      case 'push':
+      case 'unshift':
+        inserted = args
+        break
+      case 'splice':
+        inserted = args.slice(2)
+        break
+    }
+    // 给新增的属性添加监听依赖
+    if (inserted) ob.observeArray(inserted)
+    // notify change
+    // 最后 dep.notify() 通知更新
+    ob.dep.notify()
+    return result
+  })
+})
+```
+
 ### 异步请求在哪一步发起？
 可以在钩子函数 created、beforeMount、mounted 中进行异步请求，因为在这三个钩子函数中，data 已经创建，可以将服务端端返回的数据进行赋值。
 
@@ -6571,7 +7078,7 @@ vuex 和 vue-router 的插件注册方法 install 判断如果系统存在实例
 5. 装饰模式: (@装饰器的用法)
 
 ## VueRouter
-### hash路由和history路由实现原理说一下
+### hash路由和history路由实现原理说一下 (history模式和hash模式的区别)
 - location.hash的值实际就是URL中#后面的东西。
 - history实际采用了HTML5中提供的API来实现，主要有history.pushState()和history.replaceState()。
 
@@ -6614,12 +7121,317 @@ window.history.replaceState(state, title, targetURL);
     - 调用全局的 afterEach 钩子。
     - 触发 DOM 更新。
     - 调用 beforeRouteEnter 守卫中传给 next 的回调函数，创建好的组件实例会作为回调函数的参数传入。
+
+### vue-router跳转方式有哪些
+- router.push(location, onComplete?, onAbort?)
+    - 想要导航到不同的 URL，则使用 router.push 方法。这个方法会向 history 栈添加一个新的记录，所以，当用户点击浏览器后退按钮时，则回到之前的 URL。
+- router.replace(location, onComplete?, onAbort?)
+    - 跟 router.push 很像，唯一的不同就是，它不会向 history 添加新记录，而是跟它的方法名一样 —— 替换掉当前的 history 记录。
+- router.go(n)
+    - 这个方法的参数是一个整数，意思是在 history 记录中向前或者后退多少步，类似 window.history.go(n)。
+### vue-router添加参数
+- vue-router传递参数
+    - 编程式的导航 router.push
+        - this.$router.push({ name: 'news', params: { userId: 123 }})
+            - 命名路由搭配params，刷新页面参数会丢失
+        - this.$router.push({ path: '/news', query: { userId: 123 }});
+            - 查询参数搭配query，刷新页面数据不会丢失
+    - 声明式的导航 <router-link>
+        - <router-link :to="{ name: 'news', params: { userId: 1111}}">click to news page</router-link>
+### location.href和vue-router的区别
+- vue-router使用pushState进行路由更新，静态跳转，页面不会重新加载；location.href会触发浏览器，页面重新加载一次
+- vue-router使用diff算法，实现按需加载，减少dom操作
+- vue-router是路由跳转或同一个页面跳转；location.href是不同页面间跳转；
+- vue-router是异步加载this.$nextTick(()=>{获取url})；location.href是同步加载
 ## Vuex
 ### Vuex个人理解
+vue一般是单项数据流，当我们的应用遇到多个组件共享状态时，单向数据流的简洁性很容易被破坏：
+多个视图依赖于同一状态、来自不同视图的行为需要变更同一状态。
+作用：多个组件共享数据或者是跨组件传递数据
+
 vuex 是专门为 vue 提供的全局状态管理系统，用于多个组件中数据共享、数据缓存等。（无法持久化、内部核心原理是通过创造一个全局实例 new Vue）
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211015154102.png)
+### Vuex是怎么实现的？
+install函数：用来注册插件到vue里（说白了就是在vue中执行这个函数，并把vue当作参数传入此函数，使用vue的方法和绑定store到各个组件上）
 
-### vuex是什么？原理是什么？怎么使用？哪种功能场景使用它？
+store类：state、getters、mutations、actions、modules、plugins
+辅助函数：mapState、mapActions、mapMutations
+
+
+#### 怎么让每个vue组件都能拿到$store？
+给每个实例注入$store。
+
+在install方法里面，用vue.mixin混入，在beforeCreate的生命周期的钩子函数，使得当每个组件实例化的时候都会调用这个函数，给自己赋值一个store属性
+```js
+let Vue
+const install = (_Vue) => { 
+  Vue = _Vue
+  // 使用vue的混入方法，在创建之前，给每个组件都增加$store属性
+  Vue.mixin({
+    // 创建之前会被执行
+    beforeCreate () {
+      // 根实例有store属性
+      if (this.$options && this.$options.store) {
+        this.$store = this.$options.store  
+      } else {
+      // 根实例上没有的store属性，往父亲节点找
+      // new Vue({store}) 这里已经在根组件挂载有store属性
+        this.$store = this.$parent && this.$parent.$store 
+      }
+    }
+  })
+}
+export default {
+  install // 给用户提供一个install方法，默认会被调用
+}
+```
+#### 怎么实现state数据响应式？
+利用vue的响应式原理，让state的修改都可以更新回视图，而不是单纯获取state数据。
+```js
+class Store {
+  constructor (options) {
+    // this.vm  = options.state   只是单纯获取state数据，但是数据修改不会更新界面
+    /** 借用Vue的双向绑定机制让Vuex中data变化实时更新界面 */
+    this.vm = new _Vue({
+      data: {
+        state: options.state
+      }
+    })
+  }
+/* 类的属性访问器
+    访问state对象时候，就直接返回响应式的数据
+    Object.defineProperty get 同理
+  */
+  get state () {
+    return this.vm.state
+  }
+}
+```
+#### getters怎么实现？
+getters从根本上就是computed，给你返回一些派生的状态（对数据进行过滤操作）。
+
+遍历用户传入的参数获取属性名，利用Object.defineProperty的get获取方法执行的结果，赋值到getters对象对应的属性名上，用户通过this.getters.myName就可以调用对应的值
+```js
+// 简化代码，封装遍历方法
+const forEach = (obj, callback) => {
+  Object.keys(obj).forEach((key) => {
+    callback(key, obj[key])
+  })
+}
+forEach(getters, (getterName, fn) => {
+  Object.defineProperty(store.getters, getterName, {
+    get () {
+      // 让getter执行自己的状态 传入
+      return fn(state)
+    }
+  })
+})
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106190231.png)
+
+#### commit怎么去触发mutation
+1）不能直接改变 store 中的状态。改变 store 中的状态的唯一方法是提交 (commit) mutation。
+2）每个 mutation 都有一个字符串的 事件类型 (type) 和 一个 回调函数 (handler)。调用 store.commit(type, payload) 方法来触发mutations中的相关方法。
+```js
+forEach(mutations, (mutationName, fn) => {
+      store.mutations[mutationName] || (store.mutations[mutationName] = [])
+      store.mutations[mutationName].push((payload) => { // 先把用户传入的mutations参数的属性和方法保存到store实例上的this.mutations对象里面
+        fn(state, payload)  // 参数是state数据
+      })
+    })
+
+// 用户通过this.$store.commit('syncAdd', 10) 传入属性名和荷载，找到对应的函数，遍历执行
+commit = (type, payload) => {
+  this.mutations[type].forEach(fn => fn(payload))
+}
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106190533.png)
+
+#### dispatch怎么触发actions？
+actions和mutations的区别：
+①action提交的是mutation，而不是直接变更状态
+②actions用于处理一些异步事件，而mutations一般用于处理同步事件
+③通过store.dispatch触发action，参数是vuex.store实例（因为modules需要获取上下文）
+通过store.commit触发mutation，参数是state,payload。actions也可以实现同步函数，但是vuex要求必须遵从原则
+```js
+forEach(actions, (actionName, fn) => {
+    store.actions[actionName] || (store.actions[actionName] = [])
+    store.actions[actionName].push((payload) => {
+      fn(store, payload)  // 参数是vuex.store实例
+   	})
+})
+
+// 用户通过this.$store.dispatch('syncAdd', 10) 传入属性名和荷载，找到对应的函数，遍历执行
+dispatch = (type, payload) => {
+    this.actions[type].forEach(fn => fn(payload))
+}
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106190646.png)
+#### plugins是怎么实现？(持久化插件plugins)
+作用是：把state都存储在localStorage里面，刷新不会丢失数据
+原理：发布订阅模式
+实例store的时候，遍历plugins里面的函数，并执行 this.subscribe() 订阅到sote._subscribe数组上
+当监测到mutation有变化的时候，依次执行所有的订阅
+```js
+// store.js
+const persits = (store) => {
+  store.subscribe((mutation, state) => {
+    localStorage.setItem('vuex-state', JSON.stringify(state))
+  })
+}
+export default new Vuex.Store({ // 导出一个store实例
+  plugins: [
+    persits // 发布，通知所有的订阅
+  ]
+})
+
+
+
+/** 安装模块 */
+const installModule = (store, state, path, rootModule) => {
+  let mutations = rootModule._raw.mutations
+  if (mutations) {
+    forEach(mutations, (mutationName, fn) => {
+      store.mutations[mutationName] || (store.mutations[mutationName] = [])
+      store.mutations[mutationName].push((payload) => {
+        fn(state, payload)
+        console.log(state)
+        // 发布 让所有订阅依次执行
+        store._subscribes.forEach(fn => fn({ type: mutationName, payload }, store.state))
+      })
+    })
+  }
+}
+  
+class Store {
+  constructor (options) {
+    // 将用户的状态放到store中
+    // this.state = options.state
+    /** 借用Vue的双向绑定机制让Vuex中data变化实时更新界面 */
+    this.vm = new _Vue({
+      data: {
+        state: options.state
+      }
+    })
+    // 只循环一次，现在需要把子modules里面的getters、mutations、actions都放到对应的对象里
+    /** 保存一份到本身实例 */
+    this._options = options
+	this._subscribes=[]
+	// 实例store的时候，遍历plugins里面的函数，并执行 this.subscribe() 订阅
+    options.plugins.forEach(plugin => plugin(this))
+  }
+  subscribe (fn) {
+    this._subscribes.push(fn) // 订阅
+  }
+}
+```
+
+#### mapState怎么实现？
+抽象形容：mapState是state的语法糖。
+```js
+import { mapState } from 'vuex';
+ // computed只有mapState的情况下
+  computed: mapState({
+    counts: 'counts', // 第一种写法
+    add: (state) => this.str + ':' + state.add, // 第二种写法
+})
+
+// 还有其他的情况下
+computed: {
+  /*
+  ...mapState({
+    counts: state => state.counts,
+    add: state => state.add
+  })
+  */
+  ...mapState([  // 第三种写法：通过数组来赋值
+    'counts',
+     'add'
+  ])
+},
+```
+…mapState相当于解构赋值给computed，浅拷贝。
+```js
+let mapState = {
+  name: 'ccc',
+  age: 1,
+  child:{
+    count:2
+  }
+}
+
+let computed = {...mapState}
+computed.age = 18
+computed.child.count = 3
+console.log(computed) // {name: "ccc", age: 18, child :{count:3}}
+console.log(mapState) // {name: "ccc", age: 1, child :{count:3}}
+```
+
+1）…mapState([ ‘age’]) 会执行一个函数，返回一个对象，通过…解构到computed上
+2）执行函数时会判断传入的是字符串，还是对象或数组？
+① 如果是对象或数组，都去根实例的state上找（所有module.state都挂载在store.state上）
+    对象{ age: state => state.age }：执行函数并传入根state作为参数，让它返回对应value
+    数组[ ‘age’ ]：通过key找到根state上的对应的value
+② 如果是字符串，说明是用命名空间来获取值，则通过第一个参数（命名空间名）去根实例store._modulesNamespaceMap上找到对应的module模块，再通过第二个参数（key）找到state上对应的value返回
+
+总结：都是通过key值在state上找到value值，组装成对象返回，然后再解构赋值到computed上
+#### 命名空间
+namespaced：vuex中的store分模块管理，需要在store的index.js中引入各个模块，为了解决不同模块命名冲突的问题，将不同模块的namespaced:true，之后在不同页面中引入getter、actions、mutations时，需要加上所属的模块名
+
+
+当使用 mapState, mapGetters, mapActions 和 mapMutations 这些函数来绑定带命名空间的模块时，写起来可能比较繁琐：
+```js
+// store.js
+const moduleE = {
+  namespaced: true,
+  state: {
+    name: 'xiaoming',
+    age: 1
+  }
+}
+export default new Vuex.Store({
+  modules: { 
+	// 将模块挂载到根store
+    moduleE, // 等同于moduleE : 等同于moduleE, 上面模块的命名空间是moduleE
+    // eee: moduleE, // 下面模块的命名空间是 eee
+ }
+});
+
+
+
+
+// 带命名空间的绑定函数
+computed: {
+  // ...mapState('命名空间名', ["name"])   在辅助函数mapState的第一参数上，填写上模块的命名空间名
+ // ...mapState('moduleE', {
+ //   name: 'name'
+// })
+  ...mapState('moduleE', ['name'])
+}
+
+
+
+// 实现原理
+ computed: {
+    // ...mapState('moduleE', { // 命名空间名用法1
+    //   name: 'name'
+    // })
+   // ...mapState('moduleE', ['name']) // 命名空间名用法2
+    // ...mapState({ // 用法1
+    //   age: state => state.age
+    // })
+     ...mapState([ // 用法2
+       'age'
+     ])
+  },
+```
+命名空间原理：
+1）安装每一个模块的时候，判断有没有namespaced，为否时，则给他设置false，为true则找到moduleName和对应module，挂载到根_modulesNamespaceMap={}对象上
+
+2）当通过mapState取值的时候就可以通过命名空间名到根_modulesNamespaceMap上找到对应的值
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106191310.png)
+
+### Vuex是什么？原理是什么？怎么使用？哪种功能场景使用它？
 - 状态管理库，类似 React 中的 Rudux
 - vuex是一个专门为vue构建的状态集管理，主要是为了解决组件间状态共享的问题，强调的是数据的集中式管理，说白了主要是便于维护便于解耦所以不是所有的项目都适合使用vuex，如果你不是构建大型项目使用vuex反而使你的项目代码繁琐多余
 -  state mutations getters actions modules
@@ -6630,6 +7442,43 @@ Vuex中所有的状态更新的唯一途径都是mutation，异步操作通过 A
 ### Vuex 页面刷新数据丢失怎么解决
 需要做 vuex 数据持久化 一般使用本地存储的方案来保存数据 可以自己设计存储方案 也可以使用第三方插件
 
+### vuex中如何组合使用多个 action。
+业务逻辑场景：存在2个action，actionA和actionB，先执行完actionA才能执行actionB。
+
+```js
+actions:{
+    actionA({commit}){
+        return new Promise((reslove,reject)=>{
+            commit('someMutationA')
+            reslove()
+        })
+    }
+}
+
+
+// 第一种 在组件里派发action
+this.$store.dispatch('actionA').then(()=>{
+    // ...派发其他的action或者写其他的逻辑
+})
+// 第二种 在actions里派发另一个action
+actions:{
+    actionB({dispatch, commit}){
+        return dispatch('actionA').then(()=>{
+            commit('someOtherMutation')
+        })
+    }
+}
+// 使用async/await的写法
+actions:{
+    async actionA({commit}){
+        commit('someMutationA', await someMutationA())
+    },
+    async actionB({dispatch,commit}){
+        await dispatch('actionA') // 等待actionA完成
+        commit('someMutationB', await someMutationB)
+    }
+}
+```
 ## Webpack Vite Rollup
 ### Webpack流程
 - webpack到底是如何对我们的项目进行打包的呢？
@@ -6836,7 +7685,7 @@ module.exports = {
     }
 }
 ```
-### Webpack 的热更新原理 ？？？？？？？？
+### Webpack 的热更新原理
 HMR即Hot Module Replacement是指当你对代码修改并保存后，webpack将会对代码进行重新打包，并将改动的模块发送到浏览器端，浏览器用新的模块替换掉旧的模块，去实现局部更新页面而非整体刷新页面。
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211008171751.png)
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211008172241.png)
@@ -7093,6 +7942,67 @@ presets: [
 ]
 ```
 
+### Tree Shaking原理
+Tree-Shaking 是一种基于 ES Module 规范的 Dead Code Elimination 技术，它会在运行过程中静态分析模块之间的导入导出，确定 ESM 模块中哪些导出值未曾其它模块使用，并将其删除，以此实现打包产物的优化。
+
+Tree Shaking已经成为一种应用广泛的性能优化手段。
+
+```js
+// webpack.config.js
+module.exports = {
+  entry: "./src/index",
+  mode: "production",
+  devtool: false,
+  optimization: {
+    usedExports: true,
+  },
+};
+```
+
+#### 理论基础
+在 CommonJs、AMD、CMD 等旧版本的 JavaScript 模块化方案中，导入导出行为是高度动态，难以预测的。
+```js
+if(process.env.NODE_ENV === 'development'){
+  require('./bar');
+  exports.foo = 'foo';
+}
+```
+而 ESM 方案则从规范层面规避这一行为，它要求所有的导入导出语句只能出现在模块顶层，且导入导出的模块名必须为字符串常量。ESM 下模块之间的依赖关系是高度确定的，与运行状态无关，编译工具只需要对 ESM 模块做静态分析，就可以从代码字面量中推断出哪些模块值未曾被其它模块使用，这是实现 Tree Shaking 技术的必要条件。
+```js
+// index.js
+import {bar} from './bar';
+console.log(bar);
+
+// bar.js
+export const bar = 'bar';
+export const foo = 'foo';
+
+
+//bar.js 模块导出了 bar 、foo ，但只有 bar 导出值被其它模块使用，经过 Tree Shaking 处理后，foo 变量会被视作无用代码删除。
+```
+
+#### 实现原理
+Tree Shaking 是先找出 已使用 的代码，自然剩下的则是 未使用 的代码，最后通过注释的方式分别标注。区分 已使用 和 未使用 的代码后，通过 压缩器 将 未使用 的代码删除。
+
+由于 Tree Shaking 是通过 ES6 Import 和 Export 实现找出 已使用 和 未使用 的代码， 所以 Tree Shaking 使用前提： 是源码必须遵循 ES6 的模块规范 (import & export)，如果是 CommonJS 规范 (require) 则无法使用。
+
+Webpack 中，Tree-shaking 的实现一是先标记出模块导出值中哪些没有被用过(标记的效果就是删除没有被其它模块使用的导出语句)，二是使用 Terser 删掉这些没被用到的导出语句。标记过程大致可划分为三个步骤：
+    - Make 阶段，收集模块导出变量并记录到模块依赖关系图 ModuleGraph 变量中
+    - Seal 阶段，遍历 ModuleGraph 标记模块导出变量有没有被使用
+    - 生成产物时，若变量没有被其它模块使用则删除对应的导出语句
+真正执行“Shaking”操作的是 Terser 插件。未使用的变量和模块经过标记后，已经变成一段 Dead Code —— 不可能被执行到的代码，这个时候只需要用 Terser 提供的 DCE 功能就可以删除这一段定义语句，以此实现完整的 Tree Shaking 效果。
+    
+    - 收集模块导出
+    - 标记模块导出
+    - 生成代码
+    - 删除 Dead Code
+    - 结束
+
+- Dead Code 一般具有以下几个特征
+    - 代码不会被执行，不可到达
+    - 代码执行的结果不会被用到
+    - 代码只会影响死变量（只写不读）
+    - 
 ### Rollup原理
 Rollup中，一个文件就是一个模块。每一个模块都会根据文件的代码生成一个 AST 语法抽象树，Rollup 需要对每一个 AST 节点进行分析。
 
@@ -7252,6 +8162,156 @@ console.log(str)
 
 ## 手写相关函数
 ### 手写相关函数1
+#### 封装localStorage
+因为localStorage是永久存储的，不支持设置过期时间，而我们有时又不希望把本地的存储一起发往服务器，所以也不会使用cookie，基于这样的业务场景，就对localStorage进行了二次封装，让它具备过期时间的特点。
+```js
+class Storage {
+  constructor (express) {
+    this.express = express;
+  }
+  set(key, value, express) {
+    let obj = {
+      data: value,
+      cTime: Date.now(),
+      express: express || this.express
+    };
+    localStorage.setItem(key, JSON.stringify(obj));
+  }
+  get(key) {
+    let item = localStorage.getItem(key);
+    if (!item) {
+      return null;
+    }
+    item = JSON.parse(item);
+    let nowTime = Date.now();
+    if (item.express && item.express < (nowTime - item.cTime)) {
+      this.remove(key);
+      return null;
+    } else {
+      return item.data;
+    }
+  }
+  remove(key) {
+    localStorage.removeItem(key);
+  }
+  clear(){
+    localStorage.clear();
+  }
+}
+```
+#### 获取当前页面url参数
+- 传统方式,查找location.search
+- 新API URL SearchParams
+
+```js
+// 传统方式
+function query(name) {
+  const search = location.search.substr(1) // 类似 array.slice(1)
+  const reg = new RegExp(`(^|&)${name}=([^&]*)(&|$)`, 'i')
+  const res = search.match(reg)
+  if (res === null) {
+    return null
+  }
+  return res[2]
+}
+query('d')
+
+
+
+function query(name) {
+  const search = location.search
+  const p = new URLSearchParams(search)
+  return p.get(name)
+}
+console.log(query('b'))
+```
+#### 将url参数解析为JS对象
+- 传统方式， 分析 srarch
+- 使用 URLSearchParams
+
+```js
+function queyrToObj() {
+    const res = {}
+    const search = location.search.substr(1)//截取?之后的参数
+    search.split('&').forEach(paramStr => {
+        const arr = paramStr.split('=')
+        const key = arr[0]
+        const val = arr[1]
+        res[key] = val
+    })
+    return res
+}
+
+
+
+function queryToObj() {
+    const res = {}
+    const pList = new URLSearchParams(location.search)
+    pList.forEach((val,key) => {
+        res[key] = val
+    })
+    return res
+}
+```
+#### 手写深度比较（isEqual）
+```js
+// 判断对象是否是对象还是数组
+function isObject(obj) {
+  return typeof obj === 'object' && obj !== null
+}
+
+// 判断全相等
+function isEqual(obj1, obj2) {
+  // 判断不是对象数组的直接比较值
+  if (!isObject(obj1) || !isObject(obj2)) {
+    return obj1 === obj2
+  }
+  // 防止传入的 两个是同一对象 直接返回
+  if (obj1 === obj2) {
+    return true
+  }
+  // 是对象和数组(不考虑function)
+  // 分别取出keys
+  const obj1Keys = Object.keys(obj1)
+  const obj2Keys = Object.keys(obj2)
+  // 先判断keys的个数相等不
+  if (obj1Keys.length !== obj2Keys.length) {
+    return false
+  }
+  // 以obj1为基准 递归判断 obj2
+  for (let key in obj1) {
+    const result = isEqual(obj1[key], obj2[key])
+    if (!result) return false
+  }
+  // 遍历 递归后到了这里就是全相等
+  return true
+}
+
+//使用
+// 传入普通
+console.log(isEqual('123', '123')) //true
+// 传入一样
+console.log(isEqual(obj1, obj1)) //true
+// 比较两个一样的
+const obj1 = {
+  x: 1,
+  y: 2,
+  s: {
+    x: 1,
+    y: 2,
+  },
+}
+
+const obj2 = {
+  x: 1,
+  y: 2,
+  s: {
+    x: 1,
+    y: 2,
+  },
+}
+console.log(isEqual(obj1, obj2)) //true
+```
 #### 手写-如何找到数组中第一个没出现的最小正整数
 ```js
 给你一个未排序的整数数组 nums ，请你找出其中没有出现的最小的正整数。
@@ -9623,4 +10683,383 @@ const mySetTimeout = (fn, time) => {
 // mySetTimeout(()=>{
 //   console.log(1);
 // },1000)
+```
+
+#### 浅拷贝
+
+如果属性是基本类型，拷贝的就是基本类型的值，如果属性是引用类型，拷贝的就是内存地址 ，所以如果其中一个对象改变了这个地址，就会影响到另一个对象。
+
+浅拷贝后会重新在堆中创建内存，拷贝前后对象的基本数据类型互不影响，但拷贝前后引用类型会共享堆中的内存，引用类型就会互相影响
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210809212740.png)
+
+```js
+//方法 1
+Object.assign(target, ...sources)  // 缺陷：没能处理数组，不够通用
+//方法 2
+var simpleClone = function (target) {
+  if (typeof target === "object") {
+    let cloneTarget = Array.isArray(target) ? [] : {};
+    for (const key in target) {
+       if (obj.hasOwnProperty(key)) {
+            cloneTarget[key] = target[key];
+        }
+    }
+    return cloneTarget;
+  } else {
+    return target;
+  }
+};
+//方法 3
+let obj1 = {
+    name: 'yang',
+    res: {
+        value: 123
+    }
+}
+let {...obj2} = obj1
+obj2.res.value = 456
+console.log(obj2) // {name: "yang", res: {value: 456}}
+console.log(obj1) // {name: "yang", res: {value: 456}}
+obj2.name = 'haha'
+console.log(obj2) // {name: "haha", res: {value: 456}}
+console.log(obj1) // {name: "yang", res: {value: 456}}
+//方法 4
+ const arr1 = [
+     'yang',
+     {
+         value: 123
+     }
+ ];
+ const arr2 = arr1.slice(0);
+ arr2[1].value = 456;
+ console.log(arr2); // ["yang", {value: 456}]
+ console.log(arr1); // ["yang", {value: 456}]
+ arr2[0] = 'haha';
+ console.log(arr2); // ["haha", {value: 456}]
+ console.log(arr1); // ["yang", {value: 456}]
+//方法 5
+const arr1 = [
+      'yang',
+      {
+          value: 123
+      }
+  ];
+  const arr2 = [].concat(arr1);
+  arr2[1].value = 456;
+  console.log(arr2); // ["yang", {value: 456}]
+  console.log(arr1); // ["yang", {value: 456}]
+  arr2[0] = 'haha';
+  console.log(arr2); // ["haha", {value: 456}]
+  console.log(arr1); // ["yang", {value: 456}]
+```
+
+```
+实际上对于数组来说， 只要不修改原数组， 重新返回一个新数组就可以实现浅拷贝，比如说map、filter、reduce等方法
+```
+
+#### 深拷贝
+
+将一个对象从内存中完整的拷贝一份出来,从堆内存中开辟一个新的区域存放新对象,且修改新对象不会影响原对象。深拷贝开辟了新的堆内存地址，并且将对象的引用指向了新开辟的内存地址，和前面复制的对象完全独立，自立根生，拷贝地很深，学功夫学到家，自立门户的感觉。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210809212944.png)
+
+```js
+//方法 1 JSON.parse(JSON.stringify())
+let student = {
+  name: "小明",
+  score: {
+    english: 88,
+    chinese: 77,
+    math: 99,
+  },
+};
+
+let deepStudent = JSON.parse(JSON.stringify(student));
+// JSON.stringify 对于拷贝其他引用类型、拷贝函数、循环引用等情况无法很好处理，只能运用于简单 JSON。
+// 会忽略 undefined、symbol、不能序列化函数、不能解决循环引用的对象、不能正确处理new Date()、不能处理正则、不能处理new Error()
+deepStudent.name = "李雷";
+deepStudent.score.english = 98;
+console.log("deepStudent: ", deepStudent);
+console.log("student: ", student);
+
+
+
+
+
+//方法 2 深拷贝更为通用的做法：递归遍历赋值
+var deepClone = function (target) {
+  if (typeof target === "object") {
+    let cloneTarget = Array.isArray(target) ? [] : {};
+    for (const key in target) {
+      if (target.hasOwnProperty(key)) {
+           cloneTarget[key] = deepClone(target[key]);
+       }
+    }
+    return cloneTarget;
+  } else {
+    return target;
+  }
+};
+
+
+
+// target.target = target;
+// 这个case如果还用以上递归代码的话，会导致死循环、栈内存溢出。
+// 附加考虑循环引用
+var deepClone = function (target, map = new Map()) {
+  if (typeof target === "object") {
+    let cloneTarget = Array.isArray(target) ? [] : {};
+    if (map.get(target)) {
+      return map.get(target);
+    }
+    map.set(target, cloneTarget);
+    for (const key in target) {
+      cloneTarget[key] = deepClone(target[key], map);
+    }
+    return cloneTarget;
+  } else {
+    return target;
+  }
+};
+// 附加考虑循环引用,弱引用对象，垃圾回收机制会自动帮我们回收。
+var deepClone = function (target, map = new WeakMap()) {
+  if (typeof target === "object") {
+    let cloneTarget = Array.isArray(target) ? [] : {};
+    if (map.get(target)) {
+      return map.get(target);
+    }
+    map.set(target, cloneTarget);
+    for (const key in target) {
+      cloneTarget[key] = deepClone(target[key], map);
+    }
+    return cloneTarget;
+  } else {
+    return target;
+  }
+};
+
+
+
+
+
+
+
+
+// 超级全面的深拷贝
+const mapTag = "[object Map]";
+const setTag = "[object Set]";
+const arrayTag = "[object Array]";
+const objectTag = "[object Object]";
+const argsTag = "[object Arguments]";
+const boolTag = "[object Boolean]";
+const dateTag = "[object Date]";
+const numberTag = "[object Number]";
+const stringTag = "[object String]";
+const symbolTag = "[object Symbol]";
+const errorTag = "[object Error]";
+const regexpTag = "[object RegExp]";
+const funcTag = "[object Function]";
+const deepTag = [mapTag, setTag, arrayTag, objectTag, argsTag];
+
+function forEach(array, iteratee) {
+  let index = -1;
+  const length = array.length;
+  while (++index < length) {
+    iteratee(array[index], index);
+  }
+  return array;
+}
+function isObject(target) {
+  const type = typeof target;
+  return target !== null && (type === "object" || type === "function");
+}
+function getType(target) {
+  return Object.prototype.toString.call(target);
+}
+function getInit(target) {
+  const Ctor = target.constructor;
+  return new Ctor();
+}
+function cloneSymbol(targe) {
+  return Object(Symbol.prototype.valueOf.call(targe));
+}
+function cloneReg(targe) {
+  const reFlags = /\w*$/;
+  const result = new targe.constructor(targe.source, reFlags.exec(targe));
+  result.lastIndex = targe.lastIndex;
+  return result;
+}
+function cloneFunction(func) {
+  const bodyReg = /(?<={)(.|\n)+(?=})/m;
+  const paramReg = /(?<=\().+(?=\)\s+{)/;
+  const funcString = func.toString();
+  if (func.prototype) {
+    const param = paramReg.exec(funcString);
+    const body = bodyReg.exec(funcString);
+    if (body) {
+      if (param) {
+        const paramArr = param[0].split(",");
+        return new Function(...paramArr, body[0]);
+      } else {
+        return new Function(body[0]);
+      }
+    } else {
+      return null;
+    }
+  } else {
+    return eval(funcString);
+  }
+}
+// 处理 不可继续遍历的类型
+function cloneOtherType(targe, type) {
+  const Ctor = targe.constructor;
+  switch (type) {
+    case boolTag:
+    case numberTag:
+    case stringTag:
+    case errorTag:
+    case dateTag:
+      return new Ctor(targe);
+    case regexpTag:
+      return cloneReg(targe);
+    case symbolTag:
+      return cloneSymbol(targe);
+    case funcTag:
+      return cloneFunction(targe);
+    default:
+      return null;
+  }
+}
+function clone(target, map = new WeakMap()) {
+  // 克隆原始类型
+  if (!isObject(target)) {
+    return target;
+  }
+  // 初始化
+  const type = getType(target);
+  let cloneTarget;
+  if (deepTag.includes(type)) {
+    cloneTarget = getInit(target, type);
+  } else {
+    return cloneOtherType(target, type);
+  }
+  // 防止循环引用
+  if (map.get(target)) {
+    return map.get(target);
+  }
+  map.set(target, cloneTarget);
+  // 克隆set
+  if (type === setTag) {
+    target.forEach((value) => {
+      cloneTarget.add(clone(value, map));
+    });
+    return cloneTarget;
+  }
+  // 克隆map
+  if (type === mapTag) {
+    target.forEach((value, key) => {
+      cloneTarget.set(key, clone(value, map));
+    });
+    return cloneTarget;
+  }
+  // 克隆对象和数组
+  const keys = type === arrayTag ? undefined : Object.keys(target);
+  forEach(keys || target, (value, key) => {
+    if (keys) {
+      key = value;
+    }
+    cloneTarget[key] = clone(target[key], map);
+  });
+
+  return cloneTarget;
+}
+module.exports = {
+  clone,
+};
+
+
+
+
+
+// 其他的高级版
+function deepClone(obj, cache = new WeakMap()) {
+  if (!obj instanceof Object) return obj
+  // 防止循环引用
+  if (cache.get(obj)) return cache.get(obj)
+  // 支持函数
+  if (obj instanceof Function) {
+    return function () {
+      return obj.apply(this, arguments)
+    }
+  }
+  // 支持日期
+  if (obj instanceof Date) return new Date(obj)
+  // 支持正则对象
+  if (obj instanceof RegExp) return new RegExp(obj.source, obj.flags)
+
+  // 数组是 key 为数字索引的特殊对象
+  const res = Array.isArray(obj) ? [] : {}
+  // 缓存 copy 的对象，用于处理循环引用的情况
+  cache.set(obj, res)
+
+  Object.keys(obj).forEach((key) => {
+    if (obj[key] instanceof Object) {
+      res[key] = deepClone(obj[key], cache)
+    } else {
+      res[key] = obj[key]
+    }
+  });
+  return res
+}
+
+
+
+
+// 其他高级版本2
+// 深拷贝：对对象内部进行深拷贝，支持 Array、Date、RegExp、DOM
+const deepCopy = (sourceObj) => {
+  // 如果不是对象则退出（可停止递归）
+  if(typeof sourceObj !== 'object') return;
+  
+  // 深拷贝初始值：对象/数组
+  let newObj = (sourceObj instanceof Array) ? [] : {};
+
+  // 使用 for-in 循环对象属性（包括原型链上的属性）
+  for (let key in sourceObj) { 
+    // 只访问对象自身属性
+    if (sourceObj.hasOwnProperty(key)) {
+      // 当前属性还未存在于新对象中时
+      if(!(key in newObj)){
+        if (sourceObj[key] instanceof Date) {
+          // 判断日期类型
+          newObj[key] = new Date(sourceObj[key].getTime());
+        } else if (sourceObj[key] instanceof RegExp) {
+          // 判断正则类型
+          newObj[key] = new RegExp(sourceObj[key]);
+        } else if ((typeof sourceObj[key] === 'object') && sourceObj[key].nodeType === 1 ) {
+          // 判断 DOM 元素节点
+          let domEle = document.getElementsByTagName(sourceObj[key].nodeName)[0];
+          newObj[key] = domEle.cloneNode(true);
+        } else {
+          // 当元素属于对象（排除 Date、RegExp、DOM）类型时递归拷贝
+          newObj[key] = (typeof sourceObj[key] === 'object') ? deepCopy(sourceObj[key]) : sourceObj[key];
+        }
+      }
+    }
+  }
+  return newObj;
+}
+// deepCopy 函数测试效果
+const objA = {
+  name: 'jack',
+  birthday: new Date(),
+  pattern: /jack/g,
+  body: document.body,
+  others: [123,'coding', new Date(), /abc/gim,]
+};
+const objB = deepCopy(objA);
+console.log(objA === objB); // false
+console.log(objA.others === objB.others); // false
+console.log(objA, objB); // 对象内容一样
 ```
