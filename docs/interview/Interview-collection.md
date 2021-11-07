@@ -104,6 +104,33 @@
 ```
 
 ## CSS
+### css的三种引入方式及优先级
+1. 行内样式
+`<p style="color:#F00; "></p>`
+缺点：HTML页面不纯净，文件体积大，不利于蜘蛛爬行，后期维护不方便。
+
+2. 内嵌样式
+内嵌样式就是将CSS代码写在`<head></head>`之间，并且用`<style></style>`进行声明。
+优缺点：页面使用公共CSS代码，也是每个页面都要定义的，如果一个网站有很多页面，每个文件都会变大，后期维护难度也大，如果文件很少，CSS代码也不多，这种样式还是很不错的。
+
+3. 外部样式
+链接样式（推荐）： 链接样式是使用频率最高，最实用的样式，只需要在`<head></head>`之间加上`<link…/>`就可以了。
+优缺点：实现了页面框架代码与表现CSS代码的完全分离，使得前期制作和后期维护都十分方便
+
+导入样式（不建议使用）： 导入样式和链接样式比较相似，采用@import样式导入CSS样式表，在HTML初始化时，会被导入到HTML或者CSS文件中，成为文件的一部分，类似第二种内嵌样式。
+ 链接式和导入式的区别：
+    <link>
+        1、属于XHTML
+        2、优先加载CSS文件到页面
+    @import
+        1、属于CSS2.1
+        2、先加载HTML结构在加载CSS文件。
+
+四种CSS引入方式的优先级：
+1.就近原则
+2.理论上：行内>内嵌>链接>导入
+3.实际上：内嵌、链接、导入在同一个文件头部，谁离相应的代码近，谁的优先级高（页面多种方式使用css样式引入）
+
 ### line-height单位的区别
 1.normal
 2.inherit
@@ -1725,7 +1752,181 @@ border-radius: 水平半径 / 垂直半径;
 </style>
 <div class="semicircle"></div>
 ```
-
+### CSS九宫格布局
+#### Flex实现
+原理： 使用flex弹性布局和flex-wrap来设置
+```html
+//html代码
+<div class="box">
+      <ul class="box-inner">
+        <li>九宫格1</li>
+        <li>九宫格2</li>
+        <li>九宫格3</li>
+        <li>九宫格4</li>
+        <li>九宫格5</li>
+        <li>九宫格6</li>
+        <li>九宫格7</li>
+        <li>九宫格8</li>
+        <li>九宫格9</li>
+      </ul>
+    </div>
+// css代码
+.box {
+  position: relative;
+  width: 100%;
+  height: 600px;
+}
+.box-inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-wrap: wrap;
+}
+.box-inner > li {
+  overflow: hidden;
+  flex-grow: 1;
+  background-color: darkorange;
+  text-align: center;
+  color: #ffffff;
+  width: 33%;
+  height: 200px;
+  line-height: 200px;
+  margin: 1px;
+  text-align: center;
+}
+```
+#### Grid实现
+原理：使用grid创建网格布局，划分为3x3的等分布局。
+```html
+//html代码
+<div class="box">
+      <div>九宫格1</div>
+      <div>九宫格2</div>
+      <div>九宫格3</div>
+      <div>九宫格4</div>
+      <div>九宫格5</div>
+      <div>九宫格6</div>
+      <div>九宫格7</div>
+      <div>九宫格8</div>
+      <div>九宫格9</div>
+    </div>
+//css代码
+.box {
+  display: grid;
+  height: 600px;
+  width: 100%;
+  grid-template-columns: repeat(3, 1fr);
+ grid-template-rows: repeat(3, 1fr);
+}
+.box > div {
+  width: 98%;
+  margin: 1%;
+  background-color: deeppink;
+  text-align: center;
+  line-height: 200px;
+}
+.box > div:nth-child(even) {
+  background-color: black;
+  color: #fff;
+}
+```
+#### Float实现
+原理：利用float布局和31%的百分比设置宽和高。
+```html
+//html代码
+<div class="box">
+  <ul class="box-inner">
+    <li>九宫格1</li>
+    <li>九宫格2</li>
+    <li>九宫格3</li>
+    <li>九宫格4</li>
+    <li>九宫格5</li>
+    <li>九宫格6</li>
+    <li>九宫格7</li>
+    <li>九宫格8</li>
+    <li>九宫格9</li>
+  </ul>
+</div>
+//css代码
+.box {
+  position: relative;
+  width: 100%;
+  height: 600px;
+}
+.box-inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+.box-inner > li {
+  position: relative;
+  float: left;
+  width: 31%;
+  height: 31%;
+  margin: 1%;
+  list-style-type: none;
+  background-color: springgreen;
+  text-align: center;
+  line-height: 200px;
+}
+.box-inner > li:nth-child(odd) {
+  background-color: silver;
+}
+```
+#### Table实现
+原理1：使用原生table表格实现九宫格 缺点：单元之间的间隔使用border-spacing实现，不支持百分比，设置后为添加单元四周的间隔。
+```html
+//html代码
+<div class="box">
+  <table class="box-inner">
+    <tbody>
+      <tr>
+        <td>九宫格1</td>
+        <td>九宫格2</td>
+        <td>九宫格3</td>
+      </tr>
+      <tr>
+        <td>九宫格4</td>
+        <td>九宫格5</td>
+        <td>九宫格6</td>
+      </tr>
+      <tr>
+        <td>九宫格7</td>
+        <td>九宫格8</td>
+        <td>九宫格9</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+//css代码
+.box {
+  position: relative;
+  width: 100%;
+  height: 600px;
+}
+.box-inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  margin: 10px;
+  border-spacing: 0.57em;
+  font-size: 20px;
+  empty-cells: hide;
+  table-layout: fixed;
+}
+.box-inner > tbody > tr > td {
+  text-align: center;
+  background-color: burlywood;
+  overflow: hidden;
+}
+```
 ### RAF（requestAnimationFrame） 和 RIC（requestIdleCallback） 是什么
 #### 页面流畅与 FPS
 - 页面是一帧一帧绘制出来的，当每秒绘制的帧数（FPS）达到 60 时，页面是流畅的，小于这个值时，用户会感觉到卡顿。
@@ -1886,6 +2087,86 @@ Promise 也不建议在这里面进行，因为 Promise 的回调属性 Event lo
 ## JS
 ### 图片懒加载的原理？？？
 ### 箭头函数和普通函数有什么区别？如果把箭头函数转换为不用箭头函数的形式，如何转换?
+1. 语法更加简洁、清晰
+箭头函数的定义要比普通函数定义简洁、清晰得多，很快捷。
+
+2. 箭头函数没有 prototype (原型)，所以箭头函数本身没有this​​​​​​​
+```js
+// 箭头函数
+let a = () => {};
+console.log(a.prototype); // undefined
+
+// 普通函数
+function a() {};
+console.log(a.prototype); // {constructor:f}
+```
+
+3. 箭头函数不会创建自己的this
+箭头函数没有自己的this，箭头函数的this指向在定义（注意：是定义时，不是调用时）的时候继承自外层第一个普通函数的this。所以，箭头函数中 this 的指向在它被定义的时候就已经确定了，之后永远不会改变。
+```js
+let obj = {
+  a: 10,
+  b: () => {
+    console.log(this.a); // undefined
+    console.log(this); // Window {postMessage: ƒ, blur: ƒ, focus: ƒ, close: ƒ, frames: Window, …}
+  },
+  c: function() {
+    console.log(this.a); // 10
+    console.log(this); // {a: 10, b: ƒ, c: ƒ}
+  }
+}
+obj.b(); 
+obj.c();
+```
+
+4. call | apply | bind 无法改变箭头函数中this的指向
+call | apply | bind方法可以用来动态修改函数执行时this的指向，但由于箭头函数的this定义时就已经确定且永远不会改变。所以使用这些方法永远也改变不了箭头函数this的指向。
+```js
+var id = 10;
+let fun = () => {
+    console.log(this.id)
+};
+fun();     // 10
+fun.call({ id: 20 });     // 10
+fun.apply({ id: 20 });    // 10
+fun.bind({ id: 20 })();   // 10
+```
+
+5. 箭头函数不能作为构造函数使用
+因为箭头函数没有自己的this，它的this其实是继承了外层执行环境中的this，且this指向永远不会随在哪里调用、被谁调用而改变，所以箭头函数不能作为构造函数使用，或者说构造函数不能定义成箭头函数，否则用new调用时会报错！
+```js
+let Fun = (name, age) => {
+    this.name = name;
+    this.age = age;
+};
+
+// 报错
+let p = new Fun('dingFY', 24);
+```
+
+6. 箭头函数不绑定arguments，取而代之用rest参数...代替arguments对象，来访问箭头函数的参数列表
+箭头函数没有自己的arguments对象。在箭头函数中访问arguments实际上获得的是外层局部（函数）执行环境中的值。
+```js
+// 普通函数
+function A(a){
+  console.log(arguments);
+}
+A(1,2,3,4,5,8);  //  [1, 2, 3, 4, 5, 8, callee: ƒ, Symbol(Symbol.iterator): ƒ]
+
+// 箭头函数
+let B = (b)=>{
+  console.log(arguments);
+}
+B(2,92,32,32);   // Uncaught ReferenceError: arguments is not defined
+
+// rest参数...
+let C = (...c) => {
+  console.log(c);
+}
+C(3,82,32,11323);  // [3, 82, 32, 11323]
+```
+
+7. 箭头函数不能用作Generator函数，不能使用yield关键字
 ### JS的一些取反的特殊值
 ### CSS和JS为什么会放在头部或者底部？
 - 因为页面在加载时，浏览器会识别该文档CSS，并行下载，不会停止对当前文档的加载。放在头部可以保证在加载html生成DOM tree的时候，就可以同时对DOM tree进行渲染，可以防止闪跳，白屏或者布局混乱。
@@ -4398,14 +4679,31 @@ function factorial(num, num1 = 0, num2 = 1) {
 进程是资源分配的最小单位，线程是CPU调度的最小单位
 - 进程
     - 代表CPU所能处理的单个任务。任一时刻，CPU总是运行一个进程，其他进程处于非运行状态。
+    - 进程间通信
+        - 管道（Pipe）及有名管道（named pipe）：管道可用于具有亲缘关系进程间的通信，有名管道克服了管道没有名字的限制，因此，除具有管道所具有的功能外，它还允许无亲缘关系进程间的通信；
+        - 信号（Signal）：信号是比较复杂的通信方式，用于通知接受进程有某种事件发生，除了用于进程间通信外，进程还可以发送信号给进程本身；linux除了支持Unix早期信号语义函数sigal外，还支持语义符合Posix.1标准的信号函数sigaction（实际上，该函数是基于BSD的，BSD为了实现可靠信号机制，又能够统一对外接口，用sigaction函数重新实现了signal函数）；
+        - 消息队列（Message）：消息队列是消息的链接表，包括Posix消息队列system V消息队列。有足够权限的进程可以向队列中添加消息，被赋予读权限的进程则可以读走队列中的消息。消息队列克服了信号承载信息量少，管道只能承载无格式字节流以及缓冲区大小受限等缺点。
+        - 共享内存：使得多个进程可以访问同一块内存空间，是最快的可用IPC形式。是针对其他通信机制运行效率较低而设计的。往往与其它通信机制，如信号量结合使用，来达到进程间的同步及互斥。
+        - 信号量（semaphore）：主要作为进程间以及同一进程不同线程之间的同步手段。
+        - 套接口（Socket）：更为一般的进程间通信机制，可用于不同机器之间的进程间通信。起初是由Unix系统的BSD分支开发出来的，但现在一般可以移植到其它类Unix系统上：Linux和System V的变种都支持套接字。
+    - 通信方式的比较和优缺点：
+        - 管道：速度慢，容量有限，只有父子进程能通讯
+        - 有名管道（named pipe）：任何进程间都能通讯，但速度慢
+        - 消息队列：容量受到系统限制，且要注意第一次读的时候，要考虑上一次没有读完数据的问题
+        - 信号量：不能传递复杂消息，只能用来同步
+        - 共享内存：能够很容易控制容量，速度快，但要保持同步，比如一个进程在写的时候，另一个进程要注意读写的问题，相当于线程中的线程安全，当然，共享内存区同样可以用作线程间通讯，不过没这个必要，线程间本来就已经共享了同一进程内的一块内存
 - 线程
     - 一个线程使用某些共享内存时，其他线程必须等它结束，才能使用这一块内存。
     - 一个进程可以包括多个线程。
     - 一个进程的内存空间是共享的，每个线程都可以使用这些共享内存。
     - "互斥锁"（Mutual exclusion，缩写 Mutex），防止多个线程同时读写某一块内存区域。
     - 做"信号量"（Semaphore），用来保证多个线程不会互相冲突。
+    - 线程间通信
+        - 通过访问共享变量的方式(注:需要处理同步问题)
+        - 通过管道流
 
-    
+
+  
 - js是单线程
     - js是作为浏览器的脚本语言，主要是实现用户与浏览器的交互，以及操作dom；这决定了它只能是单线程，否则会带来很复杂的同步问题。 
     - 利用多核CPU的计算能力，HTML5提出Web Worker标准，允许JavaScript脚本创建多个线程，但是子线程完全受主线程控制，且不得操作DOM。所以，这个新标准并没有改变JavaScript单线程的本质。
@@ -4858,6 +5156,7 @@ if (!bool.valueOf()) {
 HTTP客户端一般对同一个服务器的并发连接个数都是有限制的。
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106162358.png)
 
+### Service Worker有哪些作用
 ### cookies、sessionStorage、localStorage 和 indexDB 的区别
 - cookie是网站为了标示用户身份而储存在用户本地的数据
 - 是否在http请求只能够携带
@@ -4871,7 +5170,6 @@ HTTP客户端一般对同一个服务器的并发连接个数都是有限制的�
     - localStorage 硬盘存储持久数据，浏览器关闭后数据不丢失除非主动删除数据
     - sessionStorage 存在内存中，数据在当前浏览器窗口关闭后自动删除
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211015134146.png)
-### Service Worker有哪些作用
 ### Cookie、Session、webStorage、localStorage、sessionStorage
 #### Cookie
 - HTTP 是无状态的协议（对于事务处理没有记忆能力，每次客户端和服务端会话完成时，服务端不会保存任何会话信息）：每个请求都是完全独立的，服务端无法确认当前访问者的身份信息，无法分辨上一次的请求发送者和这一次的发送者是不是同一个人。所以服务器与浏览器为了进行会话跟踪（知道是谁在访问我），就必须主动的去维护一个状态，这个状态用于告知服务端前后两个请求是否来自同一浏览器。而这个状态需要通过 cookie 或者 session 去实现。
@@ -4998,25 +5296,110 @@ HTTPS：是以安全为目标的HTTP通道，简单讲是HTTP的安全版，即H
 
 
 ### HTTP1.0、HTTP1.1、http2.0 的区别
+#### HTTP1.0和HTTP1.1
+- HTTP1.0
+    - HTTP/0.9极其简单，且使用非常受限。
+    - 每次HTTP 请求/响应都会重新建立TCP连接
+    - 添加了对 POST 和 HEAD 方法的支持
+    - 协议头带有版本号、协议类型、状态码字段
+    - 响应类型：超文本、脚本、媒体、样式表
+    - 支持keep-alive连接，但默认情况下它是“关闭”的
+- HTTP/1.1
+    - HTTP/1.0的主要缺陷是：它在每次请求\响应时都要建立新的TCP连接。这种做法非常耗时，且影响客户端和服务器的性能。
+    - 单个TCP连接上可以传送多个HTTP请求和响应
+    - 添加了对 PUT、DELETE、TRACE、OPTIONS 方法的支持
+    - 默认持久连接
 #### HTTP1.0和HTTP1.1的区别
-- 长连接：HTTP1.1支持长连接和请求的流水线处理，在一个TCP连接上可以传送多个HTTP请求和响应，减少了建立和关闭连接的消耗和延迟，在HTTP1.1中默认开启长连接keep-alive，一定程度上弥补了HTTP1.0每次请求都要创建连接的缺点。
-- 节约带宽： HTTP1.0中存在一些浪费带宽的现象，例如客户端只是需要某个对象的一部分，而服务器却将整个对象送过来了，并且不支持断点续传功能。HTTP1.1支持只发送header信息（不带任何body信息），如果服务器认为客户端有权限请求服务器，则返回100，客户端接收到100才开始把请求body发送到服务器；如果返回401，客户端就可以不用发送请求body了节约了带宽。
-- HOST域：  在HTTP1.0中认为每台服务器都绑定一个唯一的IP地址，因此，请求消息中的URL并没有传递主机名（hostname），HTTP1.0没有host域。随着虚拟主机技术的发展，在一台物理服务器上可以存在多个虚拟主机（Multi-homed Web Servers），并且它们共享一个IP地址。HTTP1.1的请求消息和响应消息都支持host域，且请求消息中如果没有host域会报告一个错误（400 Bad Request）。
-- 缓存处理：在HTTP1.0中主要使用header里的If-Modified-Since,Expires来做为缓存判断的标准，HTTP1.1则引入了更多的缓存控制策略例如Entity tag，If-Unmodified-Since, If-Match, If-None-Match等更多可供选择的缓存头来控制缓存策略。
-- 错误通知的管理：在HTTP1.1中新增了24个错误状态响应码，如409（Conflict）表示请求的资源与资源的当前状态发生冲突；410（Gone）表示服务器上的某个资源被永久性的删除。
+- HTTP1.0
+    - 队头阻塞：下个请求必须在前一个请求返回后才能发出，导致带宽无法被充分利用，后续请求被阻塞（HTTP 1.1 尝试使用流水线（Pipelining）技术，但先天 FIFO（先进先出）机制导致当前请求的执行依赖于上一个请求执行的完成，容易引起队头阻塞，并没有从根本上解决问题）；
+    - 协议开销大：header里携带的内容过大，且不能压缩，增加了传输的成本；
+    - 单向请求：只能单向请求，客户端请求什么，服务器返回什么
+- HTTP1.1
+    - 长连接：HTTP1.1支持长连接和请求的流水线处理，在一个TCP连接上可以传送多个HTTP请求和响应，减少了建立和关闭连接的消耗和延迟，在HTTP1.1中默认开启长连接keep-alive，一定程度上弥补了HTTP1.0每次请求都要创建连接的缺点。
+    - 节约带宽： HTTP1.0中存在一些浪费带宽的现象，例如客户端只是需要某个对象的一部分，而服务器却将整个对象送过来了，并且不支持断点续传功能。HTTP1.1支持只发送header信息（不带任何body信息），如果服务器认为客户端有权限请求服务器，则返回100，客户端接收到100才开始把请求body发送到服务器；如果返回401，客户端就可以不用发送请求body了节约了带宽。
+    - HOST域：  在HTTP1.0中认为每台服务器都绑定一个唯一的IP地址，因此，请求消息中的URL并没有传递主机名（hostname），HTTP1.0没有host域。随着虚拟主机技术的发展，在一台物理服务器上可以存在多个虚拟主机（Multi-homed Web Servers），并且它们共享一个IP地址。HTTP1.1的请求消息和响应消息都支持host域，且请求消息中如果没有host域会报告一个错误（400 Bad Request）。
+    - 缓存处理：在HTTP1.0中主要使用header里的If-Modified-Since,Expires来做为缓存判断的标准，HTTP1.1则引入了更多的缓存控制策略例如Entity tag，If-Unmodified-Since, If-Match, If-None-Match等更多可供选择的缓存头来控制缓存策略。
+    - 错误通知的管理：在HTTP1.1中新增了24个错误状态响应码，如409（Conflict）表示请求的资源与资源的当前状态发生冲突；410（Gone）表示服务器上的某个资源被永久性的删除。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211107112111.png)
 
 #### HTTP1.1和HTTP2.0的区别
 - 多路复用：HTTP2.0使用了多路复用的技术，做到同一个连接并发处理多个请求，而且并发请求的数量比HTTP1.1大了好几个数量级。HTTP1.1也可以多建立几个TCP连接，来支持处理更多并发的请求，但是创建TCP连接本身也是有开销的。
 - 头部数据压缩(采用HPACK压缩算法压缩头部，减小了传输的体积)： 在HTTP1.1中，HTTP请求和响应都是由状态行、请求/响应头部、消息主体三部分组成。一般而言，消息主体都会经过gzip压缩，或者本身传输的就是压缩过后的二进制文件，但状态行和头部却没有经过任何压缩，直接以纯文本传输。随着Web功能越来越复杂，每个页面产生的请求数也越来越多，导致消耗在头部的流量越来越多，尤其是每次都要传输UserAgent、Cookie这类不会频繁变动的内容，完全是一种浪费。HTTP1.1不支持header数据的压缩，HTTP2.0使用HPACK算法对header的数据进行压缩，这样数据体积小了，在网络上传输就会更快。
 - 服务器推送： 服务端推送是一种在客户端请求之前发送数据的机制。网页使用了许多资源：HTML、样式表、脚本、图片等等。在HTTP1.1中这些资源每一个都必须明确地请求。这是一个很慢的过程。浏览器从获取HTML开始，然后在它解析和评估页面的时候，增量地获取更多的资源。因为服务器必须等待浏览器做每一个请求，网络经常是空闲的和未充分使用的。为了改善延迟，HTTP2.0引入了server push，它允许服务端推送资源给浏览器，在浏览器明确地请求之前，免得客户端再次创建连接发送请求到服务器端获取。这样客户端可以直接从本地加载这些资源，不用再通过网络。
+- 非阻塞下载
+
+
+缺点：HTTP 2中，多个请求在一个TCP管道中的，出现了丢包时，HTTP 2的表现反倒不如HTTP 1.1了。因为 TCP 为了保证可靠传输，有个特别的“丢包重传”机制，丢失的包必须要等待重新传输确认，HTTP 2出现丢包时，整个 TCP 都要开始等待重传，那么就会阻塞该TCP连接中的所有请求。而对于 HTTP 1.1 来说，可以开启多个 TCP 连接，出现这种情况反到只会影响其中一个连接，剩余的 TCP 连接还可以正常传输数据
+
 
 #### Http3.0 相对于 Http2.0的区别
 http 协议是应用层协议，都是建立在传输层之上的。我们也都知道传输层上面不只有 TCP 协议，还有另外一个强大的协议 UDP 协议，2.0 和 1.0 都是基于 TCP 的，因此都会有 TCP 带来的硬伤以及局限性。而 Http3.0 则是建立在 UDP 的基础上。所以其与 Http2.0 之间有质的不同。
 
-- 连接迁移
-- 无队头阻塞
-- 自定义的拥塞控制
-- 前向安全和前向纠错
+通过多路复用，HTTP/2解决了队头阻塞问题。但如果TCP流中出现了丢包，根据TCP的拥塞控制机制，其他数据流就只能等待丢包被重新发送和接收。所以，TCP的队头阻塞问题在HTTP/2中依然存在。HTTP/3通过使用基于UDP的传输协议QUIC解决了这一问题。
+
+HTTP/3是自HTTP/2之后最新且最主要的HTTP版本。因为HTTP/3本身就是为QUIC协议设计的，所以也被描述为基于QUIC的HTTP/2。HTTP/3的目标是通过使用谷歌的QUIC协议提供快速、可靠安全的网络连接。
+- HTTP/3
+    - 基于UDP的QUIC连接迁移实现
+        - TCP的连接重连之痛
+            - 一条 TCP 连接是由四元组标识的（源 IP，源端口，目的 IP，目的端口）。什么叫连接迁移呢？就是当其中任何一个元素发生变化时，这条连接依然维持着，能够保持业务逻辑不中断。
+        - 用户的地址发生变化时，如 WIFI 切换到 4G 场景，基于 TCP 的 HTTP 协议无法保持连接的存活。QUIC 基于连接 ID 唯一识别连接。当源地址发生改变时，QUIC 仍然可以保证连接存活和数据正常收发。
+        - QUIC是基于UDP协议的，任何一条 QUIC 连接不再以 IP 及端口四元组标识，而是以一个 64 位的随机数作为 ID 来标识，这样就算 IP 或者端口发生变化时，只要 ID 不变，这条连接依然维持着，上层业务逻辑感知不到变化，不会中断，也就不需要重连。
+    - 低连接延时
+        - TLS的连接时延问题
+            - 对于数据量小的请求而言，单一次的请求握手就占用了大量的时间，对于用户体验的影响非常大。同时，在用户网络不佳的情况下，RTT延时会变得较高，极其影响用户体验。
+            - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211107112541.png)
+            - 从对比我们可以看到，即使用上了TLS 1.3，精简了握手过程，最快能做到0-RTT握手(首次是1-RTT)；但是对用户感知而言, 还要加上1RTT的TCP握手开销。
+            - QUIC通过合并加密与连接管理解决了这个问题，我们来看看其是如何实现真正意义上的0-RTT的握手, 让与server进行第一个数据包的交互就能带上用户数据。
+            - QUIC 由于基于 UDP，无需 TCP 连接，在最好情况下，短连接下 QUIC 可以做到 0RTT 开启数据传输。而基于 TCP 的 HTTPS，即使在最好的 TLS1.3 的 early data 下仍然需要 1RTT 开启数据传输。而对于目前线上常见的 TLS1.2 完全握手的情况，则需要 3RTT 开启数据传输。对于 RTT 敏感的业务，QUIC 可以有效的降低连接建立延迟。
+            - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211107134603.png)
+    - 可自定义的拥塞控制
+        - Quic使用可插拔的拥塞控制，相较于TCP，它能提供更丰富的拥塞控制信息。比如对于每一个包，不管是原始包还是重传包，都带有一个新的序列号(seq)，这使得Quic能够区分ACK是重传包还是原始包，从而避免了TCP重传模糊的问题。Quic同时还带有收到数据包与发出ACK之间的时延信息。这些信息能够帮助更精确的计算RTT。此外，Quic的ACK Frame 支持256个NACK 区间，相比于TCP的SACK(Selective Acknowledgment)更弹性化，更丰富的信息会让client和server 哪些包已经被对方收到。
+        - QUIC 的传输控制不再依赖内核的拥塞控制算法，而是实现在应用层上，这意味着我们根据不同的业务场景，实现和配置不同的拥塞控制算法以及参数。GOOGLE 提出的 BBR 拥塞控制算法与 CUBIC 是思路完全不一样的算法，在弱网和一定丢包场景，BBR 比 CUBIC 更不敏感，性能也更好。在 QUIC 下我们可以根据业务随意指定拥塞控制算法和参数，甚至同一个业务的不同连接也可以使用不同的拥塞控制算法。
+    - 无队头阻塞
+        - TCP的队头阻塞问题
+            - 虽然 HTTP2 实现了多路复用，但是因为其基于面向字节流的 TCP，因此一旦丢包，将会影响多路复用下的所有请求流。QUIC 基于 UDP，在设计上就解决了队头阻塞问题。
+            - TCP 队头阻塞的主要原因是数据包超时确认或丢失阻塞了当前窗口向右滑动，我们最容易想到的解决队头阻塞的方案是不让超时确认或丢失的数据包将当前窗口阻塞在原地。QUIC也正是采用上述方案来解决TCP 队头阻塞问题的。
+            - TCP 为了保证可靠性，使用了基于字节序号的 Sequence Number 及 Ack 来确认消息的有序到达。
+            - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211107134825.png)
+            - 如上图，应用层可以顺利读取stream1中的内容，但由于stream2中的第三个segment发生了丢包，TCP 为了保证数据的可靠性，需要发送端重传第 3 个 segment 才能通知应用层读取接下去的数据。所以即使stream3 stream4的内容已顺利抵达，应用层仍然无法读取，只能等待stream2中丢失的包进行重传。
+            - 在弱网环境下，HTTP2的队头阻塞问题在用户体验上极为糟糕。
+        - QUIC的无队头阻塞解决方案
+            - QUIC 同样是一个可靠的协议，它使用 Packet Number 代替了 TCP 的 Sequence Number，并且每个 Packet Number 都严格递增，也就是说就算 Packet N 丢失了，重传的 Packet N 的 Packet Number 已经不是 N，而是一个比 N 大的值，比如Packet N+M。
+            - QUIC 使用的Packet Number 单调递增的设计，可以让数据包不再像TCP 那样必须有序确认，QUIC 支持乱序确认，当数据包Packet N 丢失后，只要有新的已接收数据包确认，当前窗口就会继续向右滑动。待发送端获知数据包Packet N 丢失后，会将需要重传的数据包放到待发送队列，重新编号比如数据包Packet N+M 后重新发送给接收端，对重传数据包的处理跟发送新的数据包类似，这样就不会因为丢包重传将当前窗口阻塞在原地，从而解决了队头阻塞问题。那么，既然重传数据包的Packet N+M 与丢失数据包的Packet N 编号并不一致，我们怎么确定这两个数据包的内容一样呢？
+            - QUIC使用Stream ID 来标识当前数据流属于哪个资源请求，这同时也是数据包多路复用传输到接收端后能正常组装的依据。重传的数据包Packet N+M 和丢失的数据包Packet N 单靠Stream ID 的比对一致仍然不能判断两个数据包内容一致，还需要再新增一个字段Stream Offset，标识当前数据包在当前Stream ID 中的字节偏移量。
+            - 有了Stream Offset 字段信息，属于同一个Stream ID 的数据包也可以乱序传输了（HTTP/2 中仅靠Stream ID 标识，要求同属于一个Stream ID 的数据帧必须有序传输），通过两个数据包的Stream ID 与 Stream Offset 都一致，就说明这两个数据包的内容一致。
+            - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211107134949.png)
+    - 报文 Body 都是经过加密的
+        - QUIC 的 packet 除了个别报文比如 PUBLIC_RESET 和 CHLO，所有报文头部都是经过认证的，报文 Body 都是经过加密的。这样只要对 QUIC 报文任何修改，接收端都能够及时发现，有效地降低了安全风险。
+        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211107135122.png)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211107111256.png)
+#### QUIC协议
+QUIC是一种新的多路传输层网络协议标准，建立在 UDP 之上。QUIC的主要目标是通过减少页面加载时间提升用户体验，并提高HTTPS的传输性能。它在本质上是TCP+TLS+HTTP/2。
+
+设计HTTP/3的目的就是要充分利用 QUIC 的优势。QUIC 协议本身可以处理数据流，所以排除了 TCP 队头阻塞问题。
+
+- QUIC 的一些关键特性包括：
+    - 基于UDP
+    - 使用没有队头阻塞的连接复用
+    - 重构TCP的关键机制（连接复用、连接建立、拥塞控制、可靠性），并成为可靠的传输协议
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211107111633.png)
+
+- 交换数据包
+    - 安全的首包
+        - 首先，客户端在一个CRYPTO 帧中传输包含TLS 1.3 Client Hello的首包。Client Hello包含不同类型的的扩展项，如目标服务器的SNI（Server Name Indication，服务器名称指示 ）、QUIC 传输参数、压缩证书等，以及客户端支持的压缩方法和不同的加密套件。
+        - 如果服务器接受QUIC和TLS 1.3参数，它也会在CRYPTO帧中发送包含对客户端首包确认信息和TLS 1.3 Server Hello的首包信息。Server Hello中包含被服务器接收的加密套件和不同的扩展（如密钥共享、支持的版本等）。在客户端接收到 Server Hello后，会向服务器发送一个ACK确认包。
+        - 这三个首包都可能包含一个填充帧，以根据需要增加数据包的大小。
+    - 握手包
+        - 客户端和服务器之间的首包被交换以后，服务器会发送一个握手数据包，其中包含余下的服务器端消息，如证书、与服务器身份验证相关的加密扩展。客户端会验证这些证书，然后QUIC 握手以客户端发送的握手消息结束。
+    - 安全的净荷包
+        - 一旦安全的QUIC连接建立，客户端与服务器之间的信息便可以安全传输。
+
+- 我们为什么要用QUIC？
+    - 传统的TCP协议是建立在操作系统层和中间路由模块之上实现的，它的握手阶段信息很容易被这些中间模块篡改而变得不安全。
+    - 但QUIC协议是在UDP之上的用户级（如浏览器）中实现的，因此它更加灵活、对用户更友好，并且能够在短时间内支持更多设备。
+    - 在 QUIC 中，传输相关的信息被不同的保护层加密，握手包在传输链路上不容易被识别和修改。因此它提供了更安全的网络数据传输。
+
+
 ### HTTP知识点
 #### HTTP 请求报文结构/HTTP 响应报文结构
 - HTTP协议的主要特点
@@ -5028,7 +5411,7 @@ http 协议是应用层协议，都是建立在传输层之上的。我们也都
         - 请求行包含：http方法，页面地址，http协议以及版本；
         - 请求头包含：key-value值，告诉服务器端我要什么内容。
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922191832.png)
-
+    
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210824184941.png)
 ```md
 首行是Request-Line包括：请求方法，请求URI，协议版本，CRLF
@@ -5091,7 +5474,65 @@ POST和GET的区别：
         - GET会产生一个TCP数据包，而POST会产生两个TCP数据包。
         - 对于GET方式的请求，浏览器会把http header和data一并发送出去，服务器响应200(返回数据);
         - 而对于POST，浏览器先发送header，服务器响应100 continue，浏览器再发送data，服务器响应200 ok(返回数据)。
+#### 预检(OPTIONS)请求
+在浏览器中通过http请求与服务端进行请求时，偶尔会发现某一些请求会被调用两次，一次是符合我们业务需求的接口调用，一次是在我们预料之外的请求，而且这个请求还不会有任何的数据返回，咋一看似乎是哪里出了问题，这个请求便是预检请求(request method为OPTIONS)
 
+- 为何会存在OPTIONS请求呢？
+    - 可用于检测服务器允许的 http 方法。当发起跨域请求时，由于安全原因，触发一定条件时浏览器会在正式请求之前自动先发起 OPTIONS 请求，即 CORS 预检请求，服务器若接受该跨域请求，浏览器才继续发起正式请求
+- 什么时候会发起OPTIONS请求呢？
+    - 一个 CORS 预检请求是用于检查服务器是否支持 CORS 即跨域资源共享，当有必要的时候，浏览器会自动发出一个预检请求；所以在正常情况下，我们不需要自己去发这样的请求
+    - 在跨域的情况下：
+        - 当发送的请求为非简单请求时，这个时候浏览器会自动的帮我们发送一个OPTIONS请求，用于检测所请求的目标资源是否支持跨域，当浏览器发送OPTIONS请求得到响应之后，会根据responst header自动处理，若是目标资源支持跨域则会继续将正常的请求发送，若是不支持跨域则直接控制台报错，提示当前请求跨域了
+        - 若是发送的请求为简单请求时，则不会发送OPTIONS请求，浏览器会直接将请求正常发送
+- 为什么要对非简单跨域请求做预检？
+    - 减少非简单跨域请求对服务器的影响（开始时就提到，服务器有时候不想理睬跨域请求），比如PUT、DELETE请求可以直接新建或者修改、删除服务器中的资源。预检请求可以防止该情况发生。
+    - 减少服务器对于是否跨域的计算量
+        - 对于非简单请求的跨域请求，服务器对于是否跨域的计算是在预检请求上，如果预检请求通过之后，正式请求都不用再次计算。而且一次预检请求通过后，之后的每次请求都只会发正式请求。节约了很多服务端的计算量。
+- 为什么不对简单的跨域请求做预检？
+    - 一开始就提到，form能实现的简单跨域请求，浏览器做不了任何的限制。
+    - 没必要对简单请求做预检。比如，一些post请求只是想打个日志，并不需要服务器的响应，但是如果加预检请求，预检请求不通过就做不了这件事。还有一些GET请求、HEAD请求只是想获取资源，并不会修改资源，在不获取响应的时候并不会对服务器造成影响。在这种情况下，加预检请求，只会增加服务器的负担
+- 
+#### CORS跨域请求[简单请求与复杂请求]
+CORS（cross-origin resource sharing），跨源资源共享（一般俗称『跨域请求』）。
+
+- 简单请求和预检请求的区分，会看到有很多的条件：
+    - 简单请求的 HTTP 方法只能是 GET、HEAD 或 POST
+    - 简单请求的 HTTP 头只能是 
+        - Accept
+            - 请求头用来告知（服务器）客户端可以处理的内容类型
+        - Accept-Language
+            - 请求头允许客户端声明它可以理解的自然语言，以及优先选择的区域方言
+        - Conent-Language
+            - 是一个 entity header（实体消息首部），用来说明访问者希望采用的语言或语言组合，这样的话用户就可以根据自己偏好的语言来定制不同的内容
+        - Content-Type 
+            - 实体头部用于指示资源的MIME类型, 值是 application/x-www-form-urlencoded, multipart/form-data, 或者 text/plain之一的（忽略参数）
+        - Last-Event-ID
+        - DPR
+        - Downlink
+        - Save-Data
+        - Viewport-Width
+        - Width
+    - 简单请求的 Content-Type 头只能是 text/plain、multipart/form-data 或 application/x-www-form-urlencoded
+    - 任何一个不满足上述要求的请求，即被认为是复杂请求。一个复杂请求不仅有：包含通信内容的请求，同时也包含预请求。
+- 简单请求
+    - 部分响应头
+        - Access-Control-Allow-Origin（必含）- 不可省略，否则请求按失败处理。该项控制数据的可见范围，如果希望数据对任何人都可见，可以填写"*"。
+        - Access-Control-Allow-Credentials（可选） – 该项标志着请求当中是否包含cookies信息，只有一个可选值：true（必为小写）。如果不包含cookies，请略去该项，而不是填写false。这一项与XmlHttpRequest2对象当中的withCredentials属性应保持一致，即withCredentials为true时该项也为true；withCredentials为false时，省略该项不写。反之则导致请求失败。
+        - Cache-Control
+        - Content-Language
+        - Content-Type
+        - Expires
+        - Last-Modified
+- 复杂请求
+    - 比如说你需要发送PUT、DELETE等HTTP动作，或者发送Content-Type: application/json的内容。
+    - 复杂请求表面上看起来和简单请求使用上差不多，但实际上浏览器发送了不止一个请求。其中最先发送的是一种"预请求"，此时作为服务端，也需要返回"预回应"作为响应。预请求实际上是对服务端的一种权限请求，只有当预请求成功返回，实际请求才开始执行。
+    - 响应头
+        - Access-Control-Allow-Origin（必含） – 和简单请求一样的，必须包含一个域。
+        - Access-Control-Allow-Methods（必含） – 这是对预请求当中Access-Control-Request-Method的回复，这一回复将是一个以逗号分隔的列表。尽管客户端或许只请求某一方法，但服务端仍然可以返回所有允许的方法，以便客户端将其缓存。
+        - Access-Control-Allow-Headers（当预请求中包含Access-Control-Request-Headers时必须包含） – 这是对预请求当中Access-Control-Request-Headers的回复，和上面一样是以逗号分隔的列表，可以返回所有支持的头部。这里在实际使用中有遇到，所有支持的头部一时可能不能完全写出来，而又不想在这一层做过多的判断，没关系，事实上通过request的header可以直接取到Access-Control-Request-Headers，直接把对应的value设置到Access-Control-Allow-Headers即可。
+        - Access-Control-Allow-Credentials（可选） – 和简单请求当中作用相同。
+        - Access-Control-Max-Age（可选） – 以秒为单位的缓存时间。预请求的的发送并非免费午餐，允许时应当尽可能缓存。
+    - 一旦预回应如期而至，所请求的权限也都已满足，则实际请求开始发送。
 #### HTTP常见状态码及其含义
 `HTTP`状态码：
     - `1xx`:指示信息，表示请求已接收，继续处理；
@@ -5116,7 +5557,6 @@ POST和GET的区别：
 OPTIONS方法用于获取目的资源所支持的通信方式的选项。在 CORS 中，可以使用 OPTIONS 方法发起一个预检请求，以检测实际请求是否可以被服务器所接受。预检请求报文中的 Access-Control-Request-Method 首部字段告知服务器实际请求所使用的 HTTP 方法；Access-Control-Request-Headers 首部字段告知服务器实际请求所携带的自定义首部字段。服务器基于从预检请求获得的信息来判断，是否接受接下来的实际请求。
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922193301.png)
-
 
 ### 在交互过程中如果数据传送完了，还不想断开连接怎么办，怎么维持？
 在 HTTP 中响应体的 Connection 字段指定为 keep-alive
@@ -5223,7 +5663,37 @@ TCP 滑动窗口分为两种: 发送窗口和接收窗口。
             - 然后拥塞窗口大小变为拥塞阈值
             - 接着 拥塞窗口再进行线性增加，以适应网络状况
 
+### UDP实现可靠性传输
+1. 简介
+- UDP不属于连接型协议，因而具有资源消耗小，处理速度快的特点，所以通常音频、视频和普通数据在传送时使用UDP较多，因为他们及时偶尔丢失一两个数据，也不会对接受结果产生太大影响。
+- 传输层无法确保数据的可靠传输，只能通过应用层来实现。实现的方式可以参考TCP可靠性传输的方式，只是实现不在传输层，实现转移到应用层。
+- 实现确定机制、重传机制、窗口确认机制。
+- 如果你不利用Linux协议栈以及上层socket机制，自己通过抓包和发包的方式去实现可靠性传输，那么必须通过如下功能：
+    - 发送：包的分片、包确定、包的重发
+    - 接受：包的调序、包的序号确定
+- 目前有如下开源程序利用UDO实现了可靠的数据传输，分别是RUDP、RTP、UDT
 
+2. RUDP
+RUDP提供一组数据服务质量增强机制，如拥塞控制的改进、重发机制及淡化服务器算法等，从而在包丢失和网络拥塞的情况下，RTP客户机（实时位置）面前呈现的就是一个高质量的RTP流。在不干扰协议的实时特性的同时，可靠UDP的拥塞控制机制允许TCP方式下的流控制行为。
+
+3. RTP
+实时传输协议（RTP）为数据提供了具有实时特征的端到端传送服务，如在组播或单播网络服务下的交互式视频音频或模拟数据。应用程序通常在UDP上运行RTP以便使用其多路节点和校验服务；这两种协议都提供了传输层协议的功能。但是RTP可以与其他适合的底层网络或传输协议一起使用。如果底层网络提供组播方式，那么RTP可以使用该组播表传输数据到多个目的地。
+
+RTP本身没有提供按时发送机制或其他服务质量（QoS）保证，它依赖于底层服务区实现这一过程。RTP并不保证传送或防止无序传送，也不确定底层网络的可靠性。RTP实行有序传送，RTP中的序列号允许接收方重组发送发的包序列，同时序列号也能用于决定适当的包位置，例如：在视频解码中，就不需要顺序解码。
+
+4. UDT
+基于UDP的数据传输协议（UDT）是一种互联网数据传输协议。UDT的主要目的是支持高速广域网上的海量数据传输，而互联网上的标准数据传输协议TCP在高带宽长距离网络上性能很差。顾名思义，UDT建于UDP之上，并引入新的拥塞控制和数据可靠性控制机制。UDT是面向连接的双向的应用层协议。它同时支持可靠的数据流传输和部分可靠的数据报传输。由于UDT完全在UDP上实现，它也可以应用在除了高速数据传输之外的其他应用领域，例如点到点技术（P2P），防火墙穿透，多媒体数据传输等等。
+- UDT应用层协议
+    - UDT并不是在瓶颈带宽相对较小的和大量多元短文档流的情况下用来替代TCP的。
+    - UDT主要作为TCP的朋友，和TCP并存，UDT分配的带宽不应该超过根据MAX-MIN规则的最大最小公平共享原则（备注：最大最小规则允许UDT在高BDP连接下分配TCP不能使用的可用带宽）。
+    - UDT是双工的，每个UDT实体有两个部分：发送和接受。
+        - 发送者根据流量控制和速率控制来发送（和重传）应用程式数据。
+        - 接受者根据数据包和控制包，并根据接收到的包发送控制包。发送和接受程式共享同一个UDP端口来发送和接收。
+        - 接受者也负责触发和处理任何的控制事件，包括拥塞控制和可靠性控制和他们的相对机制，例如RTT估计、带宽估计、应答和重传。
+    - UDT总是试着将应用层数据打包成固定的大小，除非数据不够这么大。和TCP相似的是，这个固定的包大小叫做MSS（最大包大小）。由于期望UDT用来传输大块数据流，我们假定只能很小的一部分不规则的大小的包在UDT session中。MSS能够通过应用程式来安装，MTU是其最优值。
+    - UDT拥塞控制算法将速率控制在窗口（流量控制）合并起来，前者调整包的发送周期，后者限制最大的位被应答的包。在速率控制中使用的参数通过带宽估计技术来更新，它继承来之基于接受的包方法。同时，速率控制周期是估计RTT的常量，流控制参数参考与对方的数据到达速度，另外接收端释放的缓冲区的大小。
+
+5. 
 ### WebSocket与Ajax的区别
 - 本质不同
     - Ajax 即异步 JavaScript 和 XML，是一种创建交互式网页的应用的网页开发技术
@@ -5547,8 +6017,68 @@ server {
           console.log('Connection closed.');
       };
 ```
+#### CORS跨域请求[简单请求与复杂请求]
+CORS（cross-origin resource sharing），跨源资源共享（一般俗称『跨域请求』）。
+
+- 简单请求和预检请求的区分，会看到有很多的条件：
+    - 简单请求的 HTTP 方法只能是 GET、HEAD 或 POST
+    - 简单请求的 HTTP 头只能是 Accept/Accept-Language/Conent-Language/Content-Type 等
+    - 简单请求的 Content-Type 头只能是 text/plain、multipart/form-data 或 application/x-www-form-urlencoded
+    - 任何一个不满足上述要求的请求，即被认为是复杂请求。一个复杂请求不仅有：包含通信内容的请求，同时也包含预请求。
+- 简单请求
+    - 部分响应头
+        - Access-Control-Allow-Origin（必含）- 不可省略，否则请求按失败处理。该项控制数据的可见范围，如果希望数据对任何人都可见，可以填写"*"。
+        - Access-Control-Allow-Credentials（可选） – 该项标志着请求当中是否包含cookies信息，只有一个可选值：true（必为小写）。如果不包含cookies，请略去该项，而不是填写false。这一项与XmlHttpRequest2对象当中的withCredentials属性应保持一致，即withCredentials为true时该项也为true；withCredentials为false时，省略该项不写。反之则导致请求失败。
+        - Cache-Control
+        - Content-Language
+        - Content-Type
+        - Expires
+        - Last-Modified
+- 复杂请求
+    - 比如说你需要发送PUT、DELETE等HTTP动作，或者发送Content-Type: application/json的内容。
+    - 复杂请求表面上看起来和简单请求使用上差不多，但实际上浏览器发送了不止一个请求。其中最先发送的是一种"预请求"，此时作为服务端，也需要返回"预回应"作为响应。预请求实际上是对服务端的一种权限请求，只有当预请求成功返回，实际请求才开始执行。
+    - 响应头
+        - Access-Control-Allow-Origin（必含） – 和简单请求一样的，必须包含一个域。
+        - Access-Control-Allow-Methods（必含） – 这是对预请求当中Access-Control-Request-Method的回复，这一回复将是一个以逗号分隔的列表。尽管客户端或许只请求某一方法，但服务端仍然可以返回所有允许的方法，以便客户端将其缓存。
+        - Access-Control-Allow-Headers（当预请求中包含Access-Control-Request-Headers时必须包含） – 这是对预请求当中Access-Control-Request-Headers的回复，和上面一样是以逗号分隔的列表，可以返回所有支持的头部。这里在实际使用中有遇到，所有支持的头部一时可能不能完全写出来，而又不想在这一层做过多的判断，没关系，事实上通过request的header可以直接取到Access-Control-Request-Headers，直接把对应的value设置到Access-Control-Allow-Headers即可。
+        - Access-Control-Allow-Credentials（可选） – 和简单请求当中作用相同。
+        - Access-Control-Max-Age（可选） – 以秒为单位的缓存时间。预请求的的发送并非免费午餐，允许时应当尽可能缓存。
+    - 一旦预回应如期而至，所请求的权限也都已满足，则实际请求开始发送。
 #### 使用Access-Control-Allow-Origin为什么可以解决跨域问题?
+    
 #### 使用access-control-allow-origin解决跨域问题的流程是怎样的?
+### web安全的问题
+- SQL注入
+    - 后台人员使用用户输入的数据来组装SQL查询语句的时候不做防范， 遇到一些恶意的输入， 最后生成的SQL就会有问题。
+    - 系统一般都会加入 过滤 和 验证 机制， 可以有效预防SQL注入问题。
+- DOC攻击
+- 点击劫持
+    - click-jacking，也被称为UI-覆盖攻击。
+    - 攻击方式就是在某些操作的按钮上加一层透明的iframe。点击一下， 就入坑了。
+    - 如何防御点击劫持
+        - 使用 HTTP 头防御
+            - 通过配置 nginx 发送 X-Frame-Options 响应头。这个 HTTP 响应头 就是为了防御用 iframe 嵌套的点击劫持攻击。这样浏览器就会阻止嵌入网页的渲染。
+        - 使用 Javascript 防御
+            - 判断顶层视口的域名是不是和本页面的域名一致，如果不一致就让恶意网页自动跳转到我方的网页。
+            ```js
+            if (top.location.hostname !== self.location.hostname) {    
+                alert("您正在访问不安全的页面，即将跳转到安全页面！")   
+                top.location.href = self.location.href;
+             }
+            ```
+- 中间人攻击
+    - 中间人攻击（Man-in-the-Middle Attack, MITM）是一种由来已久的网络入侵手段.
+    - 如 SMB 会话劫持、DNS 欺骗等攻击都是典型的MITM攻击。
+    - 简而言之，所谓的MITM攻击就是通过拦截正常的网络通信数据，并进行数据篡改和嗅探来达到攻击的目的，而通信的双方却毫不知情。
+    - 如何防御中间人攻击
+        - 确保当前你所访问的网站使用了HTTPS
+        - 如果你是一个网站管理员，你应当执行HSTS协议
+        - 不要在公共Wi-Fi上发送敏感数据
+        - 如果你的网站使用了SSL，确保你禁用了不安全的SSL/TLS协议。
+        - 不要点击恶意链接或电子邮件。
+- 钓鱼网站
+- XSS
+- CSRF
 ### XSS 攻击和 CSRF 攻击各自的原理是什么？两者又有什么区别？以及如何防范？
 1、XSS 攻击
 - 概念
@@ -8162,6 +8692,36 @@ console.log(str)
 
 ## 手写相关函数
 ### 手写相关函数1
+#### 手写js版本号比较
+```js
+function Version(curV,reqV){
+    curV = curV ? curV.replace(/[vV]/, "") : "0.0.0";
+    reqV = reqV ? reqV.replace(/[vV]/, "") : "0.0.0";
+    var arr1=curV.split('.');
+    var arr2=reqV.split('.');
+    //将两个版本号拆成数字
+    var minL= Math.min(arr1.length,arr2.length);
+    var pos=0;        //当前比较位
+    var diff=0;        //当前为位比较是否相等
+
+    //逐个比较如果当前位相等则继续比较下一位
+    while(pos<minL){
+        diff=parseInt(arr1[pos])-parseInt(arr2[pos]);
+        if(diff!=0){
+          break;
+        }
+        pos++;
+    }
+
+    if (diff>0) {
+        console.log('新版本')
+    }else if (diff==0) {
+        console.log('稳定版')
+    }else{
+        console.log('旧版本')
+    }
+  }
+```
 #### 封装localStorage
 因为localStorage是永久存储的，不支持设置过期时间，而我们有时又不希望把本地的存储一起发往服务器，所以也不会使用cookie，基于这样的业务场景，就对localStorage进行了二次封装，让它具备过期时间的特点。
 ```js
