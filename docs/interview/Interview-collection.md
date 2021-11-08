@@ -4107,6 +4107,9 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 ```
 ### Promise（写的不好）
+#### Promise初介绍
+在传统的异步编程中，如果异步之间存在依赖关系，我们就需要通过层层嵌套回调来满足这种依赖，如果嵌套层数过多，可读性和可维护性都变得很差，产生所谓“回调地狱”，而Promise将回调嵌套改为链式调用，增加可读性和可维护性。
+
 - 回调地狱
     - 嵌套层次很深，难以维护
     - 无法正常使用return和throw
@@ -4149,11 +4152,11 @@ new Promise(请求1)
     .then(请求5(请求结果4))
     .catch(处理异常(异常信息))
 ```
-Promise 的写法更为直观，并且能够在外层捕获异步函数的异常信息。
-- Promise 对象的 then 方法会返回一个全新的 Promise 对象
-- 后面的 then 方法就是在为上ー个 then 返回的 Promise 注册回调
-- 前面 then 方法中回调函数的返回值会作为后面 then 方法回调的参数
-- 如果回调中返回的是 Promise，那后面 then 方法的回调会等待它的结束
+- Promise 的写法更为直观，并且能够在外层捕获异步函数的异常信息。
+    - Promise 对象的 then 方法会返回一个全新的 Promise 对象
+    - 后面的 then 方法就是在为上ー个 then 返回的 Promise 注册回调
+    - 前面 then 方法中回调函数的返回值会作为后面 then 方法回调的参数
+    - 如果回调中返回的是 Promise，那后面 then 方法的回调会等待它的结束
 
 
 Js引擎为了让microtask尽快的输出，做了一些优化，连续的多个then(3个)如果没有reject或者resolve会交替执行then而不至于让一个堵太久完成用户无响应
@@ -4182,7 +4185,22 @@ Promise.resolve().then(() => {
 0  1 2 3 4 5 6
 ```
 
+#### Promise的调用流程
+- 分析Promise的调用流程：
+    - Promise的构造方法接收一个executor()，在new Promise()时就立刻执行这个executor回调
+    - executor()内部的异步任务被放入宏/微任务队列，等待执行
+    - then()被执行，收集成功/失败回调，放入成功/失败队列
+    - executor()的异步任务被执行，触发resolve/reject，从成功/失败队列中取出回调依次执行
+- 其实熟悉设计模式的同学，很容易就能意识到这是个观察者模式，这种收集依赖 -> 触发通知 -> 取出依赖执行 的方式，被广泛运用于观察者模式的实现，在Promise里，执行顺序是then收集依赖 -> 异步触发resolve -> resolve执行依赖。
 
+#### Promise A+规范
+- Promise本质是一个状态机，且状态只能为以下三种：Pending（等待态）、Fulfilled（执行态）、Rejected（拒绝态），状态的变更是单向的，只能从Pending -> Fulfilled 或 Pending -> Rejected，状态变更不可逆
+- then方法接收两个可选参数，分别对应状态改变时触发的回调。then方法返回一个promise。then 方法可以被同一个 promise 调用多次。
+#### then链式调用
+- .then()需要返回一个Promise，这样才能找到then方法，所以我们会把then方法的返回值包装成Promise。
+- .then()的回调需要拿到上一个.then()的返回值
+- .then()的回调需要顺序执行。我们要等待当前Promise状态变更后，再执行下一个then收集的回调，这就要求我们对then的返回值分类讨论。
+#### 手写Promise的调用流程
 ```js
 /**
  * 1. Promise就是一个类   在执行这个类的时候 需要传递一个执行器进去  执行器会立即执行
@@ -4191,21 +4209,25 @@ Promise.resolve().then(() => {
  * 4. then方法内部做的事情就是判断 如果状态是成功  调用成功的回调函数 如果状态是失败 调用失败的回调函数。then方法是被定义在原生对象上的方法
  * 5. then成功回调有一个参数 表示成功之后的值 then失败回调有一个参数  表示失败后的原因
  */
+ 
+// Promise/A+规范的三种状态
 const PENDING = 'pending'
 const FULFILLED = 'fulfilled'
 const REJECTED = 'rejected'
 
 class MyPromise {
+    // // Promise状态
     status = PENDING
     // 成功之后的值
     value = undefined
     // 失败之后的原因
     error = undefined
-    // 成功回调
+    // 成功回调  then收集的执行成功的回调队列
     successCallback = []
-    // 失败回调
+    // 失败回调  then收集的执行失败的回调队列
     failureCallback = []
-    //传递执行器
+    // 传递执行器
+    // new Promise()时立即执行executor,并传入resolve和reject
     construct(executor){
         // 执行器会立即执行  (Promise的立即执行性,除了resolve，reject都执行)
         try {
@@ -4255,15 +4277,18 @@ class MyPromise {
          */
         // 将 then 方法的参数变成可选参数
         successCallback  = successCallback ? successCallback : value => value
-        // then链式调用
+        // then链式调用  return一个新的promise
         let promise2 = new MyPromise((resolve,reject) => {
             // 判断状态
             if(this.status === FULFILLED) {
+                // Promise的执行顺序是new Promise -> then()收集回调 -> resolve/reject执行回调，这一顺序是建立在executor是异步任务的前提上的，如果executor是一个同步任务，那么顺序就会变成new Promise -> resolve/reject执行回调 -> then()收集回调，resolve的执行跑到then之前去了，为了兼容这种情况。
                 // 变成异步代码   等待所有同步代码完成之后执行  这样做的原因是为了获取 promise2
                 setTimeout(() =>{
                     // 捕获 then 链式调用的错误  上一个then的错误  传给下一个then的catch
                     try {
+                        // 执行第一个(当前的)Promise的成功回调,并获取返回值
                         let x = successCallback(this.value)
+                        // //把resolveFn重新包装一下,再push进resolve执行队列,这是为了能够获取回调的返回值进行分类讨论
                         // 判断 x 的值是普通纸还是promise对象
                         // 如果是普通值 直接调用resolve
                         // 如果是promise对象，查看promise对象返回的结果
@@ -4325,17 +4350,21 @@ class MyPromise {
                 })
             }
         })
+        // return一个新的promise
         return promise2
     }
+    // 
     finally(callback) {
         //最后一个promise的then
         return this.then((value) => {
+            // finally()如果return了一个reject状态的Promise，将会改变当前Promise的状态，这个MyPromise.resolve就用于改变Promise状态，在finally()没有返回reject态Promise或throw错误的情况下，去掉MyPromise.resolve也是一样的
                                                   //执行这个promise
             return MyPromise.resolve(callback()).then(() => value)
         },(error) => {
             return MyPromise.resolve(callback()).then(() => {throw error})
         })
     } 
+    // catch方法其实就是执行一下then的第二个回调
     catch(failureCallback){
         return this.then(undefined,failureCallback)
     }
@@ -4426,14 +4455,178 @@ function resolvePromise(promise2,x,resolve,reject) {
         // return 阻止向下执行
         return reject(new TypeError('Chaining cycle detected for promise #<Promise>'))
     }
+    // 这里resolve之后，就能被下一个.then()的回调获取到返回值，从而实现链式调用
     if(x instanceof MyPromise){
         // promise对象
+        // 分类讨论返回值,如果是Promise,那么等待Promise状态变更,否则直接resolve
         // x.then((value) => resolve(value),(error) => reject(error))
-        x.then(resolve,reject)ß
+        x.then(resolve,reject)
     }else {
         // 普通值
         resolve(x)
     }
+}
+```
+```js
+//Promise/A+规定的三种状态
+const PENDING = 'pending'
+const FULFILLED = 'fulfilled'
+const REJECTED = 'rejected'
+
+class MyPromise {
+  // 构造方法接收一个回调
+  constructor(executor) {
+    this._status = PENDING     // Promise状态
+    this._value = undefined    // 储存then回调return的值
+    this._resolveQueue = []    // 成功队列, resolve时触发
+    this._rejectQueue = []     // 失败队列, reject时触发
+
+    // 由于resolve/reject是在executor内部被调用, 因此需要使用箭头函数固定this指向, 否则找不到this._resolveQueue
+    let _resolve = (val) => {
+      //把resolve执行回调的操作封装成一个函数,放进setTimeout里,以兼容executor是同步代码的情况
+      const run = () => {
+        if(this._status !== PENDING) return   // 对应规范中的"状态只能由pending到fulfilled或rejected"
+        this._status = FULFILLED              // 变更状态
+        this._value = val                     // 储存当前value
+
+        // 这里之所以使用一个队列来储存回调,是为了实现规范要求的 "then 方法可以被同一个 promise 调用多次"
+        // 如果使用一个变量而非队列来储存回调,那么即使多次p1.then()也只会执行一次回调
+        while(this._resolveQueue.length) {    
+          const callback = this._resolveQueue.shift()
+          callback(val)
+        }
+      }
+      setTimeout(run)
+    }
+    // 实现同resolve
+    let _reject = (val) => {
+      const run = () => {
+        if(this._status !== PENDING) return   // 对应规范中的"状态只能由pending到fulfilled或rejected"
+        this._status = REJECTED               // 变更状态
+        this._value = val                     // 储存当前value
+        while(this._rejectQueue.length) {
+          const callback = this._rejectQueue.shift()
+          callback(val)
+        }
+      }
+      setTimeout(run)
+    }
+    // new Promise()时立即执行executor,并传入resolve和reject
+    executor(_resolve, _reject)
+  }
+
+  // then方法,接收一个成功的回调和一个失败的回调
+  then(resolveFn, rejectFn) {
+    // 根据规范，如果then的参数不是function，则我们需要忽略它, 让链式调用继续往下执行
+    typeof resolveFn !== 'function' ? resolveFn = value => value : null
+    typeof rejectFn !== 'function' ? rejectFn = reason => {
+      throw new Error(reason instanceof Error? reason.message:reason);
+    } : null
+  
+    // return一个新的promise
+    return new MyPromise((resolve, reject) => {
+      // 把resolveFn重新包装一下,再push进resolve执行队列,这是为了能够获取回调的返回值进行分类讨论
+      const fulfilledFn = value => {
+        try {
+          // 执行第一个(当前的)Promise的成功回调,并获取返回值
+          let x = resolveFn(value)
+          // 分类讨论返回值,如果是Promise,那么等待Promise状态变更,否则直接resolve
+          x instanceof MyPromise ? x.then(resolve, reject) : resolve(x)
+        } catch (error) {
+          reject(error)
+        }
+      }
+  
+      // reject同理
+      const rejectedFn  = error => {
+        try {
+          let x = rejectFn(error)
+          x instanceof MyPromise ? x.then(resolve, reject) : resolve(x)
+        } catch (error) {
+          reject(error)
+        }
+      }
+  
+      switch (this._status) {
+        // 当状态为pending时,把then回调push进resolve/reject执行队列,等待执行
+        case PENDING:
+          this._resolveQueue.push(fulfilledFn)
+          this._rejectQueue.push(rejectedFn)
+          break;
+        // 当状态已经变为resolve/reject时,直接执行then回调
+        case FULFILLED:
+          fulfilledFn(this._value)    // this._value是上一个then回调return的值(见完整版代码)
+          break;
+        case REJECTED:
+          rejectedFn(this._value)
+          break;
+      }
+    })
+  }
+
+  //catch方法其实就是执行一下then的第二个回调
+  catch(rejectFn) {
+    return this.then(undefined, rejectFn)
+  }
+
+  //finally方法
+  finally(callback) {
+    return this.then(
+      value => MyPromise.resolve(callback()).then(() => value),             //执行回调,并returnvalue传递给后面的then
+      reason => MyPromise.resolve(callback()).then(() => { throw reason })  //reject同理
+    )
+  }
+
+  //静态的resolve方法
+  static resolve(value) {
+    if(value instanceof MyPromise) return value //根据规范, 如果参数是Promise实例, 直接return这个实例
+    return new MyPromise(resolve => resolve(value))
+  }
+
+  //静态的reject方法
+  static reject(reason) {
+    return new MyPromise((resolve, reject) => reject(reason))
+  }
+
+  //静态的all方法
+  static all(promiseArr) {
+    let index = 0
+    let result = []
+    return new MyPromise((resolve, reject) => {
+      promiseArr.forEach((p, i) => {
+        //Promise.resolve(p)用于处理传入值不为Promise的情况
+        MyPromise.resolve(p).then(
+          val => {
+            index++
+            result[i] = val
+            if(index === promiseArr.length) {
+              resolve(result)
+            }
+          },
+          err => {
+            reject(err)
+          }
+        )
+      })
+    })
+  }
+
+  //静态的race方法
+  static race(promiseArr) {
+    return new MyPromise((resolve, reject) => {
+      //同时执行Promise,如果有一个Promise的状态发生改变,就变更新MyPromise的状态
+      for (let p of promiseArr) {
+        MyPromise.resolve(p).then(  //Promise.resolve(p)用于处理传入值不为Promise的情况
+          value => {
+            resolve(value)        //注意这个resolve是上边new MyPromise的
+          },
+          err => {
+            reject(err)
+          }
+        )
+      }
+    })
+  }
 }
 ```
 #### Promise有3个状态：
@@ -4470,6 +4663,419 @@ Promise状态发生改变，就会触发.then（）里的响应函数处理后 �
 #### Promise.race()
 - 类似Promise.all（），区别在于它有任意一个完成就算完成。 场景用法： 把异步操作和定时器放在一起 如果定时器先触发，就认为超时，告知用户
 
+### async/await实现
+在多个回调依赖的场景中，尽管Promise通过链式调用取代了回调嵌套，但过多的链式调用可读性仍然不佳，流程控制也不方便，ES7 提出的async 函数，终于让 JS 对于异步操作有了终极解决方案，简洁优美地解决了以上两个问题。
+ 
+```js
+async () => {
+  const a = await Promise.resolve(a);
+  const b = await Promise.resolve(b);
+  const c = await Promise.resolve(c);
+}
+```
+那么我们要如何实现一个async/await呢，首先我们要知道，async/await实际上是对Generator（生成器）的封装，是一个语法糖。
+ES6 新引入了 Generator 函数，可以通过 yield 关键字，把函数的执行流挂起，通过next()方法可以切换到下一个状态，为改变执行流程提供了可能，从而为异步编程提供解决方案。
+```js
+function* myGenerator() {
+  yield '1'
+  yield '2'
+  return '3'
+}
+const gen = myGenerator();  // 获取迭代器
+gen.next()  //{value: "1", done: false}
+gen.next()  //{value: "2", done: false}
+gen.next()  //{value: "3", done: true}
+
+
+
+// 也可以通过给next()传参, 让yield具有返回值
+function* myGenerator() {
+  console.log(yield '1')  //test1
+  console.log(yield '2')  //test2
+  console.log(yield '3')  //test3
+}
+// 获取迭代器
+const gen = myGenerator();
+gen.next()
+gen.next('test1')
+gen.next('test2')
+gen.next('test3')
+```
+- Generator和async/await。看起来其实已经很相似，但二者又有三点不同：
+    - async/await自带执行器，不需要手动调用next()就能自动执行下一步
+    - async函数返回值是Promise对象，而Generator返回的是生成器对象
+    - await能够返回Promise的resolve/reject的值
+    - 我们对async/await的实现，其实也就是对应以上三点封装Generator
+
+
+#### 自动执行
+```js
+// 也可以通过给gen.next()传值的方式，让yield能返回resolve的值
+function* myGenerator() {
+  console.log(yield Promise.resolve(1))   //1
+  console.log(yield Promise.resolve(2))   //2
+  console.log(yield Promise.resolve(3))   //3
+}
+
+// 手动执行迭代器
+const gen = myGenerator()
+gen.next().value.then(val => {
+  // console.log(val)
+  gen.next(val).value.then(val => {
+    // console.log(val)
+    gen.next(val).value.then(val => {
+      // console.log(val)
+      gen.next(val)
+    })
+  })
+})
+
+
+
+
+
+
+
+// 手动执行的写法看起来既笨拙又丑陋，我们希望生成器函数能自动往下执行，且yield能返回resolve的值，基于这两个需求，我们进行一个基本的封装，这里async/await是关键字，不能重写，我们用函数来模拟：
+
+function run(gen) {
+  // 把返回值包装成promise
+  // 返回值是Promise：async/await的返回值是一个Promise，我们这里也需要保持一致，给返回值包一个Promise
+  return new Promise((resolve, reject) => {
+    var g = gen()
+
+    function _next(val) {
+      //错误处理
+      try {
+        var res = g.next(val) 
+      } catch(err) {
+        return reject(err); 
+      }
+      if(res.done) {
+        return resolve(res.value);
+      }
+      //res.value包装为promise，以兼容yield后面跟基本类型的情况
+      Promise.resolve(res.value).then(
+        val => {
+          _next(val);
+        }, 
+        err => {
+          // 抛出错误
+          // 缺少错误处理：上边代码里的Promise如果执行失败，就会导致后续执行直接中断，我们需要通过调用Generator.prototype.throw()，把错误抛出来，才能被外层的try-catch捕获到
+          g.throw(err)
+        });
+    }
+    _next();
+  });
+}
+function* myGenerator() {
+  try {
+    console.log(yield Promise.resolve(1)) 
+    console.log(yield 2)   //2
+    console.log(yield Promise.reject('error'))
+  } catch (error) {
+    console.log(error)
+  }
+}
+const result = run(myGenerator)     //result是一个Promise
+//输出 1 2 error
+
+
+
+
+
+
+
+
+// 到这里，一个async/await的实现基本完成了。最后我们可以看一下babel对async/await的转换结果，其实整体的思路是一样的，但是写法稍有不同：
+//相当于我们的run()
+function _asyncToGenerator(fn) {
+  // return一个function，和async保持一致。我们的run直接执行了Generator，其实是不太规范的
+  return function() {
+    var self = this
+    var args = arguments
+    return new Promise(function(resolve, reject) {
+      var gen = fn.apply(self, args);
+
+      //相当于我们的_next()
+      function _next(value) {
+        asyncGeneratorStep(gen, resolve, reject, _next, _throw, 'next', value);
+      }
+      //处理异常
+      function _throw(err) {
+        asyncGeneratorStep(gen, resolve, reject, _next, _throw, 'throw', err);
+      }
+      _next(undefined);
+    });
+  };
+}
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
+  try {
+    var info = gen[key](arg);
+    var value = info.value;
+  } catch (error) {
+    reject(error);
+    return;
+  }
+  if (info.done) {
+    resolve(value);
+  } else {
+    Promise.resolve(value).then(_next, _throw);
+  }
+}
+
+const foo = _asyncToGenerator(function* () {
+  try {
+    console.log(yield Promise.resolve(1))   //1
+    console.log(yield 2)                    //2
+    return '3'
+  } catch (error) {
+    console.log(error)
+  }
+})
+foo().then(res => {
+  console.log(res)                          //3
+})
+
+```
+
+
+
+### Generator实现
+```js
+function* foo() {
+  yield 'result1'
+  yield 'result2'
+  yield 'result3'
+}
+  
+const gen = foo()
+console.log(gen.next().value)
+console.log(gen.next().value)
+console.log(gen.next().value)
+
+
+// 看看ES5环境下是如何实现Generator的：
+"use strict";
+var _marked =
+/*#__PURE__*/
+regeneratorRuntime.mark(foo);
+
+function foo() {
+  return regeneratorRuntime.wrap(function foo$(_context) {
+    while (1) {
+      switch (_context.prev = _context.next) {
+        case 0:
+          _context.next = 2;
+          return 'result1';
+
+        case 2:
+          _context.next = 4;
+          return 'result2';
+
+        case 4:
+          _context.next = 6;
+          return 'result3';
+
+        case 6:
+        case "end":
+          return _context.stop();
+      }
+    }
+  }, _marked);
+}
+
+var gen = foo();
+console.log(gen.next().value);
+console.log(gen.next().value);
+console.log(gen.next().value);
+```
+#### regeneratorRuntime.mark()
+regeneratorRuntime.mark(foo)这个方法在第一行被调用，我们先看一下runtime里mark()方法的定义
+```js
+//runtime.js里的定义稍有不同，多了一些判断，以下是编译后的代码
+runtime.mark = function(genFun) {
+  genFun.__proto__ = GeneratorFunctionPrototype;
+  genFun.prototype = Object.create(Gp);
+  return genFun;
+};
+```
+这里边GeneratorFunctionPrototype和Gp我们都不认识，他们被定义在runtime里，不过没关系，我们只要知道mark()方法为生成器函数（foo）绑定了一系列原型就可以了，这里就简单地过了
+
+#### regeneratorRuntime.wrap()
+从上面babel转化的代码我们能看到，执行foo()，其实就是执行wrap()，那么这个方法起到什么作用呢，他想包装一个什么东西呢，我们先来看看wrap方法的定义：
+```js
+//runtime.js里的定义稍有不同，多了一些判断，以下是编译后的代码
+function wrap(innerFn, outerFn, self) {
+  // outerFn.prototype其实就是genFun.prototype，
+  var generator = Object.create(outerFn.prototype);
+  // context可以直接理解为这样一个全局对象，用于储存各种状态和上下文：
+  var context = new Context([]);
+  // makeInvokeMethod的定义如下，它return了一个invoke方法，invoke用于判断当前状态和执行下一步，其实就是我们调用的next()
+  generator._invoke = makeInvokeMethod(innerFn, self, context);
+  return generator;
+}
+```
+wrap方法先是创建了一个generator，并继承outerFn.prototype；然后new了一个context对象；makeInvokeMethod方法接收innerFn(对应foo$)、context和this，并把返回值挂到generator._invoke上；最后return了generator。其实wrap()相当于是给generator增加了一个_invoke方法
+```js
+var ContinueSentinel = {};
+
+var context = {
+  done: false,
+  method: "next",
+  next: 0,
+  prev: 0,
+  abrupt: function(type, arg) {
+    var record = {};
+    record.type = type;
+    record.arg = arg;
+
+    return this.complete(record);
+  },
+  complete: function(record, afterLoc) {
+    if (record.type === "return") {
+      this.rval = this.arg = record.arg;
+      this.method = "return";
+      this.next = "end";
+    }
+
+    return ContinueSentinel;
+  },
+  stop: function() {
+    this.done = true;
+    return this.rval;
+  }
+};
+
+
+
+
+
+
+//以下是编译后的代码
+function makeInvokeMethod(innerFn, context) {
+  // 将状态置为start
+  var state = "start";
+
+  return function invoke(method, arg) {
+    // 已完成
+    if (state === "completed") {
+      return { value: undefined, done: true };
+    }
+    
+    context.method = method;
+    context.arg = arg;
+
+    // 执行中
+    while (true) {
+      state = "executing";
+
+      var record = {
+        type: "normal",
+        arg: innerFn.call(self, context)    // 执行下一步,并获取状态(其实就是switch里边return的值)
+      };
+
+      if (record.type === "normal") {
+        // 判断是否已经执行完成
+        state = context.done ? "completed" : "yield";
+
+        // ContinueSentinel其实是一个空对象,record.arg === {}则跳过return进入下一个循环
+        // 什么时候record.arg会为空对象呢, 答案是没有后续yield语句或已经return的时候,也就是switch返回了空值的情况(跟着上面的switch走一下就知道了)
+        if (record.arg === ContinueSentinel) {
+          continue;
+        }
+        // next()的返回值
+        return {
+          value: record.arg,
+          done: context.done
+        };
+      }
+    }
+  };
+}
+```
+为什么generator._invoke实际上就是gen.next呢，因为在runtime对于next()的定义中，next()其实就return了_invoke方法
+```js
+// Helper for defining the .next, .throw, and .return methods of the
+// Iterator interface in terms of a single ._invoke method.
+function defineIteratorMethods(prototype) {
+    ["next", "throw", "return"].forEach(function(method) {
+      prototype[method] = function(arg) {
+        return this._invoke(method, arg);
+      };
+    });
+}
+
+defineIteratorMethods(Gp);
+```
+#### 低配实现 & 调用流程分析
+```js
+// 生成器函数根据yield语句将代码分割为switch-case块，后续通过切换_context.prev和_context.next来分别执行各个case
+function gen$(_context) {
+  while (1) {
+    switch (_context.prev = _context.next) {
+      case 0:
+        _context.next = 2;
+        return 'result1';
+
+      case 2:
+        _context.next = 4;
+        return 'result2';
+
+      case 4:
+        _context.next = 6;
+        return 'result3';
+
+      case 6:
+      case "end":
+        return _context.stop();
+    }
+  }
+}
+
+// 低配版context  
+var context = {
+  next:0,
+  prev: 0,
+  done: false,
+  stop: function stop () {
+    this.done = true
+  }
+}
+
+// 低配版invoke
+let gen = function() {
+  return {
+    next: function() {
+      value = context.done ? undefined: gen$(context)
+      done = context.done
+      return {
+        value,
+        done
+      }
+    }
+  }
+} 
+
+// 测试使用
+var g = gen() 
+g.next()  // {value: "result1", done: false}
+g.next()  // {value: "result2", done: false}
+g.next()  // {value: "result3", done: false}
+g.next()  // {value: undefined, done: true}
+```
+- 分析一下调用流程：
+    - 我们定义的function* 生成器函数被转化为以上代码
+    - 转化后的代码分为三大块：
+        - gen$(_context)由yield分割生成器函数代码而来
+        - context对象用于储存函数执行上下文
+        - invoke()方法定义next()，用于执行gen$(_context)来跳到下一步
+    - 当我们调用g.next()，就相当于调用invoke()方法，执行gen$(_context)，进入switch语句，switch根据context的标识，执行对应的case块，return对应结果
+    - 当生成器函数运行到末尾（没有下一个yield或已经return），switch匹配不到对应代码块，就会return空值，这时g.next()返回{value: undefined, done: true}
+
+    
+从中我们可以看出，Generator实现的核心在于上下文的保存，函数并没有真的被挂起，每一次yield，其实都执行了一遍传入的生成器函数，只是在这个过程中间用了一个context对象储存上下文，使得每次执行生成器函数的时候，都可以从上一个执行结果开始执行，看起来就像函数被挂起了一样
 
 ### Proxy
 #### Proxy
@@ -5151,6 +5757,76 @@ if (!bool.valueOf()) {
 - 策略模式 策略模式指对象有某个行为,但是在不同的场景中,该行为有不同的实现方案-比如选项的合并策略
 
 ## HTTP
+### 如何实现扫码登录功能？
+扫码登录场景想必我们都不陌生——很多PC端的网站都提供了扫码登录的功能，无需在网页上输入任何账号和密码，只需要通过手机上的APP，如微信、淘宝、QQ等等，使用扫描功能，扫描网页上的二维码，确认登录，就可以完成网页端登录。
+
+- 扫码登录分析
+    - 其实涉及到三种角色，需要解决两个问题。
+        - 三种角色
+            - PC端、手机端、服务端。
+        - 两个问题
+            - 手机端如何完成认证
+            - PC端如何完成登录
+            - 如果用普通的账号密码方式登录认证，PC端通过账号密码完成认证，然后服务端给PC端同步返回token key之类的标识，PC端再次请求服务端，需要携带token key，用于标识和证明自己登录的状态。
+            - 服务端响应的时候，需要对token key进行校验，通过则正常响应；校验不通过，认证失败；或者token过期，PC端需要再次登录认证，获取新的token key。
+            - 现在换成了扫码登录：
+                - 认证不是通过账号密码了，而是由手机端扫码来完成
+                - PC端没法同步获取认证成功之后的凭据，必须用某种方式来让PC端获取认证的凭据。
+
+
+- 扫码登录实现
+    - 手机端如何完成认证
+        - 二维码怎么生成
+            - 手机扫码这个过程，其实是对二维码的解码，获取二维码中包含的数据。
+            - 首先，二维码是展示在我们的PC端，所以生成这个操作应该由PC端去请求服务端，获取相应的数据，再由PC端生成这个二维码。
+                - 二维码包含什么呢
+                    - 二维码在我们这个场景里面是一个重要的媒介，服务端必须给这个数据生成惟一的标识作为二维码ID，同时还应该设置过期的时间。PC端根据二维码ID等数据生成二维码。
+                    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108181611.png)
+        - APP认证机制
+            - 基于APP的移动互联网认证机制。
+                - 首先，手机端一般是不会存储登录密码的，我们发现，只有装载APP，第一次登录的时候，才需要进行基于账号密码的登录，之后即使这个清理掉这个应用进程，甚至手机重启，都是不需要再次输入账号密码的，它可以自动登录。
+                - 这背后有一套基于token的认证机制，和PC有些类似，但又有一些不同。
+                - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108181722.png)
+                    - APP登录认证的时候除了账号密码，还有设备信息
+                    - 账号密码校验通过，服务端会把账号与设备进行一个绑定，进行持久化的保存，包含了账号ID，设备ID，设备类型等等
+                    - APP每次请求除了携带token key，还需要携带设备信息。
+                    - 因为移动端的设备具备唯一性，可以为每个客户端生成专属token，这个token也不用过期，所以这就是我们可以一次登录，长久使用的原理。
+        - 手机扫码干了什么
+            - 手机扫码干了两件事：
+                - 扫描二维码：识别PC端展示的二维码，获取二维码ID
+                    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108181830.png)
+                - 确认登录
+                    - 手机端通过带认证信息(token key、设备信息)、二维码信息（二维码ID）请求服务端，完成认证过程，确认PC端的登录。
+                    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108181903.png)
+        - PC端如何完成登录
+            - PC端通过token来标识登录状态。那么手机端扫码确认之后，我们的服务端就应该给PC生成相应的token。
+            - 这个PC端又如何获取它所需的token key，来完成登录呢？
+            - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108182947.png)
+            - PC端可以通过获取二维码的状态来进行相应的响应：
+                - 二维码未扫描：无操作
+                - 二维码已失效：提示刷新二维码
+                - 二维码已成功：从服务端获取PC token
+            - 获取二维码状态，主要有三种方式：
+                - 轮询
+                    - 轮询方式是指客户端会每隔一段时间就主动给服务端发送一次二维码状态的查询请求。
+                    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108183043.png)
+                - 长轮询
+                    - 长轮询是指客户端主动给服务端发送二维码状态的查询请求，服务端会按情况对请求进行阻塞，直至二维码信息更新或超时。当客户端接收到返回结果后，若二维码仍未被扫描，则会继续发送查询请求，直至状态变化（已失效或已成功）。
+                    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108183206.png)
+                - Websocket
+                    - Websocket是指前端在生成二维码后，会与后端建立连接，一旦后端发现二维码状态变化，可直接通过建立的连接主动推送信息给前端。
+                    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108183233.png)
+    - 总结
+        - 二维码扫码登录的一些关键点，现在我们把这些点串起来，来看一看二维码扫码登录的整体的实现流程。
+        - 以常用的轮询方式获取二维码状态为例：
+        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108183407.png)
+            - 访问PC端二维码生成页面，PC端请求服务端获取二维码ID
+            - 服务端生成相应的二维码ID，设置二维码的过期时间，状态等。
+            - PC获取二维码ID，生成相应的二维码。
+            - 手机端扫描二维码，获取二维码ID。
+            - 手机端将手机端token和二维码ID发送给服务端，确认登录。
+            - 服务端校验手机端token，根据手机端token和二维码ID生成PC端token
+            - PC端通过轮询方式请求服务端，通过二维码ID获取二维码状态，如果已成功，返回PC token，登录成功。
 ### 浏览器的最大请求并发数
 并发数量简单通俗的讲就是，当浏览器网页的时候同时工作的进行数量。
 HTTP客户端一般对同一个服务器的并发连接个数都是有限制的。
@@ -8661,6 +9337,59 @@ console.log(str)
     - 不同于 git rebase 的是，git merge 在不是 fast-forward（快速合并）的情况下，会产生一条额外的合并记录，类似 Merge branch 'xxx' into 'xxx' 的一条提交信息。
     - 另外，在解决冲突的时候，用 merge 只需要解决一次冲突即可，简单粗暴，而用 rebase 的时候 ，需要依次解决每次的冲突，才可以提交。
 
+## 前端工程化
+### 前端工程化规范
+一切能提升前端开发效率，提高前端应用质量的手段和工具都是前端工程化。前端工程化是一个标准化过程，所有的项目都有共同的起点，通过制定脚手架（一般区分前后台项目），内置webpack、mock服务、开发规范（eslint）、单元测试等功能，约束每个项目的模样、玩法大体一样。总结就是将前端开发流程，标准化、规范化、工具化、自动化、简单化，提升了应用质量及开发效率。
+
+- 前端工程化主要包括四个方面：模块化、组件化、规范化、自动化。
+    - 模块化
+        - 指将一个文件拆分成多个相互依赖的文件，最后进行统一的打包和加载，这样能够很好的保证高效的多人协作。
+        - JS 模块化：CommonJS、AMD、CMD 以及 ES6 Module。
+        - CSS 模块化：Sass、Less、Stylus、BEM、CSS Modules 等。其中预处理器和 BEM 都会有的一个问题就是样式覆盖。而 CSS Modules 则是通过 JS 来管理依赖，最大化的结合了 JS 模块化和 CSS 生态，比如 Vue 中的 style scoped。
+        - 资源模块化：任何资源都能以模块的形式进行加载，目前大部分项目中的文件、CSS、图片等都能直接通过 JS 做统一的依赖关系处理。
+    - 组件化
+        - 指对ui层面的拆分。其中主要包括细粒度和通用性这两块的考虑。
+        - 不同于模块化，模块化是对文件、对代码和资源拆分，而组件化则是对 UI 层面的拆分。
+        - 通常，我们会需要对页面进行拆分，将其拆分成一个一个的零件，然后分别去实现这一个个零件，最后再进行组装。在我们的实际业务开发中，对于组件的拆分我们需要做不同程度的考量，其中主要包括细粒度和通用性这两块的考虑。对于业务组件，你更多需要考量的是针对你负责业务线的一个适用度，即你设计的业务组件是否成为你当前业务的 “通用” 组件。
+    - 规范化
+        - 指的是我们在工程开发初期以及开发期间制定的系列规范。
+            - 项目目录结构
+            - 编码规范：对于编码这块的约束，一般我们都会采用一些强制措施，比如 ESLint、StyleLint 等。
+            - 联调规范
+            - 文件命名规范
+            - 样式管理规范：目前流行的样式管理有 BEM、Sass、Less、Stylus、CSS Modules 等方式。
+            - git flow 工作流：其中包含分支命名规范、代码合并规范等。
+            - 定期 code review … 等等
+    - 自动化
+        - 自动化工具在自动化合并、构建、打包都能为我们节省很多工作。而这些只是前端自动化其中的一部分，前端自动化还包含了持续集成、自动化测试等方方面面。
+        - 从最早先的 grunt、gulp 等，再到目前的 webpack、parcel。这些自动化工具在自动化合并、构建、打包都能为我们节省很多工作。而这些只是前端自动化其中的一部分，前端自动化还包含了持续集成、自动化测试等方方面面。
+
+
+
+- 前端工程化具体包含哪些知识
+    - 脚手架
+        - 脚手架包括什么
+            - 通用的项目目录模版
+            - 通用的Webpack配置
+            - 统一的Eslint校验规则
+            - 统一的单元测试框架配置：单元测试覆盖率、测试的目录等
+            - 统一的Dockerfile和jenkinsfile (用来打包成镜像和部署流水线定义)
+            - 统一babel的配置（.babelrc或babel.config.js）
+            - 统一的常量配置（缓存字段等等）
+            - 不同环境的配置文件（development、test、production）
+        - 如何开发脚手架
+            - 创建一个文件夹，做为脚手架的起点，执行npm init生成package.json文件
+            - 工欲善其事必先利其器，安装以下npm包
+                - 可用于控制台选择的工具：inquirer(交互、选择)
+                - 可处理控制台命令的工具：commander（定义脚手架命令）
+                - download-git-repo：下载远程模板工具，负责下载远程仓库的模板项目
+                - 可改变输出log颜色的工具：chalk
+                - 可执行shell命令的工具: child_process
+    - 构建工具（webpack）
+    - MOCK服务
+    - 开发规范
+    - 单元测试
+    - 项目部署
 ## 前端性能优化
 ### 前端性能优化
 #### CSS方面优化
@@ -8689,6 +9418,163 @@ console.log(str)
 - 减小cookie大小，尽量用localStorage代替
 - CDN托管静态文件
 - 开启 Gzip 压缩
+
+## 前端性能优化
+### 前端性能优化
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108160432.png)
+- 从过程趋势来看，性能优化可分为网络层面和渲染层面；从结果趋势来看，性能优化可分为时间层面和体积层面。简单来说就是要在访问网站时使其快准狠地立马呈现在用户眼前。
+- 所有的性能优化都围绕着两大层面两小层面实现，核心层面是网络层面和渲染层面，辅助层面是时间层面和体积层面，而辅助层面则充满在核心层面里。
+#### 九大策略
+- 九大策略
+    - 网络层面
+        - 网络层面的性能优化，无疑是如何让资源体积更小加载更快，因此笔者从以下四方面做出建议。
+        - 构建策略：基于构建工具(Webpack/Rollup/Parcel/Esbuild/Vite/Gulp)
+            - 该策略主要围绕webpack做相关处理，同时也是接入最普遍的性能优化策略。其他构建工具的处理也是大同小异，可能只是配置上不一致。说到webpack的性能优化，无疑是从时间层面和体积层面入手。
+            - 对两层面分别做出6个性能优化建议总共12个性能优化建议，为了方便记忆均使用四字词语概括，方便大家消化。⏱表示减少打包时间，📦表示减少打包体积。
+            - 减少打包时间：缩减范围、缓存副本、定向搜索、提前构建、并行构建、可视结构
+                - 缩减范围
+                    - 配置include/exclude缩小Loader对文件的搜索范围，好处是避免不必要的转译。node_modules目录的体积这么大，那得增加多少时间成本去检索所有文件啊？
+                    - include/exclude通常在各大Loader里配置，src目录通常作为源码目录，可做如下处理。当然include/exclude可根据实际情况修改。
+                    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108162258.png)
+                - 缓存副本
+                    - 配置cache缓存Loader对文件的编译副本，好处是再次编译时只编译修改过的文件。未修改过的文件干嘛要随着修改过的文件重新编译呢？
+                    - 大部分Loader/Plugin都会提供一个可使用编译缓存的选项，通常包含cache字眼。以babel-loader和eslint-webpack-plugin为例。
+                    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108162230.png)
+                - 定向搜索
+                    - 配置resolve提高文件的搜索速度，好处是定向指定必须文件路径。若某些第三方库以常规形式引入可能报错或希望程序自动索引特定类型文件都可通过该方式解决。
+                    - alias映射模块路径，extensions表明文件后缀，noParse过滤无依赖文件。通常配置alias和extensions就足够。
+                    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108162147.png)
+                - 提前构建
+                    - 配置DllPlugin将第三方依赖提前打包，好处是将DLL与业务代码完全分离且每次只构建业务代码。这是一个古老配置，在webpack v2时已存在，不过现在webpack v4+已不推荐使用该配置，因为其版本迭代带来的性能提升足以忽略DllPlugin所带来的效益。
+                    - DLL意为动态链接库，指一个包含可由多个程序同时使用的代码库。在前端领域里可认为是另类缓存的存在，它把公共代码打包为DLL文件并存到硬盘里，再次打包时动态链接DLL文件就无需再次打包那些公共代码，从而提升构建速度，减少打包时间。
+                    - 配置DLL总体来说相比其他配置复杂，配置流程可大致分为三步。
+                    - 首先告知构建脚本哪些依赖做成DLL并生成DLL文件和DLL映射表文件。
+                    - 然后在package.json里配置执行脚本且每次构建前首先执行该脚本打包出DLL文件。
+                    - 最后链接DLL文件并告知webpack可命中的DLL文件让其自行读取。使用html-webpack-tags-plugin在打包时自动插入DLL文件。
+                    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108162105.png) 
+                - 并行构建
+                    - 配置Thread将Loader单进程转换为多进程，好处是释放CPU多核并发的优势。在使用webpack构建项目时会有大量文件需解析和处理，构建过程是计算密集型的操作，随着文件增多会使构建过程变得越慢。
+                    - 运行在Node里的webpack是单线程模型，简单来说就是webpack待处理的任务需一件件处理，不能同一时刻处理多件任务。
+                    - 文件读写与计算操作无法避免，能不能让webpack同一时刻处理多个任务，发挥多核CPU电脑的威力以提升构建速度呢？thread-loader来帮你，根据CPU个数开启线程。
+                    - 在此需注意一个问题，若项目文件不算多就不要使用该性能优化建议，毕竟开启多个线程也会存在性能开销。
+                    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108162347.png)
+                - 可视结构
+                    - 配置BundleAnalyzer分析打包文件结构，好处是找出导致体积过大的原因。从而通过分析原因得出优化方案减少构建时间。BundleAnalyzer是webpack官方插件，可直观分析打包文件的模块组成部分、模块体积占比、模块包含关系、模块依赖关系、文件是否重复、压缩体积对比等可视化数据。
+                    - 可使用webpack-bundle-analyzer配置，有了它，我们就能快速找到相关问题。
+                    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108162454.png)
+            - 减少打包体积：分割代码、摇树优化、动态垫片、按需加载、作用提升、压缩资源
+                - 分割代码
+                    - 分割各个模块代码，提取相同部分代码，好处是减少重复代码的出现频率。webpack v4使用splitChunks替代CommonsChunksPlugin实现代码分割。
+                    - splitChunks配置较多，详情可参考官网，在此笔者贴上常用配置。
+                    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108162551.png)
+                - 摇树优化
+                    - 删除项目中未被引用代码，好处是移除重复代码和未使用代码。摇树优化首次出现于rollup，是rollup的核心概念，后来在webpack v2里借鉴过来使用。
+                    - 摇树优化只对ESM规范生效，对其他模块规范失效。摇树优化针对静态结构分析，只有import/export才能提供静态的导入/导出功能。因此在编写业务代码时必须使用ESM规范才能让摇树优化移除重复代码和未使用代码。
+                    - 在webpack里只需将打包环境设置成生产环境就能让摇树优化生效，同时业务代码使用ESM规范编写，使用import导入模块，使用export导出模
+                    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108162636.png)
+                - 动态垫片
+                    - 通过垫片服务根据UA返回当前浏览器代码垫片，好处是无需将繁重的代码垫片打包进去。每次构建都配置@babel/preset-env和core-js根据某些需求将Polyfill打包进来，这无疑又为代码体积增加了贡献。
+                    - @babel/preset-env提供的useBuiltIns可按需导入Polyfill。
+                        - false：无视target.browsers将所有Polyfill加载进来
+                        - entry：根据target.browsers将部分Polyfill加载进来(仅引入有浏览器不支持的Polyfill，需在入口文件import "core-js/stable")
+                        - usage：根据target.browsers和检测代码里ES6的使用情况将部分Polyfill加载进来(无需在入口文件import "core-js/stable")
+                        - 在此推荐大家使用动态垫片。动态垫片可根据浏览器UserAgent返回当前浏览器Polyfill，其思路是根据浏览器的UserAgent从browserlist查找出当前浏览器哪些特性缺乏支持从而返回这些特性的Polyfill。对这方面感兴趣的同学可参考polyfill-library和polyfill-service的源码。
+                        - 在此提供两个动态垫片服务，可在不同浏览器里点击以下链接看看输出不同的Polyfill。相信IExplore还是最多Polyfill的，它自豪地说：我就是我，不一样的烟火。
+                            - 官方CDN服务：https://link.juejin.cn/?target=https%3A%2F%2Fpolyfill.io%2Fv3%2Fpolyfill.min.js
+                            - 阿里CDN服务：https://link.juejin.cn/?target=https%3A%2F%2Fpolyfill.alicdn.com%2Fpolyfill.min.js
+                        - 使用html-webpack-tags-plugin在打包时自动插入动态垫片。
+                        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108162956.png)
+                - 按需加载
+                    - 将路由页面/触发性功能单独打包为一个文件，使用时才加载，好处是减轻首屏渲染的负担。因为项目功能越多其打包体积越大，导致首屏渲染速度越慢。
+                    - 首屏渲染时只需对应JS代码而无需其他JS代码，所以可使用按需加载。webpack v4提供模块按需切割加载功能，配合import()可做到首屏渲染减包的效果，从而加快首屏渲染速度。只有当触发某些功能时才会加载当前功能的JS代码。
+                    - webpack提供魔术注解命名切割模块，若无注解则切割出来的模块无法分辨出属于哪个业务模块，所以一般都是一个业务模块共用一个切割模块的注解名称
+                    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108163220.png)
+                - 作用提升
+                    - 分析模块间依赖关系，把打包好的模块合并到一个函数中，好处是减少函数声明和内存花销。作用提升首次出现于rollup，是rollup的核心概念，后来在webpack v3里借鉴过来使用。
+                    - 在未开启作用提升前，构建后的代码会存在大量函数闭包。由于模块依赖，通过webpack打包后会转换成IIFE，大量函数闭包包裹代码会导致打包体积增大(模块越多越明显)。在运行代码时创建的函数作用域变多，从而导致更大的内存开销。
+                    - 在开启作用提升后，构建后的代码会按照引入顺序放到一个函数作用域里，通过适当重命名某些变量以防止变量名冲突，从而减少函数声明和内存花销。
+                    - 在webpack里只需将打包环境设置成生产环境就能让作用提升生效，或显式设置concatenateModules。
+                    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108163405.png)
+                - 压缩资源
+                    - 压缩HTML/CSS/JS代码，压缩字体/图像/音频/视频，好处是更有效减少打包体积。极致地优化代码都有可能不及优化一个资源文件的体积更有效。
+                    - 针对HTML代码，使用html-webpack-plugin开启压缩功能。
+                    - 针对CSS/JS代码，分别使用以下插件开启压缩功能。其中OptimizeCss基于cssnano封装，Uglifyjs和Terser都是webpack官方插件，同时需注意压缩JS代码需区分ES5和ES6。
+                        - optimize-css-assets-webpack-plugin：压缩CSS代码
+                        - uglifyjs-webpack-plugin：压缩ES5版本的JS代码
+                        - terser-webpack-plugin：压缩ES6版本的JS代码
+                    - 针对字体/音频/视频文件，还真没相关Plugin供我们使用，就只能拜托大家在发布项目到生产服前使用对应的压缩工具处理了。针对图像文件，大部分Loader/Plugin封装时均使用了某些图像处理工具，而这些工具的某些功能又托管在国外服务器里，所以导致经常安装失败。
+                    - webpack压缩图像  这个值得开发
+                - 
+        - 图像策略：基于图像类型(JPG/PNG/SVG/WebP/Base64)
+            - 该策略主要围绕图像类型做相关处理，同时也是接入成本较低的性能优化策略。只需做到以下两点即可。
+            - 图像选型：了解所有图像类型的特点及其何种应用场景最合适
+                - 图像选型一定要知道每种图像类型的体积/质量/兼容/请求/压缩/透明/场景等参数相对值，这样才能迅速做出判断在何种场景使用何种类型的图像。
+                - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108164555.png)
+            - 图像压缩：在部署到生产环境前使用工具或脚本对其压缩处理
+                -  图像压缩可在上述构建策略-压缩资源里完成，也可自行使用工具完成。由于现在大部分webpack图像压缩工具不是安装失败就是各种环境问题(你懂的)，所以笔者还是推荐在发布项目到生产服前使用图像压缩工具处理，这样运行稳定也不会增加打包时间。
+                -  ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108164658.png)
+        - 分发策略：基于内容分发网络(CDN)
+            - 该策略主要围绕内容分发网络做相关处理，同时也是接入成本较高的性能优化策略，需足够资金支持。
+            - 虽然接入成本较高，但大部分企业都会购买一些CDN服务器，所以在部署的事情上就不用过分担忧，尽管使用就好。该策略尽量遵循以下两点就能发挥CDN最大作用
+                - 所有静态资源走CDN：开发阶段确定哪些文件属于静态资源
+                - 把静态资源与主页面置于不同域名下：避免请求带上Cookie
+                - 内容分发网络简称CDN，指一组分布在各地存储数据副本并可根据就近原则满足数据请求的服务器。其核心特征是缓存和回源，缓存是把资源复制到CDN服务器里，回源是资源过期/不存在就向上层服务器请求并复制到CDN服务器里。
+                - 使用CDN可降低网络拥塞，提高用户访问响应速度和命中率。构建在现有网络基础上的智能虚拟网络，依靠部署在各地服务器，通过中心平台的调度、负载均衡、内容分发等功能模块，使用户就近获取所需资源，这就是CDN的终极使命。
+                - 基于CDN的就近原则所带来的优点，可将网站所有静态资源全部部署到CDN服务器里。那静态资源包括哪些文件？通常来说就是无需服务器产生计算就能得到的资源，例如不常变化的样式文件、脚本文件和多媒体文件(字体/图像/音频/视频)等。
+        - 缓存策略：基于浏览器缓存(强缓存/协商缓存)
+            - 该策略主要围绕浏览器缓存做相关处理，同时也使接入成本最低的性能优化策略。其显著减少网络传输所带来的损耗，提升网页访问速度，是一种很值得使用的性能优化策略。
+            - 为了让浏览器缓存发挥最大作用，该策略尽量遵循以下五点就能发挥浏览器缓存最大作用。
+                - 考虑拒绝一切缓存策略：Cache-Control:no-store
+                - 考虑资源是否每次向服务器请求：Cache-Control:no-cache
+                - 考虑资源是否被代理服务器缓存：Cache-Control:public/private
+                - 考虑资源过期时间：Expires:t/Cache-Control:max-age=t,s-maxage=t
+                - 考虑协商缓存：Last-Modified/Etag
+            - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108171545.png)
+            - 整个缓存策略机制很明了，先走强缓存，若命中失败才走协商缓存。若命中强缓存，直接使用强缓存；若未命中强缓存，发送请求到服务器检查是否命中协商缓存；若命中协商缓存，服务器返回304通知浏览器使用本地缓存，否则返回最新资源。
+            - 有两种较常用的应用场景值得使用缓存策略一试，当然更多应用场景都可根据项目需求制定。
+                - 频繁变动资源：设置Cache-Control:no-cache，使浏览器每次都发送请求到服务器，配合Last-Modified/ETag验证资源是否有效
+                - 不常变化资源：设置Cache-Control:max-age=31536000，对文件名哈希处理，当代码修改后生成新的文件名，当HTML文件引入文件名发生改变才会下载最新文件
+    - 渲染层面
+        - 渲染层面的性能优化，无疑是如何让代码解析更好执行更快。因此笔者从以下五方面做出建议。
+        - CSS策略：基于CSS规则
+            - 避免出现超过三层的嵌套规则
+            - 避免为ID选择器添加多余选择器
+            - 避免使用标签选择器代替类选择器
+            - 避免使用通配选择器，只对目标节点声明规则
+            - 避免重复匹配重复定义，关注可继承属性
+        - DOM策略：基于DOM操作
+            - 缓存DOM计算属性
+            - 避免过多DOM操作
+            - 使用DOMFragment缓存批量化DOM操作
+        - 阻塞策略：基于脚本加载
+            - 脚本与DOM/其它脚本的依赖关系很强：对<script>设置defer
+            - 脚本与DOM/其它脚本的依赖关系不强：对<script>设置async
+        - 回流重绘策略：基于回流重绘
+            - 缓存DOM计算属性
+            - 使用类合并样式，避免逐条改变样式
+            - 使用display控制DOM显隐，将DOM离线化
+        - 异步更新策略：基于异步更新
+            - 在异步任务中修改DOM时把其包装成微任务
+        - 上述五方面都是编写代码时完成，充满在整个项目流程的开发阶段里。因此在开发阶段需时刻注意以下涉及到的每一点，养成良好的开发习惯，性能优化也自然而然被使用上了。
+        - 渲染层面的性能优化更多表现在编码细节上，而并非实体代码。简单来说就是遵循某些编码规则，才能将渲染层面的性能优化发挥到最大作用。回流重绘策略在渲染层面的性能优化里占比较重，也是最常规的性能优化之一。
+    - 上述四方面都是一步接着一步完成，充满在整个项目流程里。构建策略和图像策略处于开发阶段，分发策略和缓存策略处于生产阶段，因此在每个阶段都可检查是否按顺序接入上述策略。通过这种方式就能最大限度增加性能优化应用场景。
+#### 六大指标
+根据性能优化的重要性和实际性划分出九大策略和六大指标，其实它们都是一条条活生生的性能优化建议。有些性能优化建议接不接入影响都不大，因此将九大策略定位高于六大指标。针对九大策略还是建议在开发阶段和生产阶段接入，在项目复盘时可将六大指标的条条框框根据实际应用场景接入。
+
+- 六大指标基本囊括大部分性能优化细节，可作为九大策略的补充。笔者根据每条性能优化建议的特征将指标划分为以下六方面。
+    - 加载优化：资源在加载时可做的性能优化
+        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108172559.png)
+    - 执行优化：资源在执行时可做的性能优化
+        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108172613.png)
+    - 渲染优化：资源在渲染时可做的性能优化
+        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108172624.png)
+    - 样式优化：样式在编码时可做的性能优化
+        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108172638.png)
+    - 脚本优化：脚本在编码时可做的性能优化
+        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108172654.png)
+    - V8引擎优化：针对V8引擎特征可做的性能优化  
+        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108172704.png)
+
 
 ## 手写相关函数
 ### 手写相关函数1
