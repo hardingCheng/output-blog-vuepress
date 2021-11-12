@@ -1,7 +1,6 @@
 # 面经+自己的心得
 
 ## 对于前端的看法和理解？？？
-
 ## 前端和后端到底有什么不同？？？
 
 web前端: 就是在用户可以看得见摸得着的东西。包括你浏览页面的结构、外观视觉表现以及层面的交互实现。前端开发人员的目标是确保所有用户都可以访问该网站或应用，并在所有视图中做出响应 —— 移动和桌面。
@@ -206,7 +205,18 @@ div{
     animation:mymove 2s ease-in-out 3s infinite alternate running;
 }
 ```
-### css的块元素和行内元素，有哪些，区别，转换？？？？？??????
+### css的块元素和行内元素，有哪些，区别，转换
+- 块级元素：会自动占据一定矩形空间，可以通过设置高度、宽度、内外边距等属性，来调整的这个矩形的样子。
+- 行内元素：则没有自己的独立空间，它是依附于其他块级元素存在的，因此，对行内元素设置高度、宽度、内外边距等属性，都是无效的。
+
+- 常见的块级元素和行内元素
+  - 块级元素：div、p、h1-h6、hr、ul、ol
+  - 行内元素：a、b、i、u、em、input、select、img、label、br
+
+- CSS块元素与行内元素的转换：
+  - 块转行内：display:block;
+  - 行内转块：display:inline;
+
 ### css的三种引入方式及优先级
 
 1. 行内样式
@@ -453,38 +463,37 @@ clear 清除浮动
 2. 消除相邻元素垂直方向的边距重叠：第二个子元素套一层，并设置overflow: hidden，构建BFC使其不影响外部元素。
 3. 清除浮动：父元素设置overflow: hidden触发BFC实现清除浮动，防止父元素高度塌陷，后面的元素被覆盖，实现文字环绕等等。
 4. 使用float脱离文档流，高度塌陷
-   ```html
-   <!DOCTYPE html>
-   <html lang="en">
-   <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>高度塌陷</title>
-    <style>
-        .box {
-            margin: 100px;
-            width: 100px;
-            height: 100px;
-            background: red;
-            float: left;
-        }
-        .container {
-            background: #000;
-            // 给父元素加上这个，触发BFC 解决Float脱离文档流，高度塌陷
-            // display: inline-block;
-            // overflow: auto/hidden/scroll; /** 创建一个BFC **/
-        }
-    </style>
-   </head>
-   <body>
-    <div class="container">
-        <div class="box"></div>
-        <div class="box"></div>
-    </div>
-   </body>
-   </html>
-   ```
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>高度塌陷</title>
+<style>
+    .box {
+        margin: 100px;
+        width: 100px;
+        height: 100px;
+        background: red;
+        float: left;
+    }
+    .container {
+        background: #000;
+        // 给父元素加上这个，触发BFC 解决Float脱离文档流，高度塌陷
+        // display: inline-block;
+        // overflow: auto/hidden/scroll; /** 创建一个BFC **/
+    }
+</style>
+</head>
+<body>
+<div class="container">
+    <div class="box"></div>
+    <div class="box"></div>
+</div>
+</body>
+</html>
 ```
 2. margin边距重叠
 
@@ -589,7 +598,6 @@ element高度＝内容高度（height包含了元素内容宽度、边框、内�
 element宽度＝内容宽度（width包含了元素内容宽度、边框、内距）
 
 ### Flex
-
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211009164716.png)
 #### Flex属性
 Flex 是 Flexible Box 的缩写，意为"弹性布局",用来为盒状模型提供最大的灵活性。指定容器 display: flex 即可。 简单的分为容器属性和元素属性。
@@ -658,12 +666,12 @@ Flex 是 Flexible Box 的缩写，意为"弹性布局",用来为盒状模型提�
   - align-self：允许单个项目与其他项目不一样的对齐方式，可以覆盖
     - 子容器的 align-self 属性允许单个项目有与其他项目不一样的对齐方式，可覆盖父容器 align-items 属性。默认值为 auto，表示继承父元素的 align-items属性，如果没有父元素，则等同于 stretch。
 #### flex:1, flex:auto, flex:0 区别
-  flex属性是flex-grow, flex-shrink 和 flex-basis的简写，默认值为0 1 auto。后两个属性可选。
-    ```css
-      .item {
-      flex: none | [ <'flex-grow'> <'flex-shrink'>? || <'flex-basis'> ]
-      }
-    ```
+flex属性是flex-grow, flex-shrink 和 flex-basis的简写，默认值为0 1 auto。后两个属性可选。
+```css
+  .item {
+    flex: none | [ <'flex-grow'> <'flex-shrink'>? || <'flex-basis'> ]
+  }
+```
 - flex-grow属性
   - flex-grow属性定义项目的放大比例，默认为0，即如果存在剩余空间，也不放大。
   - 如果所有项目的flex-grow属性都为1，则它们将等分剩余空间（如果有的话）。如果一个项目的flex-grow属性为2，其他项目都为1，则前者占据的剩余空间将比其他项多一倍。
@@ -1717,7 +1725,7 @@ grid-column: span 2;
     max-width: 100%;
 }
 ```
-### px、rpx、em、rem、dpr、vw、wh 的值各是什么意思 ???????
+### px、rpx、em、rem、dpr、vw、wh 的值各是什么意思
 - px:像素
   - css中的px是一个相对（抽象）单位是虚拟像素，因为不同的设备在大小宽高相同时，他们的物理像素大小也可能是不同的，物理像素高的设备单位面积内存放的像素点就高，因此画质看起来就更精细，通常情况下在pc端中，css中的px就接近于实际的像素大小，但是在移动设备上，根据不用机型的分辨率大小，css中的一个px可能就会对应不同数量的物理像素点
 - rem: 根据根元素(即 html)的 font-size
@@ -2218,6 +2226,7 @@ Promise 也不建议在这里面进行，因为 Promise 的回调属性 Event lo
 - 属性值为0时，不加单位
 - 属性值为小于1的小数时，省略小数点前面的0
 - css雪碧图
+
 ## JS
 ### 图片懒加载的原理？？？？？？？？？？
 ### JS的一些取反的特殊值？？？？？？？？？
@@ -2575,7 +2584,171 @@ null 的字面意思是：空值 。这个值的语义是，希望表示一个�
     - Date 👉 true
       ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106161911.png)
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106161929.png)
-### JS基本数据类型  Symbol主要用于什么场景下????????
+### JS数据类型
+- undefined
+- Null
+- Boolean
+- String
+- Number
+- Symbol
+- BigInt
+- Object
+  - Array
+  - RegExp
+  - Date
+  - Math
+  - Function
+
+- 基础类型存储在栈内存，被引用或拷贝时，会创建一个完全相等的变量；
+- 引用类型存储在堆内存，存储的是地址，多个引用指向同一个地址，这里会涉及一个“共享”的概念。
+
+### 数据类型
+
+值类型（7个）：Undefined、Null、Number、String、Boolean、Symbol(ES6)、BigInt(ES10)
+引用类型：Object：Array、Function
+
+- Javascript 中的数据类型包括原始类型和引用类型。其中原始类型包括 null、undefined、boolean、string、symbol、bigInt、number。
+  - 基本类型的访问是按值访问的，就是说你可以操作保存在变量中的实际的值s。
+  - 基本类型的变量是存放在栈区的（栈区指内存里的栈内存）
+  - 通过值复制的方式赋值和传递值。
+  - 值类型的数据是不可变的，在内存中占有固定大小的空间，它们都会被存储在栈（stack）中。
+- 引用类型指的是 Object
+  - 而引用类型则是通过复制指针，实现复制，但指针指向的是同一个对象，所以改变其中一个两个 都改变；
+  - 它们总是通过引用复制的方式赋值和传递值。
+  - 引用类型的数据大小不固定，所以把它们的值存在堆（Heap）中，但还是会把它们在堆中的内存地址存在栈中。在查询引用类型数据时，先从栈中读取所持有的数据在堆中的内存地址，然后根据地址找到实际的数据。
+### 判断数据类型的方法
+
+typeof可以检测变量的数据类型，返回如下6种字符串number、string、boolean、object、undefined、function。
+
+```js
+typeof undefined; // "undefined"
+typeof false; // "boolean"
+typeof 1; // "number"
+typeof '1'; // "string"
+typeof Symbol(); // "Symbol"
+typeof 123n // 'bigint'
+typeof function a(){} //"function"
+
+
+typeof null // 'object'
+typeof {}; // "object" 
+typeof []; // "object" 
+typeof new Date(); // "object"
+```
+
+优点：能够快速区分基本数据类型。
+缺点：不能将Object、Array和Null区分，都返回object。
+
+一般通过 `Object.prototype.toString(...)`来查看。每种引用类型都会直接或者间接继承自Object类型，因此它们都包含toString()函数。不同数据类型的toString()类型返回值也不一样，所以通过toString()函数可以准确判断值的类型。
+
+```js
+Object.prototype.toString.call(1) // "[object Number]"
+Object.prototype.toString.call('hi') // "[object String]"
+Object.prototype.toString.call({a:'hi'}) // "[object Object]"
+Object.prototype.toString.call([1,'a']) // "[object Array]"
+Object.prototype.toString.call(true) // "[object Boolean]"
+Object.prototype.toString.call(() => {}) // "[object Function]"
+Object.prototype.toString.call(null) // "[object Null]"
+Object.prototype.toString.call(undefined) // "[object Undefined]"
+Object.prototype.toString.call(Symbol(1)) // "[object Symbol]"
+
+优点：精准判断数据类型。
+缺点：写法繁琐不容易记，推荐进行封装后使用。
+```
+
+`instanceof` 运算符也常常用来判断对象类型。用法: 左边的运算数是一个`object`，右边运算数是对象类的名字或者构造函数; 返回`true`或`false`。
+
+```js
+[] instanceof Array; // true
+[] instanceof Object; // true
+[] instanceof RegExp; // false
+new Date instanceof Date; // true
+```
+
+`instanceof` 的内部机制是：检测构造函数的 `prototype` 属性是否出现在某个实例对象的原型链上。
+
+- instanceof，用于检测某个对象的原型链是否包含某个构造函数的 prototype 属性。
+- instanceof 适用于检测对象，它是基于原型链运作的。
+- instanceof 除了适用于任何 object 的类型检查之外，也可以用来检测内置对象，比如：Array、RegExp、Object、Function
+- instanceof 对基本数据类型检测不起作用，主要是因为基本数据类型没有原型链。
+
+优点：能够区分Array、Object和Function，适合用于判断自定义的类实例对象。
+缺点：Number，Boolean，String基本数据类型不能判断。
+- 判断某个`实例`是否属于某种类型
+```js
+    let person = function () {
+    }
+    let nicole = new person()
+    nicole instanceof person // true
+
+    function Foo() {
+    }
+    Object instanceof Object // true
+    Function instanceof Function // true
+    Function instanceof Object // true
+    Foo instanceof Foo // false
+    Foo instanceof Object // true
+    Foo instanceof Function // true
+```
+- 也可以判断一个实例是否是其父类型或者祖先类型的实例。
+```js
+  function Car(make, model, year) {
+    this.make = make;
+    this.model = model;
+    this.year = year;
+  }
+  const auto = new Car('Honda', 'Accord', 1998);
+  console.log(auto instanceof Car);
+  // expected output: true
+
+  console.log(auto instanceof Object);
+  // expected output: true
+```
+#### Symbol主要用于什么场景下
+- 应用场景1：使用Symbol来作为对象属性名(key)
+  - 在这之前，我们通常定义或访问对象的属性时都是使用字符串
+  - Symbol可同样用于对象属性的定义和访问
+  - Symbol类型的key是不能通过Object.keys()或者for...in来枚举的，它未被包含在对象自身的属性名集合(property names)之中。所以，利用该特性，我们可以把一些不需要对外操作和访问的属性使用Symbol来定义。
+  - 当使用JSON.stringify()将对象转换成JSON字符串的时候，Symbol属性也会被排除在输出内容之外
+```js
+const PROP_NAME = Symbol()
+const PROP_AGE = Symbol() let obj = { [PROP_NAME]: "一斤代码" } obj[PROP_AGE] = 18 obj[PROP_NAME] // '一斤代码' obj[PROP_AGE] // 18 
+
+// 使用Object的API
+Object.getOwnPropertySymbols(obj) // [Symbol(name)]
+// 使用新增的反射API Reflect.ownKeys(obj) // [Symbol(name), 'age', 'title'] 
+```
+- 应用场景2：使用Symbol来替代常量
+  - 需要为常量赋一个唯一的值（比如这里的'AUDIO'、'VIDEO'、 'IMAGE'），常量少的时候还算好，但是常量一多，你可能还得花点脑子好好为他们取个好点的名字。
+  - 现在有了Symbol，我们大可不必这么麻烦了：
+```js
+const TYPE_AUDIO = Symbol()
+const TYPE_VIDEO = Symbol()
+const TYPE_IMAGE = Symbol()
+// 直接就保证了三个常量的值是唯一的了
+```
+- 应用场景3：使用Symbol定义类的私有属性/方法
+  - Symbol以及模块化机制，类的私有属性和方法才变成可能。
+  - 由于Symbol常量PASSWORD被定义在a.js所在的模块中，外面的模块获取不到这个Symbol，也不可能再创建一个一模一样的Symbol出来（因为Symbol是唯一的），因此这个PASSWORD的Symbol只能被限制在a.js内部使用，所以使用它来定义的类属性是没有办法被模块外访问到的，达到了一个私有化的效果。
+```js
+// a.js
+const PASSWORD = Symbol()
+class Login {
+    constructor(username, password) {
+        this.username = username this[PASSWORD] = password
+    }
+    checkPassword(pwd) {
+        return this[PASSWORD] === pwd
+    }
+}
+export default Login
+
+
+// b.js
+import Login from './a.js'
+const login = new Login('admin', '123456') 
+login.checkPassword('123456') // true login.PASSWORD // oh!no! login[PASSWORD] // oh!no! login["PASSWORD"] // oh!no! 
+```
 ### 变量提升(函数提升)
 
 - 所谓的变量提升（变量提升），是指在JS代码执行中， JavaScript引擎（V8）把变量的声明部分和函数的声明部分提升到代码开头的行为，变量提升后，会给变量设置默认值undefined，给函数赋值函数体。
@@ -3141,7 +3314,7 @@ function myNew(Con, ...args) {
 }
 ```
 ### Class
-#### ES6中类中的static用ES5怎么实现????
+#### ES6中类中的static用ES5怎么实现?
 
 1.静态方法就是定义在 构造函数的方法；
 2.实例方法就是定义在 构造函数原型（prototype）上的方法；
@@ -3499,20 +3672,6 @@ class IncreasingCounter {
 
 ### 手写函数（前面有很多）
 在JS基础中有很多这种需要手写的函数和方法等。
-### 数据类型
-
-值类型（7个）：Undefined、Null、Number、String、Boolean、Symbol(ES6)、BigInt(ES10)
-引用类型：Object：Array、Function
-
-- Javascript 中的数据类型包括原始类型和引用类型。其中原始类型包括 null、undefined、boolean、string、symbol、bigInt、number。
-  - 基本类型的访问是按值访问的，就是说你可以操作保存在变量中的实际的值s。
-  - 基本类型的变量是存放在栈区的（栈区指内存里的栈内存）
-  - 通过值复制的方式赋值和传递值。
-  - 值类型的数据是不可变的，在内存中占有固定大小的空间，它们都会被存储在栈（stack）中。
-- 引用类型指的是 Object
-  - 而引用类型则是通过复制指针，实现复制，但指针指向的是同一个对象，所以改变其中一个两个 都改变；
-  - 它们总是通过引用复制的方式赋值和传递值。
-  - 引用类型的数据大小不固定，所以把它们的值存在堆（Heap）中，但还是会把它们在堆中的内存地址存在栈中。在查询引用类型数据时，先从栈中读取所持有的数据在堆中的内存地址，然后根据地址找到实际的数据。
 ### 为什么会有栈内存和堆内存？
 
 与gc（垃圾回收机制）有关。为了使程序运行时占用的内存最小。
@@ -3520,94 +3679,6 @@ class IncreasingCounter {
 当一个方法执行时，每个方法都会建立自己的内存栈，在这个方法内定义的变量将会被逐个放入这块栈内存里，当方法执行结束，这个方法的内存栈也会被销毁。因此，所有在方法中定义的变量都存放在栈内存中。
 
 当在程序创建一个对象时，这个对象将被保存到运行时数据区中，以便反复利用（因为对象的创建成本通常较大），这个运行时数据区就是堆内存。堆内存中的对象不会随方法的结束而销毁，即使方法调用结束后，只要这个对象还可能被另一个变量所引用，则这个对象就不会被销毁；只有当一个对象没有被任何变量引用它时，系统的垃圾回收机制才会回收它。
-### 判断数据类型的方法
-
-typeof可以检测变量的数据类型，返回如下6种字符串number、string、boolean、object、undefined、function。
-
-```js
-typeof undefined; // "undefined"
-typeof false; // "boolean"
-typeof 1; // "number"
-typeof '1'; // "string"
-typeof Symbol(); // "Symbol"
-typeof 123n // 'bigint'
-typeof function a(){} //"function"
-
-
-typeof null // 'object'
-typeof {}; // "object" 
-typeof []; // "object" 
-typeof new Date(); // "object"
-```
-
-优点：能够快速区分基本数据类型。
-缺点：不能将Object、Array和Null区分，都返回object。
-
-一般通过 `Object.prototype.toString(...)`来查看。每种引用类型都会直接或者间接继承自Object类型，因此它们都包含toString()函数。不同数据类型的toString()类型返回值也不一样，所以通过toString()函数可以准确判断值的类型。
-
-```js
-Object.prototype.toString.call(1) // "[object Number]"
-Object.prototype.toString.call('hi') // "[object String]"
-Object.prototype.toString.call({a:'hi'}) // "[object Object]"
-Object.prototype.toString.call([1,'a']) // "[object Array]"
-Object.prototype.toString.call(true) // "[object Boolean]"
-Object.prototype.toString.call(() => {}) // "[object Function]"
-Object.prototype.toString.call(null) // "[object Null]"
-Object.prototype.toString.call(undefined) // "[object Undefined]"
-Object.prototype.toString.call(Symbol(1)) // "[object Symbol]"
-
-优点：精准判断数据类型。
-缺点：写法繁琐不容易记，推荐进行封装后使用。
-```
-
-`instanceof` 运算符也常常用来判断对象类型。用法: 左边的运算数是一个`object`，右边运算数是对象类的名字或者构造函数; 返回`true`或`false`。
-
-```js
-[] instanceof Array; // true
-[] instanceof Object; // true
-[] instanceof RegExp; // false
-new Date instanceof Date; // true
-```
-
-`instanceof` 的内部机制是：检测构造函数的 `prototype` 属性是否出现在某个实例对象的原型链上。
-
-- instanceof，用于检测某个对象的原型链是否包含某个构造函数的 prototype 属性。
-- instanceof 适用于检测对象，它是基于原型链运作的。
-- instanceof 除了适用于任何 object 的类型检查之外，也可以用来检测内置对象，比如：Array、RegExp、Object、Function
-- instanceof 对基本数据类型检测不起作用，主要是因为基本数据类型没有原型链。
-
-优点：能够区分Array、Object和Function，适合用于判断自定义的类实例对象。
-缺点：Number，Boolean，String基本数据类型不能判断。
-- 判断某个`实例`是否属于某种类型
-```js
-    let person = function () {
-    }
-    let nicole = new person()
-    nicole instanceof person // true
-
-    function Foo() {
-    }
-    Object instanceof Object // true
-    Function instanceof Function // true
-    Function instanceof Object // true
-    Foo instanceof Foo // false
-    Foo instanceof Object // true
-    Foo instanceof Function // true
-```
-- 也可以判断一个实例是否是其父类型或者祖先类型的实例。
-```js
-  function Car(make, model, year) {
-    this.make = make;
-    this.model = model;
-    this.year = year;
-  }
-  const auto = new Car('Honda', 'Accord', 1998);
-  console.log(auto instanceof Car);
-  // expected output: true
-
-  console.log(auto instanceof Object);
-  // expected output: true
-```
 
 ### JS垃圾回收机制
 
@@ -4189,7 +4260,28 @@ var deepClone = function (target, map = new WeakMap()) {
   }）
   ```
 ### 数组的遍历方法（数组的方法），那些方法有什么区别？？？？？？
-### js数组的方法，哪些会改变原数组？？？？？？？
+### js数组的方法，哪些会改变原数组
+#### 改变原数组的方法
+- 改变原数组的方法(9个)
+  - splice() 添加/删除数组元素
+  - sort() 数组排序
+  - pop() 删除一个数组中的最后的一个元素
+  - shift() 删除数组的第一个元素
+  - push() 向数组的末尾添加元素
+  - unshift() 方法可向数组的开头添加一个或更多元素，并返回新的长度。
+  - reverse() 颠倒数组中元素的顺序
+  - ES6 IteratorcopyWithin() 指定位置的成员复制到其他位置
+  - ES6 fill() 填充数组
+#### 不改变原数组的方法
+- 不改变原数组的方法(8个):
+  - slice() 浅拷贝数组的元素
+  - join() 数组转字符串
+  - toLocaleString() 数组转字符串
+  - toString() 数组转字符串 不推荐
+  - cancat方法用于合并两个或多个数组，返回一个新数组。
+  - indexOf() 查找数组是否存在某个元素，返回下标
+  - lastIndexOf() 查找指定元素在数组中的最后一个位置
+  - ES7 includes() 查找数组是否包含某个元素 返回布尔
 ### ES6
   https://juejin.cn/post/6844903959283367950
   ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210921221425.png)
@@ -5667,11 +5759,10 @@ function factorial(num, num1 = 0, num2 = 1) {
 }
 ```
 
-### js执行的时候浏览器开启了哪些线程????????????
-
+### js执行的时候浏览器开启了哪些线程
 5个 主线程，事件处理线程，渲染线程，http线程，事件触发线程
-
-### js同步代码要loop很久，会不会阻塞后面代码的执行??????
+### js同步代码要loop很久，会不会阻塞后面代码的执行
+会的
 ### 事件循环（Event Loop）---- （JavaScript的运行机制）----JS异步
 #### 线程和进程的区别，JS是单线程的吗？
 
@@ -6144,9 +6235,9 @@ if (!bool.valueOf()) {
 - 装饰模式: (@装饰器的用法)
 - 策略模式 策略模式指对象有某个行为,但是在不同的场景中,该行为有不同的实现方案-比如选项的合并策略
 ## TS
-### typescript 中, enum 实现原理
-### 列举你知道哪些 typescript 工具类型
-### typescript 工具类型返回的是 type 还是 interface?
+### typescript 中, enum 实现原理？？？？？？？？？
+### 列举你知道哪些 typescript 工具类型？？？？？？？？？
+### typescript 工具类型返回的是 type 还是 interface?？？？？？？？？？
 ## HTTP
 ### JWT
 #### 什么是 JWT
@@ -6230,13 +6321,11 @@ if (!bool.valueOf()) {
       - PC端通过轮询方式请求服务端，通过二维码ID获取二维码状态，如果已成功，返回PC token，登录成功。
 
 ### 浏览器的最大请求并发数
-
 并发数量简单通俗的讲就是，当浏览器网页的时候同时工作的进行数量。
 HTTP客户端一般对同一个服务器的并发连接个数都是有限制的。
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106162358.png)
 
 ### Service Worker有哪些作用
-
 ### cookies、sessionStorage、localStorage 和 indexDB 的区别
 
 - cookie是网站为了标示用户身份而储存在用户本地的数据
@@ -6595,8 +6684,25 @@ HTTPS：是以安全为目标的HTTP通道，简单讲是HTTP的安全版，即H
     - 客户端浏览器通过双方协商一致的安全等级，建立会话密钥，然后通过网站的公钥来加密会话密钥，并传送给网站。
     - web 服务器通过自己的私钥解密出会话密钥。
     - web 服务器通过会话密钥加密与客户端之间的通信。
+    
+- HTTPS的整体过程分为证书验证和数据传输阶段
+  - ① 证书验证阶段：
+    - 浏览器发起 HTTPS 请求；
+    - 服务端返回 HTTPS 证书；
+    - 客户端验证证书是否合法，如果不合法则提示告警。
+  - ② 数据传输阶段：
+    - 当证书验证合法后，在本地生成随机数；
+    - 通过公钥加密随机数，并把加密后的随机数传输到服务端；
+    - 服务端通过私钥对随机数进行解密；
+    - 服务端通过客户端传入的随机数构造对称加密算法，对返回结果内容进行加密后传输。
 
-#### http和https有哪些区别SSL协议是使用对称加密还是非对称加密?????????
+#### 有哪些区别SSL协议是使用对称加密还是非对称加密
+HTTPS 在内容传输的加密上使用的是对称加密，非对称加密只作用在证书验证阶段。
+
+
+- 为什么数据传输是用对称加密？
+  - 首先：非对称加密的加解密效率是非常低的，而 http 的应用场景中通常端与端之间存在大量的交互，非对称加密的效率是无法接受的。
+  - 另外：在 HTTPS 的场景中只有服务端保存了私钥，一对公私钥只能实现单向的加解密，所以 HTTPS 中内容传输加密采取的是对称加密，而不是非对称加密。
 ### HTTP1.0、HTTP1.1、http2.0 的区别
 #### HTTP1.0和HTTP1.1
 - HTTP1.0
@@ -6929,6 +7035,9 @@ ping命令是使用的网络层协议ICMP
 - TCP仅支持单播传输，UDP 提供了单播，多播，广播的功能。
 - TCP的三次握手保证了连接的可靠性; UDP是无连接的、不可靠的一种数据传输协议，首先不可靠性体现在无连接上，通信都不需要建立连接，对接收到的数据也不发送确认信号，发送端不知道数据是否会正确接收。
 - UDP的头部开销比TCP的更小，数据传输速率更高，实时性更好。
+- TCP对系统资源要求较多，UDP对系统资源要求较少。
+- 每一条TCP连接只能是点到点的；UDP支持一对一，一对多，多对一和多对多的交互通信。
+- TCP提供可靠的服务，也就是说，通过TCP连接传送的数据，无差错，不丢失，不重复，且按序到达；UDP尽最大努力交付，即不保证可靠交付。
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922215122.png)
 
@@ -6955,8 +7064,19 @@ TCP 滑动窗口分为两种: 发送窗口和接收窗口。
             - 会将拥塞阈值降低为 拥塞窗口的一半
             - 然后拥塞窗口大小变为拥塞阈值
             - 接着 拥塞窗口再进行线性增加，以适应网络状况
+#### TCP 流量控制（滑动窗口）
+流量控制就是让发送方的发送速率不要太快，让接收方来得及接受。利用滑动窗口机制可以很方便的在TCP连接上实现对发送方的流量控制。TCP的窗口单位是字节，不是报文段，发送方的发送窗口不能超过接收方给出的接收窗口的数值。
 
-#### TCP 为什么可靠？？？？？？？
+
+发送方通过维持一个发送滑动窗口来确保不会发生由于发送方报文发送太快接收方无法及时处理的问题。此时发送方的报文分为四类， 第一类是已经发送并且得到接收方确认的报文，第二类是已经发送但是没有接收到确认的报文，第三类是发送方还没发送，但是滑动窗口还足够巨大，允许被发送的报文， 第四类是还没发送并且窗口已经被占满，不允许发送的报文。 一般来说，滑动窗口的最左端都是介于第一类跟第二类报文的分界线，最右端是第三类跟第四类报文的分界线。
+
+
+
+- 滑动窗口的流量控制可以包括那么几个协议：
+  - a、停等协议。 滑动窗口的大小为1， 每个发送报文都要等到被确认以后，发送方才继续发送下一个报文。
+  - b、后退n步协议。 该协议下，滑动窗口大于1，发送方可以一直发送报文，但是当接收到接收方发送的三个连续的同一序列号的ACK报文时，说明该序列号的报文是已经丢失的，那么此时重发该丢失报文以及该报文以后的报文（包括那些已经发送的）。
+  - c、选择重传。在后退n步协议当中，如果某个报文丢失，那么将要重新发送这个丢失报文及以后的所有报文（包括已经发送的），选择重传协议不用做此要求，只要重新发送丢失的报文即可。
+#### TCP 为什么可靠
 因为TCP丢包之后，会做数据校验，然后重传数据。接收方每收到一个数据包就发送一次确认，发送方设置定时器，如果定时没有收到接收确认就重传。有两种，一种是丢多少重传多少，一种是从丢弃的地方重新传送数据，一般是后面一种。并且针对传输的流量，TCP会做限制，尽量保证网络的最大传输效率，保证接受方稳定接受。
 ### 网络 5层 osi 7层
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211109191738.png)
@@ -12226,6 +12346,7 @@ JSON.stringify([, replacer [, space]) 方法是将一个 JavaScript 值(对象�
   }
   ```
 #### 手写JSON.parse
+把JSON字符串解析为原生JavaScript对象
 - 介绍 2 种方法实现：
   - eval 实现；
   - new Function 实现；
@@ -13926,6 +14047,83 @@ function sleep(s){
   await sleep(3000);
   console.log('Do other things, ' + new Date());
 })();
+```
+#### 手写简易版axios
+```js
+ function axios({
+        //注意这里使用结构赋值，可以传默认值
+        url,
+        //默认请求方式为GET
+        method = 'GET',
+        //params用于接受get请求的参数，请求时直接带在url后面
+        params = {},
+        //data用于接受post方法的参数
+        data = {},
+    }) {
+        //返回一个promise对象
+        return new Promise((resolve, reject) => {
+            // 定义一个字符串保存url后面的拼接参数部分
+            let queryString = '';
+            // 得到key组成的数组
+            // Object.keys() 方法会返回一个由一个给定对象的自身可枚举属性组成的数组，
+            Object.keys(params).forEach(key => {
+                    // 这里使用模板字符串简化代码，同时key是一个变量，用[]而不是点语法取出
+                    queryString += `${key}=${params[key]}&`
+                })
+                // 如果queryString非空，也就是说使用get请求传参，我们直接将参数拼接在url后面
+            if (queryString) {
+                // substring() 方法用于提取字符串中介于两个指定下标之间的字符。
+                // 注意最后一个字符是&，因此我们取length-1个字符
+                queryString = queryString.substring(0, queryString.length - 1)
+                    //用？分割并拼接
+                url += '?' + queryString;
+            }
+            // 创建xhr对象
+            const request = new XMLHttpRequest()
+                // 打开连接
+            request.open(method, url, true)
+                // 绑定状态改变的监听（异步，当状态为4时才会继续执行）
+            request.onreadystatechange = function() {
+                if (request.readyState != 4) {
+                    return
+                }
+                // 发送请求 
+                // 如果是get请求，已经在url中携带参数了，直接传null
+                if (method == 'GET') {
+                    request.send(null)
+                        //如果是post请求，将data作为参数发送
+                } else if (method == "POST") {
+                    // 添加请求头
+                    request.setRequestHeader('Content-Type', 'application/json;charset=utf-8')
+                        // JSON格式话data并发送请求
+                    request.send(JSON.stringify(data))
+                }
+                //这时request会返回status和报文
+                // 解构赋值，这里仅返回状态码和报文
+                const {
+                    status,
+                    statusText
+                } = request
+                // 状态码在200到300间代表成功
+                if (status >= 200 && status < 300) {
+                    // 对返回值进行结构赋值
+                    const response = {
+                            //  JSON.stringify 将数组,对象转换成 JSON 字符串，然后使用 JSON.parse 将该字符串重新转换成数组，对象。
+                            data: JSON.parse(request.response),
+                            status,
+                            statusText
+                        }
+                        // 执行回调函数并将response作为参数
+                    resolve(response)
+                } else {
+                    reject(new Error('resquest error status is' + status))
+                }
+
+            }
+
+        })
+    }`
+
 ```
 ## Git
 ### git命令
