@@ -1,119 +1,125 @@
 # 面经+自己的心得
+
 ## 对于前端的看法和理解？？？
+
 ## 前端和后端到底有什么不同？？？
+
 web前端: 就是在用户可以看得见摸得着的东西。包括你浏览页面的结构、外观视觉表现以及层面的交互实现。前端开发人员的目标是确保所有用户都可以访问该网站或应用，并在所有视图中做出响应 —— 移动和桌面。
 
 web后端：就是用户看不见摸不着的数据库交互处理的业务逻辑。需要考虑的是如何实现功能、数据的存取、平台的稳定性与性能等。后端开发人员的目标是围绕前端构建程序，并提供所需的所有支持，并确保站点或应用始终正常运行。
+
 ## HTML
-### 如何理解 html 语义化????
+
+### 如何理解 html 语义化?
+
 - 就是用正确的标签做正确的事
-    - 头部：header
-    - 导航：nav
-    - 主体内容：main
-    - 标题：h1 ~ h6
-    - 段落：p
-    - 侧边栏：aside
-    - 页脚：footer
+  - 头部：header
+  - 导航：nav
+  - 主体内容：main
+  - 标题：h1 ~ h6
+  - 段落：p
+  - 侧边栏：aside
+  - 页脚：footer
 
 - HTML语义化有什么好处呢？
-    - 网页加载慢导致CSS文件还未加载时（没有CSS），页面仍然清晰、可读、好看。
-    - 提升用户体验，例如title、alt可用于解释名词或解释图片信息。
-    - 有利于SEO：和搜索引擎建立良好沟通，有助于爬虫抓取更多的有效信息。
-    - 方便其他设备（如屏幕阅读器、盲人阅读器、移动设备）更好的解析页面。
-    - 使代码更具可读性，便于团队开发和维护。
+  - 网页加载慢导致CSS文件还未加载时（没有CSS），页面仍然清晰、可读、好看。
+  - 提升用户体验，例如title、alt可用于解释名词或解释图片信息。
+  - 有利于SEO：和搜索引擎建立良好沟通，有助于爬虫抓取更多的有效信息。
+  - 方便其他设备（如屏幕阅读器、盲人阅读器、移动设备）更好的解析页面。
+  - 使代码更具可读性，便于团队开发和维护。
 ### DOCTYPE及作用
 `<!DOCTYPE html>`
 - 概念
-    - DTD（document type definition，文档类型定义）声明于文档最前面，用来定义XML或（X）HTML的文件类型。浏览器会使用它来判断文档类型，并根据这个判断决定用什么引擎来解析和渲染他们。
+  - DTD（document type definition，文档类型定义）声明于文档最前面，用来定义XML或（X）HTML的文件类型。浏览器会使用它来判断文档类型，并根据这个判断决定用什么引擎来解析和渲染他们。
 - 解析引擎的两种模式
-    - 解析引擎有严格模式和混杂模式。严格模式的排版和 JS 运作模式是 以该浏览器支持的最高标准运行。混杂模式，向后兼容，模拟老式浏览器，防止浏览器无法兼容页面。
+  - 解析引擎有严格模式和混杂模式。严格模式的排版和 JS 运作模式是 以该浏览器支持的最高标准运行。混杂模式，向后兼容，模拟老式浏览器，防止浏览器无法兼容页面。
 - DOCTYPE的作用
-    - DOCTYPE是用来声明文档类型和DTD规范的，其作用一是文件的合法性验证。如果文件代码不合法，那么浏览器解析时会出一些错误。二是浏览器会使用它来判断文档类型，并根据这个判断决定用什么引擎来解析和渲染他们。
-
+  - DOCTYPE是用来声明文档类型和DTD规范的，其作用一是文件的合法性验证。如果文件代码不合法，那么浏览器解析时会出一些错误。二是浏览器会使用它来判断文档类型，并根据这个判断决定用什么引擎来解析和渲染他们。
 ### html 标签的一些共有的属性有哪些？
 - id属性
-    - id属性是标签的唯一标识，每个标签的id属性的值必须是唯一的。
+  - id属性是标签的唯一标识，每个标签的id属性的值必须是唯一的。
 - class属性
-    - 常用来使用class属性值给标签设置样式，样式一样的标签可以设置同样的class。
+  - 常用来使用class属性值给标签设置样式，样式一样的标签可以设置同样的class。
 - name属性
-    - 设置标签的名字，可以有同样的名字
+  - 设置标签的名字，可以有同样的名字
 - style属性
-    - 设置标签样式
+  - 设置标签样式
 ### html5 的新特性，除了语义化标签还有什么？
 - 语义化标签
-在HTML5出来之前，我们习惯于用div来表示页面的章节或者不同模块，但是div本身是没有语义的。但是现在，HTML5中加入了一些语义化标签，来更清晰的表达文档结构。
-    - 语义化优点：
-        - 易于用户阅读，样式丢失的时候能让页面呈现清晰的结构。
-        - 有利于SEO，搜索引擎根据标签来确定上下文和各个关键字的权重。
-        - 方便其他设备解析，如盲人阅读器根据语义渲染网页
-        - 有利于开发和维护，语义化更具可读性，代码更好维护，与CSS3关系更和谐。
-![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210912105010.png)
-```html
-<title>      <!--：页面主体内容。-->
-<hn>         <!--：h1~h6，分级标题，<h1> 与 <title> 协调有利于搜索引擎优化。-->
-<ul>         <!--：无序列表。-->
-<li>         <!--：有序列表。-->
-<header>     <!--：页眉通常包括网站标志、主导航、全站链接以及搜索框。-->
-<nav>         <!--：标记导航，仅对文档中重要的链接群使用。-->
-<main>         <!--：页面主要内容，一个页面只能使用一次。如果是web应用，则包围其主要功能。-->
-<article>    <!--：定义外部的内容，其中的内容独立于文档的其余部分。-->
-<section>    <!--：定义文档中的节（section、区段）。比如章节、页眉、页脚或文档中的其他部分。-->
-<aside>         <!--：定义其所处内容之外的内容。如侧栏、文章的一组链接、广告、友情链接、相关产品列表等。-->
-<footer>     <!--：页脚，只有当父级是body时，才是整个页面的页脚。-->
-<small>      <!--：呈现小号字体效果，指定细则，输入免责声明、注解、署名、版权。-->
-<strong>     <!--：和 em 标签一样，用于强调文本，但它强调的程度更强一些。-->
-<em>         <!--：将其中的文本表示为强调的内容，表现为斜体。-->
-<mark>       <!--：使用黄色突出显示部分文本。-->
-<figure>     <!--：规定独立的流内容（图像、图表、照片、代码等等）（默认有40px左右margin）。-->
-<figcaption><!--：定义 figure 元素的标题，应该被置于 figure 元素的第一个或最后一个子元素的位置。-->
-<cite>       <!--：表示所包含的文本对某个参考文献的引用，比如书籍或者杂志的标题。-->
-<blockquoto><!--：定义块引用，块引用拥有它们自己的空间。-->
-<q>          <!--：短的引述（跨浏览器问题，尽量避免使用）。-->
-<time>       <!--：datetime属性遵循特定格式，如果忽略此属性，文本内容必须是合法的日期或者时间格式。-->
-<abbr>       <!--：简称或缩写。-->
-<dfn>       <!--：定义术语元素，与定义必须紧挨着，可以在描述列表dl元素中使用。-->
-<address>    <!--：作者、相关人士或组织的联系信息（电子邮件地址、指向联系信息页的链接）。-->
-<del>        <!--：移除的内容。-->
-<ins>        <!--：添加的内容。-->
-<code>       <!--：标记代码。-->
-<meter>      <!--：定义已知范围或分数值内的标量测量。（Internet Explorer 不支持 meter 标签）-->
-<progress>    <!--：定义运行中的进度（进程）。-->
-```
--  H5新特性
-    - 新增选择器 document.querySelector、document.querySelectorAll
-    - 拖拽释放(Drag and drop) API
-    - 媒体播放的 video 和 audio
-    - 本地存储 localStorage 和 sessionStorage
-    - 离线应用 manifest
-    - 桌面通知 Notifications
-    - 语意化标签 article、footer、header、nav、section
-    - 增强表单控件 calendar、date、time、email、url、search
-    - 地理位置 Geolocation
-    - 多任务 webworker
-    - 全双工通信协议 websocket
-    - 历史管理 history
-    - 跨域资源共享(CORS) Access-Control-Allow-Origin
-    - 页面可见性改变事件 visibilitychange
-    - 跨窗口通信 PostMessage
-    - Form Data 对象
-    - 绘画 canvas
+  在HTML5出来之前，我们习惯于用div来表示页面的章节或者不同模块，但是div本身是没有语义的。但是现在，HTML5中加入了一些语义化标签，来更清晰的表达文档结构。
+  - 语义化优点：
+    - 易于用户阅读，样式丢失的时候能让页面呈现清晰的结构。
+    - 有利于SEO，搜索引擎根据标签来确定上下文和各个关键字的权重。
+    - 方便其他设备解析，如盲人阅读器根据语义渲染网页
+    - 有利于开发和维护，语义化更具可读性，代码更好维护，与CSS3关系更和谐。
+      ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210912105010.png)
+      ```html
+      <title>      <!--：页面主体内容。-->
+      <hn>         <!--：h1~h6，分级标题，<h1> 与 <title> 协调有利于搜索引擎优化。-->
+      <ul>         <!--：无序列表。-->
+      <li>         <!--：有序列表。-->
+      <header>     <!--：页眉通常包括网站标志、主导航、全站链接以及搜索框。-->
+      <nav>         <!--：标记导航，仅对文档中重要的链接群使用。-->
+      <main>         <!--：页面主要内容，一个页面只能使用一次。如果是web应用，则包围其主要功能。-->
+      <article>    <!--：定义外部的内容，其中的内容独立于文档的其余部分。-->
+      <section>    <!--：定义文档中的节（section、区段）。比如章节、页眉、页脚或文档中的其他部分。-->
+      <aside>         <!--：定义其所处内容之外的内容。如侧栏、文章的一组链接、广告、友情链接、相关产品列表等。-->
+      <footer>     <!--：页脚，只有当父级是body时，才是整个页面的页脚。-->
+      <small>      <!--：呈现小号字体效果，指定细则，输入免责声明、注解、署名、版权。-->
+      <strong>     <!--：和 em 标签一样，用于强调文本，但它强调的程度更强一些。-->
+      <em>         <!--：将其中的文本表示为强调的内容，表现为斜体。-->
+      <mark>       <!--：使用黄色突出显示部分文本。-->
+      <figure>     <!--：规定独立的流内容（图像、图表、照片、代码等等）（默认有40px左右margin）。-->
+      <figcaption><!--：定义 figure 元素的标题，应该被置于 figure 元素的第一个或最后一个子元素的位置。-->
+      <cite>       <!--：表示所包含的文本对某个参考文献的引用，比如书籍或者杂志的标题。-->
+      <blockquoto><!--：定义块引用，块引用拥有它们自己的空间。-->
+      <q>          <!--：短的引述（跨浏览器问题，尽量避免使用）。-->
+      <time>       <!--：datetime属性遵循特定格式，如果忽略此属性，文本内容必须是合法的日期或者时间格式。-->
+      <abbr>       <!--：简称或缩写。-->
+      <dfn>       <!--：定义术语元素，与定义必须紧挨着，可以在描述列表dl元素中使用。-->
+      <address>    <!--：作者、相关人士或组织的联系信息（电子邮件地址、指向联系信息页的链接）。-->
+      <del>        <!--：移除的内容。-->
+      <ins>        <!--：添加的内容。-->
+      <code>       <!--：标记代码。-->
+      <meter>      <!--：定义已知范围或分数值内的标量测量。（Internet Explorer 不支持 meter 标签）-->
+      <progress>    <!--：定义运行中的进度（进程）。-->
+      ```
+- H5新特性
+  - 新增选择器 document.querySelector、document.querySelectorAll
+  - 拖拽释放(Drag and drop) API
+  - 媒体播放的 video 和 audio
+  - 本地存储 localStorage 和 sessionStorage
+  - 离线应用 manifest
+  - 桌面通知 Notifications
+  - 语意化标签 article、footer、header、nav、section
+  - 增强表单控件 calendar、date、time、email、url、search
+  - 地理位置 Geolocation
+  - 多任务 webworker
+  - 全双工通信协议 websocket
+  - 历史管理 history
+  - 跨域资源共享(CORS) Access-Control-Allow-Origin
+  - 页面可见性改变事件 visibilitychange
+  - 跨窗口通信 PostMessage
+  - Form Data 对象
+  - 绘画 canvas
+
 - 移除的元素
-    - 纯表现的元素：basefont、big、center、font、 s、strike、tt、u
-    - 对可用性产生负面影响的元素：frame、frameset、noframes
+  - 纯表现的元素：basefont、big、center、font、 s、strike、tt、u
+  - 对可用性产生负面影响的元素：frame、frameset、noframes
 ### script标签defer与async差异
 - defer
-    - 如果script标签设置了该属性，则浏览器会异步的下载该文件并且不会影响到后续DOM的渲染；如果有多个设置了defer的script标签存在，则会按照顺序执行所有的script；defer脚本会在文档渲染完毕后，DOMContentLoaded事件调用前执行。
-    - 载入 JavaScript 文件时不阻塞 HTML 的解析，执行阶段被放到 HTML 标签解析完成之后。
-    - 在加载多个JS脚本的时候，async是无顺序的加载，而defer是有顺序的加载。
+  - 如果script标签设置了该属性，则浏览器会异步的下载该文件并且不会影响到后续DOM的渲染；如果有多个设置了defer的script标签存在，则会按照顺序执行所有的script；defer脚本会在文档渲染完毕后，DOMContentLoaded事件调用前执行。
+  - 载入 JavaScript 文件时不阻塞 HTML 的解析，执行阶段被放到 HTML 标签解析完成之后。
+  - 在加载多个JS脚本的时候，async是无顺序的加载，而defer是有顺序的加载。
 - async
-    - async的设置，会使得script脚本异步的加载并在允许的情况下执行
-    - async的执行，并不会按着script在页面中的顺序来执行，而是谁先加载完谁执行。
-    - 这种方式加载的 JavaScript 依然会阻塞 load 事件
-    - async-script 可能在 DOMContentLoaded 触发之前或之后执行，但一定在 load 触发之前执行。
+  - async的设置，会使得script脚本异步的加载并在允许的情况下执行
+  - async的执行，并不会按着script在页面中的顺序来执行，而是谁先加载完谁执行。
+  - 这种方式加载的 JavaScript 依然会阻塞 load 事件
+  - async-script 可能在 DOMContentLoaded 触发之前或之后执行，但一定在 load 触发之前执行。
 ### viewport
-```html
-<meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
-<!-- 
+  ```html
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+    <!-- 
     width    设置viewport宽度，为一个正整数，或字符串‘device-width’
     device-width  设备宽度
     height   设置viewport高度，一般设置了宽度，会自动解析出高度，可以不用设置
@@ -121,26 +127,99 @@ web后端：就是用户看不见摸不着的数据库交互处理的业务逻�
     minimum-scale    允许用户最小缩放比例，为一个数字，可以带小数
     maximum-scale    允许用户最大缩放比例，为一个数字，可以带小数
     user-scalable    是否允许手动缩放
--->
-```
+    -->
+  ```
 
 ## CSS
 ### 实现瀑布流的方法？？？？？？？
-### 伪类与伪元素列举一下/伪类和伪元素有什么区别？？？？？？
-### CSS 动画属性有哪些 ？？？？？
-### css的块元素和行内元素，有哪些，区别，转换？？？？？
+### 伪类与伪元素列举一下？
+#### 伪类
+##### 条件伪类
+- `:lang()`：基于元素语言来匹配页面元素；
+- `:dir()`：匹配特定文字书写方向的元素；
+- `:has()`：匹配包含指定元素的元素；
+- `:is()`：匹配指定选择器列表里的元素
+- `:not()`：用来匹配不符合一组选择器的元素（只能写一中选择符）；
+##### 行为伪类
+- `:active`：鼠标激活的元素；
+- `:hover`： 鼠标悬浮的元素；
+- `::selection`：鼠标选中的元素；
+##### 状态伪类
+- `:target`：当前锚点的元素；
+- `:link`：未访问的链接元素；
+- `:visited`：已访问的链接元素；
+- `:focus`：输入聚焦的表单元素；
+- `:required`：输入必填的表单元素；
+- `:valid`：输入合法的表单元素；
+- `:invalid`：输入非法的表单元素；
+- `:in-range`：输入范围以内的表单元素；
+- `:out-of-range`：输入范围以外的表单元素；
+- `:checked`：选项选中的表单元素；
+- `:optional`：选项可选的表单元素；
+- `:enabled`：事件启用的表单元素；
+- `:disabled`：事件禁用的表单元素；
+- `:read-only`：只读的表单元素；
+- `:read-write`：可读可写的表单元素；
+- `:blank`：输入为空的表单元素；
+- `:current()`：浏览中的元素；
+- `:past()`：已浏览的元素；
+- `:future()`：未浏览的元素；
+  推荐的顺序：link-visited-focus-hover-active
+##### 结构伪类
+- `:root`：文档的根元素；
+- `:empty`：无子元素的元素(没有任何子元素，甚至连文本节点都没有)；
+- `:first-letter`：元素的首字母；
+- `:first-line`：元素的首行；
+- `:nth-child(n)`：元素中指定顺序索引的元素；
+- `:nth-last-child(n)`：元素中指定逆序索引的元素；；
+- `:nth-of-type(n)`：标签中指定顺序索引的标签；
+- `:nth-last-of-type(n)`：标签中指定逆序索引的标签；
+- `:first-of-type` ：标签中为首的标签（选择一个元素中某种元素的第一个，同一个父元素的元素是一组，从这样的一组元素中选择某种元素的第一个）；
+- `:last-of-type`：标签中为尾标签（选择一个元素中某种元素的最后一个，同一个父元素的元素是一组，从这样的一组元素中选择某种元素的最后一个）；
+- `:only-of-type`：父元素仅有该标签的标签（匹配同胞中唯一的那种元素）；
+- `:first-child`：元素中为首的元素（选择一个元素中的第一个子元素）；
+- `:last-child` ：元素中为尾的元素（选择一个元素中的最后一个子元素）；
+- `:only-child`：父元素仅有该元素的元素（选择的元素是另一个元素的唯一子元素，只匹配完全没有同胞的元素）；
+#### 伪元素
+- `::before`：在元素前插入内容；
+- `::after`：在元素后插入内容；
+- `::first-letter:`选择伪元素用于装饰任何`非行内元素`的首字母。只能应用到块级元素。
+- `::first-line:`装饰`非行内元素`的首行文本。只能应用到块级元素。
+#### 伪类和伪元素有什么区别
+区分伪元素和伪类，记住两点：
+
+1. 伪类表示被选择元素的某种状态，例如:hover
+2. 伪元素表示的是被选择元素的某个部分，这个部分看起来像一个独立的元素，但是是"假元素"，只存在于css中，所以叫"伪"的元素，例如:before和:after
+3. 核心区别在于，是否创造了“新的元素”
+
+### CSS动画属性有哪些????????????
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211111102545.png)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211111102814.png)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211111102905.png)
+
+```html
+animation: name duration timing-function delay iteration-count direction play-state;
+
+
+div{
+    animation:mymove 2s ease-in-out 3s infinite alternate running;
+}
+```
+### css的块元素和行内元素，有哪些，区别，转换？？？？？??????
 ### css的三种引入方式及优先级
+
 1. 行内样式
-`<p style="color:#F00; "></p>`
-缺点：HTML页面不纯净，文件体积大，不利于蜘蛛爬行，后期维护不方便。
+   `<p style="color:#F00; "></p>`
+   缺点：HTML页面不纯净，文件体积大，不利于蜘蛛爬行，后期维护不方便。
 
 2. 内嵌样式
-内嵌样式就是将CSS代码写在`<head></head>`之间，并且用`<style></style>`进行声明。
-优缺点：页面使用公共CSS代码，也是每个页面都要定义的，如果一个网站有很多页面，每个文件都会变大，后期维护难度也大，如果文件很少，CSS代码也不多，这种样式还是很不错的。
+   内嵌样式就是将CSS代码写在`<head></head>`之间，并且用`<style></style>`进行声明。
+   优缺点：页面使用公共CSS代码，也是每个页面都要定义的，如果一个网站有很多页面，每个文件都会变大，后期维护难度也大，如果文件很少，CSS代码也不多，这种样式还是很不错的。
 
 3. 外部样式
-链接样式（推荐）： 链接样式是使用频率最高，最实用的样式，只需要在`<head></head>`之间加上`<link…/>`就可以了。
-优缺点：实现了页面框架代码与表现CSS代码的完全分离，使得前期制作和后期维护都十分方便
+   链接样式（推荐）： 链接样式是使用频率最高，最实用的样式，只需要在`<head></head>`之间加上`<link…/>`就可以了。
+   优缺点：实现了页面框架代码与表现CSS代码的完全分离，使得前期制作和后期维护都十分方便
 
 导入样式（不建议使用）： 导入样式和链接样式比较相似，采用@import样式导入CSS样式表，在HTML初始化时，会被导入到HTML或者CSS文件中，成为文件的一部分，类似第二种内嵌样式。
  链接式和导入式的区别：
@@ -157,6 +236,7 @@ web后端：就是用户看不见摸不着的数据库交互处理的业务逻�
 3.实际上：内嵌、链接、导入在同一个文件头部，谁离相应的代码近，谁的优先级高（页面多种方式使用css样式引入）
 
 ### line-height单位的区别
+
 1.normal
 2.inherit
 3.number
@@ -164,19 +244,21 @@ web后端：就是用户看不见摸不着的数据库交互处理的业务逻�
 5.% 同number+px/em/rem单位效果一样，后代元素会直接继承父元素的line-height计算结果值
 
 - normal同number效果一样，会在每个后代元素下重新计算出实际值，系数约1.2
+
 - %同number+px/em/rem单位效果一样，后代元素会直接继承父元素的line-height计算结果值
+
 - 当一个元素是使用带单位的值声明的，那么它的后代元素会继承其父元素line-height计算结果值:行高属性是用类似px、em、rem等单位来声明时，它的值会先被计算，然后计算后的值会传到任何继承它的后代元素。
+
 - 当一个元素是使用不带单位的数字，声明的值会被继承，也就是说这个值会在子元素中用来与子元素本身的font-size重新计算子元素的line-height。
+
 - 所以我们通常想要的效果是使用不带单位的line-height,我们可以在父元素上设定一个无单位数字line-height,其子元素会默认继承。如果想在子元素上有额外的样式，则在子元素上写line-height覆盖即可。
-### 移除inline-block间隙
+  ### 移除inline-block间隙
 1. 移除空格
-元素间的间隙出现的原因是元素标签之间的空格，把空格去掉间隙自然就会消失。  
+   元素间的间隙出现的原因是元素标签之间的空格，把空格去掉间隙自然就会消失。
 ```html
 <div class="demo">
-    <span>我是一个span</span><span>我是一个span</span><span>我是一个span</span><span>我是一个span</span>
+  <span>我是一个span</span><span>我是一个span</span><span>我是一个span</span><span>我是一个span</span>
 </div>
-
-
 
 <div class="demo">
         <span>我是一个span
@@ -184,7 +266,6 @@ web后端：就是用户看不见摸不着的数据库交互处理的业务逻�
         </span><span>我是一个span
         </span><span>我是一个span</span>
     </div>
-    
 
 <div class="demo">
         <span>我是一个span</span><!-- 
@@ -192,7 +273,7 @@ web后端：就是用户看不见摸不着的数据库交互处理的业务逻�
         --><span>我是一个span</span><!-- 
         --><span>我是一个span</span>
     </div>
-```  
+```
 2.取消标签闭合
 ```html
 <div class="demo">
@@ -221,7 +302,7 @@ web后端：就是用户看不见摸不着的数据库交互处理的业务逻�
     <div class='second-div'></div>
     <div class='third-div'></div>
 </div>
-  
+
 // css
 .third {
   font-size: 0;  // 这里
@@ -242,6 +323,7 @@ web后端：就是用户看不见摸不着的数据库交互处理的业务逻�
   background: red;
   width: calc(100% - 100px);
 }
+
 ```
 4.letter-spacing和/line-height
 ```html
@@ -278,23 +360,30 @@ web后端：就是用户看不见摸不着的数据库交互处理的业务逻�
   width: calc(100% - 100px);
 }
 ```
+
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106101630.png)
 5.word-spacing
 最优解在这，设置父元素，display:table和word-spacing
+
 ```css
 .parent{
   display: table;
   word-spacing:-1em; /*兼容其他浏览器，题主还未验证*/
 }
 ```
+
 ### 清除浮动
+
 BFC 清除浮动
+
 ```css
 .parent {
     overflow: hidden;
 }
 ```
+
 clear 清除浮动
+
 ```css
 .clearfix {
     zoom: 1;
@@ -305,31 +394,32 @@ clear 清除浮动
     clear: both;
 }
 ```
+
 ### .position有几种，分别描述？
 - static（静态定位）
-    - 对象遵循标准文档流中，top, right, bottom, left 等属性失效。
+  - 对象遵循标准文档流中，top, right, bottom, left 等属性失效。
 - relative（相对定位）
-    - 对象遵循标准文档流中，依赖top, right, bottom, left 等属性相对于该对象在标准文档流中的位置进行偏移，同时可通过z-index定义层叠关系。
+  - 对象遵循标准文档流中，依赖top, right, bottom, left 等属性相对于该对象在标准文档流中的位置进行偏移，同时可通过z-index定义层叠关系。
 - absolute（绝对定位）
-    - 对象脱离标准文档流，使用top, right, bottom, left 等属性进行绝对定位 同时可通过z-index定义层叠关系。
-    - 相对于static定位以外的第一个父元素进行绝对定位
+  - 对象脱离标准文档流，使用top, right, bottom, left 等属性进行绝对定位 同时可通过z-index定义层叠关系。
+  - 相对于static定位以外的第一个父元素进行绝对定位
 - fixed（固定定位）
-    - 对象脱离标准文档流，使用top, right, bottom, left 等属性进行绝对定位,同时可通过z-index定义层叠关系。
-    - fixed 元素总是相对于 body 定位的
+  - 对象脱离标准文档流，使用top, right, bottom, left 等属性进行绝对定位,同时可通过z-index定义层叠关系。
+  - fixed 元素总是相对于 body 定位的
 - sticky（粘性定位元素）
-    - 可以说是相对定位relative和固定定位fixed的结合
-    - 元素固定的相对偏移是相对于离它最近的具有滚动框的祖先元素，如果祖先元素都不可以滚动，那么是相对于 viewport 来计算元素的偏移量。
-    - 在目标区域以内，它的行为就像 position:relative;在滑动过程中，某个元素距离其父元素的距离达到sticky粘性定位的要求时(比如top：100px)；position:sticky这时的效果相当于fixed定位，固定到适当位置。
+  - 可以说是相对定位relative和固定定位fixed的结合
+  - 元素固定的相对偏移是相对于离它最近的具有滚动框的祖先元素，如果祖先元素都不可以滚动，那么是相对于 viewport 来计算元素的偏移量。
+  - 在目标区域以内，它的行为就像 position:relative;在滑动过程中，某个元素距离其父元素的距离达到sticky粘性定位的要求时(比如top：100px)；position:sticky这时的效果相当于fixed定位，固定到适当位置。
 ### z-index
 - z-index的取值
-    - auto（自动，默认值）
-    - 整数（正整数/负整数/0）
-        - 数值越大，元素也就越靠近观察者；而数值越小，元素看起来也就越远。
-    - inherit（继承）
+  - auto（自动，默认值）
+  - 整数（正整数/负整数/0）
+    - 数值越大，元素也就越靠近观察者；而数值越小，元素看起来也就越远。
+  - inherit（继承）
+
 
 一共可以有7种层叠等级。
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211009152205.png)
-
 - 背景和边框 —— 形成层叠上下文的元素的背景和边框，也是层叠上下文中的最低等级。
 - 负z-index值 —— 层叠上下文内有着 负z-index值 的子元素。
 - 块级盒 —— 文档流中非行内非定位子元素。
@@ -348,31 +438,25 @@ clear 清除浮动
 2. BFC的区域不会与浮动元素的box重叠(浮动元素不会覆盖到触发 BFC 元素上)。清除浮动布局，阻止同级元素被浮动元素覆盖。（非浮动元素触发了BFC,阻止元素被浮动元素覆盖原理）
 3. BFC在页面上是独立的容器，外面的元素不会影响里面的元素，里面的元素也不会影响外面的元素。（父级触发了BFC）
 4. 计算BFC高度的时候，浮动元素也会参与计算，防止使用float脱离文档流，高度塌陷。（父级触发了BFC）
-
-
-1. BFC 区域内的元素外边距会发生重叠。
-2. BFC 区域内的元素不会与浮动元素重叠。
-3. 计算 BFC 区域的高度时，浮动元素也参与计算。
-4. BFC 区域就相当于一个容器，内部的元素不会影响到外部，同样外部的元素也不会影响到内部。
+5. BFC 区域内的元素外边距会发生重叠。
+6. BFC 区域内的元素不会与浮动元素重叠。
+7. 计算 BFC 区域的高度时，浮动元素也参与计算。
+8. BFC 区域就相当于一个容器，内部的元素不会影响到外部，同样外部的元素也不会影响到内部。
 > #### BFC触发
-
-1. float的值不是none。
-2. position的值不是static或者relative。绝对定位元素（元素的 `position` 为 `absolute` 或 `fixed`）
-3. display的值是inline-block、table-cell、flex、table-caption或者inline-flex。
-4. 内联块 (元素具有 display: inline-block)。
-5. overflow的值不是visible(hidden、scroll、auto、inherit)
-
+9. float的值不是none。
+10. position的值不是static或者relative。绝对定位元素（元素的 `position` 为 `absolute` 或 `fixed`）
+11. display的值是inline-block、table-cell、flex、table-caption或者inline-flex。
+12. 内联块 (元素具有 display: inline-block)。
+13. overflow的值不是visible(hidden、scroll、auto、inherit)
 > #### BFC解决了什么问题
 1. 消除父子元素边距重叠，父元素设置overflow: hidden
 2. 消除相邻元素垂直方向的边距重叠：第二个子元素套一层，并设置overflow: hidden，构建BFC使其不影响外部元素。
 3. 清除浮动：父元素设置overflow: hidden触发BFC实现清除浮动，防止父元素高度塌陷，后面的元素被覆盖，实现文字环绕等等。
-
-
-1. 使用float脱离文档流，高度塌陷
-```html
-<!DOCTYPE html>
-<html lang="en">
-<head>
+4. 使用float脱离文档流，高度塌陷
+   ```html
+   <!DOCTYPE html>
+   <html lang="en">
+   <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -392,17 +476,16 @@ clear 清除浮动
             // overflow: auto/hidden/scroll; /** 创建一个BFC **/
         }
     </style>
-</head>
-<body>
+   </head>
+   <body>
     <div class="container">
         <div class="box"></div>
         <div class="box"></div>
     </div>
-</body>
-</html>
-
+   </body>
+   </html>
+   ```
 ```
-
 2. margin边距重叠
 
 ```html
@@ -425,7 +508,7 @@ clear 清除浮动
       .box2 {
           margin: 30px 0;
       }
-      
+
       // 给子元素加一个父级
       .box5 {
           overflow: auto/hidden/scroll  /** 创建一个BFC **/
@@ -438,7 +521,7 @@ clear 清除浮动
         <div class="box3"></div>
         <div class="box4"></div>
     </div>
-  	// after
+      // after
     <div>
         <div class="box3"></div>
         <div class="box5"> <!--创建一个BFC-->
@@ -449,7 +532,6 @@ clear 清除浮动
 </html>
 ```
 3. 两栏布局,元素浮动后发生重叠
-
 ```html
 <!DOCTYPE html>
 <html lang="en">
@@ -471,29 +553,24 @@ clear 清除浮动
     <div style="float: left;">
         两栏布局两栏布局两栏布局两栏布局两栏布局两栏布局两栏布局两栏布局两栏布局两栏布局两栏布局两栏布局两栏布局
     </div>
-  	第一种：
+      第一种：
     <div style="width: 300px; display:flex;">
         我是蛙人，如有帮助请点个赞叭，如有帮助请点个赞叭，如有帮助请点个赞叭，如有帮助请点个赞叭，如有帮助请点个赞叭，如有帮助请点个赞叭
     </div>
-  	第二种：
-  	<div style="width: 300px; overflow: hidden;">
+      第二种：
+      <div style="width: 300px; overflow: hidden;">
         我是蛙人，如有帮助请点个赞叭，如有帮助请点个赞叭，如有帮助请点个赞叭，如有帮助请点个赞叭，如有帮助请点个赞叭，如有帮助请点个赞叭
     </div>
-  	。。。。
+      。。。。
 </body>
 </html>
 ```
+
 ### 标准模型，IE模型（替代盒子模型）的区别 (CSS盒模型)
-
 可以设置box-sizing：border-box；设置为IE盒子模型，来避免盒子被padding撑破。
-
 可以设置box-sizing：content-box；设置为标准盒子模型。
-
 **两者的区别在于content的不同，IE盒模型的content包括border、padding**
-
 <img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210720141137.png" style="zoom:33%;" />
-
-```
 W3C标准盒模型:
 外盒尺寸计算（元素空间尺寸）
 element空间高度＝内容高度＋内距＋边框＋外距
@@ -510,98 +587,126 @@ element宽间宽度＝内容宽度＋外距（width包含了元素内容宽度�
 内盒尺寸计算（元素大小）
 element高度＝内容高度（height包含了元素内容宽度、边框、内距）
 element宽度＝内容宽度（width包含了元素内容宽度、边框、内距）
-```
+
 ### Flex
+
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211009164716.png)
 #### Flex属性
 Flex 是 Flexible Box 的缩写，意为"弹性布局",用来为盒状模型提供最大的灵活性。指定容器 display: flex 即可。 简单的分为容器属性和元素属性。
 - 容器的属性：
-    - flex-direction：决定主轴的方向（即子 item 的排列方法）flex-direction: row | row-reverse | column | column-reverse;
-      ```css
+  - flex-direction：决定主轴的方向（即子 item 的排列方法）flex-direction: row | row-reverse | column | column-reverse;
+    ```css
+    .ele {
+        flex-direction: row;                // 默认值，主轴为水平方向，起点在左端。
+        flex-direction: row-reverse;        // 主轴为水平方向，起点在右端。
+        flex-direction: column;             // 主轴为垂直方向，起点在上。
+        flex-direction: column-reverse;     // 主轴为垂直方向，起点在下。
+      }
+    ```
+  - flex-wrap：决定换行规则 flex-wrap: nowrap | wrap | wrap-reverse;
+    ```css
+    .ele {
+       flex-wrap: nowrap;          // 默认，不换行
+       flex-wrap: wrap;            // 换行，第一行在上方。
+       flex-wrap: wrap-reverse     // 换行，第一行在下方。
+    }
+    ```
+  - flex-flow： flex-direction 属性和 flex-wrap 属性的简写形式。默认值为 row nowrap。
+    ```css
       .ele {
-          flex-direction: row;                // 默认值，主轴为水平方向，起点在左端。
-          flex-direction: row-reverse;        // 主轴为水平方向，起点在右端。
-          flex-direction: column;             // 主轴为垂直方向，起点在上。
-          flex-direction: column-reverse;     // 主轴为垂直方向，起点在下。
-        }
-      ```
-    - flex-wrap：决定换行规则 flex-wrap: nowrap | wrap | wrap-reverse;
-    ```css
-    .ele {
-         flex-wrap: nowrap;          // 默认，不换行
-         flex-wrap: wrap;            // 换行，第一行在上方。
-         flex-wrap: wrap-reverse     // 换行，第一行在下方。
-    }
+        lex-flow: <flex-direction> || <flex-wrap>;
+      }
     ```
-    - flex-flow： flex-direction 属性和 flex-wrap 属性的简写形式。默认值为 row nowrap。
-    ```css
-    .ele {
-      flex-flow: <flex-direction> || <flex-wrap>;
-    }
-    ```
-    - justify-content：对其方式，水平主轴对齐方式
+  - justify-content：对其方式，水平主轴对齐方式
     ```css
     .ele{
-        justify-content: flex-start;      // 默认，左对齐
-        justify-content: flex-end;        // 右对齐
-        justify-content: center;          // 居中
-        justify-content: space-between;   // 两端对齐，项目之间的间隔都相等。
-        justify-content: space-around;    // 每个项目两侧的间隔相等。所以，项目之间的间隔比项目与边框的间隔大一倍。
+      justify-content: flex-start;      // 默认，左对齐
+      justify-content: flex-end;        // 右对齐
+      justify-content: center;          // 居中
+      justify-content: space-between;   // 两端对齐，项目之间的间隔都相等。
+      justify-content: space-around;    // 每个项目两侧的间隔相等。所以，项目之间的间隔比项目与边框的间隔大一倍。
     }
     ```
-    - align-items：对齐方式，竖直轴线方向
+  - align-items：对齐方式，竖直轴线方向
     ```css
-    .ele{
+      .ele{
         align-items: flex-start;    // 交叉轴的起点对齐。
         align-items: flex-end;      // 交叉轴的终点对齐。
         align-items: center;        // 交叉轴的中点对齐。
         align-items: baseline;      // 项目的第一行文字的基线对齐。
         align-items: stretch;       // 默认，如果项目未设置高度或设为auto，将占满整个容器的高度。
-    }
+      }
     ```
-    - align-content：多根轴线的对齐方式。如果项目只有一根轴线，该属性不起作用。
+  - align-content：多根轴线的对齐方式。如果项目只有一根轴线，该属性不起作用。
     ```css
-    .ele{
+      .ele{
         align-content: flex-start;   // 与交叉轴的起点对齐
         align-content; flex-end;     // 与交叉轴的终点对齐。
         align-content: center;       // 与交叉轴的中点对齐。
         align-content: space-between;// 与交叉轴两端对齐，轴线之间的间隔平均分布。
         align-content: space-around; // 每根轴线两侧的间隔都相等。所以，轴线之间的间隔比轴线与边框的间隔大一倍。
         align-content: stretch;     // 默认 轴线占满整个交叉轴。
-    }
-    ``` 
-- 项目的属性（元素的属性）：
-    - order 属性：子容器的排列顺序，定义项目的排列顺序，顺序越小，排列越靠前，默认为 0
-    - flex-grow 属性：定义项目的放大比例，即使存在空间，也不会放大
-    - flex-shrink 属性：定义了项目的缩小比例，当空间不足的情况下会等比例的缩小，如果 定义个 item 的 flow-shrink 为 0，则为不缩小
-    - flex-basis 属性：定义了在分配多余的空间，项目占据的空间。
-    - flex：是 flex-grow 和 flex-shrink、flex-basis 的简写，默认值为 0 1 auto。
-    - align-self：允许单个项目与其他项目不一样的对齐方式，可以覆盖
-        - 子容器的 align-self 属性允许单个项目有与其他项目不一样的对齐方式，可覆盖父容器 align-items 属性。默认值为 auto，表示继承父元素的 align-items属性，如果没有父元素，则等同于 stretch。
-#### flex:auto和flex:1的区别??????????????
+      }
+    ```
 
-#### flex:1 
+- 项目的属性（元素的属性）：
+  - order 属性：子容器的排列顺序，定义项目的排列顺序，顺序越小，排列越靠前，默认为 0
+  - flex-grow 属性：定义项目的放大比例，即使存在空间，也不会放大
+  - flex-shrink 属性：定义了项目的缩小比例，当空间不足的情况下会等比例的缩小，如果 定义个 item 的 flow-shrink 为 0，则为不缩小
+  - flex-basis 属性：定义了在分配多余的空间，项目占据的空间。
+  - flex：是 flex-grow 和 flex-shrink、flex-basis 的简写，默认值为 0 1 auto。
+  - align-self：允许单个项目与其他项目不一样的对齐方式，可以覆盖
+    - 子容器的 align-self 属性允许单个项目有与其他项目不一样的对齐方式，可覆盖父容器 align-items 属性。默认值为 auto，表示继承父元素的 align-items属性，如果没有父元素，则等同于 stretch。
+#### flex:1, flex:auto, flex:0 区别
+  flex属性是flex-grow, flex-shrink 和 flex-basis的简写，默认值为0 1 auto。后两个属性可选。
+    ```css
+      .item {
+      flex: none | [ <'flex-grow'> <'flex-shrink'>? || <'flex-basis'> ]
+      }
+    ```
+- flex-grow属性
+  - flex-grow属性定义项目的放大比例，默认为0，即如果存在剩余空间，也不放大。
+  - 如果所有项目的flex-grow属性都为1，则它们将等分剩余空间（如果有的话）。如果一个项目的flex-grow属性为2，其他项目都为1，则前者占据的剩余空间将比其他项多一倍。
+- flex-shrink属性
+  - flex-shrink属性定义了项目的缩小比例，默认为1，即如果空间不足，该项目将缩小。
+  - 如果所有项目的flex-shrink属性都为1，当空间不足时，都将等比例缩小。如果一个项目的flex-shrink属性为0，其他项目都为1，则空间不足时，前者不缩小。
+  - 负值对该属性无效
+- flex-basis属性
+  - flex-basis属性定义了在分配多余空间之前，项目占据的主轴空间（main size）。浏览器根据这个属性，计算主轴是否有多余空间。它的默认值为auto，即项目的本来大小。
+  - 它可以设为跟width或height属性一样的值（比如350px），则项目将占据固定空间。
+
+
+1. flex: auto; ==> flex: 1 1 auto;相当于可扩大，可缩小
+2. flex: none; ==> flex: 0 0 auto;相当于不可扩大，不可缩小
+3. flex: 0; ==> flex:0 1 0%;相当于不可扩大，可缩小
+4. flex: 1; (取值为非负数字) ==> flex: 1 1 0%; (赋值在第一位，后两位是固定的1 ，0%);相当于可扩大，可缩小
+5. flex: 20%; || flex: 200px; (取值为一个长度或百分比) ==> flex:1 1 20%; || flex: 1 1 200px; (前两位是固定值，赋值第三位)
+6. flex: 2 3; (取值为两个非负数字) ==> flex: 2 3 0%; (取值为前两位，第三位固定0%)
+7. flex: 2 200px; (取值为一个非负数字和一个长度或百分比) ==> flex:2 1 200px; (取值为第一位和最后一位，中间值固定1)
+
+#### flex:1
 - 该属性有两个快捷值：auto (1 1 auto) 和 none (0 0 auto)。
 - flex-grow（扩展量）定义项目的的放大比例；
-    - 代表含义是对额外空间的占据量，所谓额外空间就是这一行多余的空间，有多余的空间这一属性才有用。默认值是0，意思就是即使有多余空间，它也不要
-    - 默认为0，即 即使存在剩余空间，也不会放大；所有项目的flex-grow为1：等分剩余空间（自动放大占位）；flex-grow为n的项目，占据的空间（放大的比例）是flex-grow为1的n倍。
+  - 代表含义是对额外空间的占据量，所谓额外空间就是这一行多余的空间，有多余的空间这一属性才有用。默认值是0，意思就是即使有多余空间，它也不要
+  - 默认为0，即 即使存在剩余空间，也不会放大；所有项目的flex-grow为1：等分剩余空间（自动放大占位）；flex-grow为n的项目，占据的空间（放大的比例）是flex-grow为1的n倍。
 - flex-shrink（收缩量）定义项目的缩小比例；
-    - 这个属性只有在没有额外空间时起作用，意思是没有额外空间时，成员贡献出空间的大小。默认值为1，如果为0意思是不贡献空间，也就是说即使空间不足，成员大小也不发生改变。
-    - 默认为1，即 如果空间不足，该项目将缩小；
-    - 所有项目的flex-shrink为1：当空间不足时，缩小的比例相同；flex-shrink为0：空间不足时，该项目不会缩小；flex-shrink为n的项目，空间不足时缩小的比例是flex-shrink为1的n倍。
+  - 这个属性只有在没有额外空间时起作用，意思是没有额外空间时，成员贡献出空间的大小。默认值为1，如果为0意思是不贡献空间，也就是说即使空间不足，成员大小也不发生改变。
+  - 默认为1，即 如果空间不足，该项目将缩小；
+  - 所有项目的flex-shrink为1：当空间不足时，缩小的比例相同；flex-shrink为0：空间不足时，该项目不会缩小；flex-shrink为n的项目，空间不足时缩小的比例是flex-shrink为1的n倍。
 - flex-basis
-    - 表示在分配额外空间之前，成员占据的空间，默认值为auto，意思就是你本来占多少就是多少。但也可以自己设置长度(px)。这个值的效果就是确定在释放和分配空间的时候，你的初值是多少。
-    - 定义在分配多余空间之前，项目占据的主轴空间（main size），浏览器根据此属性计算主轴是否有多余空间
-    - 默认值为auto，即 项目原本大小；设置后项目将占据固定空间。
+  - 表示在分配额外空间之前，成员占据的空间，默认值为auto，意思就是你本来占多少就是多少。但也可以自己设置长度(px)。这个值的效果就是确定在释放和分配空间的时候，你的初值是多少。
+  - 定义在分配多余空间之前，项目占据的主轴空间（main size），浏览器根据此属性计算主轴是否有多余空间
+  - 默认值为auto，即 项目原本大小；设置后项目将占据固定空间。
 ### Grid
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211009164716.png)
-flex 布局虽然强大，但是只能是一维布局，如果要进行二维布局，那么我们还需要使用 grid。
+lex 布局虽然强大，但是只能是一维布局，如果要进行二维布局，那么我们还需要使用 grid。
 
 grid 布局又称为“网格布局”，可以实现二维布局方式，和之前的 表格table布局差不多，然而，这是使用 CSS 控制的，不是使用 HTML 控制的，同时还可以依赖于媒体查询根据不同的上下文得新定义布局。和 table 布局不同的是，grid 布局不需要在 HTML 中使用特定的标签布局，所有的布局都是在 CSS 中完成的，你可以随意定义你的 grid 网格。
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211015141127.png)
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211015144548.png)
+
 #### 使用 grid 布局
 使用 grid 布局很简单，通过display属性设置属性值为 grid 或 inline-grid 或者是 subgrid（该元素父元素为网格，继承父元素的行和列的大小） 就可以了。
 
@@ -638,39 +743,40 @@ grid 布局又称为“网格布局”，可以实现二维布局方式，和之
 `minmax()`函数来创建行或列的最小或最大尺寸，第一个参数定义网格轨道的最小值，第二个参数定义网格轨道的最大值。可以接受任何长度值，也接受 auto 值。auto 值允许网格轨道基于内容的尺寸拉伸或挤压。
 ```css
 .grid-container{
-    padding: 20px;
-    display: grid;
-    grid-template-rows: minmax(100px,200px) minmax(50px,200px);
-    grid-template-columns: 1fr 1fr 2fr;
-    background: pink;
-    height: 300px;
+  padding: 20px;
+  display: grid;
+  grid-template-rows: minmax(100px,200px) minmax(50px,200px);
+  grid-template-columns: 1fr 1fr 2fr;
+  background: pink;
+  height: 300px;
 }
 ```
 遇到的问题：
 - 将第一行的高度设置为`minmax(100px,200px)`，第二行的高度设置为`minmax(50px,200px)`，容器总高度设置为`300px`，这时每一列的高度要怎么算呢？
 - 判断总高度是小于第一列高度的最大值和第二列高度的最大值之和的，如果大于最大值之和，那么第一列和第二列的高度都为设置的最大值，如果是小于最小值之和的话，那么第一列和第二列的高度都为设置的最小值。
 - 总高度是小于第一列高度的最大值和第二列高度的最大值之和
-    -  总高度 `300px` - 第一列最小高度 `100px` - 第二列最小高度 `50px` = `150px`
-    -  第一列高度：第一列最小高度 `100px + 150px/2 = 175px`;
-    -  第二列高度：第一列最小高度 `50px + 150px/2 = 125px`;
+  - 总高度 `300px` - 第一列最小高度 `100px` - 第二列最小高度 `50px` = `150px`
+  - 第一列高度：第一列最小高度 `100px + 150px/2 = 175px`;
+  - 第二列高度：第一列最小高度 `50px + 150px/2 = 125px`;
+
 #### 重复行或者列
 `repeat()` 属性可以创建重复的网格轨道。这个适用于创建相等尺寸的网格项目和多个网格项目。
 `repeat()` 也接受两个参数：第一个参数定义网格轨道应该重复的次数，第二个参数定义每个轨道的尺寸。
 ```css
-.grid-container{
-    padding: 20px;
-    display: grid;
-    grid-template-columns: repeat(2,100px);
-    grid-template-rows: repeat(3,100px);
-    background: pink;
-}
+  .grid-container{
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(2,100px);
+  grid-template-rows: repeat(3,100px);
+  background: pink;
+  }
 ```
 #### 间距
 - grid-column-gap：创建列与列之间的距离。
 - grid-row-gap：行与行之间的距离。
 - grid-gap 是 grid-row-gap 和 grid-column-gap两个属性的缩写。
 ```css
-.grid-container{
+  .grid-container{
     padding: 20px;
     display: grid;
     grid-template-columns: repeat(2,100px);
@@ -678,47 +784,46 @@ grid 布局又称为“网格布局”，可以实现二维布局方式，和之
     grid-column-gap: 50px;
     grid-row-gap: 15px;
     background: pink;
-}
+  }
 ```
 #### 通过网格线定位 grid item
 我们可以通过表格线行或者列来定位 grid item。
 ```html
-<div class="grid-container">
+  <div class="grid-container">
     <div class="item item1">1</div>
     <div class="item item2">2</div>
     <div class="item item3">3</div>
     <div class="item item4">4</div>
     <div class="item item5">5</div>
     <div class="item item6">6</div>
-</div>
+  </div>
 
 
-.grid-container{
-    padding: 20px;
-    display: grid;
-    grid-template-columns: repeat(2,100px);
-    grid-template-rows: repeat(3,100px);
-    grid-column-gap: 50px;
-    grid-row-gap: 15px;
-    background: pink;
-}
-.item{
-    border: 2px solid palegoldenrod;
-    color: #fff;
-    text-align: center;
-    font-size: 20px;
-}
-.item1{
-    grid-row-start: 2;
-    grid-row-end: 3;
-    grid-column-start: 2;
-    grid-column-end: 3;
-    background: #fffa90;
-    color: #000;
-}
+  .grid-container{
+      padding: 20px;
+      display: grid;
+      grid-template-columns: repeat(2,100px);
+      grid-template-rows: repeat(3,100px);
+      grid-column-gap: 50px;
+      grid-row-gap: 15px;
+      background: pink;
+  }
+  .item{
+      border: 2px solid palegoldenrod;
+      color: #fff;
+      text-align: center;
+      font-size: 20px;
+  }
+  .item1{
+      grid-row-start: 2;
+      grid-row-end: 3;
+      grid-column-start: 2;
+      grid-column-end: 3;
+      background: #fffa90;
+      color: #000;
+  }
 ```
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211015143416.png)
-
 - `grid-row` 是 `grid-row-start` 和 `grid-row-end` 的简写。`grid-column` 是 `grid-column-start` 和 `grid-column-end` 的简写。
     - 只提供一个值，指定了 `grid-row-start` 和 `grid-column-start` 的值。
     - 提供两个值，第一个值是 `grid-row-start` 或者 `grid-column-start` 的值，第二个值是 `grid-row-end` 或者 `grid-column-end` 的值，两者之间必须要用`/`隔开。
@@ -740,10 +845,12 @@ grid-row-end: 4;
 ```
 
 也可以使用`grid-row`和`grid-column`简写的形式，关键词`span`后面紧随数字，表示合并多少个列或行，`/` 前面是从第几行`/`列开始。
+
 ```css
 grid-row: 2 / span 3; 
 grid-column: span 2;
 ```
+
 ```css
 .grid-container{
     padding: 20px;
@@ -769,9 +876,11 @@ grid-column: span 2;
     grid-row-end: 4;
 }
 ```
+
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211015144225.png)
 
 #### 自定义网格线名称
+
 在`grid`中，是可以自定义网格线的名称的，然后使用定义好的网格线来进行布局，`[col1-start]` 网格线名称一定要使用 `[]` 括住。
 
 ```html
@@ -816,54 +925,53 @@ grid-column: span 2;
 .i { grid-column: col2-start / col3-end; grid-row: row4-start; background: #ffffff;}
 .j { grid-column: col1-start / col3-end; grid-row: row5-start; background: #ffffff;}
 ```
+
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211015144801.png)
+
 #### 通过网格区域命名和定位网格项目
 - 什么是网格区域：
-    - 网格区域(grid-area)是一个逻辑空间，主要用来放置一个或多个网格单元格（Grid Cell）。他是由四条网格线(Grid line)，网格区域每边一条，四边相交组织的网格轨道(Grid Track)。简单点理解，网格区域是有四条网格线交织组成的网格空间，这个空间中可能是一个网格单元格，也可能是多个网格单元格。
+  - 网格区域(grid-area)是一个逻辑空间，主要用来放置一个或多个网格单元格（Grid Cell）。他是由四条网格线(Grid line)，网格区域每边一条，四边相交组织的网格轨道(Grid Track)。简单点理解，网格区域是有四条网格线交织组成的网格空间，这个空间中可能是一个网格单元格，也可能是多个网格单元格。
 - 定义网格区域
-    - 在CSS Grid Layout中定义网格区域有两种方式，一种是通过网格线来定义，另一种是通过grid-template-areas来定义。接下来看看两种定义网格区域的方法在具体使用过程中有何不同。
+  - 在CSS Grid Layout中定义网格区域有两种方式，一种是通过网格线来定义，另一种是通过grid-template-areas来定义。接下来看看两种定义网格区域的方法在具体使用过程中有何不同。
+
 - 网格线定义网格区域
-    - 使用网格线定义网格区域的方法非常的简单，首先依赖于`grid-template-columns`和`grid-template-rows`显式定义网格线，甚至是由浏览器隐式创建网格线，然后通过`grid-area`属性通过取网格线，组成网格线交织区域，那么这个区域就是所讲的网格区域。在使用`grid-area`属性调用网格线，其遵循的规则是`grid-area: row-start/ column-start / row-end / column-end`。
+  - 使用网格线定义网格区域的方法非常的简单，首先依赖于`grid-template-columns`和`grid-template-rows`显式定义网格线，甚至是由浏览器隐式创建网格线，然后通过`grid-area`属性通过取网格线，组成网格线交织区域，那么这个区域就是所讲的网格区域。在使用`grid-area`属性调用网格线，其遵循的规则是`grid-area: row-start/ column-start / row-end / column-end`。
 - `grid-template-areas`定义网格区域
-    - 除了使用网格线的交组来定义网格区域之外，在 CSS Grid Layout 中还可以通过`grid-template-areas`属性来定义网格区域的名称，然后需要放在对应网格区域的元素，可以通过`grid-area`属性来指定。而且重复区域可以使用同一个名称来实现跨区域。另外对于空的轨道区域，可以使用点号 . 来代表
-```html
-<div class="grid-container">
+  - 除了使用网格线的交组来定义网格区域之外，在 CSS Grid Layout 中还可以通过`grid-template-areas`属性来定义网格区域的名称，然后需要放在对应网格区域的元素，可以通过`grid-area`属性来指定。而且重复区域可以使用同一个名称来实现跨区域。另外对于空的轨道区域，可以使用点号 . 来代表
+  ```html
+    <div class="grid-container">
     <div class="header ">header</div>
     <div class="content ">content</div>
     <div class="sidebar ">sidebar</div>
     <div class="footer ">footer</div>
-</div>
+    </div>
 
-.grid-container{
-    text-align: center;
-    padding: 20px;
-    display: grid;
-    grid-column-gap: 5px;
-    grid-row-gap: 5px;
-    background: pink;
-    grid-template-areas: "header header header header header"
-                         "sidebar content content content content"
-                         "footer footer footer footer footer";
+    .grid-container{
+        text-align: center;
+        padding: 20px;
+        display: grid;
+        grid-column-gap: 5px;
+        grid-row-gap: 5px;
+        background: pink;
+        grid-template-areas: "header header header header header"
+                            "sidebar content content content content"
+                            "footer footer footer footer footer";
 
-    grid-template-rows: 50px 150px 50px;
-    grid-template-columns: 200px 200px 200px;
+        grid-template-rows: 50px 150px 50px;
+        grid-template-columns: 200px 200px 200px;
 
-}
+    }
 
-.header { grid-area:header; background: #fff}
-.content { grid-area: content; background: #fffa90}
-.sidebar { grid-area: sidebar; background: #5bc0de}
-.footer { grid-area: footer; background: #ffff00}
-```
+    .header { grid-area:header; background: #fff}
+    .content { grid-area: content; background: #fffa90}
+    .sidebar { grid-area: sidebar; background: #5bc0de}
+    .footer { grid-area: footer; background: #ffff00}
+  ```
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211015145529.png)
 在不设置高度的情况下（父容器和 grid-template-rows 的值，或者 grid-template-rows 设置为 auto 时，slider 和 content 的高度是一致的，并且会根据其内的高度自适应）
-
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211015145708.png)
-
-
 ### 常见布局的方案
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211009164716.png)
-
 #### 单列布局
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210929065711.png)
 - header,content和footer等宽的单列布局
@@ -871,159 +979,163 @@ grid-column: span 2;
 - header与footer等宽,content略窄的单列布局
     - header、footer的内容宽度不设置，块级元素充满整个屏幕，但header、content和footer的内容区设置同一个width，并通过margin:auto实现居中。
 ```html
-<div class="header"></div>
-<div class="content"></div>
-<div class="footer"></div>
+  <div class="header"></div>
+  <div class="content"></div>
+  <div class="footer"></div>
 
-.header{
-    margin:0 auto; 
-    max-width: 960px;
-    height:100px;
-    background-color: blue;
-}
-.content{
-    margin: 0 auto;
-    max-width: 960px;
-    height: 400px;
-    background-color: aquamarine;
-}
-.footer{
-    margin: 0 auto;
-    max-width: 960px;
-    height: 100px;
-    background-color: aqua;
-}
+  .header{
+      margin:0 auto; 
+      max-width: 960px;
+      height:100px;
+      background-color: blue;
+  }
+  .content{
+      margin: 0 auto;
+      max-width: 960px;
+      height: 400px;
+      background-color: aquamarine;
+  }
+  .footer{
+      margin: 0 auto;
+      max-width: 960px;
+      height: 100px;
+      background-color: aqua;
+  }
 ```
+
 ```html
-<div class="header">
-    <div class="nav"></div>
-</div>
-<div class="content"></div>
-<div class="footer"></div>
+  <div class="header">
+      <div class="nav"></div>
+  </div>
+  <div class="content"></div>
+  <div class="footer"></div>
 
 
-.header{
-    margin:0 auto;
-    max-width: 960px;
-    height:100px;
-    background-color: blue;
-}
-.nav{
-    margin: 0 auto;
-    max-width: 800px;
-    background-color: darkgray;
-    height: 50px;
-}
-.content{
-    margin: 0 auto;
-    max-width: 800px;
-    height: 400px;
-    background-color: aquamarine;
-}
-.footer{
-    margin: 0 auto;
-    max-width: 960px;
-    height: 100px;
-    background-color: aqua;
-}
+  .header{
+      margin:0 auto;
+      max-width: 960px;
+      height:100px;
+      background-color: blue;
+  }
+  .nav{
+      margin: 0 auto;
+      max-width: 800px;
+      background-color: darkgray;
+      height: 50px;
+  }
+  .content{
+      margin: 0 auto;
+      max-width: 800px;
+      height: 400px;
+      background-color: aquamarine;
+  }
+  .footer{
+      margin: 0 auto;
+      max-width: 960px;
+      height: 100px;
+      background-color: aqua;
+  }
 ```
+
 #### 两列自适应布局
+
 两列自适应布局是指一列由内容撑开，另一列撑满剩余宽度的布局方式。
 - float+overflow:hidden
-    - 如果是普通的两列布局，浮动+普通元素的margin便可以实现，但如果是自适应的两列布局，利用float+overflow:hidden便可以实现，这种办法主要通过overflow触发BFC,而BFC不会重叠浮动元素。
-    - 使用overflow属性来触发bfc，来阻止浮动造成的文字环绕效果。
-    - 注意点:如果侧边栏在右边时，注意渲染顺序。即在HTML中，先写侧边栏后写主内容
+  - 如果是普通的两列布局，浮动+普通元素的margin便可以实现，但如果是自适应的两列布局，利用float+overflow:hidden便可以实现，这种办法主要通过overflow触发BFC,而BFC不会重叠浮动元素。
+  - 使用overflow属性来触发bfc，来阻止浮动造成的文字环绕效果。
+  - 注意点:如果侧边栏在右边时，注意渲染顺序。即在HTML中，先写侧边栏后写主内容
 - Flex布局
-    - Flex布局，也叫弹性盒子布局，区区简单几行代码就可以实现各种页面的的布局。
+  - Flex布局，也叫弹性盒子布局，区区简单几行代码就可以实现各种页面的的布局。
 - grid布局
-    - Grid布局，是一个基于网格的二维布局系统，目的是用来优化用户界面设计。
+  - Grid布局，是一个基于网格的二维布局系统，目的是用来优化用户界面设计。
 ```html
-<div class="parent" style="background-color: lightgrey;">
-    <div class="left" style="background-color: lightblue;">
-        <p>left</p>
-    </div>
-    <div class="right"  style="background-color: lightgreen;">
-        <p>right</p>
-        <p>right</p>
-    </div>        
-</div>
-
-.parent {
-  overflow: hidden;
-  zoom: 1;
-}
-.left {
-  float: left;
-  margin-right: 20px;
-}
-.right {
-  overflow: hidden;
-  zoom: 1;
-}
-```
-```css
-//html部分同上
-.parent {
-  display:flex;
-}  
-.right {
-  margin-left:20px; 
-  flex:1;
-}
-```
-```css
-//html部分同上
-.parent {
-  display:grid;
-  grid-template-columns:auto 1fr;
-  grid-gap:20px
-} 
-```
-#### 三栏布局
-中间列自适应宽度，旁边两侧固定宽度。
-1. 圣杯布局
-比较特殊的三栏布局，同样也是两边固定宽度，中间自适应，唯一区别是dom结构必须是先写中间列部分，这样实现中间列可以优先加载。
-**要注意的是，中间栏要在放在文档流前面以优先渲染。**
-- 缺点
-    - center部分的最小宽度不能小于left部分的宽度，否则会left部分掉到下一行
-    - 如果其中一列内容高度拉长(如下图)，其他两列的背景并不会自动填充。(借助等高布局正padding+负margin可解决）。
-```html
-<div class="container">
-    <div class="center">测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试</div>
-    <div class="left">left</div>
-    <div class="right">right</div>
-</div>
-
-.container {
-    // 导致左右栏也会  跟着走
-    // 分别给左右栏 position: relative;定位到原本的位置
-    padding:0 220px;//为左右栏腾出空间
+  <div class="parent" style="background-color: lightgrey;">
+  <div class="left" style="background-color: lightblue;">
+    <p>left</p>
+  </div>
+  <div class="right"  style="background-color: lightgreen;">
+    <p>right</p>
+    <p>right</p>
+  </div>
+  </div>
+  .parent {
+    overflow: hidden;
+    zoom: 1;
   }
   .left {
     float: left;
-    width: 200px;
-    height: 400px;
-    background: red;
-    margin-left: -100%;
-    position: relative;
-    left: -220px;
-  }
-  .center {
-    float: left;
-    width: 100%;
-    height: 500px;
-    background: yellow;
+    margin-right: 20px;
   }
   .right {
-    float: left;
-    width: 200px;
-    height: 400px;
-    background: blue;
-    margin-left: -200px;
-    position: relative;
-    right: -220px;
+    overflow: hidden;
+    zoom: 1;
   }
 ```
+```css
+  //html部分同上
+  .parent {
+    display:flex;
+  }
+  .right {
+    margin-left:20px; 
+    flex:1;
+  }
+```
+
+```css
+//html部分同上
+  .parent {
+    display:grid;
+    grid-template-columns:auto 1fr;
+    grid-gap:20px
+  }
+```
+
+#### 三栏布局
+中间列自适应宽度，旁边两侧固定宽度。
+1. 圣杯布局
+   比较特殊的三栏布局，同样也是两边固定宽度，中间自适应，唯一区别是dom结构必须是先写中间列部分，这样实现中间列可以优先加载。
+   **要注意的是，中间栏要在放在文档流前面以优先渲染。**
+- 缺点
+  - center部分的最小宽度不能小于left部分的宽度，否则会left部分掉到下一行
+  - 如果其中一列内容高度拉长(如下图)，其他两列的背景并不会自动填充。(借助等高布局正padding+负margin可解决）。
+    ```html
+      <div class="container">
+      <div class="center">测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试</div>
+      <div class="left">left</div>
+      <div class="right">right</div>
+      </div>
+
+      .container {
+          // 导致左右栏也会  跟着走
+          // 分别给左右栏 position: relative;定位到原本的位置
+          padding:0 220px;//为左右栏腾出空间
+        }
+        .left {
+          float: left;
+          width: 200px;
+          height: 400px;
+          background: red;
+          margin-left: -100%;
+          position: relative;
+          left: -220px;
+        }
+        .center {
+          float: left;
+          width: 100%;
+          height: 500px;
+          background: yellow;
+        }
+        .right {
+          float: left;
+          width: 200px;
+          height: 400px;
+          background: blue;
+          margin-left: -200px;
+          position: relative;
+          right: -220px;
+        }
+      ```
 2. 双飞翼布局
 同样也是三栏布局，在圣杯布局基础上进一步优化，解决了圣杯布局错乱问题，实现了内容与布局的分离。而且任何一栏都可以是最高栏，不会出问题。
 - 缺点
@@ -1036,9 +1148,7 @@ grid-column: span 2;
     <div class="left"></div>
     <div class="right"></div>
   </article>
-  
-  
-  
+   
   .container {
       //不会引起塌陷
       min-width: 600px; //确保中间内容可以显示出来，两倍left宽+right宽
@@ -1073,105 +1183,103 @@ grid-column: span 2;
     }
   </style>
 ```
+
 - 两种布局实现方式对比:
-    - 两种布局方式都是把主列放在文档流最前面，使主列优先加载。
-    - 两种布局方式在实现上也有相同之处，都是让三列浮动，然后通过负外边距形成三列布局。
-    - 两种布局方式的不同之处在于如何处理中间主列的位置： 圣杯布局是利用父容器的左、右内边距+两个从列相对定位； 双飞翼布局是把主列嵌套在一个新的父级块中利用主列的左、右外边距进行布局调整
+  - 两种布局方式都是把主列放在文档流最前面，使主列优先加载。
+  - 两种布局方式在实现上也有相同之处，都是让三列浮动，然后通过负外边距形成三列布局。
+  - 两种布局方式的不同之处在于如何处理中间主列的位置： 圣杯布局是利用父容器的左、右内边距+两个从列相对定位； 双飞翼布局是把主列嵌套在一个新的父级块中利用主列的左、右外边距进行布局调整
 3. 绝对定位法
-```html
-<div class="left">Left</div>
-<div class="main">Main</div>
-<div class="right">Right</div>
+   ```html
+    <div class="left">Left</div>
+    <div class="main">Main</div>
+    <div class="right">Right</div>
 
-
-
-//简单的进行CSS reset
-body,html{
-    height:100%;
-    padding: 0px;
-    margin:0px;
-}
-//左右绝对定位
-.left,.right{
-    position: absolute;
-    top:0px;
-    background: red;
-    height:100%;
-}
-.left{
-    left:0;
-    width:100px;
-}
-.right{
-    right:0px;
-    width:200px;
-}
-//中间使用margin空出左右元素所占据的空间
-.main{
-    margin:0px 200px 0px 100px;
-    height:100%;
-    background: blue;
-}
-```
+    //简单的进行CSS reset
+    body,html{
+        height:100%;
+        padding: 0px;
+        margin:0px;
+    }
+    //左右绝对定位
+    .left,.right{
+        position: absolute;
+        top:0px;
+        background: red;
+        height:100%;
+    }
+    .left{
+        left:0;
+        width:100px;
+    }
+    .right{
+        right:0px;
+        width:200px;
+    }
+    //中间使用margin空出左右元素所占据的空间
+    .main{
+        margin:0px 200px 0px 100px;
+        height:100%;
+        background: blue;
+    }
+  ```
 - 缺点
     - 如果中间栏含有最小宽度限制，或是含有宽度的内部元素，当浏览器宽度小到一定程度，会发生层重叠的情况。
 
 4. 浮动
 ```html
-//注意元素次序
-<div class="left">Left</div>
-<div class="right">Right</div>
-<div class="main">Main</div>
+  //注意元素次序
+  <div class="left">Left</div>
+  <div class="right">Right</div>
+  <div class="main">Main</div>
 
 
-body,html {
-    height:100%;
-    padding: 0;
-    margin: 0
-}
-//左栏左浮动
-.left {
-    background: red;
-    width: 100px;
-    float: left;
-    height: 100%;
-}
-//中间自适应
-.main {
-    background: blue;
-    height: 100%;
-    margin:0px 200px 0px 100px;
-}
-//右栏右浮动
-.right {
-    background: red;
-    width: 200px;
-    float: right;
-    height: 100%;
-}
+  body,html {
+      height:100%;
+      padding: 0;
+      margin: 0
+  }
+  //左栏左浮动
+  .left {
+      background: red;
+      width: 100px;
+      float: left;
+      height: 100%;
+  }
+  //中间自适应
+  .main {
+      background: blue;
+      height: 100%;
+      margin:0px 200px 0px 100px;
+  }
+  //右栏右浮动
+  .right {
+      background: red;
+      width: 200px;
+      float: right;
+      height: 100%;
+  }
 ```
-
-
 #### 等高布局
 等高布局是指子元素在父元素中高度相等的布局方式。
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210929073545.png)
-1. 利用正padding+负margin
-可解决圣杯布局的第二点缺点，因为背景是在 padding 区域显示的，设置一个大数值的 padding-bottom，再设置相同数值的负的 margin-bottom，并在所有列外面加上一个容器，并设置 overflow:hidden 把溢出背景切掉。这种可能实现多列等高布局，并且也能实现列与列之间分隔线效果，结构简单，兼容所有浏览器。
-```css
-/* 在圣杯布局的布局的基础上 */
-.center,
-.left,
-.right {
-    padding-bottom: 10000px;
-    margin-bottom: -10000px;
-}
 
-.container {
-    padding-left: 220px;
-    padding-right: 220px;
-    overflow: hidden; 
-}
-```
+1. 利用正padding+负margin
+   可解决圣杯布局的第二点缺点，因为背景是在 padding 区域显示的，设置一个大数值的 padding-bottom，再设置相同数值的负的 margin-bottom，并在所有列外面加上一个容器，并设置 overflow:hidden 把溢出背景切掉。这种可能实现多列等高布局，并且也能实现列与列之间分隔线效果，结构简单，兼容所有浏览器。
+   ```css
+    /* 在圣杯布局的布局的基础上 */
+    .center,
+    .left,
+    .right {
+      padding-bottom: 10000px;
+      margin-bottom: -10000px;
+    }
+
+    .container {
+        padding-left: 220px;
+        padding-right: 220px;
+        overflow: hidden; 
+  }
+  ```
 2. 模仿表格布局
 
 #### 粘连布局
@@ -1187,8 +1295,7 @@ body,html {
     </div>
   </div>
   <div id="footer">footer</div>
-  
-  
+
   * {
       margin: 0;
       padding: 0;
@@ -1257,337 +1364,338 @@ body,html {
       margin-bottom: -10000px;
     }
 ```
+
 - 实现
-    - footer必须是一个独立的结构，与wrap没有任何嵌套关系
-    - wrap区域的高度通过设置min-height，变为视口高度
-    - footer要使用margin为负来确定自己的位置
-    - 在main区域需要设置 padding-bottom。这也是为了防止负 margin 导致 footer 覆盖任何实际内容。
+  - footer必须是一个独立的结构，与wrap没有任何嵌套关系
+  - wrap区域的高度通过设置min-height，变为视口高度
+  - footer要使用margin为负来确定自己的位置
+  - 在main区域需要设置 padding-bottom。这也是为了防止负 margin 导致 footer 覆盖任何实际内容。
 
 ### 水平垂直居中
 #### 定宽高
 - 绝对定位和负magin值
-```html
-<template>
-    <div id="app">
-        <div class="box">
-            <div class="children-box"></div>
-        </div>
-    </div>
-</template>
-<style type="text/css">
-.box {
-    width: 200px;
-    height: 200px;
-    border: 1px solid red;
-    position: relative;
-}
-.children-box {
-    position: absolute;
-    width: 100px;
-    height: 100px;
-    background: yellow;
-    left: 50%;
-    top: 50%;
-    margin-left: -50px;
-    margin-top: -50px; 
-}
-</style>
-```
-- 绝对定位 + transform
-```js
-<template>
-    <div id="app">
-        <div class="box">
-            <div class="children-box"></div>
-        </div>
-    </div>
-</template>
-<style type="text/css">
-.box {
-    width: 200px;
-    height: 200px;
-    border: 1px solid red;
-    position: relative;
-}
-.children-box {
-    position: absolute;
-    width: 100px;
-    height: 100px;
-    background: yellow;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%); 
-}
-</style>
-```
-- 绝地定位 + margin: auto
-```html
-<style>
-        .box1 {
-           width: 500px;
-           height: 500px;
-           background-color:aqua;
-           position: relative;
-        }
-        .box2 {
-            width: 100px;
-            height: 100px;
-            background-color: blanchedalmond;
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            margin: auto;
-        }
+  ```html
+    <template>
+      <div id="app">
+          <div class="box">
+              <div class="children-box"></div>
+          </div>
+      </div>
+    </template>
+    <style type="text/css">
+    .box {
+      width: 200px;
+      height: 200px;
+      border: 1px solid red;
+      position: relative;
+    }
+    .children-box {
+      position: absolute;
+      width: 100px;
+      height: 100px;
+      background: yellow;
+      left: 50%;
+      top: 50%;
+      margin-left: -50px;
+      margin-top: -50px; 
+    }
     </style>
-</head>
-<body>
+  ```
+- 绝对定位 + transform
+  ```js
+    <template>
+      <div id="app">
+          <div class="box">
+              <div class="children-box"></div>
+          </div>
+      </div>
+    </template>
+    <style type="text/css">
+    .box {
+      width: 200px;
+      height: 200px;
+      border: 1px solid red;
+      position: relative;
+    }
+    .children-box {
+      position: absolute;
+      width: 100px;
+      height: 100px;
+      background: yellow;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%); 
+    }
+    </style>
+  ```
+- 绝地定位 + margin: auto
+  ```html
+  <style>
+    .box1 {
+        width: 500px;
+        height: 500px;
+        background-color:aqua;
+        position: relative;
+    }
+    .box2 {
+        width: 100px;
+        height: 100px;
+        background-color: blanchedalmond;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        margin: auto;
+    }
+  </style>
+  <body>
    <div class="box1">
        <div class="box2"></div>
    </div>
-</body>
-```
+  </body>
+  ```
+
 - flex布局
-```html
-<template>
-    <div id="app">
-        <div class="box">
-            <div class="children-box"></div>
-        </div>
-    </div>
-</template>
-<style type="text/css">
-.box {
-    width: 200px;
-    height: 200px;
-    border: 1px solid red;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.children-box {
-    background: yellow;
-    height: 100px;
-    width: 100px;
-}
-</style>
-```
+  ```html
+    <template>
+      <div id="app">
+          <div class="box">
+              <div class="children-box"></div>
+          </div>
+      </div>
+    </template>
+    <style type="text/css">
+    .box {
+      width: 200px;
+      height: 200px;
+      border: 1px solid red;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .children-box {
+      background: yellow;
+      height: 100px;
+      width: 100px;
+    }
+    </style>
+  ```
 - grid布局
-```html
-<template>
-    <div id="app">
-        <div class="box">
-            <div class="children-box"></div>
-        </div>
-    </div>
-</template>
-<style type="text/css">
-.box {
-    width: 200px;
-    height: 200px;
-    border: 1px solid red;
-    display: grid;
-}
-.children-box {
-    width: 100px;
-    height: 100px;
-    background: yellow;
-    margin: auto;
-}
-</style>
-```
+  ```html
+    <template>
+      <div id="app">
+          <div class="box">
+              <div class="children-box"></div>
+          </div>
+      </div>
+    </template>
+    <style type="text/css">
+    .box {
+      width: 200px;
+      height: 200px;
+      border: 1px solid red;
+      display: grid;
+    }
+    .children-box {
+      width: 100px;
+      height: 100px;
+      background: yellow;
+      margin: auto;
+    }
+    </style>
+  ```
 - table-cell + vertical-align + inline-block/margin: auto
-```html
-<template>
-    <div id="app">
-        <div class="box">
-            <div class="children-box"></div>
-        </div>
-    </div>
-</template>
-<style type="text/css">
-.box {
-    width: 200px;
-    height: 200px;
-    border: 1px solid red;
-    display: table-cell;
-    text-align: center;
-    vertical-align: middle;
-}
-.children-box {
-    width: 100px;
-    height: 100px;
-    background: yellow;
-    display: inline-block;// 可以换成margin: auto;
-}
-</style>
-```
+  ```html
+    <template>
+      <div id="app">
+          <div class="box">
+              <div class="children-box"></div>
+          </div>
+      </div>
+    </template>
+    <style type="text/css">
+    .box {
+      width: 200px;
+      height: 200px;
+      border: 1px solid red;
+      display: table-cell;
+      text-align: center;
+      vertical-align: middle;
+    }
+    .children-box {
+      width: 100px;
+      height: 100px;
+      background: yellow;
+      display: inline-block;// 可以换成margin: auto;
+    }
+    </style>
+  ```
 #### 不定宽高
 - 绝对定位 + transform
-```html
-<template>
-    <div id="app">
-        <div class="box">
-            <div class="children-box">111111</div>
-        </div>
-    </div>
-</template>
-<style type="text/css">
-.box {
-    width: 200px;
-    height: 200px;
-    border: 1px solid red;
-    position: relative;
-}
-.children-box {
-   position: absolute;
-   background: yellow;
-   left: 50%;
-   top: 50%;
-   transform: translate(-50%, -50%);
-}
-</style>
-```
+  ```html
+    <template>
+      <div id="app">
+          <div class="box">
+              <div class="children-box">111111</div>
+          </div>
+      </div>
+    </template>
+    <style type="text/css">
+    .box {
+      width: 200px;
+      height: 200px;
+      border: 1px solid red;
+      position: relative;
+    }
+    .children-box {
+    position: absolute;
+    background: yellow;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    }
+    </style>
+  ```
+
 - table-cell
-```html
-<template>
-    <div id="app">
-        <div class="box">
-            <div class="children-box">111111</div>
-        </div>
-    </div>
-</template>
-<style type="text/css">
-.box {
-    width: 200px;
-    height: 200px;
-    border: 1px solid red;
-    display: table-cell;
-    text-align: center;
-    vertical-align: middle;
-}
-.children-box {
-   background: yellow;
-   display: inline-block;
-}
-</style>
-```
+  ```html
+    <template>
+      <div id="app">
+          <div class="box">
+              <div class="children-box">111111</div>
+          </div>
+      </div>
+    </template>
+    <style type="text/css">
+    .box {
+      width: 200px;
+      height: 200px;
+      border: 1px solid red;
+      display: table-cell;
+      text-align: center;
+      vertical-align: middle;
+    }
+    .children-box {
+    background: yellow;
+    display: inline-block;
+    }
+    </style>
+  ```
 - flex布局
-```html
-<template>
-    <div id="app">
-        <div class="box">
-            <div class="children-box">11111111</div>
-        </div>
-    </div>
-</template>
-<style type="text/css">
-.box {
-    width: 200px;
-    height: 200px;
-    border: 1px solid red;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-.children-box {
-    background: yellow;
-}
-</style>
-```
+  ```html
+    <template>
+      <div id="app">
+          <div class="box">
+              <div class="children-box">11111111</div>
+          </div>
+      </div>
+    </template>
+    <style type="text/css">
+    .box {
+      width: 200px;
+      height: 200px;
+      border: 1px solid red;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .children-box {
+      background: yellow;
+    }
+    </style>
+  ```
+
 - flex + margin:auto
-```html
-<template>
-    <div id="app">
-        <div class="box">
-            <div class="children-box">11111111</div>
-        </div>
-    </div>
-</template>
-<style type="text/css">
-.box {
-    width: 200px;
-    height: 200px;
-    border: 1px solid red;
-    display: flex;
-}
-.children-box {
-    background: yellow;
-    margin: auto;
-}
-</style>
-```
-- grid 
-```html
-<template>
-    <div id="app">
-        <div class="box">
-            <div class="children-box">11111111</div>
-        </div>
-    </div>
-</template>
-<style type="text/css">
-.box {
-    width: 200px;
-    height: 200px;
-    border: 1px solid red;
-    display: grid;
-}
-.children-box {
-    background: yellow;
-    align-self: center;
-    justify-self: center;
-}
-</style>
-```
+  ```html
+    <template>
+      <div id="app">
+          <div class="box">
+              <div class="children-box">11111111</div>
+          </div>
+      </div>
+    </template>
+    <style type="text/css">
+    .box {
+      width: 200px;
+      height: 200px;
+      border: 1px solid red;
+      display: flex;
+    }
+    .children-box {
+      background: yellow;
+      margin: auto;
+    }
+    </style>
+  ```
+
+- grid
+  ```html
+    <template>
+      <div id="app">
+          <div class="box">
+              <div class="children-box">11111111</div>
+          </div>
+      </div>
+    </template>
+    <style type="text/css">
+    .box {
+      width: 200px;
+      height: 200px;
+      border: 1px solid red;
+      display: grid;
+    }
+    .children-box {
+      background: yellow;
+      align-self: center;
+      justify-self: center;
+    }
+    </style>
+  ```
 - gird+margin:auto
-```js
-<template>
-    <div id="app">
-        <div class="box">
-            <div class="children-box">11111111</div>
-        </div>
-    </div>
-</template>
-<style type="text/css">
-.box {
-    width: 200px;
-    height: 200px;
-    border: 1px solid red;
-    display: grid;
-}
-.children-box {
-    background: yellow;
-    margin: auto;
-}
-</style>
-```
+  ```js
+    <template>
+      <div id="app">
+          <div class="box">
+              <div class="children-box">11111111</div>
+          </div>
+      </div>
+    </template>
+    <style type="text/css">
+    .box {
+      width: 200px;
+      height: 200px;
+      border: 1px solid red;
+      display: grid;
+    }
+    .children-box {
+      background: yellow;
+      margin: auto;
+    }
+    </style>
+  ```
+
 - writing-mode属性布局(不是很了解)
-
-
 #### 内联元素居中布局
 - 水平居中
-    - 行内元素可设置：text-align: center;
-    - flex布局设置父元素：display: flex; justify-content: center;
+  - 行内元素可设置：text-align: center;
+  - flex布局设置父元素：display: flex; justify-content: center;
 - 垂直居中
-    - 单行文本父元素确认高度：height === line-heigh
-    - 多行文本父元素确认高度：disaply: table-cell; vertical-align: middle;
-
+  - 单行文本父元素确认高度：height === line-heigh
+  - 多行文本父元素确认高度：disaply: table-cell; vertical-align: middle;
 #### 块级元素居中布局
 - 水平居中
-    - 定宽: margin: 0 auto;
-    - 不定宽： 参考上诉例子中不定宽高例子。
-    - 定位
-    - flex
-    - grid
+  - 定宽: margin: 0 auto;
+  - 不定宽： 参考上诉例子中不定宽高例子。
+  - 定位
+  - flex
+  - grid
 - 垂直居中
-    - position: absolute设置left、top、margin-left、margin-to(定高)；
-    - display: table-cell；
-    - transform: translate(x, y)；
-    - flex(不定高，不定宽)；
-    - grid(不定高，不定宽)，兼容性相对比较差；
-
+  - position: absolute设置left、top、margin-left、margin-to(定高)；
+  - display: table-cell；
+  - transform: translate(x, y)；
+  - flex(不定高，不定宽)；
+  - grid(不定高，不定宽)，兼容性相对比较差；
 ### 单行文本溢出，多行文本溢出的代码实现?
 #### 单行文本省略
 ```css
@@ -1611,35 +1719,34 @@ body,html {
 ```
 ### px、rpx、em、rem、dpr、vw、wh 的值各是什么意思 ???????
 - px:像素
-    - css中的px是一个相对（抽象）单位是虚拟像素，因为不同的设备在大小宽高相同时，他们的物理像素大小也可能是不同的，物理像素高的设备单位面积内存放的像素点就高，因此画质看起来就更精细，通常情况下在pc端中，css中的px就接近于实际的像素大小，但是在移动设备上，根据不用机型的分辨率大小，css中的一个px可能就会对应不同数量的物理像素点
+  - css中的px是一个相对（抽象）单位是虚拟像素，因为不同的设备在大小宽高相同时，他们的物理像素大小也可能是不同的，物理像素高的设备单位面积内存放的像素点就高，因此画质看起来就更精细，通常情况下在pc端中，css中的px就接近于实际的像素大小，但是在移动设备上，根据不用机型的分辨率大小，css中的一个px可能就会对应不同数量的物理像素点
 - rem: 根据根元素(即 html)的 font-size
-    - rem和em类似都是相对长度单位，但是rem只会相对于html根元素的字体大小，也就是说如果根元素字体设置为18px，那么全局内rem的值换算都为1rem = 18px
-    - 有时我们为了换算方便会将根元素的字体大小先设置为62.5%，然后根据需要进行调整，原因是62.5%*16px = 10px，此时也就是1rem = 10px
+  - rem和em类似都是相对长度单位，但是rem只会相对于html根元素的字体大小，也就是说如果根元素字体设置为18px，那么全局内rem的值换算都为1rem = 18px
+  - 有时我们为了换算方便会将根元素的字体大小先设置为62.5%，然后根据需要进行调整，原因是62.5%*16px = 10px，此时也就是1rem = 10px
 - em: 根据「自身元素」的 font-size
-    - 使用em单位的元素如果自身设置了字体大小，那么就相对于自身计算，如果自身没有设置字体大小那么就会继承父元素的字体大小，如果父元素没有设置，就会依次向上寻找（因为字体大小是会被继承的），如果页面中没有设置字体大小，那么就会以浏览器的默认字体大小16px为基准
+  - 使用em单位的元素如果自身设置了字体大小，那么就相对于自身计算，如果自身没有设置字体大小那么就会继承父元素的字体大小，如果父元素没有设置，就会依次向上寻找（因为字体大小是会被继承的），如果页面中没有设置字体大小，那么就会以浏览器的默认字体大小16px为基准
 - vw: viewport width
 - vh: viewport height
-    - vh指的是视窗高度 vh类似于一种百分比的单位，他相对于视窗的高度，将视窗的高度分为100份，10vh也就是占用视窗的10%
+  - vh指的是视窗高度 vh类似于一种百分比的单位，他相对于视窗的高度，将视窗的高度分为100份，10vh也就是占用视窗的10%
 - vm:
-    - vm是在视口中选取 宽度或者高度最小的那一个，然后想vw、vh一样将其分为100等份
+  - vm是在视口中选取 宽度或者高度最小的那一个，然后想vw、vh一样将其分为100等份
 - rpx：
-    - rpx 响应式px单位
-    - rpx本质上是和宽度相关的单位，屏幕越宽实际像素值就越大，这是根据屏幕宽度缩放的单位，如果你不想根据屏幕缩放，那么不要使用rpx
-    - 使用rpx单位元素的大小的计算公式为
-        - 750 * 元素在设计稿中的宽度 / 设计稿基准宽度
-        - 若设计稿宽度为 750px，元素 A 在设计稿上的宽度为 100px，那么元素 A 在 uni-app 里面的宽度应该设为：750 * 100 / 750，结果为：100rpx
-        - 若设计稿宽度为 640px，元素 A 在设计稿上的宽度为 100px，那么元素 A 在 uni-app 里面的宽度应该设为：750 * 100 / 640，结果为：117rpx
-    - rpx本质上是和宽度相关的单位，屏幕越宽实际像素值就越大，这是根据屏幕宽度缩放的单位，如果你不想根据屏幕缩放，那么不要使用rpx
-    - 如果你的字体使用了rpx就需要注意了，你的字体也会跟着屏幕的宽度变化而变化
-    - rpx不支持切换横竖屏时进行计算大小，因此如果你使用了rpx，建议锁定屏幕方向
+  - rpx 响应式px单位
+  - rpx本质上是和宽度相关的单位，屏幕越宽实际像素值就越大，这是根据屏幕宽度缩放的单位，如果你不想根据屏幕缩放，那么不要使用rpx
+  - 使用rpx单位元素的大小的计算公式为
+    - 750 * 元素在设计稿中的宽度 / 设计稿基准宽度
+    - 若设计稿宽度为 750px，元素 A 在设计稿上的宽度为 100px，那么元素 A 在 uni-app 里面的宽度应该设为：750 * 100 / 750，结果为：100rpx
+    - 若设计稿宽度为 640px，元素 A 在设计稿上的宽度为 100px，那么元素 A 在 uni-app 里面的宽度应该设为：750 * 100 / 640，结果为：117rpx
+  - rpx本质上是和宽度相关的单位，屏幕越宽实际像素值就越大，这是根据屏幕宽度缩放的单位，如果你不想根据屏幕缩放，那么不要使用rpx
+  - 如果你的字体使用了rpx就需要注意了，你的字体也会跟着屏幕的宽度变化而变化
+  - rpx不支持切换横竖屏时进行计算大小，因此如果你使用了rpx，建议锁定屏幕方向
 ### 伪类与伪元素
 - 伪类
-    - 伪类用于当已有元素处于的某个状态时，为其添加对应的样式，这个状态是根据用户行为而动态变化的。比如说，当用户悬停在指定的元素时，我们可以通过:hover 来描述这个元素的状态。虽然它和普通的 css 类相似，可以为已有的元素添加样式，但是它只有处于 dom 树无法描述的状态下才能为元素添加样式，所以将其称为伪类。
-    - 双冒号 (::) 表示伪元素
+  - 伪类用于当已有元素处于的某个状态时，为其添加对应的样式，这个状态是根据用户行为而动态变化的。比如说，当用户悬停在指定的元素时，我们可以通过:hover 来描述这个元素的状态。虽然它和普通的 css 类相似，可以为已有的元素添加样式，但是它只有处于 dom 树无法描述的状态下才能为元素添加样式，所以将其称为伪类。
+  - 双冒号 (::) 表示伪元素
 - 伪元素
-    - 伪元素用于创建一些不在文档树中的元素，并为其添加样式。比如说，我们可以通过:before 来在一个元素前增加一些文本，并为这些文本添加样式。虽然用户可以看到这些文本，但是这些文本实际上不在文档树中。
-    - 单冒号 (:)表示伪类
-
+  - 伪元素用于创建一些不在文档树中的元素，并为其添加样式。比如说，我们可以通过:before 来在一个元素前增加一些文本，并为这些文本添加样式。虽然用户可以看到这些文本，但是这些文本实际上不在文档树中。
+  - 单冒号 (:)表示伪类
 ### CSS选择器的优先级
 第一优先级：!important会覆盖页面内任何位置的元素样式
 1.内联样式，如style="color: green"，权值为1000
@@ -1648,103 +1755,99 @@ body,html {
 4.标签、伪元素选择器，如div::first-line，权值为0001
 5.通配符、子类选择器、兄弟选择器，如*, >, +，权值为0000
 6.继承的样式没有权值
-
 ### display:none visibility:hidden opacity:0 区别
 - display: none;
-    - DOM 结构：浏览器不会渲染 display 属性为 none 的元素，不占据空间；
-    - 事件监听：无法进行 DOM 事件监听；
-    - 性能：动态改变此属性时会引起重排，性能较差；
-    - 继承：不会被子元素继承，毕竟子类也不会被渲染；
-    - transition：transition 不支持 display。
+  - DOM 结构：浏览器不会渲染 display 属性为 none 的元素，不占据空间；
+  - 事件监听：无法进行 DOM 事件监听；
+  - 性能：动态改变此属性时会引起重排，性能较差；
+  - 继承：不会被子元素继承，毕竟子类也不会被渲染；
+  - transition：transition 不支持 display。
 - visibility: hidden;
-    - DOM 结构：元素被隐藏，但是会被渲染不会消失，占据空间；
-    - 事件监听：无法进行 DOM 事件监听；
-    - 性 能：动态改变此属性时会引起重绘，性能较高；
-    - 继 承：会被子元素继承，子元素可以通过设置 visibility: visible; 来取消隐藏；
-    - transition：visibility 会立即显示，隐藏时会延时
+  - DOM 结构：元素被隐藏，但是会被渲染不会消失，占据空间；
+  - 事件监听：无法进行 DOM 事件监听；
+  - 性 能：动态改变此属性时会引起重绘，性能较高；
+  - 继 承：会被子元素继承，子元素可以通过设置 visibility: visible; 来取消隐藏；
+  - transition：visibility 会立即显示，隐藏时会延时
 - opacity: 0;
-    - DOM 结构：透明度为 100%，元素隐藏，占据空间；
-    - 事件监听：可以进行 DOM 事件监听；
-    - 性 能：提升为合成层，不会触发重绘，性能较高；
-    - 继 承：会被子元素继承,且，子元素并不能通过 opacity: 1 来取消隐藏；
-    - transition：opacity 可以延时显示和隐藏
-
+  - DOM 结构：透明度为 100%，元素隐藏，占据空间；
+  - 事件监听：可以进行 DOM 事件监听；
+  - 性 能：提升为合成层，不会触发重绘，性能较高；
+  - 继 承：会被子元素继承,且，子元素并不能通过 opacity: 1 来取消隐藏；
+  - transition：opacity 可以延时显示和隐藏
 
 1.opacity：0，该元素隐藏起来了，但不会改变页面布局，并且，如果该元素已经绑定 一些事件，如click 事件，那么点击该区域，也能触发点击事件的
 2.visibility：hidden，该元素隐藏起来了，但不会改变页面布局，但是不会触发该元素已 经绑定的事件 ，隐藏对应元素，在文档布局中仍保留原来的空间（重绘）
 3.display：none，把元素隐藏起来，并且会改变页面布局，可以理解成在页面中把该元素。 不显示对应的元素，在文档布局中不再分配空间（回流+重绘）
-
 ### CSS标签meta  ？？？？？？？？？
-
 ### CSS画三角形   画半圆
 #### 三角形
 利用元素的 border 绘制三角形，先来看一下宽高均为 0，border 有宽度
 ```html
-<style>
-.triangle {
-    width: 0;
-    height: 0;
-    border: 100px solid transparent;
-    border-bottom: 200px solid #0ff;
-}
-</style>
+  <style>
+  .triangle {
+      width: 0;
+      height: 0;
+      border: 100px solid transparent;
+      border-bottom: 200px solid #0ff;
+  }
+  </style>
 
-<div class="triangle"></div>
+  <div class="triangle"></div>
 ```
 #### 梯形
 梯形也是基于 border 来绘制的，只不过绘制梯形时，宽高和border尺寸相同。
 ```html
-<style>
-  .trapezoid {
-    width: 50px;
-    height: 50px;
-    background: #ff0;
-    border-top: 50px solid #f00;
-    border-bottom: 50px solid #00f;
-    border-left: 50px solid #0f0;
-    border-right: 50px solid #0ff;
-  }
-</style>
-<div class="trapezoid"></div>
+  <style>
+    .trapezoid {
+      width: 50px;
+      height: 50px;
+      background: #ff0;
+      border-top: 50px solid #f00;
+      border-bottom: 50px solid #00f;
+      border-left: 50px solid #0f0;
+      border-right: 50px solid #0ff;
+    }
+  </style>
+  <div class="trapezoid"></div>
 ```
 #### 扇形
 ```html
-<style>
-  .sector1 {
-      border-radius:100px 0 0;
-      width: 100px;
-      height: 100px;
-      background: #00f;
-  }
-</style>
-<div class="sector1"></div>
+  <style>
+    .sector1 {
+        border-radius:100px 0 0;
+        width: 100px;
+        height: 100px;
+        background: #00f;
+    }
+  </style>
+  <div class="sector1"></div>
 
 
 
-<style>
-  .sector2 {
-      border: 100px solid transparent;
-      width: 0;
-      border-radius: 100px;
-      border-top-color: #f00;
-  }
-</style>
-<div class="sector2"></div>
+  <style>
+    .sector2 {
+        border: 100px solid transparent;
+        width: 0;
+        border-radius: 100px;
+        border-top-color: #f00;
+    }
+  </style>
+  <div class="sector2"></div>
 ```
 #### 椭圆
 border-radius: 水平半径 / 垂直半径;
 ```html
-<style>
-  .oval {
-      width: 100px;
-      height: 50px;
-      background: #ff0;
-      border-radius: 50px / 25px;
-  }
-</style>
-<div class="oval"></div>
-
+  <style>
+    .oval {
+        width: 100px;
+        height: 50px;
+        background: #ff0;
+        border-radius: 50px / 25px;
+    }
+  </style>
+  <div class="oval"></div>
 ```
+
 #### 箭头
 ```html
  <style>
@@ -1763,21 +1866,20 @@ border-radius: 水平半径 / 垂直半径;
         border: 50px solid;
         border-color: transparent #fff transparent transparent;
     }
-  
 </style>
 <div class="arrow"></div>
 ```
 #### 半圆
 ```html
-<style>
-  .semicircle{
-    width: 100px;
-    height: 50px;
-    border-radius: 50px 50px 0 0;
-    background-color: rebeccapurple;
-  }
-</style>
-<div class="semicircle"></div>
+  <style>
+    .semicircle{
+      width: 100px;
+      height: 50px;
+      border-radius: 50px 50px 0 0;
+      background-color: rebeccapurple;
+    }
+  </style>
+  <div class="semicircle"></div>
 ```
 ### CSS九宫格布局
 #### Flex实现
@@ -1785,51 +1887,52 @@ border-radius: 水平半径 / 垂直半径;
 ```html
 //html代码
 <div class="box">
-      <ul class="box-inner">
-        <li>九宫格1</li>
-        <li>九宫格2</li>
-        <li>九宫格3</li>
-        <li>九宫格4</li>
-        <li>九宫格5</li>
-        <li>九宫格6</li>
-        <li>九宫格7</li>
-        <li>九宫格8</li>
-        <li>九宫格9</li>
-      </ul>
-    </div>
-// css代码
-.box {
-  position: relative;
-  width: 100%;
-  height: 600px;
-}
-.box-inner {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-wrap: wrap;
-}
-.box-inner > li {
-  overflow: hidden;
-  flex-grow: 1;
-  background-color: darkorange;
-  text-align: center;
-  color: #ffffff;
-  width: 33%;
-  height: 200px;
-  line-height: 200px;
-  margin: 1px;
-  text-align: center;
-}
+    <ul class="box-inner">
+      <li>九宫格1</li>
+      <li>九宫格2</li>
+      <li>九宫格3</li>
+      <li>九宫格4</li>
+      <li>九宫格5</li>
+      <li>九宫格6</li>
+      <li>九宫格7</li>
+      <li>九宫格8</li>
+      <li>九宫格9</li>
+    </ul>
+  </div>
+
+  // css代码
+  .box {
+    position: relative;
+    width: 100%;
+    height: 600px;
+  }
+  .box-inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .box-inner > li {
+    overflow: hidden;
+    flex-grow: 1;
+    background-color: darkorange;
+    text-align: center;
+    color: #ffffff;
+    width: 33%;
+    height: 200px;
+    line-height: 200px;
+    margin: 1px;
+    text-align: center;
+  }
 ```
 #### Grid实现
 原理：使用grid创建网格布局，划分为3x3的等分布局。
 ```html
-//html代码
-<div class="box">
+  //html代码
+  <div class="box">
       <div>九宫格1</div>
       <div>九宫格2</div>
       <div>九宫格3</div>
@@ -1840,73 +1943,76 @@ border-radius: 水平半径 / 垂直半径;
       <div>九宫格8</div>
       <div>九宫格9</div>
     </div>
-//css代码
-.box {
-  display: grid;
-  height: 600px;
-  width: 100%;
-  grid-template-columns: repeat(3, 1fr);
- grid-template-rows: repeat(3, 1fr);
-}
-.box > div {
-  width: 98%;
-  margin: 1%;
-  background-color: deeppink;
-  text-align: center;
-  line-height: 200px;
-}
-.box > div:nth-child(even) {
-  background-color: black;
-  color: #fff;
-}
+  //css代码
+  .box {
+    display: grid;
+    height: 600px;
+    width: 100%;
+    grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  }
+  .box > div {
+    width: 98%;
+    margin: 1%;
+    background-color: deeppink;
+    text-align: center;
+    line-height: 200px;
+  }
+  .box > div:nth-child(even) {
+    background-color: black;
+    color: #fff;
+  }
 ```
+
 #### Float实现
 原理：利用float布局和31%的百分比设置宽和高。
 ```html
-//html代码
-<div class="box">
-  <ul class="box-inner">
-    <li>九宫格1</li>
-    <li>九宫格2</li>
-    <li>九宫格3</li>
-    <li>九宫格4</li>
-    <li>九宫格5</li>
-    <li>九宫格6</li>
-    <li>九宫格7</li>
-    <li>九宫格8</li>
-    <li>九宫格9</li>
-  </ul>
-</div>
-//css代码
-.box {
-  position: relative;
-  width: 100%;
-  height: 600px;
-}
-.box-inner {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-.box-inner > li {
-  position: relative;
-  float: left;
-  width: 31%;
-  height: 31%;
-  margin: 1%;
-  list-style-type: none;
-  background-color: springgreen;
-  text-align: center;
-  line-height: 200px;
-}
-.box-inner > li:nth-child(odd) {
-  background-color: silver;
-}
+  //html代码
+  <div class="box">
+    <ul class="box-inner">
+      <li>九宫格1</li>
+      <li>九宫格2</li>
+      <li>九宫格3</li>
+      <li>九宫格4</li>
+      <li>九宫格5</li>
+      <li>九宫格6</li>
+      <li>九宫格7</li>
+      <li>九宫格8</li>
+      <li>九宫格9</li>
+    </ul>
+  </div>
+  //css代码
+  .box {
+    position: relative;
+    width: 100%;
+    height: 600px;
+  }
+  .box-inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .box-inner > li {
+    position: relative;
+    float: left;
+    width: 31%;
+    height: 31%;
+    margin: 1%;
+    list-style-type: none;
+    background-color: springgreen;
+    text-align: center;
+    line-height: 200px;
+  }
+  .box-inner > li:nth-child(odd) {
+    background-color: silver;
+  }
 ```
 #### Table实现
+
 原理1：使用原生table表格实现九宫格 缺点：单元之间的间隔使用border-spacing实现，不支持百分比，设置后为添加单元四周的间隔。
+
 ```html
 //html代码
 <div class="box">
@@ -1956,24 +2062,28 @@ border-radius: 水平半径 / 垂直半径;
 ```
 ### RAF（requestAnimationFrame） 和 RIC（requestIdleCallback） 是什么
 #### 页面流畅与 FPS
+
 - 页面是一帧一帧绘制出来的，当每秒绘制的帧数（FPS）达到 60 时，页面是流畅的，小于这个值时，用户会感觉到卡顿。
+
 - 1s 60帧，所以每一帧分到的时间是 1000/60 ≈ 16 ms。所以我们书写代码时力求不让一帧的工作量超过 16ms。
 #### Frame
-览器每一帧都需要完成哪些工作？
-![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211013143020.png)
+浏览器每一帧都需要完成哪些工作？
+  ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211013143020.png)
 - 一帧内需要完成如下六个步骤的任务：
-    - 处理用户的交互
-    - JS 解析执行
-    - 帧开始。窗口尺寸变更，页面滚去等的处理
-    - requestAnimationFrame
-    - 布局
-    - 绘制
+  - 处理用户的交互
+  - JS 解析执行
+  - 帧开始。窗口尺寸变更，页面滚去等的处理
+  - requestAnimationFrame
+  - 布局
+  - 绘制
 #### requestIdleCallback
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211013143303.png)
-- requestIdleCallback：: 会在浏览器空闲时间执行回调，也就是允许开发人员在主事件循环中执行低优先级任务，而不影响一些延迟关键事件。如果有多个回调，会按照先进先出原则执行，但是当传入了 timeout，为了避免超时，有可能会打乱这个顺序。
-- 上面六个步骤完成后没超过 16 ms，说明时间有富余(空闲时间多了)，此时就会执行 requestIdleCallback 里注册的任务。
-- 从上图也可看出，和 requestAnimationFrame 每一帧必定会执行不同，requestIdleCallback 是捡浏览器空闲来执行任务。
 
+- requestIdleCallback：: 会在浏览器空闲时间执行回调，也就是允许开发人员在主事件循环中执行低优先级任务，而不影响一些延迟关键事件。如果有多个回调，会按照先进先出原则执行，但是当传入了 timeout，为了避免超时，有可能会打乱这个顺序。
+
+- 上面六个步骤完成后没超过 16 ms，说明时间有富余(空闲时间多了)，此时就会执行 requestIdleCallback 里注册的任务。
+
+- 从上图也可看出，和 requestAnimationFrame 每一帧必定会执行不同，requestIdleCallback 是捡浏览器空闲来执行任务。
 
 ```js
 requestIdleCallback(myNonEssentialWork, { timeout: 2000 });
@@ -2009,8 +2119,8 @@ function work () {
 // 超时的情况，其实就是浏览器很忙，没有空闲时间，此时会等待指定的 timeout 那么久再执行，通过入参 dealine 拿到的 didTmieout 会为 true，同时 timeRemaining () 返回的也是 0。超时的情况下如果选择继续执行的话，肯定会出现卡顿的，因为必然会将一帧的时间拉长。
 ```
 - cancelIdleCallback
-    - 与 setTimeout 类似，返回一个唯一 id，可通过 cancelIdleCallback 来取消任务。
-#### requestAnimationFrame 
+  - 与 setTimeout 类似，返回一个唯一 id，可通过 cancelIdleCallback 来取消任务。
+#### requestAnimationFrame
 requestAnimationFrame： 告诉浏览器在下次重绘之前执行传入的回调函数(通常是操纵 dom，更新动画的函数)；由于是每帧执行一次，那结果就是每秒的执行次数与浏览器屏幕刷新次数一样，通常是每秒 60 次。
 
 在没有 requestAnimationFrame 方法的时候，执行动画，我们可能使用 setTimeout 或 setInterval 来触发视觉变化；但是这种做法的问题是：回调函数执行的时间是不固定的，可能刚好就在末尾，或者直接就不执行了，经常会引起丢帧而导致页面卡顿。
@@ -2021,84 +2131,81 @@ requestAnimationFrame： 告诉浏览器在下次重绘之前执行传入的回�
 requestAnimationFrame 方法不同与 setTimeout 或 setInterval，它是由系统来决定回调函数的执行时机的，会请求浏览器在下一次重新渲染之前执行回调函数。无论设备的刷新率是多少，requestAnimationFrame 的时间间隔都会紧跟屏幕刷新一次所需要的时间；例如某一设备的刷新率是 75 Hz，那这时的时间间隔就是 13.3 ms（1 秒 / 75 次）。需要注意的是这个方法虽然能够保证回调函数在每一帧内只渲染一次，但是如果这一帧有太多任务执行，还是会造成卡顿的；因此它只能保证重新渲染的时间间隔最短是屏幕的刷新时间。
 
 ```js
-let offsetTop = 0;
-const div = document.querySelector(".div");
-const run = () => {
- div.style.transform = `translate3d(0, ${offsetTop += 10}px, 0)`;
- window.requestAnimationFrame(run);
-};
-run();
+  let offsetTop = 0;
+  const div = document.querySelector(".div");
+  const run = () => {
+  div.style.transform = `translate3d(0, ${offsetTop += 10}px, 0)`;
+  window.requestAnimationFrame(run);
+  };
+  run();
 ```
-
 #### 总结
 一些低优先级的任务可使用`requestIdleCallback`等浏览器不忙的时候来执行，同时因为时间有限，它所执行的任务应该尽量是能够量化，细分的微任务（micro task）。
 
 因为它发生在一帧的最后，此时页面布局已经完成，所以不建议在 requestIdleCallback 里再操作 DOM，这样会导致页面再次重绘。DOM 操作建议在 RAF 中进行。同时，操作 DOM 所需要的耗时是不确定的，因为会导致重新计算布局和视图的绘制，所以这类操作不具备可预测性。
 
 Promise 也不建议在这里面进行，因为 Promise 的回调属性 Event loop 中优先级较高的一种微任务，会在requestIdleCallback 结束时立即执行，不管此时是否还有富余的时间，这样有很大可能会让一帧超过 16 ms。
+
 ### 怎样处理 移动端 1px 被 渲染成 2px问题？
 - 局部处理
-    - meta标签中的 viewport属性 ，initial-scale 设置为 1
-    - rem按照设计稿标准走，外加利用transfrome 的scale(0.5) 缩小一倍即可；
+  - meta标签中的 viewport属性 ，initial-scale 设置为 1
+  - rem按照设计稿标准走，外加利用transfrome 的scale(0.5) 缩小一倍即可；
 - 全局处理
-    - mate标签中的 viewport属性 ，initial-scale 设置为 0.5
-    - rem 按照设计稿标准走即可
-
+  - mate标签中的 viewport属性 ，initial-scale 设置为 0.5
+  - rem 按照设计稿标准走即可
 ### 网页视口尺寸
 - 屏幕
-    - 屏幕尺寸
-        - 屏幕尺寸是屏幕的宽度和高度：显示器或移动屏幕。window.screen是保存屏幕尺寸信息的对象。
-            - screen.width：屏幕的宽 、 screen.height：屏幕的高。
-            - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106104805.png)
-    - 可用屏幕尺寸
-        - 可用的屏幕大小由活动屏幕的宽度和高度组成，没有操作系统工具栏。
-        - screen.availWidth：可利用的宽，等于屏幕的宽、screen.availHeight：可利用的高，等于屏幕的高减去 mac 顶部栏或 windows 底部栏。
-        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106104855.png)
-    - 屏幕距离
-        - screenTop：浏览器窗口左上角到屏幕上边缘的距离。
-        - screenLeft：浏览器窗口左上角到屏幕左边缘的距离。
-        - Firefox 浏览器不支持上述属性，但是可以使用👇:
-            - screenX：等于 screenLeft。
-            - screenY：等于 screenTop。
-        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106105729.png)
+  - 屏幕尺寸
+    - 屏幕尺寸是屏幕的宽度和高度：显示器或移动屏幕。window.screen是保存屏幕尺寸信息的对象。
+      - screen.width：屏幕的宽 、 screen.height：屏幕的高。
+      - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106104805.png)
+  - 可用屏幕尺寸
+    - 可用的屏幕大小由活动屏幕的宽度和高度组成，没有操作系统工具栏。
+    - screen.availWidth：可利用的宽，等于屏幕的宽、screen.availHeight：可利用的高，等于屏幕的高减去 mac 顶部栏或 windows 底部栏。
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106104855.png)
+  - 屏幕距离
+    - screenTop：浏览器窗口左上角到屏幕上边缘的距离。
+    - screenLeft：浏览器窗口左上角到屏幕左边缘的距离。
+    - Firefox 浏览器不支持上述属性，但是可以使用👇:
+      - screenX：等于 screenLeft。
+      - screenY：等于 screenTop。
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106105729.png)
 - window窗口
-    - 窗口的外部大小由整个浏览器窗口的宽度和高度组成，包含地址栏，选项卡栏和其他浏览器面板。
-        - window.outerWidth：浏览器窗口的宽、window.outerHeight：浏览器窗口的高。
-        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106105935.png)
+  - 窗口的外部大小由整个浏览器窗口的宽度和高度组成，包含地址栏，选项卡栏和其他浏览器面板。
+    - window.outerWidth：浏览器窗口的宽、window.outerHeight：浏览器窗口的高。
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106105935.png)
 - 客户区
-    - 元素的客户区大小（client dimension），指的是元素内容及其内边距所占据的空间大小
-    - clientWidth：内容可视区的宽度、clientHeight：内容可视区的高度。
-    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106110042.png)
-    - 如果有滚动条clientWidth = 元素宽 + padding（左右） - 滚动条
-    - 如果没有滚动条clientWidth = 元素宽 + padding（左右）
-    - 获取页面大小:let pageWidth = document.documentElement.clientWidth || document.body.clientWidth（ie7之前的版本）;
+  - 元素的客户区大小（client dimension），指的是元素内容及其内边距所占据的空间大小
+  - clientWidth：内容可视区的宽度、clientHeight：内容可视区的高度。
+  - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106110042.png)
+  - 如果有滚动条clientWidth = 元素宽 + padding（左右） - 滚动条
+  - 如果没有滚动条clientWidth = 元素宽 + padding（左右）
+  - 获取页面大小:let pageWidth = document.documentElement.clientWidth || document.body.clientWidth（ie7之前的版本）;
 - 网页大小
-    - 网页大小由呈现的页面内容的宽度和高度组成。
-    - scrollWidth：实际内容的宽度。没有垂直滚动条时与clientWidth相同。否则是等于实际内容的宽度 + padding。scrollWidth也包括 ::before 和 ::after这样的伪元素。
-    - scrollHeight：实际内容的高度。没有垂直滚动条时与clientHeight相同。否则是等于实际内容的高度 + padding。scrollHeight也包括 ::before 和 ::after这样的伪元素。
-    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106110220.png)
+  - 网页大小由呈现的页面内容的宽度和高度组成。
+  - scrollWidth：实际内容的宽度。没有垂直滚动条时与clientWidth相同。否则是等于实际内容的宽度 + padding。scrollWidth也包括 ::before 和 ::after这样的伪元素。
+  - scrollHeight：实际内容的高度。没有垂直滚动条时与clientHeight相同。否则是等于实际内容的高度 + padding。scrollHeight也包括 ::before 和 ::after这样的伪元素。
+  - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106110220.png)
 - 滚动距离
-    - scrollLeft：元素最左端和窗口中可见内容的最左端之间的距离。即当前左滚的距离
-    - scrollTop：元素最顶端和窗口中可见内容的最顶端之间的距离。即当前上滚的距离
-    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106110333.png)
-    - 如果有滚动条scrollLeft = 隐藏内容宽度 + border
-    - 如果没有滚动条scrollLeft = 0
+  - scrollLeft：元素最左端和窗口中可见内容的最左端之间的距离。即当前左滚的距离
+  - scrollTop：元素最顶端和窗口中可见内容的最顶端之间的距离。即当前上滚的距离
+  - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106110333.png)
+  - 如果有滚动条scrollLeft = 隐藏内容宽度 + border
+  - 如果没有滚动条scrollLeft = 0
 - 偏移量
-    - 偏移量包括元素在屏幕上占用的所有可见的空间。元素的可见大小由其高度、宽度决定，包括所有内边距、滚动条和边框大小（注意，不包括外边距）。
-    - offsetHeight：元素在垂直方向上占用的空间大小，包括元素的高度、（可见的）水平滚动条的高度、上边框高度和下边框高度。
-    - offsetWidth：元素在水平方向上占用的空间大小。包括元素的宽度、（可见的）垂直滚动条的宽度、左边框宽度和右边框宽度。
-    - offsetLeft：当前元素内容区域（包括border）左边缘到 offsetParent 内容区域（不包括border）左边缘的距离。
-    - offsetTop：当前元素内容区域（包括border）顶部到 offsetParent 内容区域（不包括border）顶部的距离。
-    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106110734.png)
-    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106110836.png)
-    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106111014.png)
-    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106111112.png)
-    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106111243.png)
-    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106111342.png)
-    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106111403.png)
-    - 
-
-
+  - 偏移量包括元素在屏幕上占用的所有可见的空间。元素的可见大小由其高度、宽度决定，包括所有内边距、滚动条和边框大小（注意，不包括外边距）。
+  - offsetHeight：元素在垂直方向上占用的空间大小，包括元素的高度、（可见的）水平滚动条的高度、上边框高度和下边框高度。
+  - offsetWidth：元素在水平方向上占用的空间大小。包括元素的宽度、（可见的）垂直滚动条的宽度、左边框宽度和右边框宽度。
+  - offsetLeft：当前元素内容区域（包括border）左边缘到 offsetParent 内容区域（不包括border）左边缘的距离。
+  - offsetTop：当前元素内容区域（包括border）顶部到 offsetParent 内容区域（不包括border）顶部的距离。
+  - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106110734.png)
+  - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106110836.png)
+  - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106111014.png)
+  - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106111112.png)
+  - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106111243.png)
+  - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106111342.png)
+  - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106111403.png)
+  - 
 
 ### CSS优化
 - 多个css合并，尽量减少HTTP请求
@@ -2112,130 +2219,252 @@ Promise 也不建议在这里面进行，因为 Promise 的回调属性 Event lo
 - 属性值为小于1的小数时，省略小数点前面的0
 - css雪碧图
 ## JS
-### 图片懒加载的原理？？？
+### 图片懒加载的原理？？？？？？？？？？
+### JS的一些取反的特殊值？？？？？？？？？
 ### 箭头函数和普通函数有什么区别？如果把箭头函数转换为不用箭头函数的形式，如何转换?
 1. 语法更加简洁、清晰
-箭头函数的定义要比普通函数定义简洁、清晰得多，很快捷。
+   箭头函数的定义要比普通函数定义简洁、清晰得多，很快捷。
 
 2. 箭头函数没有 prototype (原型)，所以箭头函数本身没有this​​​​​​​
 ```js
-// 箭头函数
-let a = () => {};
-console.log(a.prototype); // undefined
+   // 箭头函数
+   let a = () => {};
+   console.log(a.prototype); // undefined
 
-// 普通函数
-function a() {};
-console.log(a.prototype); // {constructor:f}
+  // 普通函数
+  function a() {};
+  console.log(a.prototype); // {constructor:f}
 ```
-
 3. 箭头函数不会创建自己的this
 箭头函数没有自己的this，箭头函数的this指向在定义（注意：是定义时，不是调用时）的时候继承自外层第一个普通函数的this。所以，箭头函数中 this 的指向在它被定义的时候就已经确定了，之后永远不会改变。
 ```js
-let obj = {
-  a: 10,
-  b: () => {
-    console.log(this.a); // undefined
-    console.log(this); // Window {postMessage: ƒ, blur: ƒ, focus: ƒ, close: ƒ, frames: Window, …}
-  },
-  c: function() {
-    console.log(this.a); // 10
-    console.log(this); // {a: 10, b: ƒ, c: ƒ}
+  let obj = {
+    a: 10,
+    b: () => {
+      console.log(this.a); // undefined
+      console.log(this); // Window {postMessage: ƒ, blur: ƒ, focus: ƒ, close: ƒ, frames: Window, …}
+    },
+    c: function() {
+      console.log(this.a); // 10
+      console.log(this); // {a: 10, b: ƒ, c: ƒ}
+    }
   }
-}
-obj.b(); 
-obj.c();
+  obj.b();
+  obj.c();
 ```
 
 4. call | apply | bind 无法改变箭头函数中this的指向
 call | apply | bind方法可以用来动态修改函数执行时this的指向，但由于箭头函数的this定义时就已经确定且永远不会改变。所以使用这些方法永远也改变不了箭头函数this的指向。
-```js
-var id = 10;
-let fun = () => {
-    console.log(this.id)
-};
-fun();     // 10
-fun.call({ id: 20 });     // 10
-fun.apply({ id: 20 });    // 10
-fun.bind({ id: 20 })();   // 10
-```
+   ```js
+    var id = 10;
+    let fun = () => {
+      console.log(this.id)
+    };
+    fun();     // 10
+    fun.call({ id: 20 });     // 10
+    fun.apply({ id: 20 });    // 10
+    fun.bind({ id: 20 })();   // 10
+   ```
 
 5. 箭头函数不能作为构造函数使用
 因为箭头函数没有自己的this，它的this其实是继承了外层执行环境中的this，且this指向永远不会随在哪里调用、被谁调用而改变，所以箭头函数不能作为构造函数使用，或者说构造函数不能定义成箭头函数，否则用new调用时会报错！
 ```js
 let Fun = (name, age) => {
-    this.name = name;
-    this.age = age;
+  this.name = name;
+  this.age = age;
 };
 
 // 报错
 let p = new Fun('dingFY', 24);
-```
 
+```
 6. 箭头函数不绑定arguments，取而代之用rest参数...代替arguments对象，来访问箭头函数的参数列表
 箭头函数没有自己的arguments对象。在箭头函数中访问arguments实际上获得的是外层局部（函数）执行环境中的值。
 ```js
-// 普通函数
-function A(a){
-  console.log(arguments);
-}
-A(1,2,3,4,5,8);  //  [1, 2, 3, 4, 5, 8, callee: ƒ, Symbol(Symbol.iterator): ƒ]
+  // 普通函数
+  function A(a){
+    console.log(arguments);
+  }
+  A(1,2,3,4,5,8);  //  [1, 2, 3, 4, 5, 8, callee: ƒ, Symbol(Symbol.iterator): ƒ]
 
-// 箭头函数
-let B = (b)=>{
-  console.log(arguments);
-}
-B(2,92,32,32);   // Uncaught ReferenceError: arguments is not defined
+  // 箭头函数
+  let B = (b)=>{
+    console.log(arguments);
+  }
+  B(2,92,32,32);   // Uncaught ReferenceError: arguments is not defined
 
-// rest参数...
-let C = (...c) => {
-  console.log(c);
-}
-C(3,82,32,11323);  // [3, 82, 32, 11323]
+  // rest参数...
+  let C = (...c) => {
+    console.log(c);
+  }
+  C(3,82,32,11323);  // [3, 82, 32, 11323]
 ```
 
 7. 箭头函数不能用作Generator函数，不能使用yield关键字
-### 哪些场景下不能使用箭头函数???????
-### JS的一些取反的特殊值？？？？？？？？？
+8. 箭头函数没有prototype(原型)，所以箭头函数本身没有this
+9. 箭头函数的this在定义的时候继承自外层第一个普通函数的this。
+10. 如果箭头函数外层没有普通函数，严格模式和非严格模式下它的this都会指向window(全局对象)
+11. 箭头函数本身的this指向不能改变，但可以修改它要继承的对象的this。
+12. 箭头函数的this指向全局，使用arguments会报未声明的错误。
+13. 箭头函数的this指向普通函数时,它的argumens继承于该普通函数
+14. 使用new调用箭头函数会报错，因为箭头函数没有constructor
+15. 箭头函数不支持new.target
+16. 箭头函数不支持重命名函数参数,普通函数的函数参数支持重命名
+17. 箭头函数相对于普通函数语法更简洁优雅
+### 箭头函数的注意事项
+
+18. 一条语句返回对象字面量，需要加括号，或者直接写成多条语句的return形式，否则像func中演示的一样，花括号会被解析为多条语句的花括号，不能正确解析
+```js
+  var func1 = () => { foo: 1 }; // 想返回一个对象,花括号被当成多条语句来解析，执行后返回undefined
+  var func2 = () => ({foo: 1}); // 用圆括号是正确的写法
+  var func2 = () => {
+    return {
+    foo: 1 // 更推荐直接当成多条语句的形式来写，可读性高
+    };
+  };
+```
+19. 箭头函数在参数和箭头之间不能换行！
+```js
+var func = ()
+        => 1;  // 报错： Unexpected token =>
+```
+
+20. 箭头函数的解析顺序相对靠前
+```js
+let a = false || function() {}; // ok
+let b = false || () => {}; // Malformed arrow function parameter list
+let c = false || (() => {}); // ok
+```
+
+### 哪些场景下不能使用箭头函数？
+
+1. 定义对象方法
+JS 中对象方法的定义方式是在对象上定义一个指向函数的属性，当方法被调用的时候，方法内的 this 就会指向方法所属的对象。
+```js
+let obj = {
+  array: [1, 2, 3],
+  sum: () => {
+      console.log(this === window); // true
+      return this.array.reduce((result, item) => result + item);
+  }
+};
+console.log(this === window); //true
+obj.sum();//报错：Uncaught TypeError: Cannot read property 'reduce' of undefined at Object.sum
+// 确保 this 是在运行时是由包含它的上下文决定的。
+let obj = {
+    array: [1, 2, 3],
+    sum() {
+        console.log(this === window); // false
+        return this.array.reduce((result, item) => result + item);
+    }
+};
+console.log(this === window); //true
+console.log(obj.sum());//6
+```
+2. 定义原型方法
+同样的规则适用于原型方法（prototype method）的定义，使用箭头函数会导致运行时的执行上下文错误。
+```js
+function Cat(name) {
+    this.name = name;
+}
+Cat.prototype.sayCatName = () => {
+    console.log(this === window); // => true
+    return this.name;
+};
+const cat = new Cat('Tom');
+console.log(cat.sayCatName()); // undefined
+
+
+
+function Cat(name) {
+    this.name = name;
+}
+Cat.prototype.sayCatName = function () {
+    console.log(this === window); // => false
+    return this.name;
+}
+const cat = new Cat('Tom');
+console.log(cat.sayCatName()); // Tom
+```
+
+3. 定义事件回调函数（不能定义动态上下文的回调函数）
+箭头函数在声明的时候就绑定了执行上下文，要动态改变上下文是不可能的，在需要动态上下文的时候它的弊端就凸显出来。
+```js
+// 比如在客户端编程中常见的 DOM 事件回调函数（event listenner）绑定，触发回调函数时 this 指向当前发生事件的 DOM 节点，而动态上下文这个时候就非常有用，比如下面这段代码试图使用箭头函数来作事件回调函数。
+const button = document.getElementById('myButton');
+button.addEventListener('click', () => {
+  console.log(this === window); // true
+  this.innerHTML = 'Clicked button';
+});
+
+// 在全局上下文下定义的箭头函数执行时 this 会指向 window，当单击事件发生时，this.innerHTML 就等价于 window.innerHTML，而后者是没有任何意义的。
+// 使用函数表达式就可以在运行时动态的改变 this
+const button = document.getElementById('myButton');
+button.addEventListener('click', function () {
+    console.log(this === button); // true
+    this.innerHTML = 'Clicked button';
+});
+
+```
+4. 定义构造函数
+```js
+// 构造函数中的 this 指向新创建的对象，当执行 new Car() 的时候，构造函数 Car 的上下文就是新创建的对象，也就是说 this instanceof Car === true。显然，箭头函数是不能用来做构造函数， 实际上 JS 会禁止你这么做，如果你这么做了，它就会抛出异常。
+const Message = (text) => {
+    this.text = text;
+};
+const helloMessage = new Message('Hello World!');//报错： Throws "TypeError: Message is not a constructor"
+
+
+// 　构造新的 Message 实例时，JS 引擎抛了错误，因为 Message 不是构造函数。可以通过使用函数表达式或者函数声明来声明构造函数修复上面的例子。
+const Message = function(text) {
+    this.text = text;
+};
+const helloMessage = new Message('Hello World!');
+console.log(helloMessage.text); // 'Hello World!'
+```
+
 ### CSS和JS为什么会放在头部或者底部？
 - 因为页面在加载时，浏览器会识别该文档CSS，并行下载，不会停止对当前文档的加载。放在头部可以保证在加载html生成DOM tree的时候，就可以同时对DOM tree进行渲染，可以防止闪跳，白屏或者布局混乱。
 - 外部引入js文件阻塞其他资源下载，也会阻塞该js引入位置以下的页面的内容呈现，而且js可能会改变DOM tree的结构，需要一个稳定的DOM tree，所以要放置在页面的最下面。
 ### undefined和null有什么区别？
 首先，undefined和null都是假值（falsy），都能作为条件进行判断。这两种不同类型的值，既有着不同的语义和场景，又表现出较为相似的行为。
-
 #### undefined
 undefined 的字面意思就是：未定义的值 。这个值的语义是，希望表示一个变量最原始的状态，而非人为操作的结果 。
 
 因此，undefined 一般都来自于某个表达式最原始的状态值，不是人为操作的结果。当然，你也可以手动给一个变量赋值 undefined，但这样做没有意义，因为一个变量不赋值就是 undefined 。
 
 这种原始状态会在以下 4 种场景中出现：
+
 1. 声明一个变量，但是没有赋值
 ```js
-var foo;
-console.log(foo); // undefined
-// 访问 foo，返回了 undefined，表示这个变量自从声明了以后，就从来没有使用过，也没有定义过任何有效的值。
+  var foo;
+  console.log(foo); // undefined
+  // 访问 foo，返回了 undefined，表示这个变量自从声明了以后，就从来没有使用过，也没有定义过任何有效的值。
 ```
 2. 访问对象上不存在的属性或者未定义的变量
 ```js
-console.log(Object.foo); // undefined
-console.log(typeof demo); // undefined
-// 访问 Object 对象上的 foo 属性，返回 undefined ， 表示Object 上不存在或者没有定义名为 foo 的属性；对未声明的变量执行typeof操作符返回了undefined值。
+  console.log(Object.foo); // undefined
+  console.log(typeof demo); // undefined
+  // 访问 Object 对象上的 foo 属性，返回 undefined ， 表示Object 上不存在或者没有定义名为 foo 的属性；对未声明的变量执行typeof操作符返回了undefined值。
 ```
+
 3. 函数定义了形参，但没有传递实参
 ```js
 //函数定义了形参 a
 function fn(a) {
-    console.log(a); // undefined
+  console.log(a); // undefined
 }
 fn(); //未传递实参
 // 函数 fn 定义了形参 a，但 fn 被调用时没有传递参数，因此，fn 运行时的参数 a 就是一个原始的、未被赋值的变量。
 ```
+
 4. 使用void对表达式求值
 ```js
-void 0 ; // undefined
-void false; // undefined
-void []; // undefined
-void null; // undefined
-void function fn(){} ; // undefined
+  void 0 ; // undefined
+  void false; // undefined
+  void []; // undefined
+  void null; // undefined
+  void function fn(){} ; // undefined
 
 // ECMAScript 明确规定 void 操作符 对任何表达式求值都返回 undefined ，这和函数执行操作后没有返回值的作用是一样的，JavaScript 中的函数都有返回值，当没有 return 操作时，就默认返回一个原始的状态值，这个值就是 undefined，表明函数的返回值未被定义。
 ```
@@ -2249,15 +2478,13 @@ null 的字面意思是：空值 。这个值的语义是，希望表示一个�
 
 2. 特殊的typeof null
 当我们使用typeof操作符检测null值，我们理所应当地认为应该返"Null"类型呀，但是事实返回的类型却是"object"。
-```js
-var data = null;
-console.log(typeof data); // "object"
+  ```js
+  var data = null;
+  console.log(typeof data); // "object"
 ```
+
 - 一方面从逻辑角度来看，null值表示一个空对象指针，它代表的其实就是一个空对象，所以使用typeof操作符检测时返回"object"也是可以理解的。
 - 另一方面，其实在JavaScript 最初的实现中，JavaScript 中的值是由一个表示类型的标签和实际数据值表示的(对象的类型标签是 0)。由于 null 代表的是空指针（大多数平台下值为 0x00），因此，null的类型标签也成为了 0，typeof null就错误的返回了"object"。在ES6中，当时曾经有提案为历史平凡, 将type null的值纠正为null, 但最后提案被拒了,所以还是保持"object"类型。
-
-
-
 
 用一句话总结两者的区别就是：undefined 表示一个变量自然的、最原始的状态值，而 null 则表示一个变量被人为的设置为空对象，而不是原始状态。所以，在实际使用过程中，为了保证变量所代表的语义，不要对一个变量显式的赋值 undefined，当需要释放一个对象时，直接赋值为 null 即可。
 
@@ -2266,141 +2493,141 @@ console.log(typeof data); // "object"
 - 判断null和undefined时，应永远使用严格判断（===）
 - js中“没有传”、“没有给”和undefined基本等价；而null是有值的——例如：默认参数
 
-### ==和===
-== 代表相同， ===代表严格相同（数据类型和值都相等）。 
+### == 和 ===
+== 代表相同， ===代表严格相同（数据类型和值都相等）。
 
 当进行双等号比较时候，先检查两个操作数数据类型，如果相同，则进行===比较，如果不同，则愿意为你进行一次类型转换，转换成相同类型后再进行比较，而===比较时，如果类型不同，直接就是false。
 
 - 双等号==
-    - 如果两个值类型相同，再进行三个等号(===)的比较；
-    - 如果两个值类型不同，也有可能相等，需根据以下规则进行类型转换在比较
-    - 查看是否是 undefined 和 null 比较
-        - ✅ 返回 true
-        - ⬇️ 如果不是继续下一条规则
-    - 是否在比较 string 和 number
-        - ✅ 如果是，那么将 string 转为 number 并回到最初重新比较 ♻️
-        - ⬇️ 如果不是继续下一条规则
-    - 查看我们比较的项中是否有 boolean
-        - ✅ 如果有，那么将 boolean 转为 number 并回到最初重新比较 ♻️
-        - ⬇️ 如果不是继续下一条规则
-    - 查看是否有一项是 object
-        - ✅ 如果有，那么将 object 转为其原始值 primitive 并回到最初重新比较 ♻️
-        - ❌ 如果还不是，只能返回 false 了💩
-![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106160907.png)
+  - 如果两个值类型相同，再进行三个等号(===)的比较；
+  - 如果两个值类型不同，也有可能相等，需根据以下规则进行类型转换在比较
+  - 查看是否是 undefined 和 null 比较
+    - ✅ 返回 true
+    - ⬇️ 如果不是继续下一条规则
+  - 是否在比较 string 和 number
+    - ✅ 如果是，那么将 string 转为 number 并回到最初重新比较 ♻️
+    - ⬇️ 如果不是继续下一条规则
+  - 查看我们比较的项中是否有 boolean
+    - ✅ 如果有，那么将 boolean 转为 number 并回到最初重新比较 ♻️
+    - ⬇️ 如果不是继续下一条规则
+  - 查看是否有一项是 object
+    - ✅ 如果有，那么将 object 转为其原始值 primitive 并回到最初重新比较 ♻️
+    - ❌ 如果还不是，只能返回 false 了💩
+      ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106160907.png)
 
 - 类型转换
-    - 获取对象原始值
-        - 接着我们再来研究一下对象怎么转换为原始值的：转换类型的这个方法在 JS 源代码中是 ToPrimitive 这个方法，该方法有一个可选参数 PreferredType，这个参数的作用是指定期望类型；如果第一个参数对应的对象可以被转换为不止一种类型，那么后者可以作为一种暗示，表示该对象应该转换为那种类型
-    - 默认情况下（期望类型默认为 number）
-        - 调用 valueOf 方法：
-            - ✅ 如果返回的是原始值，那么就用这个
-            - ⬇️ 如果返回的不是原始值，那么跳到下一步
-        - 调用 toString 方法：
-            - ✅ 如果返回的是原始值，那么就用这个
-            - ❌ 否则报错💩
-    - 如果期望类型为 string：
-        - 调用 toString 方法：
-            - ✅ 如果返回的是原始值，那么就用这个
-            - ⬇️ 如果返回的不是原始值，那么跳到下一步
-        - 调用 valueOf 方法：
-            - ✅ 如果返回的是原始值，那么就用这个
-            - ❌ 否则报错💩
-    - 如果对象是 Date 类型（期望类型为 string）：
-        - 调用 toString 方法：
-            - ✅ 如果返回的是原始值，那么就用这个
-            - ⬇️ 如果返回的不是原始值，那么跳到下一步
-        - 调用 valueOf 方法：
-            - ✅ 如果返回的是原始值，那么就用这个
-            - ❌ 否则报错💩
-    - 简单的说就是默认调用 valueOf 方法，然后是 toString 方法；如果对象是 Date 类型或对象的期望类型为 string，那么先调用 toString 方法😪
-
+  - 获取对象原始值
+    - 接着我们再来研究一下对象怎么转换为原始值的：转换类型的这个方法在 JS 源代码中是 ToPrimitive 这个方法，该方法有一个可选参数 PreferredType，这个参数的作用是指定期望类型；如果第一个参数对应的对象可以被转换为不止一种类型，那么后者可以作为一种暗示，表示该对象应该转换为那种类型
+  - 默认情况下（期望类型默认为 number）
+    - 调用 valueOf 方法：
+      - ✅ 如果返回的是原始值，那么就用这个
+      - ⬇️ 如果返回的不是原始值，那么跳到下一步
+    - 调用 toString 方法：
+      - ✅ 如果返回的是原始值，那么就用这个
+      - ❌ 否则报错💩
+  - 如果期望类型为 string：
+    - 调用 toString 方法：
+      - ✅ 如果返回的是原始值，那么就用这个
+      - ⬇️ 如果返回的不是原始值，那么跳到下一步
+    - 调用 valueOf 方法：
+      - ✅ 如果返回的是原始值，那么就用这个
+      - ❌ 否则报错💩
+  - 如果对象是 Date 类型（期望类型为 string）：
+    - 调用 toString 方法：
+      - ✅ 如果返回的是原始值，那么就用这个
+      - ⬇️ 如果返回的不是原始值，那么跳到下一步
+    - 调用 valueOf 方法：
+      - ✅ 如果返回的是原始值，那么就用这个
+      - ❌ 否则报错💩
+  - 简单的说就是默认调用 valueOf 方法，然后是 toString 方法；如果对象是 Date 类型或对象的期望类型为 string，那么先调用 toString 方法😪
 
 - 转换为 number
-    - 转换成 number 类型的规则：
-        - undefined 👉 NaN 如果是 undefined 则直接转换成 NaN
-        - null 👉 0 如果是 null 则转换成 0
-        - boolean 👉 0/1 如果是 boolean 则转换成 0 或 1
-        - string 👉 0/NaN/(parse to number) 如果是 string 则转换成对应的 number，空字符串转换为 0，无法转换的则为 NaN
-        - object 👉 首先获取原始值然后再转为 number
-![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106161657.png)
-
+  - 转换成 number 类型的规则：
+    - undefined 👉 NaN 如果是 undefined 则直接转换成 NaN
+    - null 👉 0 如果是 null 则转换成 0
+    - boolean 👉 0/1 如果是 boolean 则转换成 0 或 1
+    - string 👉 0/NaN/(parse to number) 如果是 string 则转换成对应的 number，空字符串转换为 0，无法转换的则为 NaN
+    - object 👉 首先获取原始值然后再转为 number
+      ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106161657.png)
 - 转换为 string
-    - 转为 string 的规则为：
-        -  undefined 👉 'undefined'
-        -  null 👉 'null'
-        -  number 👉 'number'
-        -  boolean 👉 'true'/'false'
-        -  object 👉 首先获取原始值，然后转为 string
-![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106161750.png)
-
+  - 转为 string 的规则为：
+    - undefined 👉 'undefined'
+    - null 👉 'null'
+    - number 👉 'number'
+    - boolean 👉 'true'/'false'
+    - object 👉 首先获取原始值，然后转为 string
+      ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106161750.png)
 
 - 转为 boolean
-    - ❌下面这些在 JS 中都为 falsy 除此之外的都是 truthy
-        - undefined 👉 falsy
-        - null 👉 falsy
-        - 0 👉 falsy
-        - "" 👉 falsy
-        - NaN 👉 falsy
-    - 转换规则如下：
-        - undefined 👉 false
-        - null 👉 false
-        - number 👉 当为 0 时 false 否则为 true
-        - string 👉 当为空字符串时为 false 否则为 true
-        - object 👉 true
-        - array 👉 true
-        - Date 👉 true
-![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106161911.png)
-
+  - ❌下面这些在 JS 中都为 falsy 除此之外的都是 truthy
+    - undefined 👉 falsy
+    - null 👉 falsy
+    - 0 👉 falsy
+    - "" 👉 falsy
+    - NaN 👉 falsy
+  - 转换规则如下：
+    - undefined 👉 false
+    - null 👉 false
+    - number 👉 当为 0 时 false 否则为 true
+    - string 👉 当为空字符串时为 false 否则为 true
+    - object 👉 true
+    - array 👉 true
+    - Date 👉 true
+      ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106161911.png)
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106161929.png)
 ### JS基本数据类型  Symbol主要用于什么场景下????????
 ### 变量提升(函数提升)
+
 - 所谓的变量提升（变量提升），是指在JS代码执行中， JavaScript引擎（V8）把变量的声明部分和函数的声明部分提升到代码开头的行为，变量提升后，会给变量设置默认值undefined，给函数赋值函数体。
+
 - 在JS的变量提升中，提升的只是变量的声明，所以对于var a = 1，一般把它拆分成var a 和 a = 1。只提升var a，a = 1不变。
+
 - 有多个同名变量声明时，函数声明会覆盖其他的声明。如果有多个同名函数声明，则是由最后的一个函数声明覆盖之前所有的声明。
 ### js声明变量的方式
-JavaScript中可以通过var、let、const、function、import、class这几种方式来声明变量。
+  JavaScript中可以通过var、let、const、function、import、class这几种方式来声明变量。
 1. var
 ```js
-var x = 'global'; //全局变量
-function local(){
+  var x = 'global'; //全局变量
+  function local(){
   var x = 'local variable'; //局部变量
   console.log(x)
-}
-local() // 'local variable'
-console.log(x) // 'global'
+  }
+  local() // 'local variable'
+  console.log(x) // 'global'
 ```
+
 2. let声明变量(let命令用于声明变量,let声明的变量是可变的)
 ```js
-let lt= 520;
-var lzp= 1314;
-
-lt = 410;
-lzp = 1122; 
-console.log(lt) // 410
+  let lt= 520;
+  var lzp= 1314;
+  lt = 410;
+  lzp = 1122; 
+  console.log(lt) // 410
 ```
 3. const声明变量(const命令用于声明变量，const声明的变量是不可变的。)
 ```js
-const lzp= 410;
-lzp = 1122; // 报错
+  const lzp= 410;
+  lzp = 1122; // 报错
 ```
+
 4. function声明变量
 ES6允许我们为函数的参数设置默认值，即直接写在参数定义的后面。当参数值为undefined的时候，默认值生效。
 ```js
-function log(x , y = "lutian"){
+  function log(x , y = "lutian"){
   console.log(x,y);
-}
-log('love'); //love lutian
-log('love','only'); //love only
+  }
+  log('love'); //love lutian
+  log('love','only'); //love only
 ```
-5. import声明变量
-ES6 模块不是对象，而是通过export命令显式指定输出的代码，再通过import命令输入。
-Module 语法是 JavaScript 模块的标准写法，使用import取代require
-```js
-import { func1, func2 } from 'moduleA';
-import { Button } from 'antd';
 
-// 在导入导出时可以根据需求起别名，方便理解和开发
-import {longlonglongName as name} from './moduleA.js';
+5. import声明变量
+ES6 模块不是对象，而是通过export命令显式指定输出的代码，再通过import命令输入。Module 语法是 JavaScript 模块的标准写法，使用import取代require
+```js
+  import { func1, func2 } from 'moduleA';
+  import { Button } from 'antd';
+
+  // 在导入导出时可以根据需求起别名，方便理解和开发
+  import {longlonglongName as name} from './moduleA.js';
 ```
 6. class声明变量
 ES6 的class可以看作只是一个语法糖，它的绝大部分功能，ES5 都可以做到，新的class写法只是让对象原型的写法更加清晰、更像面对象编程的语法。 ES5类的定义
@@ -2409,13 +2636,10 @@ function Person(x, y) {
   this.name = x;
   this.age = y;
 }
-
 Person.prototype.getInfo = function () {
   return '(' + this.name + ', ' + this.age + ')';
 };
-
 var info = new Person('lutian', 18);
-
 
 
 
@@ -2424,12 +2648,10 @@ class Person {
     this.name = name;
     this.age = age;
   }
-
   getInfo() {
     return '(' + this.name + ', ' + this.age + ')';
   }
 }
-
 typeof Person // "function"
 Person === Person.prototype.constructor // true
 ```
@@ -2438,105 +2660,105 @@ Person === Person.prototype.constructor // true
 - 函数声明function fn() {...}
 - 函数表达式const fn = function() {..}
 - 函数声明会在代码执行前预加载,而函数表达式不会
-
-
 ### 为什么要用 setTimeout 模拟 setInterval ？
 setInterval 是一个宏任务。用多了你就会发现它并不是准确无误，极端情况下还会出现一些令人费解的问题。
-
 - 推入任务队列后的时间不准确
-    - 在 setInterval 被推入任务队列时，如果在它前面有很多任务或者某个任务等待时间较长比如网络请求等，那么这个定时器的执行时间和我们预定它执行的时间可能并不一致。
-```js
-let startTime = new Date().getTime();
-let count = 0;
-//耗时任务
-setInterval(function() {
-  let i = 0;
-  while (i++ < 1000000000);
-}, 0);
-setInterval(function() {
-  count++;
-  console.log(
-    "与原设定的间隔时差了：",
-    new Date().getTime() - (startTime + count * 1000),
-    "毫秒"
-  );
-}, 1000);
-// 输出：
-// 与原设定的间隔时差了： 699 毫秒
-// 与原设定的间隔时差了： 771 毫秒
-// 与原设定的间隔时差了： 887 毫秒
-// 与原设定的间隔时差了： 981 毫秒
-// 与原设定的间隔时差了： 1142 毫秒
-// 与原设定的间隔时差了： 1822 毫秒
-// 与原设定的间隔时差了： 1891 毫秒
-// 与原设定的间隔时差了： 2001 毫秒
-// 与原设定的间隔时差了： 2748 毫秒
-// ...
-
-```
+  - 在 setInterval 被推入任务队列时，如果在它前面有很多任务或者某个任务等待时间较长比如网络请求等，那么这个定时器的执行时间和我们预定它执行的时间可能并不一致。
+    ```js
+      let startTime = new Date().getTime();
+      let count = 0;
+      //耗时任务
+      setInterval(function() {
+      let i = 0;
+      while (i++ < 1000000000);
+      }, 0);
+      setInterval(function() {
+      count++;
+      console.log(
+      "与原设定的间隔时差了：",
+      new Date().getTime() - (startTime + count * 1000),
+      "毫秒"
+      );
+      }, 1000);
+      // 输出：
+      // 与原设定的间隔时差了： 699 毫秒
+      // 与原设定的间隔时差了： 771 毫秒
+      // 与原设定的间隔时差了： 887 毫秒
+      // 与原设定的间隔时差了： 981 毫秒
+      // 与原设定的间隔时差了： 1142 毫秒
+      // 与原设定的间隔时差了： 1822 毫秒
+      // 与原设定的间隔时差了： 1891 毫秒
+      // 与原设定的间隔时差了： 2001 毫秒
+      // 与原设定的间隔时差了： 2748 毫秒
+      // ...
+    ```
 - 函数操作耗时过长导致的不准确
     - 考虑极端情况，假如定时器里面的代码需要进行大量的计算(耗费时间较长)，或者是 DOM 操作。这样一来，花的时间就比较长，有可能前一次代码还没有执行完，后一次代码就被添加到队列了。也会到时定时器变得不准确，甚至出现同一时间执行两次的情况。
     - 最常见的出现的就是，当我们需要使用 ajax 轮询服务器是否有新数据时，必定会有一些人会使用 setInterval，然而无论网络状况如何，它都会去一遍又一遍的发送请求，最后的间隔时间可能和原定的时间有很大的出入。
-```js
-// 做一个网络轮询，每一秒查询一次数据。
-let startTime = new Date().getTime();
-let count = 0;
+    ```js
+    // 做一个网络轮询，每一秒查询一次数据。
+    let startTime = new Date().getTime();
+    let count = 0;
 
-setInterval(() => {
-    let i = 0;
-    while (i++ < 10000000); // 假设的网络延迟
-    count++;
-    console.log(
-        "与原设定的间隔时差了：",
-        new Date().getTime() - (startTime + count * 1000),
-        "毫秒"
-    );
-}, 1000)
-输出：
-// 与原设定的间隔时差了： 567 毫秒
-// 与原设定的间隔时差了： 552 毫秒
-// 与原设定的间隔时差了： 563 毫秒
-// 与原设定的间隔时差了： 554 毫秒(2次)
-// 与原设定的间隔时差了： 564 毫秒
-// 与原设定的间隔时差了： 602 毫秒
-// 与原设定的间隔时差了： 573 毫秒
-// 与原设定的间隔时差了： 633 毫秒
-```
+    setInterval(() => {
+        let i = 0;
+        while (i++ < 10000000); // 假设的网络延迟
+        count++;
+        console.log(
+            "与原设定的间隔时差了：",
+            new Date().getTime() - (startTime + count * 1000),
+            "毫秒"
+        );
+    }, 1000)
+    输出：
+    // 与原设定的间隔时差了： 567 毫秒
+    // 与原设定的间隔时差了： 552 毫秒
+    // 与原设定的间隔时差了： 563 毫秒
+    // 与原设定的间隔时差了： 554 毫秒(2次)
+    // 与原设定的间隔时差了： 564 毫秒
+    // 与原设定的间隔时差了： 602 毫秒
+    // 与原设定的间隔时差了： 573 毫秒
+    // 与原设定的间隔时差了： 633 毫秒
+    ```
+
 - setInterval 缺点 与 setTimeout 的不同
-    - 再次强调，定时器指定的时间间隔，表示的是何时将定时器的代码添加到消息队列，而不是何时执行代码。所以真正何时执行代码的时间是不能保证的，取决于何时被主线程的事件循环取到，并执行。
-    - 每个 setTimeout 产生的任务会直接 push 到任务队列中；而 setInterval 在每次把任务 push 到任务队列前，都要进行一下判断(看上次的任务是否仍在队列中，如果有则不添加，没有则添加)。
-    - setInterval 有两个缺点：
-        - 使用 setInterval 时，某些间隔会被跳过；
-        - 可能多个定时器会连续执行；
-        - 一般用 setTimeout 模拟 setInterval，来规避掉上面的缺点。
+  - 再次强调，定时器指定的时间间隔，表示的是何时将定时器的代码添加到消息队列，而不是何时执行代码。所以真正何时执行代码的时间是不能保证的，取决于何时被主线程的事件循环取到，并执行。
+  - 每个 setTimeout 产生的任务会直接 push 到任务队列中；而 setInterval 在每次把任务 push 到任务队列前，都要进行一下判断(看上次的任务是否仍在队列中，如果有则不添加，没有则添加)。
+  - setInterval 有两个缺点：
+    - 使用 setInterval 时，某些间隔会被跳过；
+    - 可能多个定时器会连续执行；
+    - 一般用 setTimeout 模拟 setInterval，来规避掉上面的缺点。
+
 - setTimeout 模拟 setInterval
-```js
-// 写一个 interval 方法
-let timer = null
-interval(func, wait){
-    let interv = function(){
-        func.call(null);
-        timer=setTimeout(interv, wait);
-    };
-    timer= setTimeout(interv, wait);
- },
+  ```js
+    // 写一个 interval 方法
+    let timer = null
+    interval(func, wait){
+      let interv = function(){
+          func.call(null);
+          timer=setTimeout(interv, wait);
+      };
+      timer= setTimeout(interv, wait);
+    },
 
-// 和 setInterval() 一样使用它
-interval(function() {}, 20);
+    // 和 setInterval() 一样使用它
+    interval(function() {}, 20);
 
-// 终止定时器
-if (timer) {
-  window.clearSetTimeout(timer);
-  timer = null;
-}
-```
+    // 终止定时器
+    if (timer) {
+      window.clearSetTimeout(timer);
+      timer = null;
+    }
+  ```
 ### JS编译原理
 ```js
-var name;    //编译阶段处理
-name='jack';    //执行阶段处理
+  var name;    //编译阶段处理
+  name='jack';    //执行阶段处理
 ```
+
 #### 编译阶段
 这个阶段的主角就是所谓的编译器，这个编译器会找遍当前作用域，看看是不是已经存在一个叫 name 的变量。如果已经存在，那么就什么都不做，直接忽略 var name 这个声明，继续编译下去；如果没有，则在当前作用域里新增一个叫 name 的变量。然后，编译器会为引擎生成运行时所需要的代码，程序就进入了执行阶段
+
 #### 执行阶段
 这个阶段的主角就是大家所熟悉的JS引擎啦，JS引擎在运行的时候，也会先找遍当前作用域，看看是否有一个叫 name 的变量，如果有的话，那么刚刚好，直接赋值，如果没有的话，那就是当前作用域没有，那怎么办，那就考虑探出头去，去外面（ 父级作用域 ）看看有没有，没有的话，再去外面查找，一层又一层（ 当然如果是还有父层的话 ），如果最终还是找不到的话，那么JS引擎也表示无能为力，那就抛个异常给别人看看吧，表示自己已经努力过了。
 
@@ -2545,9 +2767,13 @@ name='jack';    //执行阶段处理
 ### 作用域和作用域链
 #### 作用域
 定义：简单来说作用域就是变量与函数的可访问范围，由当前环境与上层环境的一系列变量对象组成
+
 1. 全局作用域：代码在程序的任何地方都能被访问，window 对象的内置属性都拥有全局作用域。
+
 2. 函数作用域：在固定的代码片段才能被访问
+
 3. 块级作用域：块级作用域相当于是只在这块代码块中生效，如果它被大括号 {} 所包围，那么大括号中就是一段代码块，代码块中使用 let 和 const 声明的变量也被称为局部变量
+
 作用：作用域最大的用处就是隔离变量，不同作用域下同名变量不会有冲突。
 #### 作用域链
 作用域链参考链接一般情况下，变量到 创建该变量 的函数的作用域中取值。但是如果在当前作用域中没有查到，就会向上级作用域去查，直到查到全局作用域，这么一个查找过程形成的链条就叫做作用域链。
@@ -2558,57 +2784,55 @@ name='jack';    //执行阶段处理
 - 闭包应用场景:作为参数被传入,作为返回值被返回
 - 自由变量的查找,要在函数定义的地方(而非执行的地方)
 - 影响:变量会常驻内存,得不到释放。闭包不要乱用
-
-
-
 - 防抖节流
-```js
-// 防抖
-function debounce(fn, delay = 300) {
-  let timer; //闭包引用的外界变量
-  return function () {
-    const args = arguments;
-    if (timer) {
-      clearTimeout(timer);
-    }
-    timer = setTimeout(() => {
-      fn.apply(this, args);
-    }, delay);
-  };
-}
-```
+  ```js
+  // 防抖
+  function debounce(fn, delay = 300) {
+    let timer; //闭包引用的外界变量
+    return function () {
+      const args = arguments;
+      if (timer) {
+        clearTimeout(timer);
+      }
+      timer = setTimeout(() => {
+        fn.apply(this, args);
+      }, delay);
+    };
+  }
+  ```
+
 - 模拟块级作用域
-```js
-function outputNumbers(count) {
-  (function () {
-    for (var i = 0; i < count; i++) {
-      console.log(i);
-    }
-  })();
-}
-outputNumbers(5)
-```
+  ```js
+  function outputNumbers(count) {
+    (function () {
+      for (var i = 0; i < count; i++) {
+        console.log(i);
+      }
+    })();
+  }
+  outputNumbers(5)
+  ```
 - 对象中创建私有变量
-```js
-var aaa = (function () {
-  var a = 1;
-  function bbb() {
-    a++;
-    console.log(a);
-  }
-  function ccc() {
-    a++;
-    console.log(a);
-  }
-  return {
-    b: bbb, //json结构
-    c: ccc,
-  };
-})();
-console.log(aaa.a); //undefined
-aaa.b(); //2
-aaa.c(); //3
-```
+  ```js
+  var aaa = (function () {
+    var a = 1;
+    function bbb() {
+      a++;
+      console.log(a);
+    }
+    function ccc() {
+      a++;
+      console.log(a);
+    }
+    return {
+      b: bbb, //json结构
+      c: ccc,
+    };
+  })();
+  console.log(aaa.a); //undefined
+  aaa.b(); //2
+  aaa.c(); //3
+  ```
 ### apply call bind 区别
 - 三者都可以改变函数的 this 对象指向。
 - 三者第一个参数都是 this 要指向的对象，如果如果没有这个参数或参数为 undefined 或 null，则默认指向全局 window。
@@ -2625,9 +2849,7 @@ aaa.c(); //3
 函数式（Funtional Programming，FP）
 响应式（Reactive Programming，RP）
 函数响应式（Functional Reactive Programming，FRP）
-
 ### this的五种情况
-
 `this`是在执行的时候确定的。不执行，你就不知道在哪里。
 
 1. 作为普通函数执行时，`this`指向`window`。
@@ -2645,7 +2867,6 @@ aaa.c(); //3
 1. 如果一个函数中有this，但是它没有被上一级的对象所调用，那么this指向的就是window，这里需要说明的是在js的严格版中this指向的不是window，但是我们这里不探讨严格版的问题，你想了解可以自行上网查找。
 2. 如果一个函数中有this，这个函数有被上一级的对象所调用，那么this指向的就是上一级的对象。
 3. 如果一个函数中有this，这个函数中包含多个对象，尽管这个函数是被最外层的对象所调用，this指向的也只是它上一级的对象
-
 
 箭头函数中没有`this`绑定，必须通过查找作用域链来决定其值。如果箭头函数被非箭头函数包含，则`this`绑定的是最近一层非箭头函数的`this`，否则`this`的值则被设置为全局对象。
 而箭头函数的`this`是上层普通函数的`this`或者是全局对象（浏览器中是`window`）
@@ -2668,7 +2889,6 @@ var student = {
 student.doSth(); // '若川'
 student.arrowDoSth2(); // 'window'
 ```
-
 
 如果要判断一个运行中函数的 `this` 绑定， 就需要找到这个函数的直接调用位置。找到之后 就可以顺序应用下面这四条规则来判断 `this` 的绑定对象。
 
@@ -2694,9 +2914,12 @@ student.arrowDoSth2(); // 'window'
 - 原型对象也有自己的原型对象，通过_proto_指向。
 ```js
 1. Person.prototype.constructor == Person // **准则1：原型对象（即Person.prototype）的constructor指向构造函数本身**
+
 2. person01.__proto__ == Person.prototype // **准则2：实例（即person01）的__proto__和原型对象指向同一个地方**
+
 ```
 ‌**原型**:  在 JS 中，每当定义一个对象（函数也是对象）时，对象中都会包含一些预定义的属性。其中每个函数对象都有一个prototype 属性，这个属性指向函数的原型对象。
+
 
 通过这种方式，所有的实例都可以访问到这个方法，并且这个方法只需要占用一份内存，节省内存，this 的指向还能正确指向类的实例。
 
@@ -2705,6 +2928,7 @@ student.arrowDoSth2(); // 'window'
 当在一个对象 obj 上访问某个属性时，如果不存在于 obj，那么便会去对象的原型也就是 obj.__proto__ 上去找这个属性。如果有则返回这个属性，没有则去对象 obj 的原型的原型也就是 obj.__proto__.__proto__去找，重复以上步骤。一直到访问纯对象的原型也就是 Object.prototype，没有的话续往上找也就是 Object.prototype.__proto__，其实就是 null，直接返回 undefined。
 
 **特点**:  JavaScript对象是通过引用来传递的，我们创建的每个新对象实体中并没有一份属于自己的原型副本。当我们修改原型时，与之相关的对象也会继承这一改变。
+
 ```js
 // 原型、构造函数、实例、原型链的关系
 // 1、实例 ==> 1. 对象就是一个实例，就有_proto_属性
@@ -2722,6 +2946,7 @@ student.arrowDoSth2(); // 'window'
 //              3. obj3.__proto__.constructor === Fn.prototype.constructor
 //              4. obj3.__proto__ === Fn.prototype  // 修改prototype的属性， __proto__也会修改，同理也是
 ```
+
 ### 原型链，为什么要这么设计
 - 在定义函数时，会执行两个动作：一个动作是创建函数对象，这是因为函数是对象；另一个动作是创建一个完全独立的原型对象；定义的函数的原型属性将指向该原型对象。
 - 那么 prototype 就是调用 `构造函数` 而创建的那个对象`实例`的`的原型对象`。
@@ -2734,53 +2959,53 @@ student.arrowDoSth2(); // 'window'
 - __proto__ 属性在 ES6 时被标准化，但因为性能问题并不推荐使用，推荐使用 Object.getPrototypeOf()。
 - __proto__ 是每个实例上都有的属性，prototype 是构造函数的属性，在实例上并不存在，所以这两个并不一样，但 foo.__proto__ 和 Foo.prototype 指向同一个对象。
 - 每个对象拥有一个原型对象，通过__proto__指针指向上一个原型 ，并从中继承方法和属性，同时原型对象也可能拥有原型，这样一层一层，最终指向 null，这就是原型链。
-
-
 - js 每个对象都会拥有`__proto__`属性的。这个属性指向原型对象，这个对象的所有属性和方法都会被构造函数的实例所继承。
 - 实例都包含一个指向构造函数的`原型对象`的`__proto__`内部指针。。
 - 实例都会有一个`constructor`属性去指向它的构造函数
 - 在原型对象中使用`.constructor`（构造器）属性来区分，我这个原型对象被那个构造函数引用了。所有原型对象都会自动获得一个constructor（构造函数）属性，这个属性是一个指向prototype属性所在函数的指针。
 ### Function、Object、null等等的关系和鸡蛋问题
 每个JS对象一定对应一个原型对象，并从原型对象继承属性和方法。
+
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211014094614.png)
+
 原型链的尽头指向null，那么Function.prototype、Object.prototype、null、Function.prototype.__proto__、Object.prototype.__proto__、function、object之间的关系是什么。
 
 - 原型链的尽头（root）是Object.prototype。所有对象均从Object.prototype继承属性。
-    - Object/Array/String等等构造函数本质上和Function一样，均继承于Function.prototype。
-![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211014100423.png)
+  - Object/Array/String等等构造函数本质上和Function一样，均继承于Function.prototype。
+    ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211014100423.png)
 - Function.prototype和Function.__proto__为同一对象。
-![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211014101327.png)
+  ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211014101327.png)
 - Function.prototype直接继承root（Object.prototype）。
-![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211014101357.png)
+  ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211014101357.png)
 - 通过这点我们可以弄清 继承的原型链：Object.prototype(root)<---Function.prototype<---Function|Object|Array...
-![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211014101415.png)
-
-
+  ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211014101415.png)
 - Function.prototype是个不同于一般函数（对象）的函数（对象）。
-    - Function.prototype像普通函数一样可以调用，但总是返回undefined。
-    - 普通函数实际上是Function的实例，即普通函数继承于Function.prototype。func.__proto__ === Function.prototype。
-    - Function.prototype继承于Object.prototype，并且没有prototype这个属性。func.prototype是普通对象，Function.prototype.prototype是null。
-    - 所以，Function.prototype其实是个另类的函数，可以独立于/先于Function产生。
+  - Function.prototype像普通函数一样可以调用，但总是返回undefined。
+  - 普通函数实际上是Function的实例，即普通函数继承于Function.prototype。func.__proto__ === Function.prototype。
+  - Function.prototype继承于Object.prototype，并且没有prototype这个属性。func.prototype是普通对象，Function.prototype.prototype是null。
+  - 所以，Function.prototype其实是个另类的函数，可以独立于/先于Function产生。
 - Object本身是个（构造）函数，是Function的实例，即Object.__proto__就是Function.prototype。
 - 先有Object.prototype（原型链顶端），Function.prototype继承Object.prototype而产生，最后，Function和Object和其它构造函数继承Function.prototype而产生。
-
-
 ### __proto__和prototype的区别和关系?
 JS正是通过__proto__和prototype的合作实现了原型链，以及对象的继承。
-- 对象__proto__属性的值就是它所对应的原型对象
-```js
-var one = {x: 1};
-var two = new Object();
-one.__proto__ === Object.prototype // true
-two.__proto__ === Object.prototype // true
-one.toString === one.__proto__.toString // true
-```
-首先来说说prototype属性，不像每个对象都有__proto__属性来标识自己所继承的原型，只有函数才有prototype属性。
-为什么只有函数才有prototype属性？ES规范就这么定的。
-当你创建函数时，JS会为这个函数自动添加prototype属性。
-构造函数，通过prototype来存储要共享的属性和方法。而一旦你把这个函数当作构造函数（constructor）调用（即通过new关键字调用），那么JS就会帮你创建该构造函数的实例，实例继承构造函数prototype的所有属性和方法（实例通过设置自己的__proto__指向承构造函数的prototype来实现这种继承）。
-对象的__proto__指向自己构造函数的prototype。obj.__proto__.__proto__...的原型链由此产生，包括我们的操作符instanceof正是通过探测obj.__proto__.__proto__... === Constructor.prototype来验证obj是否是Constructor的实例。
 
+- 对象__proto__属性的值就是它所对应的原型对象
+  ```js
+  var one = {x: 1};
+  var two = new Object();
+  one.__proto__ === Object.prototype // true
+  two.__proto__ === Object.prototype // true
+  one.toString === one.__proto__.toString // true
+  ```
+首先来说说prototype属性，不像每个对象都有__proto__属性来标识自己所继承的原型，只有函数才有prototype属性。
+
+为什么只有函数才有prototype属性？ES规范就这么定的。
+
+当你创建函数时，JS会为这个函数自动添加prototype属性。
+
+构造函数，通过prototype来存储要共享的属性和方法。而一旦你把这个函数当作构造函数（constructor）调用（即通过new关键字调用），那么JS就会帮你创建该构造函数的实例，实例继承构造函数prototype的所有属性和方法（实例通过设置自己的__proto__指向承构造函数的prototype来实现这种继承）。
+
+对象的__proto__指向自己构造函数的prototype。obj.__proto__.__proto__...的原型链由此产生，包括我们的操作符instanceof正是通过探测obj.__proto__.__proto__... === Constructor.prototype来验证obj是否是Constructor的实例。
 
 - js 每个对象都会拥有`prototype`属性的。这个属性指向原型对象，这个对象的所有属性和方法都会被构造函数的实例所继承。
 - 实例都包含一个指向构造函数的`原型对象`的`__proto__`内部指针。。
@@ -2792,21 +3017,21 @@ one.toString === one.__proto__.toString // true
     o.__proto__ === Object.prototype  //true
     o instanceof Object      //true
     o instanceof Function    //false
-    
+
     var o = Object();
     o.__proto__ === Object.prototype  //true
     o instanceof Object      //true
     o instanceof Function    //false
-    
+
     var o = new Object();
     o.__proto__ === Object.prototype  //true
     o instanceof Object      //true
     o instanceof Function    //false
-    
+
     function Fn(){}
     var fn = new Fn();
     fn.__proto__ === Fn.prototype;
-    
+
     fn instanceof Fn        //true
     fn instanceof Object    //true
     fn instanceof Function  //false
@@ -2814,28 +3039,29 @@ one.toString === one.__proto__.toString // true
 
    Function.__proto__ === Function.prototype  //true
    Object.__proto__ === Function.prototype  //true
-   
+
    Function.prototype.__proto__ === Object.prototype
    Object.prototype.__proto__ === null，是原型链有终点。
-   
+
    function fn(){}
    fn.__proto__ === Function.prototype  //true
    fn.prototype.__proto__ === Object.prototype  //true
    fn.prototype.constructor === fn  //true
 ```
-```js
-函数含有__proto__与prototype属性，__proto__指向Function.prototype,prototype指向Object.prototype，
-```
 
+```js
+  函数含有__proto__与prototype属性，__proto__指向Function.prototype,prototype指向Object.prototype
+```
 _proto_是服务于函数对象的，prototype是服务于构造函数的实例化对象的
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922072448.png)
+
 ```js
-console.log(User.__proto__ === Object);//false
-console.log(User.__proto__ === Object.__proto__);//true
-console.log(User.prototype.__proto__ === User.__proto__.__proto__);//true
-console.log(User.prototype.__proto__ === Object.prototype);//true
-  
+  console.log(User.__proto__ === Object);//false
+  console.log(User.__proto__ === Object.__proto__);//true
+  console.log(User.prototype.__proto__ === User.__proto__.__proto__);//true
+  console.log(User.prototype.__proto__ === Object.prototype);//true
 ```
+
 _proto_属性的作用主要是用来确定当前对象的继承者，在当前对象找不到指定的属性和对象时，会去proto属性指定的对象中寻找，之后依次类推直到找完所有继承或找到要找的属性为止。
 
 prototype 中定义的属性和方法都是留给自己的 “后代” 用的。
@@ -2847,12 +3073,14 @@ JS中的 proto 入场了，它存在于普通对象和函数对象中，它的�
 
 1、instanceof的作用是用来做检测类型：
 （1）instanceof可以检测某个对象是不是另一个对象的实例(用于判断某个实例是否属于某构造函数)；
+
 ```js
-var Person = function() {};
-var student = new Person();
-console.log(student instanceof Person);  // true
+  var Person = function() {};
+  var student = new Person();
+  console.log(student instanceof Person);  // true
 ```
-（2）instanceof可以检测父类型(在继承关系中用来判断一个实例是否属于它的父类型或者祖先类型的实)；
+（2）instanceof可以检测父类型(在继承关系中用来判断一个实例是否属于它的父类型或者祖先类型的实）
+
 ```js
 function Person() {};
 function Student() {};
@@ -2863,9 +3091,11 @@ console.log(s instanceof Student); //true
 console.log(s instanceof Person); //true
 // 但是，instanceof不适合检测一个对象本身的类型。
 ```
+
 2、instanceof 检测一个对象A是不是另一个对象B的实例的原理：
 其实 `instanceof` 主要的实现原理就是只要右边变量的 `prototype` 在左边变量的原型链上即可。因此，`instanceof` 在查找的过程中会遍历左边变量的原型链，直到找到右边变量的 `prototype`，如果查找失败，则会返回 false，告诉我们左边变量并非是右边变量的实例。
 查看对象B的prototype指向的对象是否在对象A的[[prototype]]链上。如果在，则返回true,如果不在则返回false。不过有一个特殊的情况，当对象B的prototype为null将会报错(类似于空指针异常)。
+
 ```js
 function _instanceof(A, B) {
     var O = B.prototype;// 取B的显示原型
@@ -2880,17 +3110,19 @@ function _instanceof(A, B) {
     }
 }
 ```
+
 ```js
 // instanceof ==> 1. 判断实例对象的__proto__和构造函数的prototype属性指向同一个引用地址
                     （并不能判断一个对象是不是一个构造函数直接生成的实例），
 //                2. obj3 instanceof Fn  // true
 //                3. obj3 instanceof Object  // true，由于 Fn instanceof Object === true
-//                4. 如何准确判断一个对象是不是一个构造函数直接生成的实例对象(通过constructor)： 
+//                4. 如何准确判断一个对象是不是一个构造函数直接生成的实例对象(通过constructor)：
 //                   obj3.__proto__.constructor === Fn.prototype.constructor // true
 //                   obj3.__proto__.constructor === Object.prototype.constructor // false
 ```
 
 ### `.new`操作符和`new`一个对象发生了什么?
+
 1.创建一个空对象。
 2.该对象的隐式原型指向该函数的原型。(设置原型，将对象的原型设置为函数的prototype对象。)
 3.这个新对象会绑定到函数调用的this。(让函数的this指向这个对象，执行构造函数的代码（为这个新对象添加属性）)
@@ -2910,7 +3142,33 @@ function myNew(Con, ...args) {
 ```
 ### Class
 #### ES6中类中的static用ES5怎么实现????
-### ES5 继承
+
+1.静态方法就是定义在 构造函数的方法；
+2.实例方法就是定义在 构造函数原型（prototype）上的方法；
+
+```js
+let Animal = function (type) {
+  this.type = type
+}
+
+// 动态方法
+Animal.prototype.walk = function(){
+  // 调用静态方法
+  Animal.eat()
+  console.log('I am walking')
+}
+
+// 静态方法
+Animal.eat = function (food) {
+  console.log(`I am eating`);
+}
+
+let cat = new Animal('cat')
+cat.walk()
+cat.eat()
+```
+
+### ES5 继承(extend)
 #### 原型链继承
 ```js
 function Parent() {
@@ -2922,9 +3180,8 @@ Parent.prototype.getName = function () {
 }
 
 function Child() {
-    
-}
 
+}
 //主要精髓所在
 Child.prototype = new Parent()
 Child.prototype.constructor = Child
@@ -2936,11 +3193,10 @@ console.log(arzhChild2.names) //[ 'arzh', 'arzh1', 'arzh2' ]
 var arzhChild3 = new Child()
 arzhChild3.names.push('arzh3')
 console.log(arzhChild3.names) //[ 'arzh', 'arzh1', 'arzh2', 'arzh3' ]
-
 ```
 - 缺点
-    - 每个实例对引用类型属性的修改都会被其他的实例共享
-    - 在创建Child实例的时候，无法向Parent传参。这样就会使Child实例没法自定义自己的属性（名字）
+  - 每个实例对引用类型属性的修改都会被其他的实例共享
+  - 在创建Child实例的时候，无法向Parent传参。这样就会使Child实例没法自定义自己的属性（名字）
 
 #### 构造函数实现继承
 ```js
@@ -2959,13 +3215,14 @@ console.log(arzhChild2.names) //[ 'arzh', 'arzh1', 'arzh2' ]
 var arzhChild3 = new Child()
 arzhChild3.names.push('arzh3')
 console.log(arzhChild3.names) //[ 'arzh', 'arzh1', 'arzh3' ]
-```    
+```
+
 - 优点
-    - 解决了每个实例对引用类型属性的修改都会被其他的实例共享的问题
-    - 子类可以向父类传参
+  - 解决了每个实例对引用类型属性的修改都会被其他的实例共享的问题
+  - 子类可以向父类传参
 - 缺点
-    - 无法复用父类的公共函数
-    - 每次子类构造实例都得执行一次父类函数
+  - 无法复用父类的公共函数
+  - 每次子类构造实例都得执行一次父类函数
 
 #### 组合式继承(原型链继承和借用构造函数合并)
 ```js
@@ -2992,12 +3249,12 @@ arzhChild2.body.push('head2')
 console.log(arzhChild2.name,arzhChild2.age) //arzh2 20
 console.log(arzhChild2.body) //[ 'foot', 'hand', 'head2' ]
 ```
-- 优点 
-    - 解决了每个实例对引用类型属性的修改都会被其他的实例共享的问题
-    - 子类可以向父类传参
-    - 可实现父类方法复用
+- 优点
+  - 解决了每个实例对引用类型属性的修改都会被其他的实例共享的问题
+  - 子类可以向父类传参
+  - 可实现父类方法复用
 - 缺点:
-    - 需执行两次父类构造函数，第一次是Child.prototype = new Parent(),第二次是Parent.call(this, name)造成不必要的浪费
+  - 需执行两次父类构造函数，第一次是Child.prototype = new Parent(),第二次是Parent.call(this, name)造成不必要的浪费
 
 #### 原型式继承
 复制传入的对象到创建对象的原型上，从而实现继承
@@ -3008,6 +3265,7 @@ function createObj(o) {
     return new F();
 }
 ```
+
 ```js
 function Parent4() {
   this.name = "parent4";
@@ -3030,10 +3288,11 @@ console.log(s5 instanceof Child4, s5 instanceof Parent4);
 console.log(s5.constructor);
 ```
 - 缺点
-    -  同原型链继承一样，每个实例对引用类型属性的修改都会被其他的实例共享
+  - 同原型链继承一样，每个实例对引用类型属性的修改都会被其他的实例共享
 
 #### 寄生式继承
 寄生式继承的思路是创建一个用于封装继承过程的函数，通过传入一个对象，然后复制一个对象的副本，然后对象进行扩展，最后返回这个对象。这个扩展的过程就可以理解是一种继承。这种继承的优点就是对一个简单对象实现继承，如果这个对象不是我们的自定义类型时。缺点是没有办法实现函数的复用。可以在创建对象的时候，把对象方法也通过此种方式继承。
+
 ```js
 function createEnhanceObj(o) {
     //代替原型式继承的createObj
@@ -3044,6 +3303,7 @@ function createEnhanceObj(o) {
     return clone;
 }
 ```
+
 ```js
 function Parent5() {
   this.name = "parent5";
@@ -3058,14 +3318,13 @@ Child5.prototype = Object.create(Parent5.prototype);
 Child5.prototype.constructor = Child5;
 ```
 - 缺点
-    - 同借用构造函数一样，无法复用父类函数，每次创建对象都会创建一遍方法
-
+  - 同借用构造函数一样，无法复用父类函数，每次创建对象都会创建一遍方法
 #### 寄生组合式继承
 不需要为了子类的原型而多new了一次父类的构造函数，如Child.prototype = new Parent() 只需要复制父类原型的一个副本给子类原型即可。
 ```js
 function inheritPrototype(Parent, Child){
-	Child.prototype = Object.create(Parent.prototype) //创建父类原型的一个副本,把副本赋值给子类原型
-	Child.prototype.constructor = Child;
+    Child.prototype = Object.create(Parent.prototype) //创建父类原型的一个副本,把副本赋值给子类原型
+    Child.prototype.constructor = Child;
 }
 ```
 ```js
@@ -3089,8 +3348,7 @@ var arzhChild = new Child('red')
 console.log(arzhChild.name) // 'arzh'
 ```
 - 优点
-    - 不必为了指定子类型的原型而调用父类型的构造函数
-
+  - 不必为了指定子类型的原型而调用父类型的构造函数
 #### ES6继承
 ES6支持通过类来实现继承，方法比较简单.
 ```js
@@ -3099,57 +3357,51 @@ class Point {
         this.x = x
         this.y = y
     }
-    
+
     toString() {
         return this.x + '' + this.y
     }
 }
-
 class ColorPoint extends Point {
     constructor(x, y, color) {
         super(x, y) //调用父类的constructor(x, y)
         this.color = color
     }
-    
+
     toString() {
         return this.color + ' ' + super.toString() // 调用父类的toString()
     }
 }
-
 var colorPoint = new ColorPoint('1', '2', 'red')
-
 console.log(colorPoint.toString())  // red 12
 ```
-
 #### ES5继承和ES6继承的差别
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210927093321.png)
-- 差别1：
-    - ES6的构造函数通过原型链连接起来了，构造函数之间有直接的引用关系；
-    - ES5实际上是使用call或者apply借用父类构造函数实现的实例化，构造函数之间没有直接的引用关系
-- 差别2：
-    - ES5的实例化对象是由子类构造函数先创建的，然后父类构造函数是使用call或者apply修改这个对象
-    - ES6的实例化对象是由父类构造函数先创建的（这就是为什么要先调用super），然后子类构造函数修改这个对象
 
+- 差别1：
+  - ES6的构造函数通过原型链连接起来了，构造函数之间有直接的引用关系；
+  - ES5实际上是使用call或者apply借用父类构造函数实现的实例化，构造函数之间没有直接的引用关系
+- 差别2：
+  - ES5的实例化对象是由子类构造函数先创建的，然后父类构造函数是使用call或者apply修改这个对象
+  - ES6的实例化对象是由父类构造函数先创建的（这就是为什么要先调用super），然后子类构造函数修改这个对象
 #### ES6实例成员、静态成员、静态方法处理
 - 静态方法
-    - 类相当于实例的原型，所有在类中定义的方法，都会被实例继承。如果在一个方法前，加上static关键字，就表示该方法不会被实例继承，而是直接通过类来调用，这就称为“静态方法”。
-    - 静态方法包含this关键字，这个this指的是类，而不是实例。
-    - 静态方法可以与非静态方法重名。
-    - 父类Foo有一个静态方法，子类Bar可以调用这个方法。静态方法也是可以从super(super.classMethod())对象上调用的。
-```js
-class Foo {
-  static classMethod() {
-    return 'hello';
-  }
-}
+  - 类相当于实例的原型，所有在类中定义的方法，都会被实例继承。如果在一个方法前，加上static关键字，就表示该方法不会被实例继承，而是直接通过类来调用，这就称为“静态方法”。
+  - 静态方法包含this关键字，这个this指的是类，而不是实例。
+  - 静态方法可以与非静态方法重名。
+  - 父类Foo有一个静态方法，子类Bar可以调用这个方法。静态方法也是可以从super(super.classMethod())对象上调用的。
+    ```js
+    class Foo {
+      static classMethod() {
+      return 'hello';
+      }
+    }
+    Foo.classMethod() // 'hello'
 
-Foo.classMethod() // 'hello'
-
-var foo = new Foo();
-foo.classMethod()
-// TypeError: foo.classMethod is not a function
-```
-
+    var foo = new Foo();
+    foo.classMethod()
+    // TypeError: foo.classMethod is not a function
+  ```
 - 实例属性
     - 定义在constructor()方法里面的this上面
     - 定义在类的最顶层。
@@ -3170,109 +3422,108 @@ class IncreasingCounter {
 ```
 
 - 静态属性
-    - 静态属性指的是 Class 本身的属性，即Class.propName，而不是定义在实例对象（this）上的属性。
-    -  ES6 明确规定，Class 内部只有静态方法，没有静态属性。
-    -  写法为Foo类定义了一个静态属性prop。
-```js
-// 老写法
-class Foo {
-  // ...
-}
-Foo.prop = 1;
-
-// 新写法
-class Foo {
-  static prop = 1;
-}
-```
-
+  - 静态属性指的是 Class 本身的属性，即Class.propName，而不是定义在实例对象（this）上的属性。
+  - ES6 明确规定，Class 内部只有静态方法，没有静态属性。
+  - 写法为Foo类定义了一个静态属性prop。
+    ```js
+    // 老写法
+    class Foo {
+    // ...
+    }
+    Foo.prop = 1;
+    // 新写法
+    class Foo {
+      static prop = 1;
+    }
+  ```
 - 私有方法
-    - 私有方法和私有属性，是只能在类的内部访问的方法和属性，外部不能访问。
-    - 一种做法是在命名上加以区别。
-        - _bar()方法前面的下划线，表示这是一个只限于内部使用的私有方法。但是，这种命名是不保险的，在类的外部，还是可以调用到这个方法。
-    - 另一种方法就是索性将私有方法移出类，因为类内部的所有方法都是对外可见的。
-    - 一种方法是利用Symbol值的唯一性，将私有方法的名字命名为一个Symbol值。
-```js
-class Widget {
+  - 私有方法和私有属性，是只能在类的内部访问的方法和属性，外部不能访问。
+  - 一种做法是在命名上加以区别。
+    - _bar()方法前面的下划线，表示这是一个只限于内部使用的私有方法。但是，这种命名是不保险的，在类的外部，还是可以调用到这个方法。
+  - 另一种方法就是索性将私有方法移出类，因为类内部的所有方法都是对外可见的。
+  - 一种方法是利用Symbol值的唯一性，将私有方法的名字命名为一个Symbol值。
+  ```js
+  class Widget {
 
-  // 公有方法
-  foo (baz) {
-    this._bar(baz);
+    // 公有方法
+    foo (baz) {
+      this._bar(baz);
+    }
+
+    // 私有方法
+    _bar(baz) {
+      return this.snaf = baz;
+    }
+    // ...
   }
 
-  // 私有方法
-  _bar(baz) {
+
+
+
+  class Widget {
+    foo (baz) {
+      bar.call(this, baz);
+    }
+
+    // ...
+  }
+  function bar(baz) {
     return this.snaf = baz;
   }
 
-  // ...
-}
 
 
 
+  const bar = Symbol('bar');
+  const snaf = Symbol('snaf');
 
-class Widget {
-  foo (baz) {
-    bar.call(this, baz);
-  }
+  export default class myClass{
 
-  // ...
-}
-function bar(baz) {
-  return this.snaf = baz;
-}
+    // 公有方法
+    foo(baz) {
+      this[bar](baz);
+    }
 
+    // 私有方法
+    [bar](baz) {
+      return this[snaf] = baz;
+    }
 
+    // ...
+  };
 
-
-const bar = Symbol('bar');
-const snaf = Symbol('snaf');
-
-export default class myClass{
-
-  // 公有方法
-  foo(baz) {
-    this[bar](baz);
-  }
-
-  // 私有方法
-  [bar](baz) {
-    return this[snaf] = baz;
-  }
-
-  // ...
-};
-
-const inst = new myClass();
-Reflect.ownKeys(myClass.prototype)
-// [ 'constructor', 'foo', Symbol(bar) ]
-```
+  const inst = new myClass();
+  Reflect.ownKeys(myClass.prototype)
+  // [ 'constructor', 'foo', Symbol(bar) ]
+  ```
 
 ### 手写函数（前面有很多）
 在JS基础中有很多这种需要手写的函数和方法等。
-
 ### 数据类型
+
 值类型（7个）：Undefined、Null、Number、String、Boolean、Symbol(ES6)、BigInt(ES10)
 引用类型：Object：Array、Function
-- Javascript 中的数据类型包括原始类型和引用类型。其中原始类型包括 null、undefined、boolean、string、symbol、bigInt、number。
-    - 基本类型的访问是按值访问的，就是说你可以操作保存在变量中的实际的值s。
-    - 基本类型的变量是存放在栈区的（栈区指内存里的栈内存）
-    - 通过值复制的方式赋值和传递值。
-    - 值类型的数据是不可变的，在内存中占有固定大小的空间，它们都会被存储在栈（stack）中。
--  引用类型指的是 Object
-    -  而引用类型则是通过复制指针，实现复制，但指针指向的是同一个对象，所以改变其中一个两个 都改变；
-    -  它们总是通过引用复制的方式赋值和传递值。
-    -  引用类型的数据大小不固定，所以把它们的值存在堆（Heap）中，但还是会把它们在堆中的内存地址存在栈中。在查询引用类型数据时，先从栈中读取所持有的数据在堆中的内存地址，然后根据地址找到实际的数据。
 
+- Javascript 中的数据类型包括原始类型和引用类型。其中原始类型包括 null、undefined、boolean、string、symbol、bigInt、number。
+  - 基本类型的访问是按值访问的，就是说你可以操作保存在变量中的实际的值s。
+  - 基本类型的变量是存放在栈区的（栈区指内存里的栈内存）
+  - 通过值复制的方式赋值和传递值。
+  - 值类型的数据是不可变的，在内存中占有固定大小的空间，它们都会被存储在栈（stack）中。
+- 引用类型指的是 Object
+  - 而引用类型则是通过复制指针，实现复制，但指针指向的是同一个对象，所以改变其中一个两个 都改变；
+  - 它们总是通过引用复制的方式赋值和传递值。
+  - 引用类型的数据大小不固定，所以把它们的值存在堆（Heap）中，但还是会把它们在堆中的内存地址存在栈中。在查询引用类型数据时，先从栈中读取所持有的数据在堆中的内存地址，然后根据地址找到实际的数据。
 ### 为什么会有栈内存和堆内存？
+
 与gc（垃圾回收机制）有关。为了使程序运行时占用的内存最小。
 
 当一个方法执行时，每个方法都会建立自己的内存栈，在这个方法内定义的变量将会被逐个放入这块栈内存里，当方法执行结束，这个方法的内存栈也会被销毁。因此，所有在方法中定义的变量都存放在栈内存中。
 
 当在程序创建一个对象时，这个对象将被保存到运行时数据区中，以便反复利用（因为对象的创建成本通常较大），这个运行时数据区就是堆内存。堆内存中的对象不会随方法的结束而销毁，即使方法调用结束后，只要这个对象还可能被另一个变量所引用，则这个对象就不会被销毁；只有当一个对象没有被任何变量引用它时，系统的垃圾回收机制才会回收它。
-
 ### 判断数据类型的方法
+
 typeof可以检测变量的数据类型，返回如下6种字符串number、string、boolean、object、undefined、function。
+
 ```js
 typeof undefined; // "undefined"
 typeof false; // "boolean"
@@ -3288,12 +3539,12 @@ typeof {}; // "object"
 typeof []; // "object" 
 typeof new Date(); // "object"
 ```
+
 优点：能够快速区分基本数据类型。
 缺点：不能将Object、Array和Null区分，都返回object。
 
-
-
 一般通过 `Object.prototype.toString(...)`来查看。每种引用类型都会直接或者间接继承自Object类型，因此它们都包含toString()函数。不同数据类型的toString()类型返回值也不一样，所以通过toString()函数可以准确判断值的类型。
+
 ```js
 Object.prototype.toString.call(1) // "[object Number]"
 Object.prototype.toString.call('hi') // "[object String]"
@@ -3309,15 +3560,17 @@ Object.prototype.toString.call(Symbol(1)) // "[object Symbol]"
 缺点：写法繁琐不容易记，推荐进行封装后使用。
 ```
 
-
 `instanceof` 运算符也常常用来判断对象类型。用法: 左边的运算数是一个`object`，右边运算数是对象类的名字或者构造函数; 返回`true`或`false`。
+
 ```js
 [] instanceof Array; // true
 [] instanceof Object; // true
 [] instanceof RegExp; // false
 new Date instanceof Date; // true
 ```
+
 `instanceof` 的内部机制是：检测构造函数的 `prototype` 属性是否出现在某个实例对象的原型链上。
+
 - instanceof，用于检测某个对象的原型链是否包含某个构造函数的 prototype 属性。
 - instanceof 适用于检测对象，它是基于原型链运作的。
 - instanceof 除了适用于任何 object 的类型检查之外，也可以用来检测内置对象，比如：Array、RegExp、Object、Function
@@ -3325,57 +3578,59 @@ new Date instanceof Date; // true
 
 优点：能够区分Array、Object和Function，适合用于判断自定义的类实例对象。
 缺点：Number，Boolean，String基本数据类型不能判断。
-    - 判断某个`实例`是否属于某种类型
-    ```js
-        let person = function () {
-        }
-        let nicole = new person()
-        nicole instanceof person // true
-        
-        function Foo() {
-        }
-        
-        Object instanceof Object // true
-        Function instanceof Function // true
-        Function instanceof Object // true
-        Foo instanceof Foo // false
-        Foo instanceof Object // true
-        Foo instanceof Function // true
-    ```
-    - 也可以判断一个实例是否是其父类型或者祖先类型的实例。
-    ```js
-        function Car(make, model, year) {
-          this.make = make;
-          this.model = model;
-          this.year = year;
-        }
-        const auto = new Car('Honda', 'Accord', 1998);
-        
-        console.log(auto instanceof Car);
-        // expected output: true
-        
-        console.log(auto instanceof Object);
-        // expected output: true
-    ```
-    
+- 判断某个`实例`是否属于某种类型
+```js
+    let person = function () {
+    }
+    let nicole = new person()
+    nicole instanceof person // true
+
+    function Foo() {
+    }
+    Object instanceof Object // true
+    Function instanceof Function // true
+    Function instanceof Object // true
+    Foo instanceof Foo // false
+    Foo instanceof Object // true
+    Foo instanceof Function // true
+```
+- 也可以判断一个实例是否是其父类型或者祖先类型的实例。
+```js
+  function Car(make, model, year) {
+    this.make = make;
+    this.model = model;
+    this.year = year;
+  }
+  const auto = new Car('Honda', 'Accord', 1998);
+  console.log(auto instanceof Car);
+  // expected output: true
+
+  console.log(auto instanceof Object);
+  // expected output: true
+```
+
 ### JS垃圾回收机制
+
 每隔一段时间， JS 的垃圾收集器都会对变量进行“巡逻”，就和保安巡逻园区一样，让不相干的人赶紧走。当一个变量不被需要了以后，它就会把这个变量所占用的内存空间所释放，这个过程就叫做垃圾回收
 
 JS 的垃圾回收算法分为两种，**引用计数法**和**标记清除法**
 
 **引用计数法**：在引用计数法的机制下，内存中的每一个值都会对应一个引用计数。
 引用计数法是最初级的垃圾回收算法，已经被现代浏览器所淘汰了。在学习引用计数法之前，需要首先对引用有一定的概念，你可以认为它就是对当前变量所指向的那块内存地址的描述，有点类似于JS引用数据类型的内存指向的概念，先来看一行代码：
+
 ```js
 var obj={name:'jack'};
 ```
+
 当我们在给 obj 赋值的同时，其实就创建了一个指向该变量的引用,引用计数为1，在引用计数法的机制下，内存中的每一个值都会对应一个引用计数。而当我们给 obj 赋值为 null时，这个变量就变成了一块没用的内存，那么此时， obj 的引用计数将会变成 0，它将会被垃圾收集器所回收，也就是 obj 所占用的内存空间将会被释放。
 
 函数作用域的生命周期是很短暂的，在函数执行完毕之后，里面的变量基本是没用的变量了，不清除的后果就是该内存垃圾没有被释放，依然霸占着原有的内存不松手，就会容易引发内存泄漏。
+
 ```js
 function changeName(){
   var obj1={};
   var obj2={};
-  
+
   obj1.target=obj2;
   obj2.target=obj1;
   obj1.age=15;
@@ -3387,24 +3642,24 @@ changeName();
 ```
 
 **标记清除法**：引用计数法的弊端已经很明显了，那么，现在所要说的标记清除法就不存在这样子的问题。因为它采用的判断标准是看这个对象是否可抵达，它主要分为两个阶段，*标记阶段和清除阶段*:
-- 标记阶段
-    - 垃圾收集器会从根对象（Window对象）出发，扫描所有可以触及的对象，这就是所谓的可抵达
-- 清除阶段
-    - 在扫描的同时，根对象无法触及（不可抵达）的对象,就是被认为不被需要的对象，就会被当成垃圾清除
-```js
-function changeName(){
-  var obj1={};
-  var obj2={};
-  
-  obj1.target=obj2;
-  obj2.target=obj1;
-  obj1.age=15;
-  console.log(obj1.target);
-  console.log(obj2.target);
-}
 
-changeName();
-```
+- 标记阶段
+  - 垃圾收集器会从根对象（Window对象）出发，扫描所有可以触及的对象，这就是所谓的可抵达
+- 清除阶段
+  - 在扫描的同时，根对象无法触及（不可抵达）的对象,就是被认为不被需要的对象，就会被当成垃圾清除
+  ```js
+  function changeName(){
+    var obj1={};
+    var obj2={};
+    obj1.target=obj2;
+    obj2.target=obj1;
+    obj1.age=15;
+    console.log(obj1.target);
+    console.log(obj2.target);
+  }
+  changeName();
+
+  ```
 在函数执行完毕之后，函数的声明周期结束，那么现在，从 Window对象 出发， obj1 和 obj2 都会被垃圾收集器标记为不可抵达，这样子的情况下，互相引用的情况也会迎刃而解。
 
 ### 内存泄漏
@@ -3424,70 +3679,59 @@ var o4 = Object.create(p)
 ```
 
 ### 判断一个对象是不是可迭代的,判断一个对象是否为空
+
 - 判断一个对象是不是可迭代的
-    - **每个可迭代对象必然包含一个 [Symbol.iterator]  方法属性**
-    - 每个可迭代对象都有一个 [Symbol.iterator]  方法属性，没有的话，肯定不是可迭代对象。
+  - **每个可迭代对象必然包含一个 [Symbol.iterator]  方法属性**
+  - 每个可迭代对象都有一个 [Symbol.iterator]  方法属性，没有的话，肯定不是可迭代对象。
 
 - 判断一个对象是否为空
-    ```js
-        function goodEmptyCheck(value) {
-            return value && Object.keys(value).length === 0 && value.constructor === Object;
-        }
-        
-        
-        
-        
-         let isEmpty = (obj) => (JSON.stringify(obj) === '{}') ? true : false
-    ```
-
+  ```js
+  function goodEmptyCheck(value) {
+    return value && Object.keys(value).length === 0 && value.constructor === Object;
+  }
+  let isEmpty = (obj) => (JSON.stringify(obj) === '{}') ? true : false
+  ```
 ### for in 和 for of 的区别
 - for in
-    - for...in语句以**任意顺序**遍历一个对象的除Symbol以外的可枚举属性。
-    - for ... in更适合遍历对象，不建议与数组一起使用，因为遍历顺序有可能不是按照实际数组的索引顺序。
-
+  - for...in语句以**任意顺序**遍历一个对象的除Symbol以外的可枚举属性。
+  - for ... in更适合遍历对象，不建议与数组一起使用，因为遍历顺序有可能不是按照实际数组的索引顺序。
 - for-of
-    - for...of语句在可迭代对象（包括 Array，Map，Set，String，TypedArray，arguments对象等 ）上创建一个迭代循环，并为每个不同属性的值执行语句。
-    - 与forEach()不同的是，它可以正确响应break、continue和return语句。
-
+  - for...of语句在可迭代对象（包括 Array，Map，Set，String，TypedArray，arguments对象等 ）上创建一个迭代循环，并为每个不同属性的值执行语句。
+  - 与forEach()不同的是，它可以正确响应break、continue和return语句。
 ### for ... of相关问题
 - for .. in (以及forEach for )是常规的同步遍历
 - for .. of常用于异步的遍历
-```js
-function test(item) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      resolve(item * item)
-    }, 1000)
-  })
-}
-
-const arr = [100, 200, 300]
-
-// 使用同步遍历的时候 是在1000ms后全部把结果打印出来了，而不是隔一秒打印s
-arr.forEach(async (i) => {
-  console.log(await test(i))
-})
-
-
-
-
-function test(item) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      resolve(item * item)
-    }, 1000)
-  })
-}
-
-const arr = [100, 200, 300]
-// 使用for...of 遍历会 1000ms 打印一次
-!(async function () {
-  for (let item of arr) {
-    console.log(await test(item))
+  ```js
+  function test(item) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve(item * item)
+      }, 1000)
+    })
   }
-})()
-```
+  const arr = [100, 200, 300]
 
+  // 使用同步遍历的时候 是在1000ms后全部把结果打印出来了，而不是隔一秒打印s
+  arr.forEach(async (i) => {
+    console.log(await test(i))
+  })
+
+  function test(item) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        resolve(item * item)
+      }, 1000)
+    })
+  }
+
+  const arr = [100, 200, 300]
+  // 使用for...of 遍历会 1000ms 打印一次
+  !(async function () {
+    for (let item of arr) {
+      console.log(await test(item))
+    }
+  })()
+  ```
 ### 闭包的应用场景
 - 闭包是指有权访问另一个函数作用域中的变量的函数
 - 延长局部变量的生命周期，在某些情况下，希望某些函数内的变量在函数执行后不被销毁
@@ -3504,24 +3748,24 @@ for(var i = 0; i < 5; i++) {
     })(i)
 }
 ```
+
 - setTimeout 传参
-原生的setTimeout传递的第一个函数不能带参数
-```js
-//原生的setTimeout传递的第一个函数不能带参数
-setTimeout(function(param){
+  原生的setTimeout传递的第一个函数不能带参数
+  ```js
+  //原生的setTimeout传递的第一个函数不能带参数
+  setTimeout(function(param){
     alert(param)
-},1000)
+  },1000)
 
-
-//通过闭包可以实现传参效果
-function myfunc(param){
-    return function(){
-        alert(param)
-    }
-}
-var f1 = myfunc(1);
-setTimeout(f1,1000);
-```
+  //通过闭包可以实现传参效果
+  function myfunc(param){
+      return function(){
+          alert(param)
+      }
+  }
+  var f1 = myfunc(1);
+  setTimeout(f1,1000);
+  ```
 - IIFE 自执行函数
 ```js
   var arr = [];
@@ -3537,12 +3781,13 @@ setTimeout(f1,1000);
     console.log(arr[1]()) // 1
     console.log(arr[2]()) // 2
 ```
+
 - 函数防抖、节流
-```js
 - 输入框连续输入进行AJAX验证时
 - 浏览器窗口缩放时，resize事件。
-//防抖
-function debounce(handle, delay) {
+  ```js
+  //防抖
+  function debounce(handle, delay) {
     var timer = null;
     return function () {
         var _self = this, _args = arguments;
@@ -3551,13 +3796,14 @@ function debounce(handle, delay) {
             handle.apply(_self, _args)
         }, delay)
     }
-}
-
+  }
+  ```
 
 - DOM元素拖拽
 - Canvas画笔功能
-//节流
-function throttle(handler, wait) {
+  ```js
+  //节流
+  function throttle(handler, wait) {
     var lastTime = 0;
     return function (e) {
         var nowTime = new Date().getTime();
@@ -3566,17 +3812,17 @@ function throttle(handler, wait) {
             lastTime = nowTime;
         }
     }
-}
-```
+  }
+  ```
 - 柯里化
-当一个函数有多个参数的时候先传递一部分参数调用它（这部分参数以后永远不变）然后返回一个新的函数接收剩余的参数，返回结果。
-    - 柯里化可以我们给一个函数传递较少的参数得到一个已经记住了某些固定参数的函数，这是一种对函数参数的缓存。
-    - 让函数变得更灵活，颗粒度更小。
-    - 可以把多元函数转换为一元函数，可以组合使用函数产生强大的功能。
-    - 参数对复用。
-    - 提高实用性。
-    - 延迟执行 只传递给函数一部分参数来调用它，让它返回一个函数去处理剩下的参数。柯里化的函数可以延迟接收参数，就是比如一个函数需要接收的参数是两个，执行的时候必须接收两个参数，否则没法执行。但是柯里化后的函数，可以先接收一个参数。
+  当一个函数有多个参数的时候先传递一部分参数调用它（这部分参数以后永远不变）然后返回一个新的函数接收剩余的参数，返回结果。
 
+  - 柯里化可以我们给一个函数传递较少的参数得到一个已经记住了某些固定参数的函数，这是一种对函数参数的缓存。
+  - 让函数变得更灵活，颗粒度更小。
+  - 可以把多元函数转换为一元函数，可以组合使用函数产生强大的功能。
+  - 参数对复用。
+  - 提高实用性。
+  - 延迟执行 只传递给函数一部分参数来调用它，让它返回一个函数去处理剩下的参数。柯里化的函数可以延迟接收参数，就是比如一个函数需要接收的参数是两个，执行的时候必须接收两个参数，否则没法执行。但是柯里化后的函数，可以先接收一个参数。
 ```js
 function curry(fn){
     return function curriedFn(...args){
@@ -3588,47 +3834,46 @@ function curry(fn){
         return fn(...args);
     }
 }
-````
-- 函数组合
-```js
-const compose = (...fns) => {
-  return fns.reduce((acc,cur) => {
-    return (...args) => {
-      return acc(cur(...args))
-    }
-  })
-}
 ```
+
+- 函数组合
+  ```js
+    const compose = (...fns) => {
+      return fns.reduce((acc,cur) => {
+        return (...args) => {
+          return acc(cur(...args))
+        }
+      })
+    }
+  ```
 ### var、let 和 const 有什么区别
 - 三者的区别
-    - 区别1
-        - var定义的变量，没有块的概念，可以跨块访问, 不能跨函数访问。
-        - let定义的变量，只能在块作用域里访问，不能跨块访问，也不能跨函数访问。
-        - const用来定义常量，使用时必须初始化(即必须赋值)，只能在块作用域里访问，且不能修改。
-    - 区别2
-        - var可以先使用，后声明，因为存在变量提升；let必须先声明后使用。
-        - var是允许在相同作用域内重复声明同一个变量的，而let与const不允许这一现象。
-        - 在全局上下文中，基于let声明的全局变量和全局对象GO（window）没有任何关系 ;var声明的变量会和GO有映射关系；
-    - 区别3
-        - 解决暂时性死区
-            - 如果区块中存在 let 和 const 命令，这个区块对这些命令声明的变量，从一开始就形成了封闭作用域。假如我们尝试在声明前去使用这类变量，就会报错。
-            - 当我们进入当前作用域时，let 或者 const 声明的变量已经存在了——它们只是不允许被获取而已。要想获取它们，必须得等到代码执行到声明处。
-        - let /const/function会把当前所在的大括号(除函数之外)作为一个全新的块级上下文，应用这个机制，在开发项目的时候，遇到循环事件绑定等类似的需求，无需再自己构建闭包来存储，只要基于let的块作用特征即可解决
-
-
+  - 区别1
+    - var定义的变量，没有块的概念，可以跨块访问, 不能跨函数访问。
+    - let定义的变量，只能在块作用域里访问，不能跨块访问，也不能跨函数访问。
+    - const用来定义常量，使用时必须初始化(即必须赋值)，只能在块作用域里访问，且不能修改。
+  - 区别2
+    - var可以先使用，后声明，因为存在变量提升；let必须先声明后使用。
+    - var是允许在相同作用域内重复声明同一个变量的，而let与const不允许这一现象。
+    - 在全局上下文中，基于let声明的全局变量和全局对象GO（window）没有任何关系 ;var声明的变量会和GO有映射关系；
+  - 区别3
+    - 解决暂时性死区
+      - 如果区块中存在 let 和 const 命令，这个区块对这些命令声明的变量，从一开始就形成了封闭作用域。假如我们尝试在声明前去使用这类变量，就会报错。
+      - 当我们进入当前作用域时，let 或者 const 声明的变量已经存在了——它们只是不允许被获取而已。要想获取它们，必须得等到代码执行到声明处。
+    - let /const/function会把当前所在的大括号(除函数之外)作为一个全新的块级上下文，应用这个机制，在开发项目的时候，遇到循环事件绑定等类似的需求，无需再自己构建闭包来存储，只要基于let的块作用特征即可解决
 1. var
-在ES5中，顶层对象的属性和全局变量是等价的，用`var`声明的变量既是全局变量，也是顶层变量。
-注意：顶层对象，在浏览器环境指的是`window`对象，在`Node`指的是`global`对象。
+   在ES5中，顶层对象的属性和全局变量是等价的，用`var`声明的变量既是全局变量，也是顶层变量。
+   注意：顶层对象，在浏览器环境指的是`window`对象，在`Node`指的是`global`对象。
 - 在变量未赋值时，变量undefined（为使用声明变量时也为undefined）
 - 作用域——var的作用域为方法作用域；只要在方法内定义了，整个方法内的定义变量后的代码都可以使用
 ```js
-var a = 10;
-console.log(window.a) // 10
+  var a = 10;
+  console.log(window.a) // 10
 ```
 使用`var`声明的变量存在变量提升情况。
 ```js
-console.log(a) // undefined
-var a = 20
+  console.log(a) // undefined
+  var a = 20
 ```
 在编译阶段，编译器会将其变成以下执行。
 ```js
@@ -3646,7 +3891,7 @@ console.log(a) // 30
 ```js
 var a = 20
 function change(){
-    var a = 30
+  var a = 30
 }
 change()
 console.log(a) // 20 
@@ -3655,22 +3900,22 @@ console.log(a) // 20
 ```js
 var a = 20
 function change(){
-   a = 30
+  a = 30
 }
 change()
 console.log(a) // 30 
 ```
 2. let
-`let`是`ES6`新增的命令，用来声明变量。
-用法类似于`var`，但是所声明的变量，只在`let`命令所在的`代码块内`有效。
+   `let`是`ES6`新增的命令，用来声明变量。
+   用法类似于`var`，但是所声明的变量，只在`let`命令所在的`代码块内`有效。
 - 在变量为声明前直接使用会报错
 - 作用域——let为块作用域——通常let比var 范围要小
 - let禁止重复声明变量，否则会报错；var可以重复声明
 ```js
-{
+  {
     let a = 20
-}
-console.log(a) // ReferenceError: a is not defined.
+  }
+  console.log(a) // ReferenceError: a is not defined.
 ```
 不存在变量提升。
 这表示在声明它之前，变量a是不存在的，这时如果用到它，就会抛出一个错误
@@ -3683,9 +3928,9 @@ let a = 2
 ```js
 var a = 123
 if (true) {
-    // 只要块级作用域内存在`let`命令，这个区域就不再受外部影响。
-    a = 'abc' // ReferenceError
-    let a;
+  // 只要块级作用域内存在`let`命令，这个区域就不再受外部影响。
+  a = 'abc' // ReferenceError
+  let a;
 }
 ```
 最后，`let`不允许在相同作用域中重复声明。
@@ -3693,8 +3938,6 @@ if (true) {
 let a = 20
 let a = 30
 // Uncaught SyntaxError: Identifier 'a' has already been declared
-
-
 // 注意的是相同作用域，下面这种情况是不会报错的
 let a = 20
 {
@@ -3721,7 +3964,9 @@ a = 3
 const a;
 // SyntaxError: Missing initializer in const declaration
 ```
+
 如果之前用`var`或`let`声明过变量，再用`const`声明同样会报错。
+
 ```js
 var a = 20
 let b = 20
@@ -3729,9 +3974,11 @@ const a = 30
 const b = 30
 // 都会报错
 ```
+
 `const`实际上保证的并不是变量的值不得改动，而是变量指向的那个内存地址所保存的数据不得改动。
 对于简单类型的数据，值就保存在变量指向的那个内存地址，因此等同于常量。
 对于复杂类型的数据，变量指向的内存地址，保存的只是一个指向实际数据的指针，`const`只能保证这个指针是固定的，并不能确保改变量的结构不变。
+
 ```js
 const foo = {};
 // 为 foo 添加一个属性，可以成功
@@ -3740,6 +3987,7 @@ foo.prop // 123
 // 将 foo 指向另一个对象，就会报错
 foo = {}; // TypeError: "foo" is read-only
 ```
+
 其它情况，`const`与`let`一致。
 4. 区别
 `var`、`let`、`const`三者区别可以围绕下面六点展开：
@@ -3749,7 +3997,7 @@ foo = {}; // TypeError: "foo" is read-only
 - 重复声明
 - 修改声明的变量
 - 使用
-变量提升
+  变量提升
 - `var`声明的变量存在变量提升，即变量可以在声明之前调用，值为`undefined`。
 - `let`和`const`不存在变量提升，即它们所声明的变量一定要在声明后使用，否则报错。
 ```js
@@ -3783,7 +4031,7 @@ if (true) {
 ```js
 // var
 {
-    var a = 20
+  var a = 20
 }
 console.log(a)  // 20
 
@@ -3815,9 +4063,11 @@ let b = 20 // Identifier 'b' has already been declared
 const c = 10
 const c = 20 // Identifier 'c' has already been declared
 ```
+
 修改声明的变量
 `var`和`let`可以。
 `const`声明一个只读的常量。一旦声明，常量的值就不能改变。
+
 ```js
 // var
 var a = 10
@@ -3833,22 +4083,20 @@ console.log(b)  // 20
 const c = 10
 c = 20
 console.log(c) // Uncaught TypeError: Assignment to constant variable
-```    
-    
+```
+
 ### 深浅拷贝
 - 浅拷贝
-    - 如果属性是基本类型，拷贝的就是基本类型的值，如果属性是引用类型，拷贝的就是内存地址 ，所以如果其中一个对象改变了这个地址，就会影响到另一个对象。
+  - 如果属性是基本类型，拷贝的就是基本类型的值，如果属性是引用类型，拷贝的就是内存地址 ，所以如果其中一个对象改变了这个地址，就会影响到另一个对象。
 ```js
 //方法 1
 Object.assign(target, ...sources)  // 缺陷：没能处理数组，不够通用
-
-
 //方法 2
 var simpleClone = function (target) {
   if (typeof target === "object") {
     let cloneTarget = Array.isArray(target) ? [] : {};
     for (const key in target) {
-       if (obj.hasOwnProperty(key)) {
+      if (obj.hasOwnProperty(key)) {
             cloneTarget[key] = target[key];
         }
     }
@@ -3857,11 +4105,9 @@ var simpleClone = function (target) {
     return target;
   }
 };
-```
 
 ```
 实际上对于数组来说， 只要不修改原数组， 重新返回一个新数组就可以实现浅拷贝，比如说map、filter、reduce等方法
-```
 
 - 深拷贝
 将一个对象从内存中完整的拷贝一份出来,从堆内存中开辟一个新的区域存放新对象,且修改新对象不会影响原对象。
@@ -3919,54 +4165,60 @@ var deepClone = function (target, map = new WeakMap()) {
 
 ### 类数组对象转换为数组的方法
 - ES6语法 Array.from(arr)
-```js
-//将hdList用Array.from（）方法转换为数组，并用list变量接收
-let list = Array.from(hdList);
-```
+  ```js
+  //将hdList用Array.from（）方法转换为数组，并用list变量接收
+  let list = Array.from(hdList);
+  ```
 - 用Array.prototype.slice.call（elems）方法转化为数组 或 [].slice.call（elems）
-```js
-let list = Array.prototype.slice.call(hdList);
-```
+  ```js
+  let list = Array.prototype.slice.call(hdList);
+  ```
 - 用[ ...elems ]方法转化为数组
-```js
-let list = [...hdList];//用[ ...elems ]方法转化为数组并用list接收
-```
+  ```js
+  let list = [...hdList];//用[ ...elems ]方法转化为数组并用list接收
+  ```
+
 - 用Array.prototype.forEach.call(elem,callback)方法
-```js
-//直接对hdList集合进行循环或者map等
-Array.prototype.forEach.call（hdList,function(){
-//...
-}）
-Array.prototype.map.call（hdList,function(){
-//...
-}）
-```
+  ```js
+  //直接对hdList集合进行循环或者map等
+  Array.prototype.forEach.call（hdList,function(){
+  //...
+  }）
+  Array.prototype.map.call（hdList,function(){
+  //...
+  }）
+  ```
 ### 数组的遍历方法（数组的方法），那些方法有什么区别？？？？？？
 ### js数组的方法，哪些会改变原数组？？？？？？？
 ### ES6
-https://juejin.cn/post/6844903959283367950
-![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210921221425.png)
+  https://juejin.cn/post/6844903959283367950
+  ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210921221425.png)
 #### Set数据结构
 概念：set是ES6新增的数据结构。集合的概念是一组无序且唯一（即不重复）的项组成。set数据结构使用了与有限集合相同的数学概念，应用在计算机的数据结构中，与数组类似，但成员都是唯一的，没有重复的值。
 
 特点：key和value相同，没有重复的value。只有健值，没有健名，有点类似数组。
 
 #### WeakSet
+
 WeakSet 对象允许你将弱引用对象储存在一个集合中。
 WeakSet 与 Set 的区别：
+
 - WeakSet 只能储存对象引用，不能存放值，而 Set 对象都可以
 - WeakSet 对象中储存的对象值都是被弱引用的，即垃圾回收机制不考虑 WeakSet 对该对象的应用，如果没有其他的变量或属性引用这个对象值，则这个对象将会被垃圾回收掉（不考虑该对象还存在于 WeakSet 中），所以，WeakSet 对象里有多少个成员元素，取决于垃圾回收机制有没有运行，运行前后成员个数可能不一致，遍历结束之后，有的成员可能取不到了（被垃圾回收了），WeakSet 对象是无法被遍历的（ES6 规定 WeakSet 不可遍历），也没有办法拿到它包含的所有元素。
 
 #### Map数据结构
+
 Map 是一种叫做字典的数据结构,Map和对象最大的不同应该就是键可以是任意类型。
 Map原生提供三个遍历器生成函数和一个遍历方法。
+
 - keys()：返回键名的遍历器。
 - values()：返回键值的遍历器。
 - entries()：返回所有成员的遍历器。
 - forEach()：遍历Map的所有成员。
-需要特别注意的是，Map的遍历顺序就是插入顺序。
+  需要特别注意的是，Map的遍历顺序就是插入顺序。
 
 #### WeakMap
+
 WeakMap 对象是一组键值对的集合，其中的键是弱引用对象，而值可以是任意。
 注意，WeakMap 弱引用的只是键名，而不是键值。键值依然是正常引用。
 
@@ -3974,15 +4226,18 @@ WeakMap 中，每个键对自己所引用对象的引用都是弱引用，在没
 
 ### CommonJS 和 ESmodules 模块化的区别
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211012163119.png)
+
 1. `ES6 Module`静态引入，编译时引入（码在编译的过程中可以做的事情包含词法和语法分析、类型检查以及代码优化等等。）
+
 2. `Commonjs`动态引入，执行时引入
+
 3. 只有`ES6 Module`才能静态分析，实现`Tree-Shaking` （rollup）
 ```js
 //Commonjs
 let apiList = require('../config/api.js')
 if(isDev) {
- // 动态也引入执行时引入
- apiList = require('../config/api.js')
+// 动态也引入执行时引入
+apiList = require('../config/api.js')
 }
 
 //ES6 Module
@@ -3991,8 +4246,8 @@ if(isDev) {
  // 编译时报错，只能静态引入
  import apiList from '../config/api_dev.js'
 }
-```
 
+```
 - CommonJS 的特性如下：
     - 一个文件就是一个模块,每个模块都有单独的作用域
     - 通过module.exports导出成员。通过require函数载入模块
@@ -4019,15 +4274,20 @@ JS里整数的计算是正确的，但是小数的计算是有误差的。
 0.1 + 0.2 
 0.30000000000000004
 ```
+
 对小数点以后的数乘以2，取结果的整数部分（不是1就是0），然后再用小数部分再乘以2，再取结果的整数部分……以此类推，直到小数部分为0或者位数已经够了就OK了。然后把取的整数部分按先后次序排列
 对浮点数进行运算的过程中，需要将十进制转换成二进制。
+
 ### Number()的存储空间是多大？假如接口返回一个超过最大字节的数字怎么办？
+
 Number类型的最大值为2的53次方，即9007199254740992，如果超过这个值，比如900719925474099222，那么得到的值会不精确，也就是900719925474099200
 
 ### 浏览器对于小数单位是怎么计算的？
+
 对浮点数进行运算的过程中，需要将十进制转换成二进制。
 
 ### 发布订阅模式是怎么样的：nodejs 中 EventEmitter 类，主要方法有 on，emit，once，off
+
 ```js
 class EventEmitter {
   constructor(defaultMaxListeners = 50) {
@@ -4112,43 +4372,41 @@ $event.once("fn1", fn2);
 
 $event.emit("fn1", "fn1参数2", "参数3", "参数4");
 // $event.emit("fn1", "fn2 fn2");
-
 ```
 
-
 ### 介绍一下函数的作用，纯函数是什么，函数的副作用是什么?
+
 - 函数是"第一等公民"
   - 函数可以像其他数据类型一样操作，如赋值给其他变量、作为函数的入参、作为函数的返回值。
-
 - 纯函数
-    - 如果函数的调用参数相同, 则永远返回相同的结果. 它不依赖于程序执行期间函数   外部任何状态或数据的变化,只依赖于传入的参数。
-    - 纯函数不会产生任何可观察的副作用, 例如: 网络请求, 输入/输出设备, 或数据突变(mutation)等。
-    - **无状态**：函数的输出仅取决于输入，而不依赖外部状态；
-    - **无副作用**：不会造成超出其作用域的变化，即不修改 函数参数 或 全局变量 等。函数依赖外部状态就无法保证相同的输出，就会带来副作用。
-    - **可缓存性**正是因为函数式声明的无状态特点，即：**相同输入总能得到相同的输出**。所以我们可以提前缓存函数的执行结果，实现更多功能。例如：优化斐波拉契数列的递归解法。
-    - **可移植性/自文档化**纯函数的依赖很明确，更易于观察和理解，配合类型签名可以使程序更加简单易读。
-    - **可测试性**纯函数让测试更加简单，只需简单地给函数一个输入，然后断言输出就可以了。
-    - **并行处理**在多线程环境下并行操作共享的内存数据很可能会出现意外情况。纯函数（封闭的环境）不需要访问共享的内存数据，所以在并行环境下可以任意运行纯函数（Web Worker可以开启新的线程)。
+  - 如果函数的调用参数相同, 则永远返回相同的结果. 它不依赖于程序执行期间函数   外部任何状态或数据的变化,只依赖于传入的参数。
+  - 纯函数不会产生任何可观察的副作用, 例如: 网络请求, 输入/输出设备, 或数据突变(mutation)等。
+  - **无状态**：函数的输出仅取决于输入，而不依赖外部状态；
+  - **无副作用**：不会造成超出其作用域的变化，即不修改 函数参数 或 全局变量 等。函数依赖外部状态就无法保证相同的输出，就会带来副作用。
+  - **可缓存性**正是因为函数式声明的无状态特点，即：**相同输入总能得到相同的输出**。所以我们可以提前缓存函数的执行结果，实现更多功能。例如：优化斐波拉契数列的递归解法。
+  - **可移植性/自文档化**纯函数的依赖很明确，更易于观察和理解，配合类型签名可以使程序更加简单易读。
+  - **可测试性**纯函数让测试更加简单，只需简单地给函数一个输入，然后断言输出就可以了。
+  - **并行处理**在多线程环境下并行操作共享的内存数据很可能会出现意外情况。纯函数（封闭的环境）不需要访问共享的内存数据，所以在并行环境下可以任意运行纯函数（Web Worker可以开启新的线程)。
 
 - 函数副作用
-    - 函数的副作用是指**在调用函数时，除了返回函数值外还产生了额外的影响**。
-    - 更改全局变量
-    - 处理用户输入
-    - 屏幕打印或打印log日志
-    - DOM查询以及浏览器cookie、localstorage查询
-    - 发送http请求
-    - 抛出异常，未被当前函数捕获
-
+  - 函数的副作用是指**在调用函数时，除了返回函数值外还产生了额外的影响**。
+  - 更改全局变量
+  - 处理用户输入
+  - 屏幕打印或打印log日志
+  - DOM查询以及浏览器cookie、localstorage查询
+  - 发送http请求
+  - 抛出异常，未被当前函数捕获
 
 ### 动态创建script标签并插入到页面上，说执行时机
+
 因为浏览器对动态插入的script标签，默认设置的是async。
 async作用的js脚本时没有顺序的，异步加载，加载后执行。
 所以还有个defer，defer是异步加载，按script在文档中的顺序执行。
 既然问题出在async上，那么创建script标签时把他设置为false就好。
 
 ### onclick和addEventListener的区别
-1.onclick事件在同一时间只能指向唯一对象（重复绑定事件只会使最后绑定的事件响应） 2.addEventListener给一个事件注册多个listener（重复绑定事件会依次从上到下响应）
 
+1.onclick事件在同一时间只能指向唯一对象（重复绑定事件只会使最后绑定的事件响应） 2.addEventListener给一个事件注册多个listener（重复绑定事件会依次从上到下响应）
 
 addEventListener第一个参数事件类型，第二个类型即绑定的具体事件，第三个参数默认是false，false是冒泡，true时是捕获；
 事件触发的顺序为先捕获再冒泡，捕获时从dom树最上层开始响应，冒泡时从dom树最底层开始响应；
@@ -4156,51 +4414,51 @@ addEventListener第一个参数事件类型，第二个类型即绑定的具体�
 阻止默认事件用e.preventDefaule(),e.returnValue; 是一个属性，适用于 IE 6 7 8;
 
 ### （DOM 事件流）浏览器的事件冒泡及事件捕获？怎么取消事件冒泡？事件代理？
+
 事件发生时会在元素节点之间按照特定的顺序传播，这个传播过程即DOM事件流。
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922093720.png)
+
 - 包括三个阶段：
-    - 事件捕获阶段
-        - 事件捕获：事件从最不精确的对象(document 对象)开始触发，然后到最精确
-        - 事件从Document节点自上而下向目标节点传播的阶段；
-    - 处于目标阶段
-        - 事件目标：当到达目标元素之后，执行目标元素该事件相应的处理函数。如果没有绑定监听函数，那就不执行。
-    - 事件冒泡阶段
-        - 事件冒泡：事件按照从最特定的事件目标到最不特定的事件目标(document对象)的顺序触发，当一个元素接收到事件的时候会把他接收到的事件传给自己的父级，一直到window 。
-        - 事件从目标节点自下而上向Document节点传播的阶段。
-        - 不出产生冒泡的事件：abort、blur、focus、load、unload、mouseenter、mouseleave、resize和自定义事件
-        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211105181843.png)
-        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211105181903.png)
+  - 事件捕获阶段
+    - 事件捕获：事件从最不精确的对象(document 对象)开始触发，然后到最精确
+    - 事件从Document节点自上而下向目标节点传播的阶段；
+  - 处于目标阶段
+    - 事件目标：当到达目标元素之后，执行目标元素该事件相应的处理函数。如果没有绑定监听函数，那就不执行。
+  - 事件冒泡阶段
+    - 事件冒泡：事件按照从最特定的事件目标到最不特定的事件目标(document对象)的顺序触发，当一个元素接收到事件的时候会把他接收到的事件传给自己的父级，一直到window 。
+    - 事件从目标节点自下而上向Document节点传播的阶段。
+    - 不出产生冒泡的事件：abort、blur、focus、load、unload、mouseenter、mouseleave、resize和自定义事件
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211105181843.png)
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211105181903.png)
 
 - 注意:
-    - JS代码只能执行捕获或者冒泡其中的一个阶段
-    - onclick 和 attachEvent 只能得到冒泡阶段
-    - addEventListener(type, listener[, useCapture]) 第三个参数如果是true，表示在事件捕获阶段调用事件处理程序；如果是false（不写默认是false），表示在事件冒泡阶段调用事件处理程序
-    - 有的事件是没有冒泡的，如：onblur、onfocus、onmouseenter、onmouseleave 等
+  - JS代码只能执行捕获或者冒泡其中的一个阶段
+  - onclick 和 attachEvent 只能得到冒泡阶段
+  - addEventListener(type, listener[, useCapture]) 第三个参数如果是true，表示在事件捕获阶段调用事件处理程序；如果是false（不写默认是false），表示在事件冒泡阶段调用事件处理程序
+  - 有的事件是没有冒泡的，如：onblur、onfocus、onmouseenter、onmouseleave 等
 
 阻止冒泡和捕获用e.stopPropagation(),event.cancelBubble; // IE 6 7 8 的停止冒泡; 
 阻止默认事件用e.preventDefaule(),e.returnValue; 是一个属性，适用于 IE 6 7 8;
 
-
 - 事件委托的原理（重）
-    - 事件委托也叫事件委派，就是利用 DOM 的冒泡事件流，注册最少的监听器，实现对 DOM 节点的所有子元素进行事件群控。
-    - 事件委托的原理：不给每个子节点单独设置事件监听器，而是设置在其父节点上，然后利用冒泡原理设置每个子节点。(给 ul 注册点击事件，然后利用事件对象的 target 来找到当前点击的 li ，然后事件冒泡到 ul 上， ul 有注册事件，就会触发事件监听器。)
-    - 事件委托的作用
-        - 只操作了一次 DOM ，提高了程序的性能。
-        - 在JavaScript中，添加到页面上的事件处理程序数量将直接关系到页面的整体运行性能，因为需要不断的操作dom,那么引起浏览器重绘和回流的可能也就越多，页面交互的事件也就变的越长，这也就是为什么要减少dom操作的原因。每一个事件处理函数，都是一个对象，那么多一个事件处理函数，内存中就会被多占用一部分空间。如果要用事件委托，就会将所有的操作放到js程序里面，只对它的父级(如果只有一个父级)这一个对象进行操作，与dom的操作就只需要交互一次，这样就能大大的减少与dom的交互次数，提高性能；
+  - 事件委托也叫事件委派，就是利用 DOM 的冒泡事件流，注册最少的监听器，实现对 DOM 节点的所有子元素进行事件群控。
+  - 事件委托的原理：不给每个子节点单独设置事件监听器，而是设置在其父节点上，然后利用冒泡原理设置每个子节点。(给 ul 注册点击事件，然后利用事件对象的 target 来找到当前点击的 li ，然后事件冒泡到 ul 上， ul 有注册事件，就会触发事件监听器。)
+  - 事件委托的作用
+    - 只操作了一次 DOM ，提高了程序的性能。
+    - 在JavaScript中，添加到页面上的事件处理程序数量将直接关系到页面的整体运行性能，因为需要不断的操作dom,那么引起浏览器重绘和回流的可能也就越多，页面交互的事件也就变的越长，这也就是为什么要减少dom操作的原因。每一个事件处理函数，都是一个对象，那么多一个事件处理函数，内存中就会被多占用一部分空间。如果要用事件委托，就会将所有的操作放到js程序里面，只对它的父级(如果只有一个父级)这一个对象进行操作，与dom的操作就只需要交互一次，这样就能大大的减少与dom的交互次数，提高性能；
 ### target/currentTarget/relateTarget
 - event.target
-    - 返回触发事件的元素
-    - 可以用来实现事件委托 (event delegation)
+  - 返回触发事件的元素
+  - 可以用来实现事件委托 (event delegation)
 - event.currentTarget
-    - 返回绑定事件的元素
+  - 返回绑定事件的元素
 - event.relateTarget
-    - 返回与事件的目标节点相关的节点。
+  - 返回与事件的目标节点相关的节点。
 ### window.onload 和 DOMContentLoaded
 ```js
-window.addEventListener('load', function(){
+  window.addEventListener('load', function(){
     //页面的全部资源加载完才会执行，包括图片、视频等
-});
-
+  });
 document.addEventListener('DOMContentLoaded', function(){
     //DOM 渲染完即可执行，此时图片、视频还可能没加载完 -> 尽量选择此方法
 });
@@ -4236,12 +4494,10 @@ Promise 中使用 resolve 和 reject 两个函数来更改状态；
 then 方法内部做但事情就是状态判断
     如果状态是成功，调用成功回调函数
     如果状态是失败，调用失败回调函数
-    
+
 promise调用then的前提是该promise的状态为fullfilled
 只有promise调用then的时候，then里面的函数才会被推入微任务中；
-
 ```
-
 
 ```js
 new Promise(请求1)
@@ -4251,14 +4507,15 @@ new Promise(请求1)
     .then(请求5(请求结果4))
     .catch(处理异常(异常信息))
 ```
-- Promise 的写法更为直观，并且能够在外层捕获异步函数的异常信息。
-    - Promise 对象的 then 方法会返回一个全新的 Promise 对象
-    - 后面的 then 方法就是在为上ー个 then 返回的 Promise 注册回调
-    - 前面 then 方法中回调函数的返回值会作为后面 then 方法回调的参数
-    - 如果回调中返回的是 Promise，那后面 then 方法的回调会等待它的结束
 
+- Promise 的写法更为直观，并且能够在外层捕获异步函数的异常信息。
+  - Promise 对象的 then 方法会返回一个全新的 Promise 对象
+  - 后面的 then 方法就是在为上ー个 then 返回的 Promise 注册回调
+  - 前面 then 方法中回调函数的返回值会作为后面 then 方法回调的参数
+  - 如果回调中返回的是 Promise，那后面 then 方法的回调会等待它的结束
 
 Js引擎为了让microtask尽快的输出，做了一些优化，连续的多个then(3个)如果没有reject或者resolve会交替执行then而不至于让一个堵太久完成用户无响应
+
 ```js
 Promise.resolve().then(() => {
     console.log(0);
@@ -4285,30 +4542,37 @@ Promise.resolve().then(() => {
 ```
 
 #### Promise的调用流程
+
 - 分析Promise的调用流程：
-    - Promise的构造方法接收一个executor()，在new Promise()时就立刻执行这个executor回调
-    - executor()内部的异步任务被放入宏/微任务队列，等待执行
-    - then()被执行，收集成功/失败回调，放入成功/失败队列
-    - executor()的异步任务被执行，触发resolve/reject，从成功/失败队列中取出回调依次执行
+  - Promise的构造方法接收一个executor()，在new Promise()时就立刻执行这个executor回调
+  - executor()内部的异步任务被放入宏/微任务队列，等待执行
+  - then()被执行，收集成功/失败回调，放入成功/失败队列
+  - executor()的异步任务被执行，触发resolve/reject，从成功/失败队列中取出回调依次执行
 - 其实熟悉设计模式的同学，很容易就能意识到这是个观察者模式，这种收集依赖 -> 触发通知 -> 取出依赖执行 的方式，被广泛运用于观察者模式的实现，在Promise里，执行顺序是then收集依赖 -> 异步触发resolve -> resolve执行依赖。
 
 #### Promise A+规范
+
 - Promise本质是一个状态机，且状态只能为以下三种：Pending（等待态）、Fulfilled（执行态）、Rejected（拒绝态），状态的变更是单向的，只能从Pending -> Fulfilled 或 Pending -> Rejected，状态变更不可逆
+
 - then方法接收两个可选参数，分别对应状态改变时触发的回调。then方法返回一个promise。then 方法可以被同一个 promise 调用多次。
 #### then链式调用
+
 - .then()需要返回一个Promise，这样才能找到then方法，所以我们会把then方法的返回值包装成Promise。
+
 - .then()的回调需要拿到上一个.then()的返回值
+
 - .then()的回调需要顺序执行。我们要等待当前Promise状态变更后，再执行下一个then收集的回调，这就要求我们对then的返回值分类讨论。
 #### 手写Promise的调用流程
 ```js
 /**
- * 1. Promise就是一个类   在执行这个类的时候 需要传递一个执行器进去  执行器会立即执行
- * 2. Promise中有三种状态 分别为 成功fulfilled 失败rejected 等待pending  一旦状态确定就不可以更改
- * 3. resolve,reject函数是用来更改状态的
- * 4. then方法内部做的事情就是判断 如果状态是成功  调用成功的回调函数 如果状态是失败 调用失败的回调函数。then方法是被定义在原生对象上的方法
- * 5. then成功回调有一个参数 表示成功之后的值 then失败回调有一个参数  表示失败后的原因
- */
- 
+* 1. Promise就是一个类   在执行这个类的时候 需要传递一个执行器进去  执行器会立即执行
+* 2. Promise中有三种状态 分别为 成功fulfilled 失败rejected 等待pending  一旦状态确定就不可以更改
+* 3. resolve,reject函数是用来更改状态的
+* 4. then方法内部做的事情就是判断 如果状态是成功  调用成功的回调函数 如果状态是失败 调用失败的回调函数。then方法是被定义在原生对象上的方法
+* 5. then成功回调有一个参数 表示成功之后的值 then失败回调有一个参数  表示失败后的原因
+*/
+
+
 // Promise/A+规范的三种状态
 const PENDING = 'pending'
 const FULFILLED = 'fulfilled'
@@ -4344,7 +4608,6 @@ class MyPromise {
         // 保存成功之后的值
         this.value = value
 
-        
         // 异步执行的时候 判断成功回调是否存在 如果存在 调用
         // this.successCallback && this.successCallback(this.value)
         while(this.successCallback.length){
@@ -4359,8 +4622,6 @@ class MyPromise {
         this.status = REJECTED
         // 保存失败之后的原因
         this.error = error
-
-
         // 异步执行的时候 判断失败回调是否存在 如果存在 调用
         // this.failureCallback && this.failureCallback(this.error)
         while(this.failureCallback.length){
@@ -4372,6 +4633,7 @@ class MyPromise {
         /**
         .then()
         .then()
+
 .       .then(value => console.log(value))
          */
         // 将 then 方法的参数变成可选参数
@@ -4410,7 +4672,7 @@ class MyPromise {
                     } catch (error) {
                         reject(error)
                     }
-                },0) 
+                },0)
             }else {
                 // 调用then的时候  没有直接调用 resolve 和 reject。异步之后调用
                 // 处理异步状态
@@ -4445,14 +4707,13 @@ class MyPromise {
                         } catch (error) {
                             reject(error)
                         }
-                    },0) 
+                    },0)
                 })
             }
         })
         // return一个新的promise
         return promise2
     }
-    // 
     finally(callback) {
         //最后一个promise的then
         return this.then((value) => {
@@ -4462,7 +4723,7 @@ class MyPromise {
         },(error) => {
             return MyPromise.resolve(callback()).then(() => {throw error})
         })
-    } 
+    }
     // catch方法其实就是执行一下then的第二个回调
     catch(failureCallback){
         return this.then(undefined,failureCallback)
@@ -4487,7 +4748,7 @@ class MyPromise {
             for(let i=0;i < len;i++){
                 let current = array[i]
                 if(current instanceof MyPromise){
-                    // 失败就调用reject(error)  
+                    // 失败就调用reject(error)
                     current.then(value => addData(i, value),error => reject(error))
                 }else {
                     addData(i,array[i])
@@ -4544,8 +4805,8 @@ class MyPromise {
             })
         })
     }
-}
 
+}
 
 function resolvePromise(promise2,x,resolve,reject) {
     // then 方法链式调用识别 Promise 对象来自自己   不能自己返回自己的promise2 形成死循环调用
@@ -4565,6 +4826,7 @@ function resolvePromise(promise2,x,resolve,reject) {
         resolve(x)
     }
 }
+
 ```
 ```js
 //Promise/A+规定的三种状态
@@ -4590,7 +4852,7 @@ class MyPromise {
 
         // 这里之所以使用一个队列来储存回调,是为了实现规范要求的 "then 方法可以被同一个 promise 调用多次"
         // 如果使用一个变量而非队列来储存回调,那么即使多次p1.then()也只会执行一次回调
-        while(this._resolveQueue.length) {    
+        while(this._resolveQueue.length) {
           const callback = this._resolveQueue.shift()
           callback(val)
         }
@@ -4621,7 +4883,7 @@ class MyPromise {
     typeof rejectFn !== 'function' ? rejectFn = reason => {
       throw new Error(reason instanceof Error? reason.message:reason);
     } : null
-  
+
     // return一个新的promise
     return new MyPromise((resolve, reject) => {
       // 把resolveFn重新包装一下,再push进resolve执行队列,这是为了能够获取回调的返回值进行分类讨论
@@ -4635,7 +4897,7 @@ class MyPromise {
           reject(error)
         }
       }
-  
+
       // reject同理
       const rejectedFn  = error => {
         try {
@@ -4645,7 +4907,7 @@ class MyPromise {
           reject(error)
         }
       }
-  
+
       switch (this._status) {
         // 当状态为pending时,把then回调push进resolve/reject执行队列,等待执行
         case PENDING:
@@ -4728,7 +4990,9 @@ class MyPromise {
   }
 }
 ```
+
 #### Promise有3个状态：
+
 - pending|【待定】初始状态
 - fulfilled|【实现】操作成功
 - rejected【被否决】操作失败
@@ -4762,20 +5026,23 @@ Promise状态发生改变，就会触发.then（）里的响应函数处理后 �
 #### Promise.race()
 - 类似Promise.all（），区别在于它有任意一个完成就算完成。 场景用法： 把异步操作和定时器放在一起 如果定时器先触发，就认为超时，告知用户
 ### promise 和 async await 有什么区别
+
 - 概念：
-    - Promise 是异步编程的一种解决方案，主要是为了解决"回调地狱"问题，有三种状态（pending/fulfilled/rejected)，对象状态不受外界影响，一旦状态改变就不会变化。
-    - async/await 也是异步编程的一种解决方案，基于Promise实现的，返回的是一个Promise对象。
+  - Promise 是异步编程的一种解决方案，主要是为了解决"回调地狱"问题，有三种状态（pending/fulfilled/rejected)，对象状态不受外界影响，一旦状态改变就不会变化。
+  - async/await 也是异步编程的一种解决方案，基于Promise实现的，返回的是一个Promise对象。
+
 - 区别：
-    - promise.then属于微任务，会放到相应宏任务的微任务队列里，等宏任务里面的同步代码执行完再执行；
-    - async函数返回一个 Promise 对象，可以使用then方法添加回调函数。async函数表示函数里面可能会有异步方法，await后面跟一个表达式。当async函数执行的时候，一旦遇到await就会先返回，遇到await会立即执行表达式，然后把表达式后面的代码放到微任务队列里，等到异步操作完成，再接着执行函数体内后面的语句。
+  - promise.then属于微任务，会放到相应宏任务的微任务队列里，等宏任务里面的同步代码执行完再执行；
+  - async函数返回一个 Promise 对象，可以使用then方法添加回调函数。async函数表示函数里面可能会有异步方法，await后面跟一个表达式。当async函数执行的时候，一旦遇到await就会先返回，遇到await会立即执行表达式，然后把表达式后面的代码放到微任务队列里，等到异步操作完成，再接着执行函数体内后面的语句。
 
 Promise和Async都能解决相同的问题，可以根据不同场景选择。Promise可以一直异步链式调用，Async/await对比就比较简洁。
 
 awiat的含义是等待，即async的函数需要等待await后的函数执行完成并且有了返回结果（Promise对象）之后，才能继续执行下面的代码，await通过返回一个Promise对象来实现同步的效果。
+
 ### promise有哪些用法，哪些库函数 ??????
 ### async/await实现
 在多个回调依赖的场景中，尽管Promise通过链式调用取代了回调嵌套，但过多的链式调用可读性仍然不佳，流程控制也不方便，ES7 提出的async 函数，终于让 JS 对于异步操作有了终极解决方案，简洁优美地解决了以上两个问题。
- 
+
 ```js
 async () => {
   const a = await Promise.resolve(a);
@@ -4783,8 +5050,10 @@ async () => {
   const c = await Promise.resolve(c);
 }
 ```
+
 那么我们要如何实现一个async/await呢，首先我们要知道，async/await实际上是对Generator（生成器）的封装，是一个语法糖。
 ES6 新引入了 Generator 函数，可以通过 yield 关键字，把函数的执行流挂起，通过next()方法可以切换到下一个状态，为改变执行流程提供了可能，从而为异步编程提供解决方案。
+
 ```js
 function* myGenerator() {
   yield '1'
@@ -4811,12 +5080,12 @@ gen.next('test1')
 gen.next('test2')
 gen.next('test3')
 ```
-- Generator和async/await。看起来其实已经很相似，但二者又有三点不同：
-    - async/await自带执行器，不需要手动调用next()就能自动执行下一步
-    - async函数返回值是Promise对象，而Generator返回的是生成器对象
-    - await能够返回Promise的resolve/reject的值
-    - 我们对async/await的实现，其实也就是对应以上三点封装Generator
 
+- Generator和async/await。看起来其实已经很相似，但二者又有三点不同：
+  - async/await自带执行器，不需要手动调用next()就能自动执行下一步
+  - async函数返回值是Promise对象，而Generator返回的是生成器对象
+  - await能够返回Promise的resolve/reject的值
+  - 我们对async/await的实现，其实也就是对应以上三点封装Generator
 
 #### 自动执行
 ```js
@@ -4839,9 +5108,6 @@ gen.next().value.then(val => {
     })
   })
 })
-
-
-
 
 
 
@@ -4880,7 +5146,7 @@ function run(gen) {
 }
 function* myGenerator() {
   try {
-    console.log(yield Promise.resolve(1)) 
+    console.log(yield Promise.resolve(1))
     console.log(yield 2)   //2
     console.log(yield Promise.reject('error'))
   } catch (error) {
@@ -4889,8 +5155,6 @@ function* myGenerator() {
 }
 const result = run(myGenerator)     //result是一个Promise
 //输出 1 2 error
-
-
 
 
 
@@ -4947,10 +5211,7 @@ const foo = _asyncToGenerator(function* () {
 foo().then(res => {
   console.log(res)                          //3
 })
-
 ```
-
-
 
 ### Generator实现
 ```js
@@ -4959,7 +5220,7 @@ function* foo() {
   yield 'result2'
   yield 'result3'
 }
-  
+
 const gen = foo()
 console.log(gen.next().value)
 console.log(gen.next().value)
@@ -5001,8 +5262,10 @@ console.log(gen.next().value);
 console.log(gen.next().value);
 console.log(gen.next().value);
 ```
+
 #### regeneratorRuntime.mark()
 regeneratorRuntime.mark(foo)这个方法在第一行被调用，我们先看一下runtime里mark()方法的定义
+
 ```js
 //runtime.js里的定义稍有不同，多了一些判断，以下是编译后的代码
 runtime.mark = function(genFun) {
@@ -5011,10 +5274,12 @@ runtime.mark = function(genFun) {
   return genFun;
 };
 ```
+
 这里边GeneratorFunctionPrototype和Gp我们都不认识，他们被定义在runtime里，不过没关系，我们只要知道mark()方法为生成器函数（foo）绑定了一系列原型就可以了，这里就简单地过了
 
 #### regeneratorRuntime.wrap()
 从上面babel转化的代码我们能看到，执行foo()，其实就是执行wrap()，那么这个方法起到什么作用呢，他想包装一个什么东西呢，我们先来看看wrap方法的定义：
+
 ```js
 //runtime.js里的定义稍有不同，多了一些判断，以下是编译后的代码
 function wrap(innerFn, outerFn, self) {
@@ -5027,7 +5292,9 @@ function wrap(innerFn, outerFn, self) {
   return generator;
 }
 ```
+
 wrap方法先是创建了一个generator，并继承outerFn.prototype；然后new了一个context对象；makeInvokeMethod方法接收innerFn(对应foo$)、context和this，并把返回值挂到generator._invoke上；最后return了generator。其实wrap()相当于是给generator增加了一个_invoke方法
+
 ```js
 var ContinueSentinel = {};
 
@@ -5062,7 +5329,6 @@ var context = {
 
 
 
-
 //以下是编译后的代码
 function makeInvokeMethod(innerFn, context) {
   // 将状态置为start
@@ -5073,7 +5339,7 @@ function makeInvokeMethod(innerFn, context) {
     if (state === "completed") {
       return { value: undefined, done: true };
     }
-    
+
     context.method = method;
     context.arg = arg;
 
@@ -5105,7 +5371,9 @@ function makeInvokeMethod(innerFn, context) {
   };
 }
 ```
+
 为什么generator._invoke实际上就是gen.next呢，因为在runtime对于next()的定义中，next()其实就return了_invoke方法
+
 ```js
 // Helper for defining the .next, .throw, and .return methods of the
 // Iterator interface in terms of a single ._invoke method.
@@ -5119,6 +5387,7 @@ function defineIteratorMethods(prototype) {
 
 defineIteratorMethods(Gp);
 ```
+
 #### 低配实现 & 调用流程分析
 ```js
 // 生成器函数根据yield语句将代码分割为switch-case块，后续通过切换_context.prev和_context.next来分别执行各个case
@@ -5144,7 +5413,7 @@ function gen$(_context) {
   }
 }
 
-// 低配版context  
+// 低配版context
 var context = {
   next:0,
   prev: 0,
@@ -5166,28 +5435,30 @@ let gen = function() {
       }
     }
   }
-} 
+}
 
 // 测试使用
-var g = gen() 
+var g = gen()
 g.next()  // {value: "result1", done: false}
 g.next()  // {value: "result2", done: false}
 g.next()  // {value: "result3", done: false}
 g.next()  // {value: undefined, done: true}
 ```
-- 分析一下调用流程：
-    - 我们定义的function* 生成器函数被转化为以上代码
-    - 转化后的代码分为三大块：
-        - gen$(_context)由yield分割生成器函数代码而来
-        - context对象用于储存函数执行上下文
-        - invoke()方法定义next()，用于执行gen$(_context)来跳到下一步
-    - 当我们调用g.next()，就相当于调用invoke()方法，执行gen$(_context)，进入switch语句，switch根据context的标识，执行对应的case块，return对应结果
-    - 当生成器函数运行到末尾（没有下一个yield或已经return），switch匹配不到对应代码块，就会return空值，这时g.next()返回{value: undefined, done: true}
 
-    
+- 分析一下调用流程：
+  - 我们定义的function* 生成器函数被转化为以上代码
+  - 转化后的代码分为三大块：
+    - gen$(_context)由yield分割生成器函数代码而来
+    - context对象用于储存函数执行上下文
+    - invoke()方法定义next()，用于执行gen$(_context)来跳到下一步
+  - 当我们调用g.next()，就相当于调用invoke()方法，执行gen$(_context)，进入switch语句，switch根据context的标识，执行对应的case块，return对应结果
+  - 当生成器函数运行到末尾（没有下一个yield或已经return），switch匹配不到对应代码块，就会return空值，这时g.next()返回{value: undefined, done: true}
+
 从中我们可以看出，Generator实现的核心在于上下文的保存，函数并没有真的被挂起，每一次yield，其实都执行了一遍传入的生成器函数，只是在这个过程中间用了一个context对象储存上下文，使得每次执行生成器函数的时候，都可以从上一个执行结果开始执行，看起来就像函数被挂起了一样
+
 ### Proxy
 #### Proxy
+
 Proxy 对象用于创建一个对象的代理，从而实现基本操作的拦截和自定义（如属性查找、赋值、枚举、函数调用等）。
 
 代理提供了一种独特的方法，可以在最底层更改或调整现有对象的行为。
@@ -5195,13 +5466,13 @@ Proxy 对象用于创建一个对象的代理，从而实现基本操作的拦�
 Proxy 是对象的包装，将代理上的操作转发到对象，并可以选择捕获其中的一些操作。
 它可以包装任何类型的对象，包括类和函数。
 
-
 ```js
 const p = new Proxy(target, handler)
 
 // target：要使用 Proxy 包装的目标对象（可以是任何类型的对象，包括原生数组，函数，甚至另一个代理）。
 // handler：一个通常以函数作为属性的对象，各属性中的函数分别定义了在执行各种操作时代理 p 的行为。
 ```
+
 ```js
 const man = {
   name: "阿宝哥",
@@ -5228,11 +5499,11 @@ console.log(proxy.age);
 ```
 
 通过 Proxy.revocable() 方法可以用来创建一个可撤销的代理对象。
+
 ```js
 Proxy.revocable(target, handler);
 
-
-const target = {}; 
+const target = {};
 const handler = {};
 const { proxy, revoke } = Proxy.revocable(target, handler);
 
@@ -5241,9 +5512,8 @@ console.log(proxy.name); // 阿宝哥
 revoke();
 console.log(proxy.name); // TypeError: Revoked
 ```
-
-
 #### Reflect 对象简介
+
 Reflect 是一个内置的对象，它提供拦截 JavaScript 操作的方法。这些方法与 proxy handlers 的方法相同。Reflect 不是一个函数对象，因此它是不可构造的。
 
 Reflect 是一个内置对象，可简化的创建 Proxy。
@@ -5272,42 +5542,45 @@ console.log(Reflect.ownKeys(man)); // [ 'name', 'city', 'sex' ]
 ```
 
 #### `Object.defineProperty`和`Proxy`的区别
+
 - Object.defineProperty
-    - Object.defineProperty只能代理某个属性。
-    - 只能监听对象(Object)，不能监听数组的变化，无法触发push, pop, shift, unshift,splice, sort, reverse。
-    - 必须遍历对象的每个属性
-    - 只能劫持当前对象属性，如果想深度劫持，必须深层遍历嵌套的对象
-    - 对象上新增属性，Object.defineProperty监听不到
-    - 若对象内部属性要全部递归代理，Object.definePropery需要一次完成所有递归，性能比Proxy差。
-    - Proxy不兼容IE，Object.defineProperty不兼容IE8及以下
-```js
-Object.defineProperty(obj,'name',{
-  value:'张三',
-  writable:false,
-  configurable: false,
-  enumerable: false,
-  get() {
+  - Object.defineProperty只能代理某个属性。
+  - 只能监听对象(Object)，不能监听数组的变化，无法触发push, pop, shift, unshift,splice, sort, reverse。
+  - 必须遍历对象的每个属性
+  - 只能劫持当前对象属性，如果想深度劫持，必须深层遍历嵌套的对象
+  - 对象上新增属性，Object.defineProperty监听不到
+  - 若对象内部属性要全部递归代理，Object.definePropery需要一次完成所有递归，性能比Proxy差。
+  - Proxy不兼容IE，Object.defineProperty不兼容IE8及以下
+  ```js
+  Object.defineProperty(obj,'name',{
+    value:'张三',
+    writable:false,
+    configurable: false,
+    enumerable: false,
+    get() {
     console.log('get log!');
     return log;
-  },
-  set(value) {
+    },
+    set(value) {
     log = value;
     archive.push({ val: log });
-  }
-})
-```
-- Proxy
-    - Proxy可以直接监听对象而非属性
-    - Proxy直接可以劫持整个对象,并返回一个新对象。
-    - Proxy可以直接监听数组的变化
-    - Proxy有多达13种拦截方法,不限于apply、ownKeys、deleteProperty、has等等是Object.defineProperty不具备的。
-    - 对象上新增属性，Proxy可以监听到
-    - 若对象内部属性要全部递归代理，Proxy可以只在调用的时候递归
-    - Proxy使用上比Object.defineProperty方便多。
+    }
+  })
+  ```
 
+- Proxy
+  - Proxy可以直接监听对象而非属性
+  - Proxy直接可以劫持整个对象,并返回一个新对象。
+  - Proxy可以直接监听数组的变化
+  - Proxy有多达13种拦截方法,不限于apply、ownKeys、deleteProperty、has等等是Object.defineProperty不具备的。
+  - 对象上新增属性，Proxy可以监听到
+  - 若对象内部属性要全部递归代理，Proxy可以只在调用的时候递归
+  - Proxy使用上比Object.defineProperty方便多。
 ### 尾递归调用及尾调用优化
 #### 尾调用
-当一个函数执行时的最后一个步骤是返回另一个函数的调用，这就叫做尾调用。 
+
+当一个函数执行时的最后一个步骤是返回另一个函数的调用，这就叫做尾调用。
+
 ```js
 // 尾调用正确示范1.0
 function f(x) {
@@ -5323,12 +5596,13 @@ function f(x) {
 }
 ```
 - 优点
-    - 由于尾调用是函数的最后一条执行语句，无需再保留外层函数的栈帧来存储它的局部变量以及调用前地址等信息，所以栈从始至终就只保留着一个栈帧。这就是尾调用优化，节省了很大一部分的内存空间。
+  - 由于尾调用是函数的最后一条执行语句，无需再保留外层函数的栈帧来存储它的局部变量以及调用前地址等信息，所以栈从始至终就只保留着一个栈帧。这就是尾调用优化，节省了很大一部分的内存空间。
 - 缺点
-    - 但上面只是理论上的理想情况，把代码改写成尾调用的形式只是一个前提条件，栈是否真的如我们所愿从始至终只保留着一个栈桢还得取决于语言是否支持。
-
+  - 但上面只是理论上的理想情况，把代码改写成尾调用的形式只是一个前提条件，栈是否真的如我们所愿从始至终只保留着一个栈桢还得取决于语言是否支持。
 #### 尾调用优化
+
 函数在调用的时候会在调用栈（call stack）中存有记录，每一条记录叫做一个调用帧（call frame），每调用一个函数，就向栈中push一条记录，函数执行结束后依次向外弹出，直到清空调用栈，参考下图：
+
 ```js
 function one() {
   two();
@@ -5341,6 +5615,7 @@ function three() {
 }
 one();
 ```
+
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922142313.png)
 在一个函数中调用另一个函数，但是并没有通过return来结束当前函数的执行，JS引擎会认为当前的函数并没有执行完成，会在执行当前函数调用的函数，等他执行完成才会释放当前函数。
 
@@ -5360,22 +5635,26 @@ function three () {
 }
 one();
 ```
+
 one函数执行时，会把one函数添加进调用栈中，one函数现在为当前帧。
 在one函数中又调用了two函数，当时在调用two函数添加了return，调用栈会把one函数弹出，当前调用栈中只有一个two函数。
 在two函数中又调用three函数，因为有return当前调用栈中只有three函数。
 当three函数执行完成后，调用栈弹出three函数，此时调用栈当前为空。
 
 #### 尾递归
+
 函数尾调用自身，这个形式称为尾递归。
+
 ```js
 function foo() {
   return foo();
 }
 ```
+
 - 优点
-    - 递归对于空间消耗很大，容易造成栈溢出。如果我们将其改成尾递归，那么能做到只保存1个栈帧，有效避免了栈溢出。
+  - 递归对于空间消耗很大，容易造成栈溢出。如果我们将其改成尾递归，那么能做到只保存1个栈帧，有效避免了栈溢出。
 - 缺点
-    -  语义不明显，阅读性较差
+  - 语义不明显，阅读性较差
 
 ```js
 'use strict';
@@ -5387,62 +5666,62 @@ function factorial(num, num1 = 0, num2 = 1) {
   return factorial(num - 1, num2, num1 + num2);
 }
 ```
-### js执行的时候浏览器开启了哪些线程????????????
-5个 主线程，事件处理线程，渲染线程，http线程，事件触发线程
-### js同步代码要loop很久，会不会阻塞后面代码的执行??????
 
+### js执行的时候浏览器开启了哪些线程????????????
+
+5个 主线程，事件处理线程，渲染线程，http线程，事件触发线程
+
+### js同步代码要loop很久，会不会阻塞后面代码的执行??????
 ### 事件循环（Event Loop）---- （JavaScript的运行机制）----JS异步
 #### 线程和进程的区别，JS是单线程的吗？
+
 进程是资源分配的最小单位，线程是CPU调度的最小单位
+
 - 进程
-    - 代表CPU所能处理的单个任务。任一时刻，CPU总是运行一个进程，其他进程处于非运行状态。
-    - 进程间通信
-        - 管道（Pipe）及有名管道（named pipe）：管道可用于具有亲缘关系进程间的通信，有名管道克服了管道没有名字的限制，因此，除具有管道所具有的功能外，它还允许无亲缘关系进程间的通信；
-        - 信号（Signal）：信号是比较复杂的通信方式，用于通知接受进程有某种事件发生，除了用于进程间通信外，进程还可以发送信号给进程本身；linux除了支持Unix早期信号语义函数sigal外，还支持语义符合Posix.1标准的信号函数sigaction（实际上，该函数是基于BSD的，BSD为了实现可靠信号机制，又能够统一对外接口，用sigaction函数重新实现了signal函数）；
-        - 消息队列（Message）：消息队列是消息的链接表，包括Posix消息队列system V消息队列。有足够权限的进程可以向队列中添加消息，被赋予读权限的进程则可以读走队列中的消息。消息队列克服了信号承载信息量少，管道只能承载无格式字节流以及缓冲区大小受限等缺点。
-        - 共享内存：使得多个进程可以访问同一块内存空间，是最快的可用IPC形式。是针对其他通信机制运行效率较低而设计的。往往与其它通信机制，如信号量结合使用，来达到进程间的同步及互斥。
-        - 信号量（semaphore）：主要作为进程间以及同一进程不同线程之间的同步手段。
-        - 套接口（Socket）：更为一般的进程间通信机制，可用于不同机器之间的进程间通信。起初是由Unix系统的BSD分支开发出来的，但现在一般可以移植到其它类Unix系统上：Linux和System V的变种都支持套接字。
-    - 通信方式的比较和优缺点：
-        - 管道：速度慢，容量有限，只有父子进程能通讯
-        - 有名管道（named pipe）：任何进程间都能通讯，但速度慢
-        - 消息队列：容量受到系统限制，且要注意第一次读的时候，要考虑上一次没有读完数据的问题
-        - 信号量：不能传递复杂消息，只能用来同步
-        - 共享内存：能够很容易控制容量，速度快，但要保持同步，比如一个进程在写的时候，另一个进程要注意读写的问题，相当于线程中的线程安全，当然，共享内存区同样可以用作线程间通讯，不过没这个必要，线程间本来就已经共享了同一进程内的一块内存
+  - 代表CPU所能处理的单个任务。任一时刻，CPU总是运行一个进程，其他进程处于非运行状态。
+  - 进程间通信
+    - 管道（Pipe）及有名管道（named pipe）：管道可用于具有亲缘关系进程间的通信，有名管道克服了管道没有名字的限制，因此，除具有管道所具有的功能外，它还允许无亲缘关系进程间的通信；
+    - 信号（Signal）：信号是比较复杂的通信方式，用于通知接受进程有某种事件发生，除了用于进程间通信外，进程还可以发送信号给进程本身；linux除了支持Unix早期信号语义函数sigal外，还支持语义符合Posix.1标准的信号函数sigaction（实际上，该函数是基于BSD的，BSD为了实现可靠信号机制，又能够统一对外接口，用sigaction函数重新实现了signal函数）；
+    - 消息队列（Message）：消息队列是消息的链接表，包括Posix消息队列system V消息队列。有足够权限的进程可以向队列中添加消息，被赋予读权限的进程则可以读走队列中的消息。消息队列克服了信号承载信息量少，管道只能承载无格式字节流以及缓冲区大小受限等缺点。
+    - 共享内存：使得多个进程可以访问同一块内存空间，是最快的可用IPC形式。是针对其他通信机制运行效率较低而设计的。往往与其它通信机制，如信号量结合使用，来达到进程间的同步及互斥。
+    - 信号量（semaphore）：主要作为进程间以及同一进程不同线程之间的同步手段。
+    - 套接口（Socket）：更为一般的进程间通信机制，可用于不同机器之间的进程间通信。起初是由Unix系统的BSD分支开发出来的，但现在一般可以移植到其它类Unix系统上：Linux和System V的变种都支持套接字。
+  - 通信方式的比较和优缺点：
+    - 管道：速度慢，容量有限，只有父子进程能通讯
+    - 有名管道（named pipe）：任何进程间都能通讯，但速度慢
+    - 消息队列：容量受到系统限制，且要注意第一次读的时候，要考虑上一次没有读完数据的问题
+    - 信号量：不能传递复杂消息，只能用来同步
+    - 共享内存：能够很容易控制容量，速度快，但要保持同步，比如一个进程在写的时候，另一个进程要注意读写的问题，相当于线程中的线程安全，当然，共享内存区同样可以用作线程间通讯，不过没这个必要，线程间本来就已经共享了同一进程内的一块内存
+
 - 线程
-    - 一个线程使用某些共享内存时，其他线程必须等它结束，才能使用这一块内存。
-    - 一个进程可以包括多个线程。
-    - 一个进程的内存空间是共享的，每个线程都可以使用这些共享内存。
-    - "互斥锁"（Mutual exclusion，缩写 Mutex），防止多个线程同时读写某一块内存区域。
-    - 做"信号量"（Semaphore），用来保证多个线程不会互相冲突。
-    - 线程间通信
-        - 通过访问共享变量的方式(注:需要处理同步问题)
-        - 通过管道流
+  - 一个线程使用某些共享内存时，其他线程必须等它结束，才能使用这一块内存。
+  - 一个进程可以包括多个线程。
+  - 一个进程的内存空间是共享的，每个线程都可以使用这些共享内存。
+  - "互斥锁"（Mutual exclusion，缩写 Mutex），防止多个线程同时读写某一块内存区域。
+  - 做"信号量"（Semaphore），用来保证多个线程不会互相冲突。
+  - 线程间通信
+    - 通过访问共享变量的方式(注:需要处理同步问题)
+    - 通过管道流
 
-
-  
 - js是单线程
-    - js是作为浏览器的脚本语言，主要是实现用户与浏览器的交互，以及操作dom；这决定了它只能是单线程，否则会带来很复杂的同步问题。 
-    - 利用多核CPU的计算能力，HTML5提出Web Worker标准，允许JavaScript脚本创建多个线程，但是子线程完全受主线程控制，且不得操作DOM。所以，这个新标准并没有改变JavaScript单线程的本质。
-    - JS引擎线程
-    - 事件触发线程
-    - 定时触发器线程
-
-
+  - js是作为浏览器的脚本语言，主要是实现用户与浏览器的交互，以及操作dom；这决定了它只能是单线程，否则会带来很复杂的同步问题。
+  - 利用多核CPU的计算能力，HTML5提出Web Worker标准，允许JavaScript脚本创建多个线程，但是子线程完全受主线程控制，且不得操作DOM。所以，这个新标准并没有改变JavaScript单线程的本质。
+  - JS引擎线程
+  - 事件触发线程
+  - 定时触发器线程
 #### js解决异步
 - js解决异步
-    - JS 实现异步时通过 **事件循环（Event Loop）**,是JS异步的解决方案。 JS实现异步的具体解决方案
-        - 同步代码，直接执行
-        - 异步代码先放在 `异步队列` 中
-        - 待同步函数执行完毕，轮询执行异步队列 中的函数
-    - JS解决异步的方案有
-        - 回调函数
-        - 事件监听
-        - 发布-订阅
-        - `Promise`
-        - Generator
-        - `Async/Await`
-
+  - JS 实现异步时通过 **事件循环（Event Loop）**,是JS异步的解决方案。 JS实现异步的具体解决方案
+    - 同步代码，直接执行
+    - 异步代码先放在 `异步队列` 中
+    - 待同步函数执行完毕，轮询执行异步队列 中的函数
+  - JS解决异步的方案有
+    - 回调函数
+    - 事件监听
+    - 发布-订阅
+    - `Promise`
+    - Generator
+    - `Async/Await`
 #### Event Loop即事件循环
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211022171914.png)
 Event Loop即事件循环，是指浏览器或Node的一种解决javaScript单线程运行时不会阻塞的一种机制，也就是我们经常使用异步的原理。
@@ -5467,30 +5746,32 @@ microtask（又称为微任务），可以理解是在当前 task 执行结束�
     - 所以它的响应速度相比setTimeout（setTimeout是task）会更快，因为无需等渲染
     - 微任务会全部执行，而宏任务会一个一个来执行
     - 也就是说，在某一个macrotask执行完后，就会将在它执行期间产生的所有microtask都执行完毕（在渲染前）
+
 - 浏览器中的任务源(task):
-    - 宏任务(macrotask)：
-        - 宿主环境提供的，比如浏览器
-        - ajax
-        - setTimeout
-        - setInterval
-        - setTmmediate(只兼容ie)
-        - script
-        - requestAnimationFrame
-        - messageChannel
-        - UI渲染
-        - 一些浏览器api
-        - 事件绑定
-        - 回调函数
-        - Node中fs可以进行异步I/O操作
-    - 微任务(microtask)：
-        - Promise（async/await
-        - queueMicrotask
-        - mutationObserver(浏览器提供)
-        - process.nexTick（Node独有的）
-process.nextTick1这个地方有点出入，我一般认为`process.nextTick()`推入主线程执行栈栈底，作为执行栈最后一个任务执行)
+  - 宏任务(macrotask)：
+    - 宿主环境提供的，比如浏览器
+    - ajax
+    - setTimeout
+    - setInterval
+    - setTmmediate(只兼容ie)
+    - script
+    - requestAnimationFrame
+    - messageChannel
+    - UI渲染
+    - 一些浏览器api
+    - 事件绑定
+    - 回调函数
+    - Node中fs可以进行异步I/O操作
+  - 微任务(microtask)：
+    - Promise（async/await
+    - queueMicrotask
+    - mutationObserver(浏览器提供)
+    - process.nexTick（Node独有的）
+      process.nextTick1这个地方有点出入，我一般认为`process.nextTick()`推入主线程执行栈栈底，作为执行栈最后一个任务执行)
 
 **主线程任务——>微任务——>宏任务**（如果宏任务里还有微任就继续执行宏任务里的微任务，如果宏任务中的微任务中还有宏任务就在依次进行）
 **主线程任务——>微任务——>宏任务——>宏任务里的微任务——>宏任务里的微任务中的宏任务——>直到任务全部完成**
+
 ```js
 console.log('1');
 setTimeout(function() {
@@ -5538,8 +5819,8 @@ console.log('10');
 执行栈在执行完同步任务后，查看执行栈是否为空，如果执行栈为空，就会去检查微任务(microTask)队列是否为空，如果为空的话，就执行macrotask（宏任务），否则就一次性执行完所有微任务。
 每次单个宏任务执行完毕后，检查微任务(microTask)队列是否为空，如果不为空的话，会按照先入先出的规则全部执行完微任务(microTask)后，设置微任务(microTask)队列为null，然后再执行宏任务，如此循环。
 
-
 最简单的JS运行机制：
+
 - 执行一个宏任务（栈中没有就从事件队列中获取）
 - 执行过程中如果遇到微任务，就将它添加到微任务的任务队列中
 - 宏任务执行完毕后，立即执行当前微任务队列中的所有微任务（依次执行）
@@ -5547,40 +5828,40 @@ console.log('10');
 - 渲染完毕后，JS线程继续接管，开始下一个宏任务（从事件队列中获取）
 
 ### DOM渲染的时机
+
 - JS是单线程的，而且和DOM渲染共用一个线程
 - JS执行的时候，得留一-些时机供DOM渲染
 - 每次Call Stack（执行栈）清空(即每次轮询结束)， 即同步任务执行完
 - 都是DOM重新渲染的机会，DOM结构如有改变则重新渲染
 - 然后再去触发下一次Event Loop（事件循环）
 
-
 ### JS 实现异步的 5 种方式
 - 回调函数（Callback）
-    - 回调函数有一个致命的弱点，就是容易写出回调地狱（Callback hell）。
-    - 回调函数的优点是简单、容易理解和实现，缺点是不利于代码的阅读和维护，各个部分之间高度耦合，使得程序结构混乱、流程难以追踪
-    - 此外它不能使用 try catch 捕获错误，不能直接 return。
+  - 回调函数有一个致命的弱点，就是容易写出回调地狱（Callback hell）。
+  - 回调函数的优点是简单、容易理解和实现，缺点是不利于代码的阅读和维护，各个部分之间高度耦合，使得程序结构混乱、流程难以追踪
+
+  - 此外它不能使用 try catch 捕获错误，不能直接 return。
 ```js
 ajax(url, () => {
+// 处理逻辑
+  ajax(url1, () => {
     // 处理逻辑
-    ajax(url1, () => {
+    ajax(url2, () => {
         // 处理逻辑
-        ajax(url2, () => {
-            // 处理逻辑
-        })
     })
+  })
 })
 ```
 
 - 发布订阅
-    - 存在一个"信号中心"，某个任务执行完成，就向信号中心"发布"（publish）一个信号，其他任务可以向信号中心"订阅"（subscribe）这个信号，从而知道什么时候自己可以开始执行。这就叫做"发布/订阅模式"（publish-subscribe pattern），又称"观察者模式"（observer pattern）。
-    - 有家外卖，你可以点外卖，这就是订阅，当你的外卖做好了，就会有人给你打电话叫你去取外卖，这就是发布
+  - 存在一个"信号中心"，某个任务执行完成，就向信号中心"发布"（publish）一个信号，其他任务可以向信号中心"订阅"（subscribe）这个信号，从而知道什么时候自己可以开始执行。这就叫做"发布/订阅模式"（publish-subscribe pattern），又称"观察者模式"（observer pattern）。
+  - 有家外卖，你可以点外卖，这就是订阅，当你的外卖做好了，就会有人给你打电话叫你去取外卖，这就是发布
 ```js
 class EventEmitter {
   constructor(defaultMaxListeners = 50) {
     this.defaultMaxListeners = defaultMaxListeners;
     this.listener = {};
   }
-
   // 订阅
   on(eventName, fn) {
     if (!this.listener[eventName]) {
@@ -5591,7 +5872,6 @@ class EventEmitter {
     }
     this.listener[eventName].push(fn);
   }
-
   // 取消
   off(eventName, fn) {
     let callBacks = this.listener[eventName];
@@ -5611,7 +5891,6 @@ class EventEmitter {
       }
     }
   }
-
   // 监听一次
   once(eventName, fn) {
     const on = (...args) => {
@@ -5622,7 +5901,6 @@ class EventEmitter {
     on.fn = fn;
     this.on(eventName, on);
   }
-
   // 发布
   emit(eventName, ...args) {
     const callBackFn = this.listener[eventName] || [];
@@ -5643,7 +5921,6 @@ function fn1(...args) {
 function fn2(...args) {
   console.log("fn2", ...args);
 }
-
 $event.once("fn1", fn2);
 
 // $event.on("fn1", fn1);
@@ -5662,7 +5939,7 @@ $event.emit("fn1", "fn1参数2", "参数3", "参数4");
 ```
 - Promise对象
     - Promise对象是异步编程的一种解决方案，比传统的回调函数和事件更合理更强大。
-    - Promise，简单说就是一个容器，里面保存着某个未来才会结束的事件的结果，相比回调函数，Promise提供统一的API，各种异步操作都可以用同样的方法进行处理。 
+    - Promise，简单说就是一个容器，里面保存着某个未来才会结束的事件的结果，相比回调函数，Promise提供统一的API，各种异步操作都可以用同样的方法进行处理。
     - Promise对象有三种状态:pending(进行中)，fulfilled(已成功)，rejected(已失败)
     - 一旦状态改变，就不再变化，任何时候都可以得到这个结果。
 ```js
@@ -5679,13 +5956,14 @@ p.then(
   }
 )
 ```
-    - promise的链式调用
-        - 每次调用返回的都是一个新的Promise实例(这就是then可用链式调用的原因)
-        - 如果then中返回的是一个结果的话会把这个结果传递下一次then中的成功回调
-        - 如果then中出现异常,会走下一个then的失败回调
-        - 在 then中使用了return，那么 return 的值会被Promise.resolve() 包装(见例1，2)
-        - then中可以不传递参数，如果不传递会透到下一个then中(见例3)
-        - catch 会捕获到没有捕获的异常
+- promise的链式调用
+  - 每次调用返回的都是一个新的Promise实例(这就是then可用链式调用的原因)
+  - 如果then中返回的是一个结果的话会把这个结果传递下一次then中的成功回调
+  - 如果then中出现异常,会走下一个then的失败回调
+  - 在 then中使用了return，那么 return 的值会被Promise.resolve() 包装(见例1，2)
+  - then中可以不传递参数，如果不传递会透到下一个then中(见例3)
+  - catch 会捕获到没有捕获的异常
+
 ```js
   // 例1
   Promise.resolve(1)
@@ -5698,26 +5976,23 @@ p.then(
 ```
 
 - 生成器Generators/ yield
-    - Generator 函数是 ES6 提供的一种异步编程解决方案
-    - Generator 函数是一个状态机，封装了多个内部状态。
-    - Generator 函数除了状态机，还是一个遍历器对象生成函数。
-    - 可暂停函数, yield可暂停，next方法可启动，每次返回的是yield后的表达式结果。
-    - yield表达式本身没有返回值，或者说总是返回undefined。next方法可以带一个参数，该参数就会被当作上一个yield表达式的返回值。
+  - Generator 函数是 ES6 提供的一种异步编程解决方案
+  - Generator 函数是一个状态机，封装了多个内部状态。
+  - Generator 函数除了状态机，还是一个遍历器对象生成函数。
+  - 可暂停函数, yield可暂停，next方法可启动，每次返回的是yield后的表达式结果。
+  - yield表达式本身没有返回值，或者说总是返回undefined。next方法可以带一个参数，该参数就会被当作上一个yield表达式的返回值。
 ```js
 function *main() {
-    try{
-        const user = yield ajax('/api/1')
-        console.log(users);
-
-        const posts = yield ajax('/api/2')
-        console.log(posts);
-
-        const urls = yield ajax('/api/3')
-        console.log(urls);
-
-    }catch(e){
-        console.log(e);
-    }
+  try{
+    const user = yield ajax('/api/1')
+    console.log(users);
+    const posts = yield ajax('/api/2')
+    console.log(posts);
+    const urls = yield ajax('/api/3')
+    console.log(urls);
+  }catch(e){
+    console.log(e);
+  }
 }
 
 const g = main()
@@ -5732,8 +6007,8 @@ function handleResults(results){
 }
 
 handleResults(g.next())
-```
 
+```
 - async/await
     - async/await 函数的实现，就是将 Generator 函数和自动执行器，包装在一个函数里。
     - async/await是基于Promise实现的，它不能用于普通的回调函数。
@@ -5769,34 +6044,36 @@ readAll() // 2.txt 3.txt
 
 ### setTimeout、Promise、Async/Await 的区别
 - setTimeout
-    - settimeout的回调函数放到宏任务队列里，等到执行栈清空以后执行。
+  - settimeout的回调函数放到宏任务队列里，等到执行栈清空以后执行。
+
 - Promise
-    - Promise本身是同步的立即执行函数， 当在executor中执行resolve或者reject的时候, 此时是异步操作， 会先执行then/catch等，当主栈完成后，才会去调用resolve/reject中存放的方法执行。
+  - Promise本身是同步的立即执行函数， 当在executor中执行resolve或者reject的时候, 此时是异步操作， 会先执行then/catch等，当主栈完成后，才会去调用resolve/reject中存放的方法执行。
 ```js
 console.log('script start')
 let promise1 = new Promise(function (resolve) {
-    console.log('promise1')
-    resolve()
-    console.log('promise1 end')
+console.log('promise1')
+resolve()
+console.log('promise1 end')
 }).then(function () {
-    console.log('promise2')
+console.log('promise2')
 })
 setTimeout(function(){
-    console.log('settimeout')
+console.log('settimeout')
 })
 console.log('script end')
 // 输出顺序: script start->promise1->promise1 end->script end->promise2->settimeout
 ```
+
 - async/await
-    - async 函数返回一个 Promise 对象，当函数执行的时候，一旦遇到 await 就会先返回，等到触发的异步操作完成，再执行函数体内后面的语句。可以理解为，是让出了线程，跳出了 async 函数体。
+  - async 函数返回一个 Promise 对象，当函数执行的时候，一旦遇到 await 就会先返回，等到触发的异步操作完成，再执行函数体内后面的语句。可以理解为，是让出了线程，跳出了 async 函数体。
 ```js
 async function async1(){
-   console.log('async1 start');
-    await async2();
-    console.log('async1 end')
+console.log('async1 start');
+await async2();
+console.log('async1 end')
 }
 async function async2(){
-    console.log('async2')
+console.log('async2')
 }
 
 console.log('script start');
@@ -5826,10 +6103,11 @@ const name = new String("Uni");
 String.prototype.age = "20";
 console.log(name.age);
 ```
+
 - 隐式装箱
-    - 创建一个对应类型的实例
-    - 在实例中调用需要的方法或属性
-    - 销毁这个实例
+  - 创建一个对应类型的实例
+  - 在实例中调用需要的方法或属性
+  - 销毁这个实例
 ```js
 'lxh'.charAt(0);
 
@@ -5839,8 +6117,6 @@ const len = newName.length;
 newName = null;
 ```
 浏览器对于这些常用的一些隐式装箱有着一定的预先处理，为的就是减少性能损耗。
-
-
 
 拆箱，就是装箱的反向操作，指的是将引用类型转换为对应的基本类型。常用的就是引用类型的valueOf和toString两个方法。JS标准规定了ToPrimitive用于拆箱转换。
 JS标准规定了ToPrimitive函数用于拆箱转换。ToPrimitive会首先调用valueOf 和 toString来获取基本数据类型。
@@ -5858,10 +6134,11 @@ if (!bool.valueOf()) {
 ```
 
 ### 常用设计模式有哪些并举例使用场景
+
 - 工厂模式 - 传入参数即可创建实例
-    - 虚拟 DOM 根据参数的不同返回基础标签的 Vnode 和组件 Vnode
+  - 虚拟 DOM 根据参数的不同返回基础标签的 Vnode 和组件 Vnode
 - 单例模式 - 整个程序有且仅有一个实例
-    - vuex 和 vue-router 的插件注册方法 install 判断如果系统存在实例就直接返回掉
+  - vuex 和 vue-router 的插件注册方法 install 判断如果系统存在实例就直接返回掉
 - 发布-订阅模式 (vue 事件机制)
 - 观察者模式 (响应式数据原理)
 - 装饰模式: (@装饰器的用法)
@@ -5870,107 +6147,126 @@ if (!bool.valueOf()) {
 ### typescript 中, enum 实现原理
 ### 列举你知道哪些 typescript 工具类型
 ### typescript 工具类型返回的是 type 还是 interface?
-
 ## HTTP
-### JWT？？？？？？？？？？？？？
+### JWT
+#### 什么是 JWT
+
+- JSON Web Token（简称 JWT）是目前最流行的跨域认证解决方案。
+
+- 是一种认证授权机制。
+
+- JWT 的声明一般被用来在身份提供者和服务提供者间传递被认证的用户身份信息，以便于从资源服务器获取资源。比如用在用户登录上。
+
+- 可以使用 HMAC 算法或者是 RSA 的公/私秘钥对 JWT 进行签名。因为数字签名的存在，这些传递的信息是可信的。
 ### 如何实现扫码登录功能？
+
 扫码登录场景想必我们都不陌生——很多PC端的网站都提供了扫码登录的功能，无需在网页上输入任何账号和密码，只需要通过手机上的APP，如微信、淘宝、QQ等等，使用扫描功能，扫描网页上的二维码，确认登录，就可以完成网页端登录。
 
 - 扫码登录分析
-    - 其实涉及到三种角色，需要解决两个问题。
-        - 三种角色
-            - PC端、手机端、服务端。
-        - 两个问题
-            - 手机端如何完成认证
-            - PC端如何完成登录
-            - 如果用普通的账号密码方式登录认证，PC端通过账号密码完成认证，然后服务端给PC端同步返回token key之类的标识，PC端再次请求服务端，需要携带token key，用于标识和证明自己登录的状态。
-            - 服务端响应的时候，需要对token key进行校验，通过则正常响应；校验不通过，认证失败；或者token过期，PC端需要再次登录认证，获取新的token key。
-            - 现在换成了扫码登录：
-                - 认证不是通过账号密码了，而是由手机端扫码来完成
-                - PC端没法同步获取认证成功之后的凭据，必须用某种方式来让PC端获取认证的凭据。
-
+  - 其实涉及到三种角色，需要解决两个问题。
+    - 三种角色
+      - PC端、手机端、服务端。
+    - 两个问题
+      - 手机端如何完成认证
+      - PC端如何完成登录
+      - 如果用普通的账号密码方式登录认证，PC端通过账号密码完成认证，然后服务端给PC端同步返回token key之类的标识，PC端再次请求服务端，需要携带token key，用于标识和证明自己登录的状态。
+      - 服务端响应的时候，需要对token key进行校验，通过则正常响应；校验不通过，认证失败；或者token过期，PC端需要再次登录认证，获取新的token key。
+      - 现在换成了扫码登录：
+        - 认证不是通过账号密码了，而是由手机端扫码来完成
+        - PC端没法同步获取认证成功之后的凭据，必须用某种方式来让PC端获取认证的凭据。
 
 - 扫码登录实现
-    - 手机端如何完成认证
-        - 二维码怎么生成
-            - 手机扫码这个过程，其实是对二维码的解码，获取二维码中包含的数据。
-            - 首先，二维码是展示在我们的PC端，所以生成这个操作应该由PC端去请求服务端，获取相应的数据，再由PC端生成这个二维码。
-                - 二维码包含什么呢
-                    - 二维码在我们这个场景里面是一个重要的媒介，服务端必须给这个数据生成惟一的标识作为二维码ID，同时还应该设置过期的时间。PC端根据二维码ID等数据生成二维码。
-                    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108181611.png)
-        - APP认证机制
-            - 基于APP的移动互联网认证机制。
-                - 首先，手机端一般是不会存储登录密码的，我们发现，只有装载APP，第一次登录的时候，才需要进行基于账号密码的登录，之后即使这个清理掉这个应用进程，甚至手机重启，都是不需要再次输入账号密码的，它可以自动登录。
-                - 这背后有一套基于token的认证机制，和PC有些类似，但又有一些不同。
-                - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108181722.png)
-                    - APP登录认证的时候除了账号密码，还有设备信息
-                    - 账号密码校验通过，服务端会把账号与设备进行一个绑定，进行持久化的保存，包含了账号ID，设备ID，设备类型等等
-                    - APP每次请求除了携带token key，还需要携带设备信息。
-                    - 因为移动端的设备具备唯一性，可以为每个客户端生成专属token，这个token也不用过期，所以这就是我们可以一次登录，长久使用的原理。
-        - 手机扫码干了什么
-            - 手机扫码干了两件事：
-                - 扫描二维码：识别PC端展示的二维码，获取二维码ID
-                    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108181830.png)
-                - 确认登录
-                    - 手机端通过带认证信息(token key、设备信息)、二维码信息（二维码ID）请求服务端，完成认证过程，确认PC端的登录。
-                    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108181903.png)
-        - PC端如何完成登录
-            - PC端通过token来标识登录状态。那么手机端扫码确认之后，我们的服务端就应该给PC生成相应的token。
-            - 这个PC端又如何获取它所需的token key，来完成登录呢？
-            - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108182947.png)
-            - PC端可以通过获取二维码的状态来进行相应的响应：
-                - 二维码未扫描：无操作
-                - 二维码已失效：提示刷新二维码
-                - 二维码已成功：从服务端获取PC token
-            - 获取二维码状态，主要有三种方式：
-                - 轮询
-                    - 轮询方式是指客户端会每隔一段时间就主动给服务端发送一次二维码状态的查询请求。
-                    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108183043.png)
-                - 长轮询
-                    - 长轮询是指客户端主动给服务端发送二维码状态的查询请求，服务端会按情况对请求进行阻塞，直至二维码信息更新或超时。当客户端接收到返回结果后，若二维码仍未被扫描，则会继续发送查询请求，直至状态变化（已失效或已成功）。
-                    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108183206.png)
-                - Websocket
-                    - Websocket是指前端在生成二维码后，会与后端建立连接，一旦后端发现二维码状态变化，可直接通过建立的连接主动推送信息给前端。
-                    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108183233.png)
-    - 总结
-        - 二维码扫码登录的一些关键点，现在我们把这些点串起来，来看一看二维码扫码登录的整体的实现流程。
-        - 以常用的轮询方式获取二维码状态为例：
-        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108183407.png)
-            - 访问PC端二维码生成页面，PC端请求服务端获取二维码ID
-            - 服务端生成相应的二维码ID，设置二维码的过期时间，状态等。
-            - PC获取二维码ID，生成相应的二维码。
-            - 手机端扫描二维码，获取二维码ID。
-            - 手机端将手机端token和二维码ID发送给服务端，确认登录。
-            - 服务端校验手机端token，根据手机端token和二维码ID生成PC端token
-            - PC端通过轮询方式请求服务端，通过二维码ID获取二维码状态，如果已成功，返回PC token，登录成功。
+  - 手机端如何完成认证
+    - 二维码怎么生成
+      - 手机扫码这个过程，其实是对二维码的解码，获取二维码中包含的数据。
+      - 首先，二维码是展示在我们的PC端，所以生成这个操作应该由PC端去请求服务端，获取相应的数据，再由PC端生成这个二维码。
+        - 二维码包含什么呢
+          - 二维码在我们这个场景里面是一个重要的媒介，服务端必须给这个数据生成惟一的标识作为二维码ID，同时还应该设置过期的时间。PC端根据二维码ID等数据生成二维码。
+          - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108181611.png)
+    - APP认证机制
+      - 基于APP的移动互联网认证机制。
+        - 首先，手机端一般是不会存储登录密码的，我们发现，只有装载APP，第一次登录的时候，才需要进行基于账号密码的登录，之后即使这个清理掉这个应用进程，甚至手机重启，都是不需要再次输入账号密码的，它可以自动登录。
+        - 这背后有一套基于token的认证机制，和PC有些类似，但又有一些不同。
+        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108181722.png)
+          - APP登录认证的时候除了账号密码，还有设备信息
+          - 账号密码校验通过，服务端会把账号与设备进行一个绑定，进行持久化的保存，包含了账号ID，设备ID，设备类型等等
+          - APP每次请求除了携带token key，还需要携带设备信息。
+          - 因为移动端的设备具备唯一性，可以为每个客户端生成专属token，这个token也不用过期，所以这就是我们可以一次登录，长久使用的原理。
+    - 手机扫码干了什么
+      - 手机扫码干了两件事：
+        - 扫描二维码：识别PC端展示的二维码，获取二维码ID
+          - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108181830.png)
+        - 确认登录
+          - 手机端通过带认证信息(token key、设备信息)、二维码信息（二维码ID）请求服务端，完成认证过程，确认PC端的登录。
+          - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108181903.png)
+    - PC端如何完成登录
+      - PC端通过token来标识登录状态。那么手机端扫码确认之后，我们的服务端就应该给PC生成相应的token。
+      - 这个PC端又如何获取它所需的token key，来完成登录呢？
+      - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108182947.png)
+      - PC端可以通过获取二维码的状态来进行相应的响应：
+        - 二维码未扫描：无操作
+        - 二维码已失效：提示刷新二维码
+        - 二维码已成功：从服务端获取PC token
+      - 获取二维码状态，主要有三种方式：
+        - 轮询
+          - 轮询方式是指客户端会每隔一段时间就主动给服务端发送一次二维码状态的查询请求。
+          - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108183043.png)
+        - 长轮询
+          - 长轮询是指客户端主动给服务端发送二维码状态的查询请求，服务端会按情况对请求进行阻塞，直至二维码信息更新或超时。当客户端接收到返回结果后，若二维码仍未被扫描，则会继续发送查询请求，直至状态变化（已失效或已成功）。
+          - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108183206.png)
+        - Websocket
+          - Websocket是指前端在生成二维码后，会与后端建立连接，一旦后端发现二维码状态变化，可直接通过建立的连接主动推送信息给前端。
+          - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108183233.png)
+  - 总结
+    - 二维码扫码登录的一些关键点，现在我们把这些点串起来，来看一看二维码扫码登录的整体的实现流程。
+    - 以常用的轮询方式获取二维码状态为例：
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108183407.png)
+      - 访问PC端二维码生成页面，PC端请求服务端获取二维码ID
+      - 服务端生成相应的二维码ID，设置二维码的过期时间，状态等。
+      - PC获取二维码ID，生成相应的二维码。
+      - 手机端扫描二维码，获取二维码ID。
+      - 手机端将手机端token和二维码ID发送给服务端，确认登录。
+      - 服务端校验手机端token，根据手机端token和二维码ID生成PC端token
+      - PC端通过轮询方式请求服务端，通过二维码ID获取二维码状态，如果已成功，返回PC token，登录成功。
+
 ### 浏览器的最大请求并发数
+
 并发数量简单通俗的讲就是，当浏览器网页的时候同时工作的进行数量。
 HTTP客户端一般对同一个服务器的并发连接个数都是有限制的。
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106162358.png)
 
 ### Service Worker有哪些作用
+
 ### cookies、sessionStorage、localStorage 和 indexDB 的区别
+
 - cookie是网站为了标示用户身份而储存在用户本地的数据
+
 - 是否在http请求只能够携带
-    - cookie数据始终在同源的http请求中携带，跨域需要设置withCredentials = true
-    - sessionStorage和localStorage不会自动把数据发给服务器，仅在本地保存
+  - cookie数据始终在同源的http请求中携带，跨域需要设置withCredentials = true
+  - sessionStorage和localStorage不会自动把数据发给服务器，仅在本地保存
+
 - 存储大小：
-    - cookie数据大小不能超过4k；
-    - sessionStorage和localStorage虽然也有存储大小的限制，但比cookie大得多，可以达到5M或更大，因不同浏览器大小不同；
+  - cookie数据大小不能超过4k；
+  - sessionStorage和localStorage虽然也有存储大小的限制，但比cookie大得多，可以达到5M或更大，因不同浏览器大小不同；
+
 - 有效时间：
-    - cookie 设置的cookie过期时间之前一直有效，即使窗口或浏览器关闭
-    - localStorage 硬盘存储持久数据，浏览器关闭后数据不丢失除非主动删除数据
-    - sessionStorage 存在内存中，数据在当前浏览器窗口关闭后自动删除
-![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211015134146.png)
+  - cookie 设置的cookie过期时间之前一直有效，即使窗口或浏览器关闭
+  - localStorage 硬盘存储持久数据，浏览器关闭后数据不丢失除非主动删除数据
+  - sessionStorage 存在内存中，数据在当前浏览器窗口关闭后自动删除
+    ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211015134146.png)
 ### Cookie、Session、webStorage、localStorage、sessionStorage
 #### Cookie
 - HTTP 是无状态的协议（对于事务处理没有记忆能力，每次客户端和服务端会话完成时，服务端不会保存任何会话信息）：每个请求都是完全独立的，服务端无法确认当前访问者的身份信息，无法分辨上一次的请求发送者和这一次的发送者是不是同一个人。所以服务器与浏览器为了进行会话跟踪（知道是谁在访问我），就必须主动的去维护一个状态，这个状态用于告知服务端前后两个请求是否来自同一浏览器。而这个状态需要通过 cookie 或者 session 去实现。
+
 - cookie 存储在客户端： cookie 是服务器发送到用户浏览器并保存在本地的一小块数据，它会在浏览器下次向同一服务器再发起请求时被携带并发送到服务器上。
+
 - cookie 是不可跨域的： 每个 cookie 都会绑定单一的域名，无法在别的域名下获取使用，一级域名和二级域名之间是允许共享使用的（靠的是 domain）。
-![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210923132748.png)
+  ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210923132748.png)
 
 #### Cookie的使用
+
 cookie 可通过 document.cookie 获取全部 cookie。它是一段字符串，是键值对的形式。
+
 ```js
 Cookies.set("name", "value", { expires: 7 }); // 设置一个cookie，7天后失效
 
@@ -5980,6 +6276,7 @@ Cookies.remove("name");
 ```
 
 #### 使用 Cookie 时需要考虑的问题
+
 - 因为存储在客户端，容易被客户端篡改，使用前需要验证合法性
 - 不要存储敏感数据，比如用户密码，账户余额
 - 使用 httpOnly 在一定程度上提高安全性
@@ -5989,22 +6286,23 @@ Cookies.remove("name");
 - 一个浏览器针对一个网站最多存 20 个Cookie，浏览器一般只允许存放 300 个Cookie
 - 移动端对 cookie 的支持不是很好，而 session 需要基于 cookie 实现，所以移动端常用的是 token
 
-
 #### Session
+
 - session 是另一种记录服务器和客户端会话状态的机制
 - session 是基于 cookie 实现的，session 存储在服务器端，sessionId 会被存储到客户端的cookie 中
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210923153926.png)
 
 - session 认证流程
-    - 用户第一次请求服务器的时候，服务器根据用户提交的相关信息，创建对应的 Session
-    - 请求返回时将此 Session 的唯一标识信息 SessionID 返回给浏览器
-    - 浏览器接收到服务器返回的 SessionID 信息后，会将此信息存入到 Cookie 中，同时 Cookie 记录此 SessionID 属于哪个域名
-    - 当用户第二次访问服务器的时候，请求会自动判断此域名下是否存在 Cookie 信息，如果存在自动将 Cookie 信息也发送给服务端，服务端会从 Cookie 中获取 SessionID，再根据 SessionID 查找对应的 Session 信息，如果没有找到说明用户没有登录或者登录失效，如果找到 Session 证明用户已经登录可执行后面操作。
+  - 用户第一次请求服务器的时候，服务器根据用户提交的相关信息，创建对应的 Session
+  - 请求返回时将此 Session 的唯一标识信息 SessionID 返回给浏览器
+  - 浏览器接收到服务器返回的 SessionID 信息后，会将此信息存入到 Cookie 中，同时 Cookie 记录此 SessionID 属于哪个域名
+  - 当用户第二次访问服务器的时候，请求会自动判断此域名下是否存在 Cookie 信息，如果存在自动将 Cookie 信息也发送给服务端，服务端会从 Cookie 中获取 SessionID，再根据 SessionID 查找对应的 Session 信息，如果没有找到说明用户没有登录或者登录失效，如果找到 Session 证明用户已经登录可执行后面操作。
 
 SessionID 是连接 Cookie 和 Session 的一道桥梁。
 
 #### 使用 session 时需要考虑的问题
+
 - 将 session 存储在服务器里面，当用户同时在线量比较多时，这些 session 会占据较多的内存，需要在服务端定期的去清理过期的 session
 - 当网站采用集群部署的时候，会遇到多台 web 服务器之间如何做 session 共享的问题。
 - 当多个应用要共享 session 时，除了以上问题，还会遇到跨域问题，因为不同的应用可能部署的主机不一样，需要在各个应用做好 cookie 跨域的处理。
@@ -6012,39 +6310,43 @@ SessionID 是连接 Cookie 和 Session 的一道桥梁。
 - 移动端对 cookie 的支持不是很好，而 session 需要基于 cookie 实现，所以移动端常用的是 token
 
 #### Cookie和Session
+
 - 安全性： Session 比 Cookie 安全，Session 是存储在服务器端的，Cookie 是存储在客户端的。
 - 存取值的类型不同：Cookie 只支持存字符串数据，想要设置其他类型的数据，需要将其转换成字符串，Session 可以存任意数据类型。
 - 有效期不同： Cookie 可设置为长时间保持，比如我们经常使用的默认登录功能，Session 一般失效时间较短，客户端关闭（默认情况下）或者 Session 超时都会失效。
 - 存储大小不同： 单个 Cookie 保存的数据不能超过 4K，Session 可存储数据远高于 Cookie，但是当访问量过多，会占用过多的服务器资源。
 
 #### WebStorage
+
 - webstorage是本地存储，存储在客户端，包括localStorage和sessionStorage；
 - localStorage生命周期是永久，这意味着除非用户手动去清除localStorage信息，否则这些信息将永远存在。存放数据大小为一般为5MB,而且它仅在客户端（即浏览器）中保存，不参与和服务器的通信；
 - sessionStorage仅在当前会话下有效，关闭页面或浏览器后被清除。存放数据大小为一般为5MB，而且它仅在客户端（即浏览器）中保存，不参与和服务器的通信。源生接口可以接受，亦可再次封装来对Object和Array有更好的支持
 - WebStorage的目标
-    - 提供一种在cookie之外存储会话数据的路径
-    - 提供一种存储大量可以跨会话存在的数据的机制
-    - HTML5的WebStorage提供了两种API：localStorage（本地存储）和sessionStorage（会话存储）
+  - 提供一种在cookie之外存储会话数据的路径
+  - 提供一种存储大量可以跨会话存在的数据的机制
+  - HTML5的WebStorage提供了两种API：localStorage（本地存储）和sessionStorage（会话存储）
 - 作用域的不同：
-    - 不同浏览器无法共享localStorage或sessionStorage中的信息。
-    - 相同浏览器的不同页面间可 以共享相同的 localStorage（页面属于相同域名和端口），但是不同页面或标签页间无法共享sessionStorage的信息。
+  - 不同浏览器无法共享localStorage或sessionStorage中的信息。
+  - 相同浏览器的不同页面间可 以共享相同的 localStorage（页面属于相同域名和端口），但是不同页面或标签页间无法共享sessionStorage的信息。
 - 存储大小：
-    - localStorage和sessionStorage的存储数据大小一般都是：5MB
+  - localStorage和sessionStorage的存储数据大小一般都是：5MB
 - 存储位置：
-    - localStorage和sessionStorage都保存在客户端，不与服务器进行交互通信
+  - localStorage和sessionStorage都保存在客户端，不与服务器进行交互通信
 - 存储内容类型：
-    - localStorage和sessionStorage只能存储字符串类型，对于复杂的对象可以使用ECMAScript提供的JSON对象的stringify和parse来处理
+  - localStorage和sessionStorage只能存储字符串类型，对于复杂的对象可以使用ECMAScript提供的JSON对象的stringify和parse来处理
 - 获取方式：
-    - localStorage：window.localStorage;；sessionStorage：window.sessionStorage;
+  - localStorage：window.localStorage;；sessionStorage：window.sessionStorage;
 - WebStorage的优点：
-    - 存储空间更大：cookie为4KB，而WebStorage是5MB
-    - 节省网络流量：WebStorage不会传送到服务器，存储在本地的数据可以直接获取，也不会像cookie一样每次请求都会传送到服务器，所以减少了客户端和服务器端的交互，节省了网络流量对于那种只需要在用户浏览一组页面期间保存而关闭浏览器后就可以丢弃的数据，sessionStorage会非常方便
-    - 快速显示：有的数据存储在WebStorage上，再加上浏览器本身的缓存。获取数据时可以从本地获取会比从服务器端获取快得多，所以速度更快
-    - 安全性：WebStorage不会随着HTTP header发送到服务器端，所以安全性相对于cookie来说比较高一些，不会担心截获，但是仍然存在伪造问题
-    - WebStorage提供了一些方法，数据操作比cookie方便
+  - 存储空间更大：cookie为4KB，而WebStorage是5MB
+  - 节省网络流量：WebStorage不会传送到服务器，存储在本地的数据可以直接获取，也不会像cookie一样每次请求都会传送到服务器，所以减少了客户端和服务器端的交互，节省了网络流量对于那种只需要在用户浏览一组页面期间保存而关闭浏览器后就可以丢弃的数据，sessionStorage会非常方便
+  - 快速显示：有的数据存储在WebStorage上，再加上浏览器本身的缓存。获取数据时可以从本地获取会比从服务器端获取快得多，所以速度更快
+  - 安全性：WebStorage不会随着HTTP header发送到服务器端，所以安全性相对于cookie来说比较高一些，不会担心截获，但是仍然存在伪造问题
+  - WebStorage提供了一些方法，数据操作比cookie方便
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210923222357.png)
+
 #### sessionStorage、localStorage和cookie的区别
+
 - 相同点是都是保存在浏览器端、且同源的
 - cookie数据始终在同源的http请求中携带（即使不需要），即cookie在浏览器和服务器间来回传递，而sessionStorage和localStorage不会自动把数据发送给服务器，仅在本地保存。cookie数据还有路径（path）的概念，可以限制cookie只属于某个路径下
 - 存储大小限制也不同，cookie数据不能超过4K，同时因为每次http请求都会携带cookie、所以cookie只适合保存很小的数据，如会话标识。sessionStorage和localStorage虽然也有存储大小的限制，但比cookie大得多，可以达到5M或更大
@@ -6052,12 +6354,220 @@ SessionID 是连接 Cookie 和 Session 的一道桥梁。
 - 作用域不同，sessionStorage不在不同的浏览器窗口中共享，即使是同一个页面；  localstorage在所有同源窗口中都是共享的；cookie也是在所有同源窗口中都是共享的
 - webStorage支持事件通知机制，可以将数据更新的通知发送给监听者
 - web Storage的api接口使用更方便
-![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210923222632.png)
+  ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210923222632.png)
 
 localStorage 适合持久化缓存数据，比如页面的默认偏好配置等；sessionStorage 适合一次性临时数据保存。
 
+### Cookie、Session、Token、JWT
+
+#### 什么是认证（Authentication）
+
+- 通俗地讲就是验证当前用户的身份，证明“你是你自己”（比如：你每天上下班打卡，都需要通过指纹打卡，当你的指纹和系统里录入的指纹相匹配时，就打卡成功）
+
+- 互联网中的认证：
+  - 用户名密码登录
+  - 邮箱发送登录链接
+  - 手机号接收验证码
+  - 只要你能收到邮箱/验证码，就默认你是账号的主人
+#### 什么是授权（Authorization）
+- 用户授予第三方应用访问该用户某些资源的权限
+  - 你在安装手机应用的时候，APP 会询问是否允许授予权限（访问相册、地理位置等权限）
+  - 你在访问微信小程序时，当登录时，小程序会询问是否允许授予权限（获取昵称、头像、地区、性别等个人信息）
+
+- 实现授权的方式有：cookie、session、token、OAuth
+#### 什么是凭证（Credentials）
+- 实现认证和授权的前提是需要一种媒介（证书） 来标记访问者的身份
+  - 在战国时期，商鞅变法，发明了照身帖。照身帖由官府发放，是一块打磨光滑细密的竹板，上面刻有持有人的头像和籍贯信息。国人必须持有，如若没有就被认为是黑户，或者间谍之类的。
+  - 在现实生活中，每个人都会有一张专属的居民身份证，是用于证明持有人身份的一种法定证件。通过身份证，我们可以办理手机卡/银行卡/个人贷款/交通出行等等，这就是认证的凭证。
+  - 在互联网应用中，一般网站（如掘金）会有两种模式，游客模式和登录模式。游客模式下，可以正常浏览网站上面的文章，一旦想要点赞/收藏/分享文章，就需要登录或者注册账号。当用户登录成功后，服务器会给该用户使用的浏览器颁发一个令牌（token），这个令牌用来表明你的身份，每次浏览器发送请求时会带上这个令牌，就可以使用游客模式下无法使用的功能。
+#### 什么是 Cookie
+- HTTP 是无状态的协议（对于事务处理没有记忆能力，每次客户端和服务端会话完成时，服务端不会保存任何会话信息）：每个请求都是完全独立的，服务端无法确认当前访问者的身份信息，无法分辨上一次的请求发送者和这一次的发送者是不是同一个人。所以服务器与浏览器为了进行会话跟踪（知道是谁在访问我），就必须主动的去维护一个状态，这个状态用于告知服务端前后两个请求是否来自同一浏览器。而这个状态需要通过 cookie 或者 session 去实现。
+
+- cookie 存储在客户端： cookie 是服务器发送到用户浏览器并保存在本地的一小块数据，它会在浏览器下次向同一服务器再发起请求时被携带并发送到服务器上。
+
+- cookie 是不可跨域的： 每个 cookie 都会绑定单一的域名，无法在别的域名下获取使用，一级域名和二级域名之间是允许共享使用的（靠的是 domain）。
+  ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211112072406.png)
+#### 什么是 Session
+- session 是另一种记录服务器和客户端会话状态的机制
+- session 是基于 cookie 实现的，session 存储在服务器端，sessionId 会被存储到客户端的cookie 中
+  ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211112072500.png)
+
+- session 认证流程：
+  - 用户第一次请求服务器的时候，服务器根据用户提交的相关信息，创建对应的 Session
+  - 请求返回时将此 Session 的唯一标识信息 SessionID 返回给浏览器
+  - 浏览器接收到服务器返回的 SessionID 信息后，会将此信息存入到 Cookie 中，同时 Cookie 记录此 SessionID 属于哪个域名
+  - 当用户第二次访问服务器的时候，请求会自动判断此域名下是否存在 Cookie 信息，如果存在自动将 Cookie 信息也发送给服务端，服务端会从 Cookie 中获取 SessionID，再根据 SessionID 查找对应的 Session 信息，如果没有找到说明用户没有登录或者登录失效，如果找到 Session 证明用户已经登录可执行后面操作。
+
+- SessionID 是连接 Cookie 和 Session 的一道桥梁，大部分系统也是根据此原理来验证用户登录状态。
+#### Cookie 和 Session 的区别
+- 安全性： Session 比 Cookie 安全，Session 是存储在服务器端的，Cookie 是存储在客户端的。
+- 存取值的类型不同：Cookie 只支持存字符串数据，想要设置其他类型的数据，需要将其转换成字符串，Session 可以存任意数据类型。
+- 有效期不同： Cookie 可设置为长时间保持，比如我们经常使用的默认登录功能，Session 一般失效时间较短，客户端关闭（默认情况下）或者 Session 超时都会失效。
+- 存储大小不同： 单个 Cookie 保存的数据不能超过 4K，Session 可存储数据远高于 Cookie，但是当访问量过多，会占用过多的服务器资源。
+#### 什么是 Token（令牌）
+- Acesss Token
+  - 访问资源接口（API）时所需要的资源凭证
+  - 简单 token 的组成： uid(用户唯一的身份标识)、time(当前时间的时间戳)、sign（签名，token 的前几位以哈希算法压缩成的一定长度的十六进制字符串）
+  - 特点：
+    - 服务端无状态化、可扩展性好
+    - 支持移动端设备
+    - 安全
+    - 支持跨程序调用
+  - token 的身份验证流程：
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211112072747.png)
+    - 客户端使用用户名跟密码请求登录
+    - 服务端收到请求，去验证用户名与密码
+    - 验证成功后，服务端会签发一个 token 并把这个 token 发送给客户端
+    - 客户端收到 token 以后，会把它存储起来，比如放在 cookie 里或者 localStorage 里
+    - 客户端每次向服务端请求资源的时候需要带着服务端签发的 token
+    - 服务端收到请求，然后去验证客户端请求里面带着的 token ，如果验证成功，就向客户端返回请求的数据
+  - 每一次请求都需要携带 token，需要把 token 放到 HTTP 的 Header 里
+  - 基于 token 的用户认证是一种服务端无状态的认证方式，服务端不用存放 token 数据。用解析 token 的计算时间换取 session 的存储空间，从而减轻服务器的压力，减少频繁的查询数据库
+  - token 完全由应用管理，所以它可以避开同源策略
+- Refresh Token
+  - 另外一种 token——refresh token
+  - refresh token 是专用于刷新 access token 的 token。如果没有 refresh token，也可以刷新 access token，但每次刷新都要用户输入登录用户名与密码，会很麻烦。有了 refresh token，可以减少这个麻烦，客户端直接用 refresh token 去更新 access token，无需用户进行额外的操作。
+  - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211112072946.png)
+  - Access Token 的有效期比较短，当 Acesss Token 由于过期而失效时，使用 Refresh Token 就可以获取到新的 Token，如果 Refresh Token 也失效了，用户就只能重新登录了。
+  - Refresh Token 及过期时间是存储在服务器的数据库中，只有在申请新的 Acesss Token 时才会验证，不会对业务接口响应时间造成影响，也不需要向 Session 一样一直保持在内存中以应对大量的请求。
+#### Token 和 Session 的区别
+- Session 是一种记录服务器和客户端会话状态的机制，使服务端有状态化，可以记录会话信息。而 Token 是令牌，访问资源接口（API）时所需要的资源凭证。Token 使服务端无状态化，不会存储会话信息。
+- Session 和 Token 并不矛盾，作为身份认证 Token 安全性比 Session 好，因为每一个请求都有签名还能防止监听以及重放攻击，而 Session 就必须依赖链路层来保障通讯安全了。如果你需要实现有状态的会话，仍然可以增加 Session 来在服务器端保存一些状态。
+- 所谓 Session 认证只是简单的把 User 信息存储到 Session 里，因为 SessionID 的不可预测性，暂且认为是安全的。而 Token ，如果指的是 OAuth Token 或类似的机制的话，提供的是 认证 和 授权 ，认证是针对用户，授权是针对 App 。其目的是让某 App 有权利访问某用户的信息。这里的 Token 是唯一的。不可以转移到其它 App上，也不可以转到其它用户上。Session 只提供一种简单的认证，即只要有此 SessionID ，即认为有此 User 的全部权利。是需要严格保密的，这个数据应该只保存在站方，不应该共享给其它网站或者第三方 App。所以简单来说：如果你的用户数据可能需要和第三方共享，或者允许第三方调用 API 接口，用 Token 。如果永远只是自己的网站，自己的 App，用什么就无所谓了。
+#### 什么是 JWT
+JWT基本上由.分隔的三部分组成，分别是头部，有效载荷和签名。 一个简单的JWT的例子，如下所示：
+```md
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiemhhbmdzYW4ifQ.ec7IVPU-ePtbdkb85IRnK4t4nUVvF2bBf8fGhJmEwSs
+```
+如果你细致得去看的话会发现其实这是一个分为 3 段的字符串，段与段之间用 点号 隔开，在 JWT 的概念中，每一段的名称分别为：
+```md
+Header.Payload.Signature
+```
+- Header
+  - JWT 的 Header 通常包含两个字段，分别是：typ(type) 和 alg(algorithm)
+   - typ：token的类型，这里固定为 JWT
+   - alg：使用的 hash 算法，例如：HMAC SHA256 或者 RSA
+- Payload
+  - JWT 中的 Payload 其实就是真实存储我们需要传递的信息的部分，例如正常我们会存储些用户 ID、用户名之类的。此外，还包含一些例如发布人、过期日期等的元数据。
+- Signature
+  - Signature 部分其实就是对我们前面的 Header 和 Payload 部分进行签名，保证 Token 在传输的过程中没有被篡改或者损坏，签名的算法也很简单，但是，为了加密，所以除了 Header 和 Payload 之外，还多了一个密钥字段
+
+
+
+
+- JSON Web Token（简称 JWT）是目前最流行的跨域认证解决方案。
+- 是一种认证授权机制。
+- JWT 是为了在网络应用环境间传递声明而执行的一种基于 JSON 的开放标准（RFC 7519）。JWT 的声明一般被用来在身份提供者和服务提供者间传递被认证的用户身份信息，以便于从资源服务器获取资源。比如用在用户登录上。
+- 可以使用 HMAC 算法或者是 RSA 的公/私秘钥对 JWT 进行签名。因为数字签名的存在，这些传递的信息是可信的。
+- 可以使用 HMAC 算法或者是 RSA 的公/私秘钥对 JWT 进行签名。因为数字签名的存在，这些传递的信息是可信的。
+- 生成 JWT
+  - jwt.io/
+  - www.jsonwebtoken.io/
+- JWT 的原理
+  - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211112074303.png)
+  - JWT 认证流程：
+    - 用户输入用户名/密码登录，服务端认证成功后，会返回给客户端一个 JWT
+    - 客户端将 token 保存到本地（通常使用 localstorage，也可以使用 cookie）
+    - 当用户希望访问一个受保护的路由或者资源的时候，需要请求头的 Authorization 字段中使用Bearer 模式添加 JWT，其内容看起来是下面这样`Authorization: Bearer <token>`
+    - 服务端的保护路由将会检查请求头 Authorization 中的 JWT 信息，如果合法，则允许用户的行为
+    - 因为 JWT 是自包含的（内部包含了一些会话信息），因此减少了需要查询数据库的需要
+    - 因为 JWT 并不使用 Cookie 的，所以你可以使用任何域名提供你的 API 服务而不需要担心跨域资源共享问题（CORS）
+    - 因为用户的状态不再存储在服务端的内存中，所以这是一种无状态的认证机制
+
+- JWT 的使用方式
+  - 客户端收到服务器返回的 JWT，可以储存在 Cookie 里面，也可以储存在 localStorage。
+  - 方式一
+    - 当用户希望访问一个受保护的路由或者资源的时候，可以把它放在 Cookie 里面自动发送，但是这样不能跨域，所以更好的做法是放在 HTTP 请求头信息的 Authorization 字段里，使用 Bearer 模式添加 JWT。
+    ```js
+    GET /calendar/v1/events
+    Host: api.example.com
+    Authorization: Bearer <token>
+    ```
+    - 用户的状态不会存储在服务端的内存中，这是一种 无状态的认证机制
+    - 服务端的保护路由将会检查请求头 Authorization 中的 JWT 信息，如果合法，则允许用户的行为。
+    - 由于 JWT 是自包含的，因此减少了需要查询数据库的需要
+    - JWT 的这些特性使得我们可以完全依赖其无状态的特性提供数据 API 服务，甚至是创建一个下载流服务。
+    - 因为 JWT 并不使用 Cookie ，所以你可以使用任何域名提供你的 API 服务而不需要担心跨域资源共享问题（CORS）
+  - 方式二
+    - 跨域的时候，可以把 JWT 放在 POST 请求的数据体里。
+  - 方式三
+    - 通过 URL 传输`http://www.example.com/user?token=xxx`
+#### Token 和 JWT 的区别
+- 相同：
+  - 都是访问资源的令牌
+  - 都可以记录用户的信息
+  - 都是使服务端无状态化
+  - 都是只有验证成功后，客户端才能访问服务端上受保护的资
+- 区别：
+  - Token：服务端验证客户端发送过来的 Token 时，还需要查询数据库获取用户信息，然后验证 Token 是否有效。
+  - JWT： 将 Token 和 Payload 加密后存储于客户端，服务端只需要使用密钥解密进行校验（校验也是 JWT 自己实现的）即可，不需要查询或者减少查询数据库，因为 JWT 自包含了用户信息和加密的数据。
+#### 常见的前后端鉴权方式
+- Session-Cookie
+- Token 验证（包括 JWT，SSO）
+- OAuth2.0（开放授权）
+#### 常见的加密算法
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211112102921.png)
+
+- 哈希算法(Hash Algorithm)又称散列算法、散列函数、哈希函数，是一种从任何一种数据中创建小的数字“指纹”的方法。哈希算法将数据重新打乱混合，重新创建一个哈希值。
+- 哈希算法主要用来保障数据真实性(即完整性)，即发信人将原始消息和哈希值一起发送，收信人通过相同的哈希函数来校验原始数据是否真实。
+- 哈希算法通常有以下几个特点：
+  - 正像快速：原始数据可以快速计算出哈希值
+  - 逆向困难：通过哈希值基本不可能推导出原始数据
+  - 输入敏感：原始数据只要有一点变动，得到的哈希值差别很大
+  - 冲突避免：很难找到不同的原始数据得到相同的哈希值，宇宙中原子数大约在 10 的 60 次方到 80 次方之间，所以 2 的 256 次方有足够的空间容纳所有的可能，算法好的情况下冲突碰撞的概率很低：
+    - 2 的 128 次方为 340282366920938463463374607431768211456，也就是 10 的 39 次方级别
+    - 2 的 160 次方为 1.4615016373309029182036848327163e+48，也就是 10 的 48 次方级别
+    - 2 的 256 次方为 1.1579208923731619542357098500869 × 10 的 77 次方，也就是 10 的 77 次方
+- 注意：
+  - 以上不能保证数据被恶意篡改，原始数据和哈希值都可能被恶意篡改，要保证不被篡改，可以使用RSA 公钥私钥方案，再配合哈希值。
+  - 哈希算法主要用来防止计算机传输过程中的错误，早期计算机通过前 7 位数据第 8 位奇偶校验码来保障（12.5% 的浪费效率低），对于一段数据或文件，通过哈希算法生成 128bit 或者 256bit 的哈希值，如果校验有问题就要求重传。
+#### 常见问题
+- 使用 cookie 时需要考虑的问题
+  - 因为存储在客户端，容易被客户端篡改，使用前需要验证合法性
+  - 不要存储敏感数据，比如用户密码，账户余额
+  - 使用 httpOnly 在一定程度上提高安全性
+  - 尽量减少 cookie 的体积，能存储的数据量不能超过 4kb
+  - 设置正确的 domain 和 path，减少数据传输
+  - cookie 无法跨域
+  - 一个浏览器针对一个网站最多存 20 个Cookie，浏览器一般只允许存放 300 个Cookie
+  - 移动端对 cookie 的支持不是很好，而 session 需要基于 cookie 实现，所以移动端常用的是 token
+
+
+
+- 使用 session 时需要考虑的问题
+  - 将 session 存储在服务器里面，当用户同时在线量比较多时，这些 session 会占据较多的内存，需要在服务端定期的去清理过期的 session
+  - 当网站采用集群部署的时候，会遇到多台 web 服务器之间如何做 session 共享的问题。因为 session 是由单个服务器创建的，但是处理用户请求的服务器不一定是那个创建 session 的服务器，那么该服务器就无法拿到之前已经放入到 session 中的登录凭证之类的信息了。
+  - 当多个应用要共享 session 时，除了以上问题，还会遇到跨域问题，因为不同的应用可能部署的主机不一样，需要在各个应用做好 cookie 跨域的处理。
+  - sessionId 是存储在 cookie 中的，假如浏览器禁止 cookie 或不支持 cookie 怎么办？ 一般会把 sessionId 跟在 url 参数后面即重写 url，所以 session 不一定非得需要靠 cookie 实现
+  - 移动端对 cookie 的支持不是很好，而 session 需要基于 cookie 实现，所以移动端常用的是 token
+
+
+- 使用 token 时需要考虑的问题
+  - 如果你认为用数据库来存储 token 会导致查询时间太长，可以选择放在内存当中。比如 redis 很适合你对 token 查询的需求。
+  - token 完全由应用管理，所以它可以避开同源策略
+  - token 可以避免 CSRF 攻击(因为不需要 cookie 了)
+  - 移动端对 cookie 的支持不是很好，而 session 需要基于 cookie 实现，所以移动端常用的是 token
+
+
+
+- 使用 JWT 时需要考虑的问题
+  - 因为 JWT 并不依赖 Cookie 的，所以你可以使用任何域名提供你的 API 服务而不需要担心跨域资源共享问题（CORS）
+  - JWT 默认是不加密，但也是可以加密的。生成原始 Token 以后，可以用密钥再加密一次。
+  - JWT 不加密的情况下，不能将秘密数据写入 JWT。
+  - JWT 不仅可以用于认证，也可以用于交换信息。有效使用 JWT，可以降低服务器查询数据库的次数。
+  - JWT 最大的优势是服务器不再需要存储 Session，使得服务器认证鉴权业务可以方便扩展。但这也- 是 JWT 最大的缺点：由于服务器不需要存储 Session 状态，因此使用过程中无法废弃某个 Token 或者更改 Token 的权限。也就是说一旦 JWT 签发了，到期之前就会始终有效，除非服务器部署额外的逻辑。
+  - JWT 本身包含了认证信息，一旦泄露，任何人都可以获得该令牌的所有权限。为了减少盗用，JWT的有效期应该设置得比较短。对于一些比较重要的权限，使用时应该再次对用户进行认证。
+  - JWT 适合一次性的命令认证，颁发一个有效期极短的 JWT，即使暴露了危险也很小，由于每次操作都会生成新的 JWT，因此也没必要保存 JWT，真正实现无状态。
+  - 为了减少盗用，JWT 不应该使用 HTTP 协议明码传输，要使用 HTTPS 协议传输。
+
+
+- 使用加密算法时需要考虑的问题
+  - 绝不要以明文存储密码
+  - 永远使用 哈希算法 来处理密码，绝不要使用 Base64 或其他编码方式来存储密码，这和以明文存储密码是一样的，使用哈希，而不要使用编码。编码以及加密，都是双向的过程，而密码是保密的，应该只被它的所有者知道， 这个过程必须是单向的。哈希正是用于做这个的，从来没有解哈希这种说法， 但是编码就存在解码，加密就存在解密。
+  - 绝不要使用弱哈希或已被破解的哈希算法，像 MD5 或 SHA1 ，只使用强密码哈希算法。
+  - 绝不要以明文形式显示或发送密码，即使是对密码的所有者也应该这样。如果你需要 “忘记密码” 的功能，可以随机生成一个新的 一次性的（这点很重要）密码，然后把这个密码发送给用户。
 ### HTTP与HTTPS有什么区别？
-HTTP与HTTPS的区别， 。
+HTTP与HTTPS的区别:
 HTTP：是互联网上应用最为广泛的一种网络协议，是一个客户端和服务器端请求和应答的标准（TCP），用于从WWW服务器传输超文本到本地浏览器的传输协议，它可以使浏览器更加高效，使网络传输减少。
 
 HTTPS：是以安全为目标的HTTP通道，简单讲是HTTP的安全版，即HTTP下加入SSL层，HTTPS的安全基础是SSL，因此加密的详细内容就需要SSL。HTTPS协议的主要作用可以分为两种：一种是建立一个信息安全通道，来保证数据传输的安全；另一种就是确认网站的真实性。
@@ -6069,13 +6579,13 @@ HTTPS：是以安全为目标的HTTP通道，简单讲是HTTP的安全版，即H
 4、http的连接很简单，是无状态的；HTTPS协议是由SSL+HTTP协议构建的可进行加密传输、身份认证的网络协议，比http协议安全。
 
 - HTTPS的优点
-    - 使用HTTPS协议可认证用户和服务器，确保数据发送到正确的客户机和服务器；
-    - HTTPS协议是由SSL+HTTP协议构建的可进行加密传输、身份认证的网络协议，要比http协议安全，可防止数据在传输过程中不被窃取、改变，确保数据的完整性。
+  - 使用HTTPS协议可认证用户和服务器，确保数据发送到正确的客户机和服务器；
+  - HTTPS协议是由SSL+HTTP协议构建的可进行加密传输、身份认证的网络协议，要比http协议安全，可防止数据在传输过程中不被窃取、改变，确保数据的完整性。
 - HTTPS的缺点
-    - https 握手阶段比较`费时`，会使页面加载时间延长 50%，增加 10%~20%的耗电。
-    - https `缓存`不如 http 高效，会增加数据开销。
-    - SSL 证书也需要钱，功能越强大的`证书费`用越高。
-    - SSL 证书需要绑定 `IP`，不能再同一个 ip 上绑定多个域名，ipv4 资源支持不了这种消耗
+  - https 握手阶段比较`费时`，会使页面加载时间延长 50%，增加 10%~20%的耗电。
+  - https `缓存`不如 http 高效，会增加数据开销。
+  - SSL 证书也需要钱，功能越强大的`证书费`用越高。
+  - SSL 证书需要绑定 `IP`，不能再同一个 ip 上绑定多个域名，ipv4 资源支持不了这种消耗
 
 #### https 协议的工作原理
 客户端在使用 HTTPS 方式与 Web 服务器通信时有以下几个步骤：
@@ -6090,29 +6600,31 @@ HTTPS：是以安全为目标的HTTP通道，简单讲是HTTP的安全版，即H
 ### HTTP1.0、HTTP1.1、http2.0 的区别
 #### HTTP1.0和HTTP1.1
 - HTTP1.0
-    - HTTP/0.9极其简单，且使用非常受限。
-    - 每次HTTP 请求/响应都会重新建立TCP连接
-    - 添加了对 POST 和 HEAD 方法的支持
-    - 协议头带有版本号、协议类型、状态码字段
-    - 响应类型：超文本、脚本、媒体、样式表
-    - 支持keep-alive连接，但默认情况下它是“关闭”的
+  - HTTP/0.9极其简单，且使用非常受限。
+  - 每次HTTP 请求/响应都会重新建立TCP连接
+  - 添加了对 POST 和 HEAD 方法的支持
+  - 协议头带有版本号、协议类型、状态码字段
+  - 响应类型：超文本、脚本、媒体、样式表
+  - 支持keep-alive连接，但默认情况下它是“关闭”的
+
 - HTTP/1.1
-    - HTTP/1.0的主要缺陷是：它在每次请求\响应时都要建立新的TCP连接。这种做法非常耗时，且影响客户端和服务器的性能。
-    - 单个TCP连接上可以传送多个HTTP请求和响应
-    - 添加了对 PUT、DELETE、TRACE、OPTIONS 方法的支持
-    - 默认持久连接
+  - HTTP/1.0的主要缺陷是：它在每次请求\响应时都要建立新的TCP连接。这种做法非常耗时，且影响客户端和服务器的性能。
+  - 单个TCP连接上可以传送多个HTTP请求和响应
+  - 添加了对 PUT、DELETE、TRACE、OPTIONS 方法的支持
+  - 默认持久连接
 #### HTTP1.0和HTTP1.1的区别
 - HTTP1.0
-    - 队头阻塞：下个请求必须在前一个请求返回后才能发出，导致带宽无法被充分利用，后续请求被阻塞（HTTP 1.1 尝试使用流水线（Pipelining）技术，但先天 FIFO（先进先出）机制导致当前请求的执行依赖于上一个请求执行的完成，容易引起队头阻塞，并没有从根本上解决问题）；
-    - 协议开销大：header里携带的内容过大，且不能压缩，增加了传输的成本；
-    - 单向请求：只能单向请求，客户端请求什么，服务器返回什么
+  - 队头阻塞：下个请求必须在前一个请求返回后才能发出，导致带宽无法被充分利用，后续请求被阻塞（HTTP 1.1 尝试使用流水线（Pipelining）技术，但先天 FIFO（先进先出）机制导致当前请求的执行依赖于上一个请求执行的完成，容易引起队头阻塞，并没有从根本上解决问题）；
+  - 协议开销大：header里携带的内容过大，且不能压缩，增加了传输的成本；
+  - 单向请求：只能单向请求，客户端请求什么，服务器返回什么
+
 - HTTP1.1
-    - 长连接：HTTP1.1支持长连接和请求的流水线处理，在一个TCP连接上可以传送多个HTTP请求和响应，减少了建立和关闭连接的消耗和延迟，在HTTP1.1中默认开启长连接keep-alive，一定程度上弥补了HTTP1.0每次请求都要创建连接的缺点。
-    - 节约带宽： HTTP1.0中存在一些浪费带宽的现象，例如客户端只是需要某个对象的一部分，而服务器却将整个对象送过来了，并且不支持断点续传功能。HTTP1.1支持只发送header信息（不带任何body信息），如果服务器认为客户端有权限请求服务器，则返回100，客户端接收到100才开始把请求body发送到服务器；如果返回401，客户端就可以不用发送请求body了节约了带宽。
-    - HOST域：  在HTTP1.0中认为每台服务器都绑定一个唯一的IP地址，因此，请求消息中的URL并没有传递主机名（hostname），HTTP1.0没有host域。随着虚拟主机技术的发展，在一台物理服务器上可以存在多个虚拟主机（Multi-homed Web Servers），并且它们共享一个IP地址。HTTP1.1的请求消息和响应消息都支持host域，且请求消息中如果没有host域会报告一个错误（400 Bad Request）。
-    - 缓存处理：在HTTP1.0中主要使用header里的If-Modified-Since,Expires来做为缓存判断的标准，HTTP1.1则引入了更多的缓存控制策略例如Entity tag，If-Unmodified-Since, If-Match, If-None-Match等更多可供选择的缓存头来控制缓存策略。
-    - 错误通知的管理：在HTTP1.1中新增了24个错误状态响应码，如409（Conflict）表示请求的资源与资源的当前状态发生冲突；410（Gone）表示服务器上的某个资源被永久性的删除。
-![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211107112111.png)
+  - 长连接：HTTP1.1支持长连接和请求的流水线处理，在一个TCP连接上可以传送多个HTTP请求和响应，减少了建立和关闭连接的消耗和延迟，在HTTP1.1中默认开启长连接keep-alive，一定程度上弥补了HTTP1.0每次请求都要创建连接的缺点。
+  - 节约带宽： HTTP1.0中存在一些浪费带宽的现象，例如客户端只是需要某个对象的一部分，而服务器却将整个对象送过来了，并且不支持断点续传功能。HTTP1.1支持只发送header信息（不带任何body信息），如果服务器认为客户端有权限请求服务器，则返回100，客户端接收到100才开始把请求body发送到服务器；如果返回401，客户端就可以不用发送请求body了节约了带宽。
+  - HOST域：  在HTTP1.0中认为每台服务器都绑定一个唯一的IP地址，因此，请求消息中的URL并没有传递主机名（hostname），HTTP1.0没有host域。随着虚拟主机技术的发展，在一台物理服务器上可以存在多个虚拟主机（Multi-homed Web Servers），并且它们共享一个IP地址。HTTP1.1的请求消息和响应消息都支持host域，且请求消息中如果没有host域会报告一个错误（400 Bad Request）。
+  - 缓存处理：在HTTP1.0中主要使用header里的If-Modified-Since,Expires来做为缓存判断的标准，HTTP1.1则引入了更多的缓存控制策略例如Entity tag，If-Unmodified-Since, If-Match, If-None-Match等更多可供选择的缓存头来控制缓存策略。
+  - 错误通知的管理：在HTTP1.1中新增了24个错误状态响应码，如409（Conflict）表示请求的资源与资源的当前状态发生冲突；410（Gone）表示服务器上的某个资源被永久性的删除。
+    ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211107112111.png)
 
 #### HTTP1.1和HTTP2.0的区别
 - 多路复用：HTTP2.0使用了多路复用的技术，做到同一个连接并发处理多个请求，而且并发请求的数量比HTTP1.1大了好几个数量级。HTTP1.1也可以多建立几个TCP连接，来支持处理更多并发的请求，但是创建TCP连接本身也是有开销的。
@@ -6120,97 +6632,95 @@ HTTPS：是以安全为目标的HTTP通道，简单讲是HTTP的安全版，即H
 - 服务器推送： 服务端推送是一种在客户端请求之前发送数据的机制。网页使用了许多资源：HTML、样式表、脚本、图片等等。在HTTP1.1中这些资源每一个都必须明确地请求。这是一个很慢的过程。浏览器从获取HTML开始，然后在它解析和评估页面的时候，增量地获取更多的资源。因为服务器必须等待浏览器做每一个请求，网络经常是空闲的和未充分使用的。为了改善延迟，HTTP2.0引入了server push，它允许服务端推送资源给浏览器，在浏览器明确地请求之前，免得客户端再次创建连接发送请求到服务器端获取。这样客户端可以直接从本地加载这些资源，不用再通过网络。
 - 非阻塞下载
 
-
 缺点：HTTP 2中，多个请求在一个TCP管道中的，出现了丢包时，HTTP 2的表现反倒不如HTTP 1.1了。因为 TCP 为了保证可靠传输，有个特别的“丢包重传”机制，丢失的包必须要等待重新传输确认，HTTP 2出现丢包时，整个 TCP 都要开始等待重传，那么就会阻塞该TCP连接中的所有请求。而对于 HTTP 1.1 来说，可以开启多个 TCP 连接，出现这种情况反到只会影响其中一个连接，剩余的 TCP 连接还可以正常传输数据
 
-
 #### Http3.0 相对于 Http2.0的区别
+
 http 协议是应用层协议，都是建立在传输层之上的。我们也都知道传输层上面不只有 TCP 协议，还有另外一个强大的协议 UDP 协议，2.0 和 1.0 都是基于 TCP 的，因此都会有 TCP 带来的硬伤以及局限性。而 Http3.0 则是建立在 UDP 的基础上。所以其与 Http2.0 之间有质的不同。
 
 通过多路复用，HTTP/2解决了队头阻塞问题。但如果TCP流中出现了丢包，根据TCP的拥塞控制机制，其他数据流就只能等待丢包被重新发送和接收。所以，TCP的队头阻塞问题在HTTP/2中依然存在。HTTP/3通过使用基于UDP的传输协议QUIC解决了这一问题。
 
 HTTP/3是自HTTP/2之后最新且最主要的HTTP版本。因为HTTP/3本身就是为QUIC协议设计的，所以也被描述为基于QUIC的HTTP/2。HTTP/3的目标是通过使用谷歌的QUIC协议提供快速、可靠安全的网络连接。
+
 - HTTP/3
-    - 基于UDP的QUIC连接迁移实现
-        - TCP的连接重连之痛
-            - 一条 TCP 连接是由四元组标识的（源 IP，源端口，目的 IP，目的端口）。什么叫连接迁移呢？就是当其中任何一个元素发生变化时，这条连接依然维持着，能够保持业务逻辑不中断。
-        - 用户的地址发生变化时，如 WIFI 切换到 4G 场景，基于 TCP 的 HTTP 协议无法保持连接的存活。QUIC 基于连接 ID 唯一识别连接。当源地址发生改变时，QUIC 仍然可以保证连接存活和数据正常收发。
-        - QUIC是基于UDP协议的，任何一条 QUIC 连接不再以 IP 及端口四元组标识，而是以一个 64 位的随机数作为 ID 来标识，这样就算 IP 或者端口发生变化时，只要 ID 不变，这条连接依然维持着，上层业务逻辑感知不到变化，不会中断，也就不需要重连。
-    - 低连接延时
-        - TLS的连接时延问题
-            - 对于数据量小的请求而言，单一次的请求握手就占用了大量的时间，对于用户体验的影响非常大。同时，在用户网络不佳的情况下，RTT延时会变得较高，极其影响用户体验。
-            - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211107112541.png)
-            - 从对比我们可以看到，即使用上了TLS 1.3，精简了握手过程，最快能做到0-RTT握手(首次是1-RTT)；但是对用户感知而言, 还要加上1RTT的TCP握手开销。
-            - QUIC通过合并加密与连接管理解决了这个问题，我们来看看其是如何实现真正意义上的0-RTT的握手, 让与server进行第一个数据包的交互就能带上用户数据。
-            - QUIC 由于基于 UDP，无需 TCP 连接，在最好情况下，短连接下 QUIC 可以做到 0RTT 开启数据传输。而基于 TCP 的 HTTPS，即使在最好的 TLS1.3 的 early data 下仍然需要 1RTT 开启数据传输。而对于目前线上常见的 TLS1.2 完全握手的情况，则需要 3RTT 开启数据传输。对于 RTT 敏感的业务，QUIC 可以有效的降低连接建立延迟。
-            - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211107134603.png)
-    - 可自定义的拥塞控制
-        - Quic使用可插拔的拥塞控制，相较于TCP，它能提供更丰富的拥塞控制信息。比如对于每一个包，不管是原始包还是重传包，都带有一个新的序列号(seq)，这使得Quic能够区分ACK是重传包还是原始包，从而避免了TCP重传模糊的问题。Quic同时还带有收到数据包与发出ACK之间的时延信息。这些信息能够帮助更精确的计算RTT。此外，Quic的ACK Frame 支持256个NACK 区间，相比于TCP的SACK(Selective Acknowledgment)更弹性化，更丰富的信息会让client和server 哪些包已经被对方收到。
-        - QUIC 的传输控制不再依赖内核的拥塞控制算法，而是实现在应用层上，这意味着我们根据不同的业务场景，实现和配置不同的拥塞控制算法以及参数。GOOGLE 提出的 BBR 拥塞控制算法与 CUBIC 是思路完全不一样的算法，在弱网和一定丢包场景，BBR 比 CUBIC 更不敏感，性能也更好。在 QUIC 下我们可以根据业务随意指定拥塞控制算法和参数，甚至同一个业务的不同连接也可以使用不同的拥塞控制算法。
-    - 无队头阻塞
-        - TCP的队头阻塞问题
-            - 虽然 HTTP2 实现了多路复用，但是因为其基于面向字节流的 TCP，因此一旦丢包，将会影响多路复用下的所有请求流。QUIC 基于 UDP，在设计上就解决了队头阻塞问题。
-            - TCP 队头阻塞的主要原因是数据包超时确认或丢失阻塞了当前窗口向右滑动，我们最容易想到的解决队头阻塞的方案是不让超时确认或丢失的数据包将当前窗口阻塞在原地。QUIC也正是采用上述方案来解决TCP 队头阻塞问题的。
-            - TCP 为了保证可靠性，使用了基于字节序号的 Sequence Number 及 Ack 来确认消息的有序到达。
-            - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211107134825.png)
-            - 如上图，应用层可以顺利读取stream1中的内容，但由于stream2中的第三个segment发生了丢包，TCP 为了保证数据的可靠性，需要发送端重传第 3 个 segment 才能通知应用层读取接下去的数据。所以即使stream3 stream4的内容已顺利抵达，应用层仍然无法读取，只能等待stream2中丢失的包进行重传。
-            - 在弱网环境下，HTTP2的队头阻塞问题在用户体验上极为糟糕。
-        - QUIC的无队头阻塞解决方案
-            - QUIC 同样是一个可靠的协议，它使用 Packet Number 代替了 TCP 的 Sequence Number，并且每个 Packet Number 都严格递增，也就是说就算 Packet N 丢失了，重传的 Packet N 的 Packet Number 已经不是 N，而是一个比 N 大的值，比如Packet N+M。
-            - QUIC 使用的Packet Number 单调递增的设计，可以让数据包不再像TCP 那样必须有序确认，QUIC 支持乱序确认，当数据包Packet N 丢失后，只要有新的已接收数据包确认，当前窗口就会继续向右滑动。待发送端获知数据包Packet N 丢失后，会将需要重传的数据包放到待发送队列，重新编号比如数据包Packet N+M 后重新发送给接收端，对重传数据包的处理跟发送新的数据包类似，这样就不会因为丢包重传将当前窗口阻塞在原地，从而解决了队头阻塞问题。那么，既然重传数据包的Packet N+M 与丢失数据包的Packet N 编号并不一致，我们怎么确定这两个数据包的内容一样呢？
-            - QUIC使用Stream ID 来标识当前数据流属于哪个资源请求，这同时也是数据包多路复用传输到接收端后能正常组装的依据。重传的数据包Packet N+M 和丢失的数据包Packet N 单靠Stream ID 的比对一致仍然不能判断两个数据包内容一致，还需要再新增一个字段Stream Offset，标识当前数据包在当前Stream ID 中的字节偏移量。
-            - 有了Stream Offset 字段信息，属于同一个Stream ID 的数据包也可以乱序传输了（HTTP/2 中仅靠Stream ID 标识，要求同属于一个Stream ID 的数据帧必须有序传输），通过两个数据包的Stream ID 与 Stream Offset 都一致，就说明这两个数据包的内容一致。
-            - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211107134949.png)
-    - 报文 Body 都是经过加密的
-        - QUIC 的 packet 除了个别报文比如 PUBLIC_RESET 和 CHLO，所有报文头部都是经过认证的，报文 Body 都是经过加密的。这样只要对 QUIC 报文任何修改，接收端都能够及时发现，有效地降低了安全风险。
-        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211107135122.png)
-![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211107111256.png)
+  - 基于UDP的QUIC连接迁移实现
+    - TCP的连接重连之痛
+      - 一条 TCP 连接是由四元组标识的（源 IP，源端口，目的 IP，目的端口）。什么叫连接迁移呢？就是当其中任何一个元素发生变化时，这条连接依然维持着，能够保持业务逻辑不中断。
+    - 用户的地址发生变化时，如 WIFI 切换到 4G 场景，基于 TCP 的 HTTP 协议无法保持连接的存活。QUIC 基于连接 ID 唯一识别连接。当源地址发生改变时，QUIC 仍然可以保证连接存活和数据正常收发。
+    - QUIC是基于UDP协议的，任何一条 QUIC 连接不再以 IP 及端口四元组标识，而是以一个 64 位的随机数作为 ID 来标识，这样就算 IP 或者端口发生变化时，只要 ID 不变，这条连接依然维持着，上层业务逻辑感知不到变化，不会中断，也就不需要重连。
+  - 低连接延时
+    - TLS的连接时延问题
+      - 对于数据量小的请求而言，单一次的请求握手就占用了大量的时间，对于用户体验的影响非常大。同时，在用户网络不佳的情况下，RTT延时会变得较高，极其影响用户体验。
+      - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211107112541.png)
+      - 从对比我们可以看到，即使用上了TLS 1.3，精简了握手过程，最快能做到0-RTT握手(首次是1-RTT)；但是对用户感知而言, 还要加上1RTT的TCP握手开销。
+      - QUIC通过合并加密与连接管理解决了这个问题，我们来看看其是如何实现真正意义上的0-RTT的握手, 让与server进行第一个数据包的交互就能带上用户数据。
+      - QUIC 由于基于 UDP，无需 TCP 连接，在最好情况下，短连接下 QUIC 可以做到 0RTT 开启数据传输。而基于 TCP 的 HTTPS，即使在最好的 TLS1.3 的 early data 下仍然需要 1RTT 开启数据传输。而对于目前线上常见的 TLS1.2 完全握手的情况，则需要 3RTT 开启数据传输。对于 RTT 敏感的业务，QUIC 可以有效的降低连接建立延迟。
+      - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211107134603.png)
+  - 可自定义的拥塞控制
+    - Quic使用可插拔的拥塞控制，相较于TCP，它能提供更丰富的拥塞控制信息。比如对于每一个包，不管是原始包还是重传包，都带有一个新的序列号(seq)，这使得Quic能够区分ACK是重传包还是原始包，从而避免了TCP重传模糊的问题。Quic同时还带有收到数据包与发出ACK之间的时延信息。这些信息能够帮助更精确的计算RTT。此外，Quic的ACK Frame 支持256个NACK 区间，相比于TCP的SACK(Selective Acknowledgment)更弹性化，更丰富的信息会让client和server 哪些包已经被对方收到。
+    - QUIC 的传输控制不再依赖内核的拥塞控制算法，而是实现在应用层上，这意味着我们根据不同的业务场景，实现和配置不同的拥塞控制算法以及参数。GOOGLE 提出的 BBR 拥塞控制算法与 CUBIC 是思路完全不一样的算法，在弱网和一定丢包场景，BBR 比 CUBIC 更不敏感，性能也更好。在 QUIC 下我们可以根据业务随意指定拥塞控制算法和参数，甚至同一个业务的不同连接也可以使用不同的拥塞控制算法。
+  - 无队头阻塞
+    - TCP的队头阻塞问题
+      - 虽然 HTTP2 实现了多路复用，但是因为其基于面向字节流的 TCP，因此一旦丢包，将会影响多路复用下的所有请求流。QUIC 基于 UDP，在设计上就解决了队头阻塞问题。
+      - TCP 队头阻塞的主要原因是数据包超时确认或丢失阻塞了当前窗口向右滑动，我们最容易想到的解决队头阻塞的方案是不让超时确认或丢失的数据包将当前窗口阻塞在原地。QUIC也正是采用上述方案来解决TCP 队头阻塞问题的。
+      - TCP 为了保证可靠性，使用了基于字节序号的 Sequence Number 及 Ack 来确认消息的有序到达。
+      - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211107134825.png)
+      - 如上图，应用层可以顺利读取stream1中的内容，但由于stream2中的第三个segment发生了丢包，TCP 为了保证数据的可靠性，需要发送端重传第 3 个 segment 才能通知应用层读取接下去的数据。所以即使stream3 stream4的内容已顺利抵达，应用层仍然无法读取，只能等待stream2中丢失的包进行重传。
+      - 在弱网环境下，HTTP2的队头阻塞问题在用户体验上极为糟糕。
+    - QUIC的无队头阻塞解决方案
+      - QUIC 同样是一个可靠的协议，它使用 Packet Number 代替了 TCP 的 Sequence Number，并且每个 Packet Number 都严格递增，也就是说就算 Packet N 丢失了，重传的 Packet N 的 Packet Number 已经不是 N，而是一个比 N 大的值，比如Packet N+M。
+      - QUIC 使用的Packet Number 单调递增的设计，可以让数据包不再像TCP 那样必须有序确认，QUIC 支持乱序确认，当数据包Packet N 丢失后，只要有新的已接收数据包确认，当前窗口就会继续向右滑动。待发送端获知数据包Packet N 丢失后，会将需要重传的数据包放到待发送队列，重新编号比如数据包Packet N+M 后重新发送给接收端，对重传数据包的处理跟发送新的数据包类似，这样就不会因为丢包重传将当前窗口阻塞在原地，从而解决了队头阻塞问题。那么，既然重传数据包的Packet N+M 与丢失数据包的Packet N 编号并不一致，我们怎么确定这两个数据包的内容一样呢？
+      - QUIC使用Stream ID 来标识当前数据流属于哪个资源请求，这同时也是数据包多路复用传输到接收端后能正常组装的依据。重传的数据包Packet N+M 和丢失的数据包Packet N 单靠Stream ID 的比对一致仍然不能判断两个数据包内容一致，还需要再新增一个字段Stream Offset，标识当前数据包在当前Stream ID 中的字节偏移量。
+      - 有了Stream Offset 字段信息，属于同一个Stream ID 的数据包也可以乱序传输了（HTTP/2 中仅靠Stream ID 标识，要求同属于一个Stream ID 的数据帧必须有序传输），通过两个数据包的Stream ID 与 Stream Offset 都一致，就说明这两个数据包的内容一致。
+      - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211107134949.png)
+  - 报文 Body 都是经过加密的
+    - QUIC 的 packet 除了个别报文比如 PUBLIC_RESET 和 CHLO，所有报文头部都是经过认证的，报文 Body 都是经过加密的。这样只要对 QUIC 报文任何修改，接收端都能够及时发现，有效地降低了安全风险。
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211107135122.png)
+      ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211107111256.png)
 #### QUIC协议
 QUIC是一种新的多路传输层网络协议标准，建立在 UDP 之上。QUIC的主要目标是通过减少页面加载时间提升用户体验，并提高HTTPS的传输性能。它在本质上是TCP+TLS+HTTP/2。
 
 设计HTTP/3的目的就是要充分利用 QUIC 的优势。QUIC 协议本身可以处理数据流，所以排除了 TCP 队头阻塞问题。
 
 - QUIC 的一些关键特性包括：
-    - 基于UDP
-    - 使用没有队头阻塞的连接复用
-    - 重构TCP的关键机制（连接复用、连接建立、拥塞控制、可靠性），并成为可靠的传输协议
-![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211107111633.png)
-
+  - 基于UDP
+  - 使用没有队头阻塞的连接复用
+  - 重构TCP的关键机制（连接复用、连接建立、拥塞控制、可靠性），并成为可靠的传输协议
+    ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211107111633.png)
 - 交换数据包
-    - 安全的首包
-        - 首先，客户端在一个CRYPTO 帧中传输包含TLS 1.3 Client Hello的首包。Client Hello包含不同类型的的扩展项，如目标服务器的SNI（Server Name Indication，服务器名称指示 ）、QUIC 传输参数、压缩证书等，以及客户端支持的压缩方法和不同的加密套件。
-        - 如果服务器接受QUIC和TLS 1.3参数，它也会在CRYPTO帧中发送包含对客户端首包确认信息和TLS 1.3 Server Hello的首包信息。Server Hello中包含被服务器接收的加密套件和不同的扩展（如密钥共享、支持的版本等）。在客户端接收到 Server Hello后，会向服务器发送一个ACK确认包。
-        - 这三个首包都可能包含一个填充帧，以根据需要增加数据包的大小。
-    - 握手包
-        - 客户端和服务器之间的首包被交换以后，服务器会发送一个握手数据包，其中包含余下的服务器端消息，如证书、与服务器身份验证相关的加密扩展。客户端会验证这些证书，然后QUIC 握手以客户端发送的握手消息结束。
-    - 安全的净荷包
-        - 一旦安全的QUIC连接建立，客户端与服务器之间的信息便可以安全传输。
-
+  - 安全的首包
+    - 首先，客户端在一个CRYPTO 帧中传输包含TLS 1.3 Client Hello的首包。Client Hello包含不同类型的的扩展项，如目标服务器的SNI（Server Name Indication，服务器名称指示 ）、QUIC 传输参数、压缩证书等，以及客户端支持的压缩方法和不同的加密套件。
+    - 如果服务器接受QUIC和TLS 1.3参数，它也会在CRYPTO帧中发送包含对客户端首包确认信息和TLS 1.3 Server Hello的首包信息。Server Hello中包含被服务器接收的加密套件和不同的扩展（如密钥共享、支持的版本等）。在客户端接收到 Server Hello后，会向服务器发送一个ACK确认包。
+    - 这三个首包都可能包含一个填充帧，以根据需要增加数据包的大小。
+  - 握手包
+    - 客户端和服务器之间的首包被交换以后，服务器会发送一个握手数据包，其中包含余下的服务器端消息，如证书、与服务器身份验证相关的加密扩展。客户端会验证这些证书，然后QUIC 握手以客户端发送的握手消息结束。
+  - 安全的净荷包
+    - 一旦安全的QUIC连接建立，客户端与服务器之间的信息便可以安全传输。
 - 我们为什么要用QUIC？
-    - 传统的TCP协议是建立在操作系统层和中间路由模块之上实现的，它的握手阶段信息很容易被这些中间模块篡改而变得不安全。
-    - 但QUIC协议是在UDP之上的用户级（如浏览器）中实现的，因此它更加灵活、对用户更友好，并且能够在短时间内支持更多设备。
-    - 在 QUIC 中，传输相关的信息被不同的保护层加密，握手包在传输链路上不容易被识别和修改。因此它提供了更安全的网络数据传输。
-
-
+  - 传统的TCP协议是建立在操作系统层和中间路由模块之上实现的，它的握手阶段信息很容易被这些中间模块篡改而变得不安全。
+  - 但QUIC协议是在UDP之上的用户级（如浏览器）中实现的，因此它更加灵活、对用户更友好，并且能够在短时间内支持更多设备。
+  - 在 QUIC 中，传输相关的信息被不同的保护层加密，握手包在传输链路上不容易被识别和修改。因此它提供了更安全的网络数据传输。
 ### HTTP知识点
 #### HTTP 请求报文结构/HTTP 响应报文结构
 - HTTP协议的主要特点
-    - HTTP协议类的主要特点：简单快速，灵活，无连接，无状态（无法区分两次连接是否一样）。
+  - HTTP协议类的主要特点：简单快速，灵活，无连接，无状态（无法区分两次连接是否一样）。
 - HTTP报文的组成部分
-    - HTTP报文的组成部分
-        - 请求报文：请求行，请求头，空行，请求体；
-        - 响应报文：状态行，响应头，空行，响应体。
-        - 请求行包含：http方法，页面地址，http协议以及版本；
-        - 请求头包含：key-value值，告诉服务器端我要什么内容。
-![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922191832.png)
-    
+  - HTTP报文的组成部分
+    - 请求报文：请求行，请求头，空行，请求体；
+    - 响应报文：状态行，响应头，空行，响应体。
+    - 请求行包含：http方法，页面地址，http协议以及版本；
+    - 请求头包含：key-value值，告诉服务器端我要什么内容。
+      ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922191832.png)
+
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210824184941.png)
+
 ```md
 首行是Request-Line包括：请求方法，请求URI，协议版本，CRLF
 首行之后是若干行请求头，包括general-header，request-header或者entity-header，每个一行以CRLF结束
 请求头和消息实体之间有一个CRLF分隔
 根据实际请求需要可能包含一个消息实体 一个请求报文例子如下：
 ```
+
 ```md
 GET /Protocols/rfc2616/rfc2616-sec5.html HTTP/1.1
 Host: www.w3.org
@@ -6229,12 +6739,14 @@ name=qiu&age=25
 ```
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210824184846.png)
+
 ```md
 首行是状态行包括：HTTP版本，状态码，状态描述，后面跟一个CRLF
 首行之后是若干行响应头，包括：通用头部，响应头部，实体头部
 响应头部和响应实体之间用一个CRLF空行分隔
 最后是一个可能的消息实体 响应报文例子如下：
 ```
+
 ```md
 HTTP/1.1 200 OK
 Date: Tue, 08 Jul 2014 05:28:43 GMT
@@ -6270,81 +6782,81 @@ POST和GET的区别：
 在浏览器中通过http请求与服务端进行请求时，偶尔会发现某一些请求会被调用两次，一次是符合我们业务需求的接口调用，一次是在我们预料之外的请求，而且这个请求还不会有任何的数据返回，咋一看似乎是哪里出了问题，这个请求便是预检请求(request method为OPTIONS)
 
 - 为何会存在OPTIONS请求呢？
-    - 可用于检测服务器允许的 http 方法。当发起跨域请求时，由于安全原因，触发一定条件时浏览器会在正式请求之前自动先发起 OPTIONS 请求，即 CORS 预检请求，服务器若接受该跨域请求，浏览器才继续发起正式请求
+  - 可用于检测服务器允许的 http 方法。当发起跨域请求时，由于安全原因，触发一定条件时浏览器会在正式请求之前自动先发起 OPTIONS 请求，即 CORS 预检请求，服务器若接受该跨域请求，浏览器才继续发起正式请求
+
 - 什么时候会发起OPTIONS请求呢？
-    - 一个 CORS 预检请求是用于检查服务器是否支持 CORS 即跨域资源共享，当有必要的时候，浏览器会自动发出一个预检请求；所以在正常情况下，我们不需要自己去发这样的请求
-    - 在跨域的情况下：
-        - 当发送的请求为非简单请求时，这个时候浏览器会自动的帮我们发送一个OPTIONS请求，用于检测所请求的目标资源是否支持跨域，当浏览器发送OPTIONS请求得到响应之后，会根据responst header自动处理，若是目标资源支持跨域则会继续将正常的请求发送，若是不支持跨域则直接控制台报错，提示当前请求跨域了
-        - 若是发送的请求为简单请求时，则不会发送OPTIONS请求，浏览器会直接将请求正常发送
+  - 一个 CORS 预检请求是用于检查服务器是否支持 CORS 即跨域资源共享，当有必要的时候，浏览器会自动发出一个预检请求；所以在正常情况下，我们不需要自己去发这样的请求
+  - 在跨域的情况下：
+    - 当发送的请求为非简单请求时，这个时候浏览器会自动的帮我们发送一个OPTIONS请求，用于检测所请求的目标资源是否支持跨域，当浏览器发送OPTIONS请求得到响应之后，会根据responst header自动处理，若是目标资源支持跨域则会继续将正常的请求发送，若是不支持跨域则直接控制台报错，提示当前请求跨域了
+    - 若是发送的请求为简单请求时，则不会发送OPTIONS请求，浏览器会直接将请求正常发送
+
 - 为什么要对非简单跨域请求做预检？
-    - 减少非简单跨域请求对服务器的影响（开始时就提到，服务器有时候不想理睬跨域请求），比如PUT、DELETE请求可以直接新建或者修改、删除服务器中的资源。预检请求可以防止该情况发生。
-    - 减少服务器对于是否跨域的计算量
-        - 对于非简单请求的跨域请求，服务器对于是否跨域的计算是在预检请求上，如果预检请求通过之后，正式请求都不用再次计算。而且一次预检请求通过后，之后的每次请求都只会发正式请求。节约了很多服务端的计算量。
+  - 减少非简单跨域请求对服务器的影响（开始时就提到，服务器有时候不想理睬跨域请求），比如PUT、DELETE请求可以直接新建或者修改、删除服务器中的资源。预检请求可以防止该情况发生。
+  - 减少服务器对于是否跨域的计算量
+    - 对于非简单请求的跨域请求，服务器对于是否跨域的计算是在预检请求上，如果预检请求通过之后，正式请求都不用再次计算。而且一次预检请求通过后，之后的每次请求都只会发正式请求。节约了很多服务端的计算量。
+
 - 为什么不对简单的跨域请求做预检？
-    - 一开始就提到，form能实现的简单跨域请求，浏览器做不了任何的限制。
-    - 没必要对简单请求做预检。比如，一些post请求只是想打个日志，并不需要服务器的响应，但是如果加预检请求，预检请求不通过就做不了这件事。还有一些GET请求、HEAD请求只是想获取资源，并不会修改资源，在不获取响应的时候并不会对服务器造成影响。在这种情况下，加预检请求，只会增加服务器的负担
-- 
-#### CORS跨域请求[简单请求与复杂请求]
-CORS（cross-origin resource sharing），跨源资源共享（一般俗称『跨域请求』）。
-
+  - 一开始就提到，form能实现的简单跨域请求，浏览器做不了任何的限制。
+  - 没必要对简单请求做预检。比如，一些post请求只是想打个日志，并不需要服务器的响应，但是如果加预检请求，预检请求不通过就做不了这件事。还有一些GET请求、HEAD请求只是想获取资源，并不会修改资源，在不获取响应的时候并不会对服务器造成影响。在这种情况下，加预检请求，只会增加服务器的负担
+- #### CORS跨域请求[简单请求与复杂请求]
+  CORS（cross-origin resource sharing），跨源资源共享（一般俗称『跨域请求』）。
 - 简单请求和预检请求的区分，会看到有很多的条件：
-    - 简单请求的 HTTP 方法只能是 GET、HEAD 或 POST
-    - 简单请求的 HTTP 头只能是 
-        - Accept
-            - 请求头用来告知（服务器）客户端可以处理的内容类型
-        - Accept-Language
-            - 请求头允许客户端声明它可以理解的自然语言，以及优先选择的区域方言
-        - Conent-Language
-            - 是一个 entity header（实体消息首部），用来说明访问者希望采用的语言或语言组合，这样的话用户就可以根据自己偏好的语言来定制不同的内容
-        - Content-Type 
-            - 实体头部用于指示资源的MIME类型, 值是 application/x-www-form-urlencoded, multipart/form-data, 或者 text/plain之一的（忽略参数）
-        - Last-Event-ID
-        - DPR
-        - Downlink
-        - Save-Data
-        - Viewport-Width
-        - Width
-    - 简单请求的 Content-Type 头只能是 text/plain、multipart/form-data 或 application/x-www-form-urlencoded
-    - 任何一个不满足上述要求的请求，即被认为是复杂请求。一个复杂请求不仅有：包含通信内容的请求，同时也包含预请求。
+  - 简单请求的 HTTP 方法只能是 GET、HEAD 或 POST
+  - 简单请求的 HTTP 头只能是
+    - Accept
+      - 请求头用来告知（服务器）客户端可以处理的内容类型
+    - Accept-Language
+      - 请求头允许客户端声明它可以理解的自然语言，以及优先选择的区域方言
+    - Conent-Language
+      - 是一个 entity header（实体消息首部），用来说明访问者希望采用的语言或语言组合，这样的话用户就可以根据自己偏好的语言来定制不同的内容
+    - Content-Type
+      - 实体头部用于指示资源的MIME类型, 值是 application/x-www-form-urlencoded, multipart/form-data, 或者 text/plain之一的（忽略参数）
+    - Last-Event-ID
+    - DPR
+    - Downlink
+    - Save-Data
+    - Viewport-Width
+    - Width
+  - 简单请求的 Content-Type 头只能是 text/plain、multipart/form-data 或 application/x-www-form-urlencoded
+  - 任何一个不满足上述要求的请求，即被认为是复杂请求。一个复杂请求不仅有：包含通信内容的请求，同时也包含预请求。
 - 简单请求
-    - 部分响应头
-        - Access-Control-Allow-Origin（必含）- 不可省略，否则请求按失败处理。该项控制数据的可见范围，如果希望数据对任何人都可见，可以填写"*"。
-        - Access-Control-Allow-Credentials（可选） – 该项标志着请求当中是否包含cookies信息，只有一个可选值：true（必为小写）。如果不包含cookies，请略去该项，而不是填写false。这一项与XmlHttpRequest2对象当中的withCredentials属性应保持一致，即withCredentials为true时该项也为true；withCredentials为false时，省略该项不写。反之则导致请求失败。
-        - Cache-Control
-        - Content-Language
-        - Content-Type
-        - Expires
-        - Last-Modified
+  - 部分响应头
+    - Access-Control-Allow-Origin（必含）- 不可省略，否则请求按失败处理。该项控制数据的可见范围，如果希望数据对任何人都可见，可以填写"*"。
+    - Access-Control-Allow-Credentials（可选） – 该项标志着请求当中是否包含cookies信息，只有一个可选值：true（必为小写）。如果不包含cookies，请略去该项，而不是填写false。这一项与XmlHttpRequest2对象当中的withCredentials属性应保持一致，即withCredentials为true时该项也为true；withCredentials为false时，省略该项不写。反之则导致请求失败。
+    - Cache-Control
+    - Content-Language
+    - Content-Type
+    - Expires
+    - Last-Modified
+
 - 复杂请求
-    - 比如说你需要发送PUT、DELETE等HTTP动作，或者发送Content-Type: application/json的内容。
-    - 复杂请求表面上看起来和简单请求使用上差不多，但实际上浏览器发送了不止一个请求。其中最先发送的是一种"预请求"，此时作为服务端，也需要返回"预回应"作为响应。预请求实际上是对服务端的一种权限请求，只有当预请求成功返回，实际请求才开始执行。
-    - 响应头
-        - Access-Control-Allow-Origin（必含） – 和简单请求一样的，必须包含一个域。
-        - Access-Control-Allow-Methods（必含） – 这是对预请求当中Access-Control-Request-Method的回复，这一回复将是一个以逗号分隔的列表。尽管客户端或许只请求某一方法，但服务端仍然可以返回所有允许的方法，以便客户端将其缓存。
-        - Access-Control-Allow-Headers（当预请求中包含Access-Control-Request-Headers时必须包含） – 这是对预请求当中Access-Control-Request-Headers的回复，和上面一样是以逗号分隔的列表，可以返回所有支持的头部。这里在实际使用中有遇到，所有支持的头部一时可能不能完全写出来，而又不想在这一层做过多的判断，没关系，事实上通过request的header可以直接取到Access-Control-Request-Headers，直接把对应的value设置到Access-Control-Allow-Headers即可。
-        - Access-Control-Allow-Credentials（可选） – 和简单请求当中作用相同。
-        - Access-Control-Max-Age（可选） – 以秒为单位的缓存时间。预请求的的发送并非免费午餐，允许时应当尽可能缓存。
-    - 一旦预回应如期而至，所请求的权限也都已满足，则实际请求开始发送。
+  - 比如说你需要发送PUT、DELETE等HTTP动作，或者发送Content-Type: application/json的内容。
+  - 复杂请求表面上看起来和简单请求使用上差不多，但实际上浏览器发送了不止一个请求。其中最先发送的是一种"预请求"，此时作为服务端，也需要返回"预回应"作为响应。预请求实际上是对服务端的一种权限请求，只有当预请求成功返回，实际请求才开始执行。
+  - 响应头
+    - Access-Control-Allow-Origin（必含） – 和简单请求一样的，必须包含一个域。
+    - Access-Control-Allow-Methods（必含） – 这是对预请求当中Access-Control-Request-Method的回复，这一回复将是一个以逗号分隔的列表。尽管客户端或许只请求某一方法，但服务端仍然可以返回所有允许的方法，以便客户端将其缓存。
+    - Access-Control-Allow-Headers（当预请求中包含Access-Control-Request-Headers时必须包含） – 这是对预请求当中Access-Control-Request-Headers的回复，和上面一样是以逗号分隔的列表，可以返回所有支持的头部。这里在实际使用中有遇到，所有支持的头部一时可能不能完全写出来，而又不想在这一层做过多的判断，没关系，事实上通过request的header可以直接取到Access-Control-Request-Headers，直接把对应的value设置到Access-Control-Allow-Headers即可。
+    - Access-Control-Allow-Credentials（可选） – 和简单请求当中作用相同。
+    - Access-Control-Max-Age（可选） – 以秒为单位的缓存时间。预请求的的发送并非免费午餐，允许时应当尽可能缓存。
+  - 一旦预回应如期而至，所请求的权限也都已满足，则实际请求开始发送。
 #### HTTP常见状态码及其含义
-`HTTP`状态码：
-    - `1xx`:指示信息，表示请求已接收，继续处理；
-    - `2xx`:成功，表示请求已被成功接收；
-    - `3xx`:重定向，要完成请求必须进行更进一步的操作；
-    - `4xx`:客户端错误，请求有语法错误或请求无法实现；
-    - `5xx`:服务器错误，服务器未能实现合法的请求。
-
-    - `200` ok: 客户端请求成功
-    - `206 Partial Content`: 客户发送了一个带有Range头的GET请求，服务器完成了它
-    - `301 Moved Permanently`: 所请求的页面已经转移至新的url
-    - `302 Found`: 所有请求的页面已经临时转移至新的url
-    - `304 Not Modified`：客户端有缓冲的文档并发出了一个条件性的请求 服务器告诉客户，原来缓冲的文档还可以继续使用
-    - `400` 客户端请求有语法错误，不能被服务器所理解
-    - `401` 请求未经授权，这个状态码必须和`www-Authenticate`报头域一起使用
-    - `403` 对被请求页面的访问被禁止
-    - `404` 请求资源不存在
-    - `505` 服务器发送不可预期的错误，原来缓冲的文档还可以继续使用
-    - `503` 请求未完成，服务器临时过载或宕机，一段时间后可能恢复正常
-
+- `HTTP`状态码：
+  - `1xx`:指示信息，表示请求已接收，继续处理；
+  - `2xx`:成功，表示请求已被成功接收；
+  - `3xx`:重定向，要完成请求必须进行更进一步的操作；
+  - `4xx`:客户端错误，请求有语法错误或请求无法实现；
+  - `5xx`:服务器错误，服务器未能实现合法的请求。
+  - `200` ok: 客户端请求成功
+  - `206 Partial Content`: 客户发送了一个带有Range头的GET请求，服务器完成了它
+  - `301 Moved Permanently`: 所请求的页面已经转移至新的url
+  - `302 Found`: 所有请求的页面已经临时转移至新的url
+  - `304 Not Modified`：客户端有缓冲的文档并发出了一个条件性的请求 服务器告诉客户，原来缓冲的文档还可以继续使用
+  - `400` 客户端请求有语法错误，不能被服务器所理解
+  - `401` 请求未经授权，这个状态码必须和`www-Authenticate`报头域一起使用
+  - `403` 对被请求页面的访问被禁止
+  - `404` 请求资源不存在
+  - `505` 服务器发送不可预期的错误，原来缓冲的文档还可以继续使用
+  - `503` 请求未完成，服务器临时过载或宕机，一段时间后可能恢复正常
 
 OPTIONS方法用于获取目的资源所支持的通信方式的选项。在 CORS 中，可以使用 OPTIONS 方法发起一个预检请求，以检测实际请求是否可以被服务器所接受。预检请求报文中的 Access-Control-Request-Method 首部字段告知服务器实际请求所使用的 HTTP 方法；Access-Control-Request-Headers 首部字段告知服务器实际请求所携带的自定义首部字段。服务器基于从预检请求获得的信息来判断，是否接受接下来的实际请求。
 
@@ -6352,65 +6864,58 @@ OPTIONS方法用于获取目的资源所支持的通信方式的选项。在 COR
 
 ### 在交互过程中如果数据传送完了，还不想断开连接怎么办，怎么维持？
 在 HTTP 中响应体的 Connection 字段指定为 keep-alive
-
 ### Fetch API 与传统 Request 的区别
 HTTP数据请求的方式:XMLHttpRequest、ajax、fetch与axios
-
 - ajax
-    - 传统 Ajax 指的是 XMLHttpRequest（XHR），多个请求之间如果有先后关系的话，就会出现回调地狱。
+  - 传统 Ajax 指的是 XMLHttpRequest（XHR），多个请求之间如果有先后关系的话，就会出现回调地狱。
 - axios
-    - 一个基于Promise 用于浏览器和 nodejs 的 HTTP 客户端，本质上也是对原生XHR的封装，只不过它是Promise的实现版本，符合最新的ES规范，
-    - 支持 Promise API
-    - 客户端支持防止CSRF
-    - 提供了一些并发请求的接口（重要，方便了很多的操作）
-    - 拦截请求和响应
-    - 转换请求和响应数据
-    - 取消请求
-    - 自动转换JSON数据
+  - 一个基于Promise 用于浏览器和 nodejs 的 HTTP 客户端，本质上也是对原生XHR的封装，只不过它是Promise的实现版本，符合最新的ES规范，
+  - 支持 Promise API
+  - 客户端支持防止CSRF
+  - 提供了一些并发请求的接口（重要，方便了很多的操作）
+  - 拦截请求和响应
+  - 转换请求和响应数据
+  - 取消请求
+  - 自动转换JSON数据
+
 - fetch
-    - 语法简洁，更加语义化
-    - 基于标准 Promise 实现，支持 async/await
-    - 同构方便
-    - 更加底层，提供的API丰富（request, response）
-    - 脱离了XHR，是ES规范里新的实现方式
-
-    - fetch只对网络请求报错，对400，500都当做成功的请求，服务器返回 400，500 错误码时并不会 reject，只有网络错误这些导致请求不能完成时，fetch 才会被 reject。
-    - fetch默认不会带cookie，需要添加配置项： fetch(url, {credentials: 'include'})
-    - fetch不支持超时控制，
-    - fetch没有办法原生监测请求的进度，而XHR可以
-
+  - 语法简洁，更加语义化
+  - 基于标准 Promise 实现，支持 async/await
+  - 同构方便
+  - 更加底层，提供的API丰富（request, response）
+  - 脱离了XHR，是ES规范里新的实现方式
+  - fetch只对网络请求报错，对400，500都当做成功的请求，服务器返回 400，500 错误码时并不会 reject，只有网络错误这些导致请求不能完成时，fetch 才会被 reject。
+  - fetch默认不会带cookie，需要添加配置项： fetch(url, {credentials: 'include'})
+  - fetch不支持超时控制，
+  - fetch没有办法原生监测请求的进度，而XHR可以
 ### 计算机分为哪几层？计算机网络的七个层？
+
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922213035.png)
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922213526.png)
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922213617.png)
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210929161835.png)
 
-
 127.0.0.1是本地循环地址，如果本地址无法ping通，则表明本地机tcp/ip协议不能正常工作。
 ping命令是使用的网络层协议ICMP
 
 ### TCP三次握手和四次挥手
 - 为什么要进行三次握手：为了确认对方的发送和接收能力。
-    - 第一次握手：建立连接时，客户端发送syn包（syn=j）到服务器，并进入SYN_SENT状态，等待服务器确认；SYN：同步序列编号（Synchronize Sequence Numbers）。
-    - 第二次握手：服务器收到syn包并确认客户的SYN（ack=j+1），同时也发送一个自己的SYN包（syn=k），即SYN+ACK包，此时服务器进入SYN_RECV状态；
-    - 第三次握手：客户端收到服务器的SYN+ACK包，向服务器发送确认包ACK(ack=k+1），此包发送完毕，客户端和服务器进入ESTABLISHED（TCP连接成功）状态，完成三次握手。
-    - 握手过程中传送的包里不包含数据，三次握手完毕后，客户端与服务器才正式开始传送数据。四次以上都可以，只不过 三次就够了
-
-
+  - 第一次握手：建立连接时，客户端发送syn包（syn=j）到服务器，并进入SYN_SENT状态，等待服务器确认；SYN：同步序列编号（Synchronize Sequence Numbers）。
+  - 第二次握手：服务器收到syn包并确认客户的SYN（ack=j+1），同时也发送一个自己的SYN包（syn=k），即SYN+ACK包，此时服务器进入SYN_RECV状态；
+  - 第三次握手：客户端收到服务器的SYN+ACK包，向服务器发送确认包ACK(ack=k+1），此包发送完毕，客户端和服务器进入ESTABLISHED（TCP连接成功）状态，完成三次握手。
+  - 握手过程中传送的包里不包含数据，三次握手完毕后，客户端与服务器才正式开始传送数据。四次以上都可以，只不过 三次就够了
 - 四次握手：
-    - **客户端进程发出连接释放报文**，并且停止发送数据。释放数据报文首部，FIN=1，其序列号为seq=u（等于前面已经传送过来的数据的最后一个字节的序号加1），此时，客户端进入FIN-WAIT-1（终止等待1）状态。 TCP规定，FIN报文段即使不携带数据，也要消耗一个序号。
-    - **服务器收到连接释放报文，发出确认报文**，ACK=1，ack=u+1，并且带上自己的序列号seq=v，此时，服务端就进入了CLOSE-WAIT（关闭等待）状态。TCP服务器通知高层的应用进程，客户端向服务器的方向就释放了，这时候处于半关闭状态，即客户端已经没有数据要发送了，但是服务器若发送数据，客户端依然要接受。这个状态还要持续一段时间，也就是整个CLOSE-WAIT状态持续的时间。
-    - 客户端收到服务器的确认请求后，此时，客户端就进入FIN-WAIT-2（终止等待2）状态，等待服务器发送连接释放报文（在这之前还需要接受服务器发送的最 后的数据）。
-    - **服务器将最后的数据发送完毕后，就向客户端发送连接释放报文**，FIN=1，ack=u+1，由于在半关闭状态，服务器很可能又发送了一些数据，假定此时的序列号为seq=w，此时，服务器就进入了LAST-ACK（最后确认）状态，等待客户端的确认。
-    - **客户端收到服务器的连接释放报文后，必须发出确认**，ACK=1，ack=w+1，而自己的序列号是seq=u+1，此时，客户端就进入了TIME-WAIT（时间等待）状态。注意此时TCP连接还没有释放，必须经过2∗∗MSL（最长报文段寿命）的时间后，当客户端撤销相应的TCB后，才进入CLOSED状态。
-    - 服务器只要收到了客户端发出的确认，立即进入CLOSED状态。同样，撤销TCB后，就结束了这次的TCP连接。可以看到，服务器结束TCP连接的时间要比客户端早一些。
-    - 为什么不是两次？
-        - 两次情况客户端说完结束就立马断开不再接收，无法确认服务端是否接收到断开消息，但且服务端可能还有消息未发送完。
-    - 为什么不是三次？
-        - 3次情况服务端接收到断开消息，向客户端发送确认接受消息，客户端未给最后确认断开的回复。
-
-    
+  - **客户端进程发出连接释放报文**，并且停止发送数据。释放数据报文首部，FIN=1，其序列号为seq=u（等于前面已经传送过来的数据的最后一个字节的序号加1），此时，客户端进入FIN-WAIT-1（终止等待1）状态。 TCP规定，FIN报文段即使不携带数据，也要消耗一个序号。
+  - **服务器收到连接释放报文，发出确认报文**，ACK=1，ack=u+1，并且带上自己的序列号seq=v，此时，服务端就进入了CLOSE-WAIT（关闭等待）状态。TCP服务器通知高层的应用进程，客户端向服务器的方向就释放了，这时候处于半关闭状态，即客户端已经没有数据要发送了，但是服务器若发送数据，客户端依然要接受。这个状态还要持续一段时间，也就是整个CLOSE-WAIT状态持续的时间。
+  - 客户端收到服务器的确认请求后，此时，客户端就进入FIN-WAIT-2（终止等待2）状态，等待服务器发送连接释放报文（在这之前还需要接受服务器发送的最 后的数据）。
+  - **服务器将最后的数据发送完毕后，就向客户端发送连接释放报文**，FIN=1，ack=u+1，由于在半关闭状态，服务器很可能又发送了一些数据，假定此时的序列号为seq=w，此时，服务器就进入了LAST-ACK（最后确认）状态，等待客户端的确认。
+  - **客户端收到服务器的连接释放报文后，必须发出确认**，ACK=1，ack=w+1，而自己的序列号是seq=u+1，此时，客户端就进入了TIME-WAIT（时间等待）状态。注意此时TCP连接还没有释放，必须经过2∗∗MSL（最长报文段寿命）的时间后，当客户端撤销相应的TCB后，才进入CLOSED状态。
+  - 服务器只要收到了客户端发出的确认，立即进入CLOSED状态。同样，撤销TCB后，就结束了这次的TCP连接。可以看到，服务器结束TCP连接的时间要比客户端早一些。
+  - 为什么不是两次？
+    - 两次情况客户端说完结束就立马断开不再接收，无法确认服务端是否接收到断开消息，但且服务端可能还有消息未发送完。
+  - 为什么不是三次？
+    - 3次情况服务端接收到断开消息，向客户端发送确认接受消息，客户端未给最后确认断开的回复。
 #### 为什么需要等待 2MSL
 因为如果不等待的话，如果服务端还有很多数据包要给客户端发，且此时客户端端口被新应用占据，那么就会接收到无用的数据包，造成数据包混乱，所以说最保险的方法就是等服务器发来的数据包都死翘翘了再启动新应用。
 
@@ -6418,7 +6923,6 @@ ping命令是使用的网络层协议ICMP
 1个 MSL 保证对端没有收到 ACK 那么进行重传的 FIN 报文能够到达
 
 如果是三次的话，那么服务端的 ACK 和 FIN 合成一个挥手，那么长时间的延迟可能让 TCP 一位 FIN 没有达到服务器端，然后让客户的不断的重发 FIN
-
 ### UDP和TCP的区别及应用场景
 #### TCP和UDP的区别
 - TCP是面向链接的，而UDP是面向无连接的。
@@ -6431,16 +6935,13 @@ ping命令是使用的网络层协议ICMP
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922215218.png)
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922215348.png)
-
 #### TCP 滑动窗口
 在 TCP 链接中，对于发送端和接收端而言，TCP 需要把发送的数据放到发送缓存区, 将接收的数据放到接收缓存区。而经常会存在发送端发送过多，而接收端无法消化的情况，所以就需要流量控制，就是在通过接收缓存区的大小，控制发送端的发送。如果对方的接收缓存区满了，就不能再继续发送了。而这种流量控制的过程就需要在发送端维护一个发送窗口，在接收端维持一个接收窗口。
 TCP 滑动窗口分为两种: 发送窗口和接收窗口。
 
 #### TCP 拥塞机制
 原因是有可能整个网络环境特别差，容易丢包，那么发送端就应该注意了。
-
-
-主要用三种方法：
+- 主要用三种方法：
     - 慢启动阈值 + 拥塞避免
         - 拥塞窗口（cwnd）
         - 慢启动阈值（ssthresh）
@@ -6454,74 +6955,66 @@ TCP 滑动窗口分为两种: 发送窗口和接收窗口。
             - 会将拥塞阈值降低为 拥塞窗口的一半
             - 然后拥塞窗口大小变为拥塞阈值
             - 接着 拥塞窗口再进行线性增加，以适应网络状况
-#### TCP 为什么可靠？？？？？？？？？
+
+#### TCP 为什么可靠？？？？？？？
+因为TCP丢包之后，会做数据校验，然后重传数据。接收方每收到一个数据包就发送一次确认，发送方设置定时器，如果定时没有收到接收确认就重传。有两种，一种是丢多少重传多少，一种是从丢弃的地方重新传送数据，一般是后面一种。并且针对传输的流量，TCP会做限制，尽量保证网络的最大传输效率，保证接受方稳定接受。
 ### 网络 5层 osi 7层
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211109191738.png)
-
 ### UDP实现可靠性传输
 1. 简介
 - UDP不属于连接型协议，因而具有资源消耗小，处理速度快的特点，所以通常音频、视频和普通数据在传送时使用UDP较多，因为他们及时偶尔丢失一两个数据，也不会对接受结果产生太大影响。
-- 传输层无法确保数据的可靠传输，只能通过应用层来实现。实现的方式可以参考TCP可靠性传输的方式，只是实现不在传输层，实现转移到应用层。
-- 实现确定机制、重传机制、窗口确认机制。
-- 如果你不利用Linux协议栈以及上层socket机制，自己通过抓包和发包的方式去实现可靠性传输，那么必须通过如下功能：
-    - 发送：包的分片、包确定、包的重发
-    - 接受：包的调序、包的序号确定
-- 目前有如下开源程序利用UDO实现了可靠的数据传输，分别是RUDP、RTP、UDT
 
+- 传输层无法确保数据的可靠传输，只能通过应用层来实现。实现的方式可以参考TCP可靠性传输的方式，只是实现不在传输层，实现转移到应用层。
+
+- 实现确定机制、重传机制、窗口确认机制。
+
+- 如果你不利用Linux协议栈以及上层socket机制，自己通过抓包和发包的方式去实现可靠性传输，那么必须通过如下功能：
+  - 发送：包的分片、包确定、包的重发
+  - 接受：包的调序、包的序号确定
+- 目前有如下开源程序利用UDO实现了可靠的数据传输，分别是RUDP、RTP、UDT
 2. RUDP
 RUDP提供一组数据服务质量增强机制，如拥塞控制的改进、重发机制及淡化服务器算法等，从而在包丢失和网络拥塞的情况下，RTP客户机（实时位置）面前呈现的就是一个高质量的RTP流。在不干扰协议的实时特性的同时，可靠UDP的拥塞控制机制允许TCP方式下的流控制行为。
-
 3. RTP
 实时传输协议（RTP）为数据提供了具有实时特征的端到端传送服务，如在组播或单播网络服务下的交互式视频音频或模拟数据。应用程序通常在UDP上运行RTP以便使用其多路节点和校验服务；这两种协议都提供了传输层协议的功能。但是RTP可以与其他适合的底层网络或传输协议一起使用。如果底层网络提供组播方式，那么RTP可以使用该组播表传输数据到多个目的地。
-
 RTP本身没有提供按时发送机制或其他服务质量（QoS）保证，它依赖于底层服务区实现这一过程。RTP并不保证传送或防止无序传送，也不确定底层网络的可靠性。RTP实行有序传送，RTP中的序列号允许接收方重组发送发的包序列，同时序列号也能用于决定适当的包位置，例如：在视频解码中，就不需要顺序解码。
-
 4. UDT
 基于UDP的数据传输协议（UDT）是一种互联网数据传输协议。UDT的主要目的是支持高速广域网上的海量数据传输，而互联网上的标准数据传输协议TCP在高带宽长距离网络上性能很差。顾名思义，UDT建于UDP之上，并引入新的拥塞控制和数据可靠性控制机制。UDT是面向连接的双向的应用层协议。它同时支持可靠的数据流传输和部分可靠的数据报传输。由于UDT完全在UDP上实现，它也可以应用在除了高速数据传输之外的其他应用领域，例如点到点技术（P2P），防火墙穿透，多媒体数据传输等等。
 - UDT应用层协议
-    - UDT并不是在瓶颈带宽相对较小的和大量多元短文档流的情况下用来替代TCP的。
-    - UDT主要作为TCP的朋友，和TCP并存，UDT分配的带宽不应该超过根据MAX-MIN规则的最大最小公平共享原则（备注：最大最小规则允许UDT在高BDP连接下分配TCP不能使用的可用带宽）。
-    - UDT是双工的，每个UDT实体有两个部分：发送和接受。
-        - 发送者根据流量控制和速率控制来发送（和重传）应用程式数据。
-        - 接受者根据数据包和控制包，并根据接收到的包发送控制包。发送和接受程式共享同一个UDP端口来发送和接收。
-        - 接受者也负责触发和处理任何的控制事件，包括拥塞控制和可靠性控制和他们的相对机制，例如RTT估计、带宽估计、应答和重传。
-    - UDT总是试着将应用层数据打包成固定的大小，除非数据不够这么大。和TCP相似的是，这个固定的包大小叫做MSS（最大包大小）。由于期望UDT用来传输大块数据流，我们假定只能很小的一部分不规则的大小的包在UDT session中。MSS能够通过应用程式来安装，MTU是其最优值。
-    - UDT拥塞控制算法将速率控制在窗口（流量控制）合并起来，前者调整包的发送周期，后者限制最大的位被应答的包。在速率控制中使用的参数通过带宽估计技术来更新，它继承来之基于接受的包方法。同时，速率控制周期是估计RTT的常量，流控制参数参考与对方的数据到达速度，另外接收端释放的缓冲区的大小。
-
-5. 
-### WebSocket与Ajax的区别
+  - UDT并不是在瓶颈带宽相对较小的和大量多元短文档流的情况下用来替代TCP的。
+  - UDT主要作为TCP的朋友，和TCP并存，UDT分配的带宽不应该超过根据MAX-MIN规则的最大最小公平共享原则（备注：最大最小规则允许UDT在高BDP连接下分配TCP不能使用的可用带宽）。
+  - UDT是双工的，每个UDT实体有两个部分：发送和接受。
+    - 发送者根据流量控制和速率控制来发送（和重传）应用程式数据。
+    - 接受者根据数据包和控制包，并根据接收到的包发送控制包。发送和接受程式共享同一个UDP端口来发送和接收。
+    - 接受者也负责触发和处理任何的控制事件，包括拥塞控制和可靠性控制和他们的相对机制，例如RTT估计、带宽估计、应答和重传。
+  - UDT总是试着将应用层数据打包成固定的大小，除非数据不够这么大。和TCP相似的是，这个固定的包大小叫做MSS（最大包大小）。由于期望UDT用来传输大块数据流，我们假定只能很小的一部分不规则的大小的包在UDT session中。MSS能够通过应用程式来安装，MTU是其最优值。
+  - UDT拥塞控制算法将速率控制在窗口（流量控制）合并起来，前者调整包的发送周期，后者限制最大的位被应答的包。在速率控制中使用的参数通过带宽估计技术来更新，它继承来之基于接受的包方法。同时，速率控制周期是估计RTT的常量，流控制参数参考与对方的数据到达速度，另外接收端释放的缓冲区的大小。
+5. ### WebSocket与Ajax的区别
 - 本质不同
-    - Ajax 即异步 JavaScript 和 XML，是一种创建交互式网页的应用的网页开发技术
-    - websocket 是 HTML5 的一种新协议，实现了浏览器和服务器的实时通信
+  - Ajax 即异步 JavaScript 和 XML，是一种创建交互式网页的应用的网页开发技术
+  - websocket 是 HTML5 的一种新协议，实现了浏览器和服务器的实时通信
 - 生命周期不同：
-    - websocket 是长连接，会话一直保持
-    - ajax 发送接收之后就会断开
+  - websocket 是长连接，会话一直保持
+  - ajax 发送接收之后就会断开
 - 适用范围：
-    - websocket 用于前后端实时交互数据
-    - ajax 非实时
+  - websocket 用于前后端实时交互数据
+  - ajax 非实时
 - 发起人：
-    - AJAX 客户端发起
-    - WebSocket 服务器端和客户端相互推送
-
-
+  - AJAX 客户端发起
+  - WebSocket 服务器端和客户端相互推送
 ### 跨域的方案
 #### 同源是什么？
 如果两个URL的协议`protocol`、主机名`host`和端口号`port`都相同的话，则这两个URL是同源。
-
 #### 前后端通讯的方式
 - Ajax（同源的通信方式）
 - WebSocket（不受同源策略的限制）
 - CORS（支持跨域通信，也支持同源通信）
-
 #### 跨域是什么？
 
 **当协议、域名与端口号中任意一个不相同时，都算作不同域，不同域之间相互请求资源的表现(非同源策略请求)，称作”跨域“**。
-
 - 造成跨域的几种常见表现
-    - 服务器分开部署（Web服务器 + 数据请求服务器）
-    - 本地开发（本地预览项目 调取 测试服务器的数据）
-    - 调取第三方平台的接口
-
+  - 服务器分开部署（Web服务器 + 数据请求服务器）
+  - 本地开发（本地预览项目 调取 测试服务器的数据）
+  - 调取第三方平台的接口
 #### 跨域的解决方案
 - 修改本地HOST
 - JSONP
@@ -6531,11 +7024,9 @@ RTP本身没有提供按时发送机制或其他服务质量（QoS）保证，�
 - Post Message（利用`iframe`标签，实现不同域的关联）
 - Hash
 - WebSocket
-
-
-1.  **JSONP**
-**原理**
-    - `JSONP`利用`script`标签不存在域的限制，且定义一个`全局执行上下文`中的函数`func`（用来接收服务器端返回的数据信息）来接收数据，从而实现跨域请求。
+1. **JSONP**
+   **原理**
+   - `JSONP`利用`script`标签不存在域的限制，且定义一个`全局执行上下文`中的函数`func`（用来接收服务器端返回的数据信息）来接收数据，从而实现跨域请求。
 
 **弊端：**
     - 只允许**GET**请求
@@ -6545,6 +7036,7 @@ RTP本身没有提供按时发送机制或其他服务质量（QoS）保证，�
 **手动封装JSONP**
 
 `callback`必须是一个全局上下文中的函数（防止不是全局的函数，我们需要把这个函数放在全局上，并且从服务器端接收回信息时，要浏览器执行该函数）
+
 ```js
 // 客户端
 function jsonp(url, callback) {
@@ -6572,7 +7064,6 @@ jsonp('http://127.0.0.1:1001/list?userName="lsh"', (result) => {
 })
 
 
-
 // 服务器端
 // Api请求数据
 app.get('/list', (req, res) => {
@@ -6587,7 +7078,6 @@ app.get('/list', (req, res) => {
 })
 
 
-
 // 服务器请求的 url
 Request URL:
  http://127.0.0.1:1001/list?userName="lsh"&callback=jsonp159876002
@@ -6597,11 +7087,8 @@ Request URL:
 { code: 0, data: Array(2) }
 ```
 
-
-
-
 2. CORS（支持跨域通信的Ajax）
-上文提到，不允许跨域的根本原因是因为`Access-Control-Allow-Origin`已被禁止。那么只要让`服务器端设置允许源`就可以了。
+   上文提到，不允许跨域的根本原因是因为`Access-Control-Allow-Origin`已被禁止。那么只要让`服务器端设置允许源`就可以了。
 
 **原理**
     - 解决掉浏览器的默认安全策略，在服务器端设置允许哪些源请求就可以了
@@ -6656,7 +7143,7 @@ fetch('/some/url/', {
 
 ```js
 app.use((req, res, next) => {
-  
+
   // 也可自定义白名单，检验请求的源是否在白名单里，动态设置
   /* let safeList = [
   "http://127.0.0.1:5500",
@@ -6672,23 +7159,21 @@ app.use((req, res, next) => {
  // 试探请求：在CORS跨域请求中，首先浏览器会自己发送一个试探请求，验证是否可以和服务器跨域通信，服务器返回200，则浏览器继续发送真实的请求
  req.method === 'OPTIONS' ? res.send('CURRENT SERVICES SUPPORT CROSS DOMAIN REQUESTS!') : next();
 });
-
 ```
+
 **CORS的好处**
+
 - 原理简单，容易配置，允许携带资源凭证
 - 仍可以用 `ajax`作为资源请求的方式
 - 可以动态设置多个源，通过判断，将`Allow-Origin`设置为当前源
 
 **CORS的局限性**
+
 - 只允许某一个源发起请求
 - 如多个源，还需要动态判断
-
-
-
-
 3. Proxy
-**Proxy**翻译为“代理”，是由webpack配置的一个插件，叫"webpack-dev-server"（只能在开发环境中使用）
-**Proxy**在webpack中的配置
+   **Proxy**翻译为“代理”，是由webpack配置的一个插件，叫"webpack-dev-server"（只能在开发环境中使用）
+   **Proxy**在webpack中的配置
 
 ```js
 const path = require('path');
@@ -6730,15 +7215,13 @@ module.exports = {
 **Proxy的局限性**
 只能在本地开发阶段使用
 
-
-
-
 4.配置Nginx反向代理
 
 主要作为**生产环境**下跨域的解决方案。
 原理：利用Node中间层的分发机制，将请求的URL转向服务器端的地址
 
 配置反向代理
+
 ```nginx
 server {
  listen: 80;
@@ -6752,12 +7235,12 @@ server {
 }
 ```
 
-
 5. POST MESSAG
 
 假设现在有两个页面，分别为A页面`port=1001`、B页面`port=1002`，实现页面A与页面B的页面通信（跨域）
 
 **原理**：
+
 - 把 B页面当做A的子页面嵌入到A页面里，通过`iframe.contentWindow.postMessage`向B页面传递某些信息
 - 在B页面中通过`window.onmessage`获取A页面传递过来的信息`ev.data`(见下代码)
 - 同理在B页面中通过`ev.source.postMessage`向A页面传递信息
@@ -6795,119 +7278,119 @@ server {
 
 5. WebSocket
 ```js
-      // Websocket【参考资料】http://www.ruanyifeng.com/blog/2017/05/websocket.html
-      var ws = new WebSocket('wss://echo.websocket.org');
-      // 发送消息
-      ws.onopen = function (evt) {
-          console.log('Connection open ...');
-          ws.send('Hello WebSockets!');
-      };
-      // 接收消息
-      ws.onmessage = function (evt) {
-          console.log('Received Message: ', evt.data);
-          ws.close();
-      };
-      // 关闭连接
-      ws.onclose = function (evt) {
-          console.log('Connection closed.');
-      };
+  // Websocket【参考资料】http://www.ruanyifeng.com/blog/2017/05/websocket.html
+  var ws = new WebSocket('wss://echo.websocket.org');
+  // 发送消息
+  ws.onopen = function (evt) {
+      console.log('Connection open ...');
+      ws.send('Hello WebSockets!');
+  };
+  // 接收消息
+  ws.onmessage = function (evt) {
+      console.log('Received Message: ', evt.data);
+      ws.close();
+  };
+  // 关闭连接
+  ws.onclose = function (evt) {
+      console.log('Connection closed.');
+  };
 ```
 #### CORS跨域请求[简单请求与复杂请求]
 CORS（cross-origin resource sharing），跨源资源共享（一般俗称『跨域请求』）。
-
 - 简单请求和预检请求的区分，会看到有很多的条件：
-    - 简单请求的 HTTP 方法只能是 GET、HEAD 或 POST
-    - 简单请求的 HTTP 头只能是 Accept/Accept-Language/Conent-Language/Content-Type 等
-    - 简单请求的 Content-Type 头只能是 text/plain、multipart/form-data 或 application/x-www-form-urlencoded
-    - 任何一个不满足上述要求的请求，即被认为是复杂请求。一个复杂请求不仅有：包含通信内容的请求，同时也包含预请求。
+  - 简单请求的 HTTP 方法只能是 GET、HEAD 或 POST
+  - 简单请求的 HTTP 头只能是 Accept/Accept-Language/Conent-Language/Content-Type 等
+  - 简单请求的 Content-Type 头只能是 text/plain、multipart/form-data 或 application/x-www-form-urlencoded
+  - 任何一个不满足上述要求的请求，即被认为是复杂请求。一个复杂请求不仅有：包含通信内容的请求，同时也包含预请求。
+
 - 简单请求
-    - 部分响应头
-        - Access-Control-Allow-Origin（必含）- 不可省略，否则请求按失败处理。该项控制数据的可见范围，如果希望数据对任何人都可见，可以填写"*"。
-        - Access-Control-Allow-Credentials（可选） – 该项标志着请求当中是否包含cookies信息，只有一个可选值：true（必为小写）。如果不包含cookies，请略去该项，而不是填写false。这一项与XmlHttpRequest2对象当中的withCredentials属性应保持一致，即withCredentials为true时该项也为true；withCredentials为false时，省略该项不写。反之则导致请求失败。
-        - Cache-Control
-        - Content-Language
-        - Content-Type
-        - Expires
-        - Last-Modified
+  - 部分响应头
+    - Access-Control-Allow-Origin（必含）- 不可省略，否则请求按失败处理。该项控制数据的可见范围，如果希望数据对任何人都可见，可以填写"*"。
+    - Access-Control-Allow-Credentials（可选） – 该项标志着请求当中是否包含cookies信息，只有一个可选值：true（必为小写）。如果不包含cookies，请略去该项，而不是填写false。这一项与XmlHttpRequest2对象当中的withCredentials属性应保持一致，即withCredentials为true时该项也为true；withCredentials为false时，省略该项不写。反之则导致请求失败。
+    - Cache-Control
+    - Content-Language
+    - Content-Type
+    - Expires
+    - Last-Modified
 - 复杂请求
-    - 比如说你需要发送PUT、DELETE等HTTP动作，或者发送Content-Type: application/json的内容。
-    - 复杂请求表面上看起来和简单请求使用上差不多，但实际上浏览器发送了不止一个请求。其中最先发送的是一种"预请求"，此时作为服务端，也需要返回"预回应"作为响应。预请求实际上是对服务端的一种权限请求，只有当预请求成功返回，实际请求才开始执行。
-    - 响应头
-        - Access-Control-Allow-Origin（必含） – 和简单请求一样的，必须包含一个域。
-        - Access-Control-Allow-Methods（必含） – 这是对预请求当中Access-Control-Request-Method的回复，这一回复将是一个以逗号分隔的列表。尽管客户端或许只请求某一方法，但服务端仍然可以返回所有允许的方法，以便客户端将其缓存。
-        - Access-Control-Allow-Headers（当预请求中包含Access-Control-Request-Headers时必须包含） – 这是对预请求当中Access-Control-Request-Headers的回复，和上面一样是以逗号分隔的列表，可以返回所有支持的头部。这里在实际使用中有遇到，所有支持的头部一时可能不能完全写出来，而又不想在这一层做过多的判断，没关系，事实上通过request的header可以直接取到Access-Control-Request-Headers，直接把对应的value设置到Access-Control-Allow-Headers即可。
-        - Access-Control-Allow-Credentials（可选） – 和简单请求当中作用相同。
-        - Access-Control-Max-Age（可选） – 以秒为单位的缓存时间。预请求的的发送并非免费午餐，允许时应当尽可能缓存。
-    - 一旦预回应如期而至，所请求的权限也都已满足，则实际请求开始发送。
+  - 比如说你需要发送PUT、DELETE等HTTP动作，或者发送Content-Type: application/json的内容。
+  - 复杂请求表面上看起来和简单请求使用上差不多，但实际上浏览器发送了不止一个请求。其中最先发送的是一种"预请求"，此时作为服务端，也需要返回"预回应"作为响应。预请求实际上是对服务端的一种权限请求，只有当预请求成功返回，实际请求才开始执行。
+  - 响应头
+    - Access-Control-Allow-Origin（必含） – 和简单请求一样的，必须包含一个域。
+    - Access-Control-Allow-Methods（必含） – 这是对预请求当中Access-Control-Request-Method的回复，这一回复将是一个以逗号分隔的列表。尽管客户端或许只请求某一方法，但服务端仍然可以返回所有允许的方法，以便客户端将其缓存。
+    - Access-Control-Allow-Headers（当预请求中包含Access-Control-Request-Headers时必须包含） – 这是对预请求当中Access-Control-Request-Headers的回复，和上面一样是以逗号分隔的列表，可以返回所有支持的头部。这里在实际使用中有遇到，所有支持的头部一时可能不能完全写出来，而又不想在这一层做过多的判断，没关系，事实上通过request的header可以直接取到Access-Control-Request-Headers，直接把对应的value设置到Access-Control-Allow-Headers即可。
+    - Access-Control-Allow-Credentials（可选） – 和简单请求当中作用相同。
+    - Access-Control-Max-Age（可选） – 以秒为单位的缓存时间。预请求的的发送并非免费午餐，允许时应当尽可能缓存。
+  - 一旦预回应如期而至，所请求的权限也都已满足，则实际请求开始发送
 #### 使用Access-Control-Allow-Origin为什么可以解决跨域问题?
-    
 #### 使用access-control-allow-origin解决跨域问题的流程是怎样的?
 ### web安全的问题
 - SQL注入
-    - 后台人员使用用户输入的数据来组装SQL查询语句的时候不做防范， 遇到一些恶意的输入， 最后生成的SQL就会有问题。
-    - 系统一般都会加入 过滤 和 验证 机制， 可以有效预防SQL注入问题。
+  - 后台人员使用用户输入的数据来组装SQL查询语句的时候不做防范， 遇到一些恶意的输入， 最后生成的SQL就会有问题。
+  - 系统一般都会加入 过滤 和 验证 机制， 可以有效预防SQL注入问题。
 - DOC攻击
 - 点击劫持
-    - click-jacking，也被称为UI-覆盖攻击。
-    - 攻击方式就是在某些操作的按钮上加一层透明的iframe。点击一下， 就入坑了。
-    - 如何防御点击劫持
-        - 使用 HTTP 头防御
-            - 通过配置 nginx 发送 X-Frame-Options 响应头。这个 HTTP 响应头 就是为了防御用 iframe 嵌套的点击劫持攻击。这样浏览器就会阻止嵌入网页的渲染。
-        - 使用 Javascript 防御
-            - 判断顶层视口的域名是不是和本页面的域名一致，如果不一致就让恶意网页自动跳转到我方的网页。
-            ```js
-            if (top.location.hostname !== self.location.hostname) {    
-                alert("您正在访问不安全的页面，即将跳转到安全页面！")   
-                top.location.href = self.location.href;
-             }
-            ```
+  - click-jacking，也被称为UI-覆盖攻击。
+  - 攻击方式就是在某些操作的按钮上加一层透明的iframe。点击一下， 就入坑了。
+  - 如何防御点击劫持
+    - 使用 HTTP 头防御
+      - 通过配置 nginx 发送 X-Frame-Options 响应头。这个 HTTP 响应头 就是为了防御用 iframe 嵌套的点击劫持攻击。这样浏览器就会阻止嵌入网页的渲染。
+    - 使用 Javascript 防御
+      - 判断顶层视口的域名是不是和本页面的域名一致，如果不一致就让恶意网页自动跳转到我方的网页。
+```js
+if (top.location.hostname !== self.location.hostname) {
+  alert("您正在访问不安全的页面，即将跳转到安全页面！")
+  top.location.href = self.location.href;
+}
+```
 - 中间人攻击
-    - 中间人攻击（Man-in-the-Middle Attack, MITM）是一种由来已久的网络入侵手段.
-    - 如 SMB 会话劫持、DNS 欺骗等攻击都是典型的MITM攻击。
-    - 简而言之，所谓的MITM攻击就是通过拦截正常的网络通信数据，并进行数据篡改和嗅探来达到攻击的目的，而通信的双方却毫不知情。
-    - 如何防御中间人攻击
-        - 确保当前你所访问的网站使用了HTTPS
-        - 如果你是一个网站管理员，你应当执行HSTS协议
-        - 不要在公共Wi-Fi上发送敏感数据
-        - 如果你的网站使用了SSL，确保你禁用了不安全的SSL/TLS协议。
-        - 不要点击恶意链接或电子邮件。
+  - 中间人攻击（Man-in-the-Middle Attack, MITM）是一种由来已久的网络入侵手段.
+  - 如 SMB 会话劫持、DNS 欺骗等攻击都是典型的MITM攻击。
+  - 简而言之，所谓的MITM攻击就是通过拦截正常的网络通信数据，并进行数据篡改和嗅探来达到攻击的目的，而通信的双方却毫不知情。
+  - 如何防御中间人攻击
+    - 确保当前你所访问的网站使用了HTTPS
+    - 如果你是一个网站管理员，你应当执行HSTS协议
+    - 不要在公共Wi-Fi上发送敏感数据
+    - 如果你的网站使用了SSL，确保你禁用了不安全的SSL/TLS协议。
+    - 不要点击恶意链接或电子邮件。
+
 - 钓鱼网站
 - XSS
 - CSRF
 ### XSS 攻击和 CSRF 攻击各自的原理是什么？两者又有什么区别？以及如何防范？
 1、XSS 攻击
 - 概念
-    - XSS（Cross Site Scripting）：跨域脚本攻击。
+  - XSS（Cross Site Scripting）：跨域脚本攻击。
 - 原理
-    - 不需要你做任何的登录认证，它会通过合法的操作（比如在 url 中输入、在评论框中输入），向你的页面注入脚本（可能是 js、hmtl 代码块等）。
+  - 不需要你做任何的登录认证，它会通过合法的操作（比如在 url 中输入、在评论框中输入），向你的页面注入脚本（可能是 js、hmtl 代码块等）。
 - 防范
-    - 编码；对于用户输入进行编码。
-    - 过滤；移除用户输入和事件相关的属性。(过滤 script、style、iframe 等节点)
-    - 校正；使用 DOM Parse 转换，校正不配对的 DOM 标签。
-    - HttpOnly
+  - 编码；对于用户输入进行编码。
+  - 过滤；移除用户输入和事件相关的属性。(过滤 script、style、iframe 等节点)
+  - 校正；使用 DOM Parse 转换，校正不配对的 DOM 标签。
+  - HttpOnly
 - 分类
-    - 反射型(非持久)：点击链接，执行脚本
-    - 存储型(持久)：恶意输入保存数据库，其他用户访问，执行脚本
-    - 基于 DOM：恶意修改 DOM 结构，基于客户端
-
-
+  - 反射型(非持久)：点击链接，执行脚本
+  - 存储型(持久)：恶意输入保存数据库，其他用户访问，执行脚本
+  - 基于 DOM：恶意修改 DOM 结构，基于客户端
 2. CSRF 攻击
 - 概念
-    - SRF（Cross-site request forgery）：跨站请求伪造。
+  - SRF（Cross-site request forgery）：跨站请求伪造。
 - 原理
-    - 登录受信任网站 A，并在本地生成 Cookie。（如果用户没有登录网站 A，那么网站 B 在诱导的时候，请求网站 A 的 api 接口时，会提示你登录）
-    - 在不登出 A 的情况下，访问危险网站 B（其实是利用了网站 A 的漏洞）。
+  - 登录受信任网站 A，并在本地生成 Cookie。（如果用户没有登录网站 A，那么网站 B 在诱导的时候，请求网站 A 的 api 接口时，会提示你登录）
+  - 在不登出 A 的情况下，访问危险网站 B（其实是利用了网站 A 的漏洞）。
 - 防范
-    - token 验证；
-    - 隐藏令牌；把 token 隐藏在 http 请求的 head 中。
-    - referer 验证；验证页面来源。
+  - token 验证；
+  - 隐藏令牌；把 token 隐藏在 http 请求的 head 中。
+  - referer 验证；验证页面来源。
 - 两者区别
-    - CSRF：需要用户先登录网站 A，获取 cookie。XSS：不需要登录。
-    - CSRF：是利用网站 A 本身的漏洞，去请求网站 A 的 api。XSS：是向网站 A 注入 JS 代码，然后执行 JS 里的代码，篡改网站 A 的内容。
+  - CSRF：需要用户先登录网站 A，获取 cookie。XSS：不需要登录。
+  - CSRF：是利用网站 A 本身的漏洞，去请求网站 A 的 api。XSS：是向网站 A 注入 JS 代码，然后执行 JS 里的代码，篡改网站 A 的内容。
 
 ### CDN
+
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210923075356.png)
 #### 简单介绍
+
 把大量资源集中到单一节点进行分发，恐怕很难有某个机房可以支撑得住这么大的流量。
 
 内容分发网络（Content Dilivery Network）的互联网底层建设(CDN)。内容分发网络（Content Dilivery Network，CDN）是一个专门用来分发内容的分布式应用。
@@ -6917,38 +7400,36 @@ CDN 构建在现有的互联网之上，通过在各地部署数据中心，让�
 需要考虑到流量、单点故障、延迟等因素。在离用户更近的地理位置提供资源，可以减少延迟。按照地理位置分散地提供资源，也可以降低中心化带来的服务压力。
 
 技术上全面解决由于网络带宽小、用户访问量大、网点分布不均等原因，提高用户访问网站的响应速度、减少带宽预算分配、改善内容可用性、增强网站安全性
-
 #### 内容分发
+
 CDN 的工作原理就是将您源站的资源缓存到位于全球各地的 CDN 节点上，用户请求资源时，就近返回节点上缓存的资源，而不需要每个用户的请求都回您的源站获取，避免网络拥塞、缓解源站压力，保证用户访问资源的速度和体验。
 
 CDN 是一个分布式的内容分发网络。当用户请求一个网络资源时，用户请求的是 CDN 提供的资源。和域名系统类似，当用户请求一个资源时，首先会接触到一个类似域名系统中目录的服务，这个服务会告诉用户究竟去哪个 IP 获取这个资源。
 
-
 事实上，很多大型的应用，会把 DNS 解析作为一种负载均衡的手段。当用户请求一个网址的时候，会从该网站提供的智能 DNS 中获取网站的 IP。
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210923072131.png)
+
 - 当用户点击网站页面上的内容URL，先经过本地DNS系统解析，如果本地DNS服务器没有相应域名的缓存，则本地DNS系统会将域名的解析权交给CNAME指向的CDN专用DNS服务器。
 - CDN的DNS服务器将CDN的全局负载均衡设备IP地址返回给用户。
 - 用户向CDN的全局负载均衡设备发起URL访问请求。
 - CDN全局负载（CDN 的智能 DNS ）均衡设备根据用户IP地址，以及用户请求的URL，选择一台用户所属区域的区域负载均衡设备，并将请求转发到此设备上。
 - 区域负载均衡设备会选择一个最优的缓存服务器节点，并从缓存服务器节点处得到缓存服务器的IP地址，最终将得到的IP地址返回给全局负载均衡设备：
-    - 根据用户IP地址，判断哪一个边缘节点距用户最近；
-    - 根据用户所请求的URL中携带的内容名称，判断哪一个边缘节点上有用户所需内容；
-    - 查询各个边缘节点当前的负载情况，判断哪一个边缘节点尚有服务能力。
+  - 根据用户IP地址，判断哪一个边缘节点距用户最近；
+  - 根据用户所请求的URL中携带的内容名称，判断哪一个边缘节点上有用户所需内容；
+  - 查询各个边缘节点当前的负载情况，判断哪一个边缘节点尚有服务能力。
 - 全局负载均衡设备把服务器的IP地址返回给用户。
 - 用户向缓存服务器发起请求，缓存服务器响应用户请求，将用户所需内容传送到用户终端。如果这台缓存服务器上并没有用户想要的内容，而区域均衡设备依然将它分配给了用户，那么这台服务器就要向它的上一级缓存服务器请求内容，直至追溯到网站的源服务器将内容拉到本地。
 
 在上面整个过程当中，CDN 的智能 DNS 还充当了负载均衡的作用。如果一个节点压力过大，则可以将流量导向其他的节点。
-
 #### CDN组成
 CDN网络的主要有中心节点和边缘节点。
 - 中心节点
-    - 中心节点包括CDN网管中心和全局负载均衡DNS重定向解析系统，负责整个CDN网络的分发及管理
+  - 中心节点包括CDN网管中心和全局负载均衡DNS重定向解析系统，负责整个CDN网络的分发及管理
 - 边缘节点
-    - CDN边缘节点主要指异地分发节点，由负载均衡设备、高速缓存服务器两部分组成。
-        - 负载均衡设备负责每个节点中各个Cache的负载均衡，保证节点的工作效率；同时还负责收集节点与周围环境的信息，保持与全局负载均衡DNS的通信，实现整个系统的负载均衡。
-        - 高速缓存服务器（Cache）负责存储客户网站的大量信息，就像一个靠近用户的网站服务器一样响应本地用户的访问请求。通过全局负载均衡DNS的控制，用户的请求被透明地指向离他最近的节点，节点中Cache服务器就像网站的原始服务器一样，响应终端用户的请求。因其距离用户更近，故其响应时间才更快。
-
+  - CDN边缘节点主要指异地分发节点，由负载均衡设备、高速缓存服务器两部分组成。
+    - 负载均衡设备负责每个节点中各个Cache的负载均衡，保证节点的工作效率；同时还负责收集节点与周围环境的信息，保持与全局负载均衡DNS的通信，实现整个系统的负载均衡。
+    - 高速缓存服务器（Cache）负责存储客户网站的大量信息，就像一个靠近用户的网站服务器一样响应本地用户的访问请求。通过全局负载均衡DNS的控制，用户的请求被透明地指向离他最近的节点，节点中Cache服务器就像网站的原始服务器一样，响应终端用户的请求。因其距离用户更近，故其响应时间才更快。
 #### 回溯
 CDN 想象成一个分布式的分级缓存，再加上数据库的两层设计。
 在 CDN 的设计当中，CDN 实际上提供的是数据的缓存。而原始数据，则由服务的提供者提供。
@@ -6960,7 +7441,6 @@ CDN 想象成一个分布式的分级缓存，再加上数据库的两层设计�
 CDN 节点到源站请求资源，重新设置缓存。通常服务提供方在使用 CDN 的时候，会在自己的某个域名发布静态资源，然后将这个域名交给 CDN。
 
 比如源站在 s.example.com 中发布静态资源，然后在 CDN 管理后台配置了这个源站。在使用 CDN 时，服务提供方会使用另一个域名，比如说 b.example.com。然后配置将 b.example.com 用 CNAME 记录指向 CDN 的智能 DNS。
-
 
 这个时候，如果用户下载b.example.com/a.jpg，CDN 的智能 DNS 会帮用户选择一个最优的 IP 地址（最优的 CDN 节点）响应这次资源的请求。如果这个 CDN 节点没有 a.jpg，CDN 就会到 s.example.com 源站去下载，缓存到 CDN 节点，然后再返回给用户。
 
@@ -6978,23 +7458,18 @@ CDN 回源有 3 种情况，
 数据库缓存，CDN缓存，代理服务器缓存，浏览器缓存。
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211013135501.png)
 所谓浏览器缓存其实就是指在本地使用的计算机中开辟一个内存区，同时也开辟一个硬盘区作为数据传输的缓冲区，然后用这个缓冲区来暂时保存用户以前访问过的信息。
-
 #### http 缓存
 浏览器缓存(Brower Caching)是浏览器对之前请求过的文件进行缓存，以便下一次访问时重复使用，节省带宽，提高访问速度，降低服务器压力
-
 http缓存机制主要在http响应头中设定，响应头中相关字段为Expires、Cache-Control、Last-Modified、Etag。
 - 缓存相关 header
-    - Expires：响应头，代表该资源的过期时间。
-    - Cache-Control：请求/响应头，缓存控制字段，精确控制缓存策略。
-    
-    - If-Modified-Since：请求头，资源最近修改时间，由浏览器告诉服务器。
-    - Last-Modified：响应头，资源最近修改时间，由服务器告诉浏览器。
-
-    - Etag：响应头，资源标识，由服务器告诉浏览器。
-    - If-None-Match：请求头，缓存资源标识，由浏览器告诉服务器。
-    
-    - If-Modified-Since 和 Last-Modified
-    - Etag 和 If-None-Match
+  - Expires：响应头，代表该资源的过期时间。
+  - Cache-Control：请求/响应头，缓存控制字段，精确控制缓存策略。
+  - If-Modified-Since：请求头，资源最近修改时间，由浏览器告诉服务器。
+  - Last-Modified：响应头，资源最近修改时间，由服务器告诉浏览器。
+  - Etag：响应头，资源标识，由服务器告诉浏览器。
+  - If-None-Match：请求头，缓存资源标识，由浏览器告诉服务器。
+  - If-Modified-Since 和 Last-Modified
+  - Etag 和 If-None-Match
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211013140918.png)
 
@@ -7005,84 +7480,80 @@ http缓存机制主要在http响应头中设定，响应头中相关字段为Exp
 强缓存和协商缓存最大也是最根本的区别是：强缓存命中的话不会发请求到服务器（比如chrome中的200 from memory cache），协商缓存一定会发请求到服务器，通过资源的请求首部字段验证资源是否命中协商缓存，如果协商缓存命中，服务器会将这个请求返回，但是不会返回这个资源的实体，而是通知客户端可以从缓存中加载这个资源（304 not modified）
 
 #### 缓存位置
-查找浏览器缓存时会按顺序查找: Service Worker-->Memory Cache-->Disk Cache-->Push Cache。
 
+查找浏览器缓存时会按顺序查找: Service Worker-->Memory Cache-->Disk Cache-->Push Cache。
 - Service Worker
-    - 是运行在浏览器背后的独立线程，一般可以用来实现缓存功能。
-    - 使用 Service Worker的话，传输协议必须为 HTTPS。
-    - 因为 Service Worker 中涉及到请求拦截，所以必须使用 HTTPS 协议来保障安全。
-    - Service Worker 的缓存与浏览器其他内建的缓存机制不同，它可以让我们自由控制缓存哪些文件、如何匹配缓存、如何读取缓存，并且缓存是持续性的。
+  - 是运行在浏览器背后的独立线程，一般可以用来实现缓存功能。
+  - 使用 Service Worker的话，传输协议必须为 HTTPS。
+  - 因为 Service Worker 中涉及到请求拦截，所以必须使用 HTTPS 协议来保障安全。
+  - Service Worker 的缓存与浏览器其他内建的缓存机制不同，它可以让我们自由控制缓存哪些文件、如何匹配缓存、如何读取缓存，并且缓存是持续性的。
+
 - Memory Cache
-    - 内存中的缓存，主要包含的是当前中页面中已经抓取到的资源，例如页面上已经下载的样式、脚本、图片等。
-    - 读取内存中的数据肯定比磁盘快，内存缓存虽然读取高效，可是缓存持续性很短，会随着进程的释放而释放。
-    - 一旦我们关闭 Tab 页面，内存中的缓存也就被释放了。
+  - 内存中的缓存，主要包含的是当前中页面中已经抓取到的资源，例如页面上已经下载的样式、脚本、图片等。
+  - 读取内存中的数据肯定比磁盘快，内存缓存虽然读取高效，可是缓存持续性很短，会随着进程的释放而释放。
+  - 一旦我们关闭 Tab 页面，内存中的缓存也就被释放了。
+
 - Disk Cache
-    - 存储在硬盘中的缓存，读取速度慢点，但是什么都能存储到磁盘中，比之 Memory Cache 胜在容量和存储时效性上。
-    - 在所有浏览器缓存中，Disk Cache 覆盖面基本是最大的。
-    - 它会根据 HTTP Herder 中的字段判断哪些资源需要缓存，哪些资源可以不请求直接使用，哪些资源已经过期需要重新请求。
-    - 并且即使在跨站点的情况下，相同地址的资源一旦被硬盘缓存下来，就不会再次去请求数据。绝大部分的缓存都来自 Disk Cache。
+  - 存储在硬盘中的缓存，读取速度慢点，但是什么都能存储到磁盘中，比之 Memory Cache 胜在容量和存储时效性上。
+  - 在所有浏览器缓存中，Disk Cache 覆盖面基本是最大的。
+  - 它会根据 HTTP Herder 中的字段判断哪些资源需要缓存，哪些资源可以不请求直接使用，哪些资源已经过期需要重新请求。
+  - 并且即使在跨站点的情况下，相同地址的资源一旦被硬盘缓存下来，就不会再次去请求数据。绝大部分的缓存都来自 Disk Cache。
+
 - Push Cache
-    - Push Cache（推送缓存）是 HTTP/2 中的内容，当以上三种缓存都没有命中时，它才会被使用。
-    - 它只在会话（Session）中存在，一旦会话结束就被释放，并且缓存时间也很短暂，在Chrome浏览器中只有5分钟左右，同时它也并非严格执行HTTP头中的缓存指令。
+  - Push Cache（推送缓存）是 HTTP/2 中的内容，当以上三种缓存都没有命中时，它才会被使用。
+  - 它只在会话（Session）中存在，一旦会话结束就被释放，并且缓存时间也很短暂，在Chrome浏览器中只有5分钟左右，同时它也并非严格执行HTTP头中的缓存指令。
 #### 强缓存
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211104153519.png)
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211013140918.png)
+
 - 强缓存命中返回 200 200（from cache）
 
 不需要发送请求到服务端，直接读取浏览器本地缓存，在 Chrome 的 Network 中显示的 HTTP 状态码是 200 ，在 Chrome 中，强缓存又分为 Disk Cache (存放在硬盘中)和 Memory Cache (存放在内存中)，存放的位置是由浏览器控制的。是否强缓存由 Expires、Cache-Control 和 Pragma 3 个 Header 属性共同来控制。
 
 - Expires
-    - Expires：Expires的值是一个 HTTP 日期，在浏览器发起请求时，会根据系统时间和 Expires 的值进行比较，如果系统时间超过了 Expires 的值，缓存失效。由于和系统时间进行比较，所以当系统时间和服务器时间不一致的时候，会有缓存有效期不准的问题。Expires 的优先级在三个 Header 属性中是最低的。
- - Cache-Control：Cache-Control 是 HTTP/1.1 中新增的属性，在请求头和响应头中都可以使用，常用的属性值如有
-    - max-age：单位是秒，缓存时间计算的方式是距离发起的时间的秒数，超过间隔的秒数缓存失效
-    - no-cache：不使用强缓存，需要与服务器验证缓存是否新鲜。
-    - no-store：禁止使用缓存（包括协商缓存），每次都向服务器请求最新的资源。
-    - private：专用于个人的缓存，中间代理、CDN 等不能缓存此响应
-    - public：响应可以被中间代理、CDN 等缓存
-    - must-revalidate：在缓存过期前可以使用，过期后必须向服务器验证
-    - 浏览器先检查 Cache-Control，如果有，则以 Cache-Control 为准，忽略 Expires。如果没有 Cache-Control，则以 Expires 为准。
-    - Cache-Control 对缓存的控制粒度更细，包括缓存代理服务器的缓存控制。
+  - Expires：Expires的值是一个 HTTP 日期，在浏览器发起请求时，会根据系统时间和 Expires 的值进行比较，如果系统时间超过了 Expires 的值，缓存失效。由于和系统时间进行比较，所以当系统时间和服务器时间不一致的时候，会有缓存有效期不准的问题。Expires 的优先级在三个 Header 属性中是最低的。
+    - Cache-Control：Cache-Control 是 HTTP/1.1 中新增的属性，在请求头和响应头中都可以使用，常用的属性值如有
+  - max-age：单位是秒，缓存时间计算的方式是距离发起的时间的秒数，超过间隔的秒数缓存失效
+  - no-cache：不使用强缓存，需要与服务器验证缓存是否新鲜。
+  - no-store：禁止使用缓存（包括协商缓存），每次都向服务器请求最新的资源。
+  - private：专用于个人的缓存，中间代理、CDN 等不能缓存此响应
+  - public：响应可以被中间代理、CDN 等缓存
+  - must-revalidate：在缓存过期前可以使用，过期后必须向服务器验证
+  - 浏览器先检查 Cache-Control，如果有，则以 Cache-Control 为准，忽略 Expires。如果没有 Cache-Control，则以 Expires 为准。
+  - Cache-Control 对缓存的控制粒度更细，包括缓存代理服务器的缓存控制。
 - Pragma
-    - Pragma 只有一个属性值，就是 no-cache ，效果和 Cache-Control 中的 no-cache 一致，不使用强缓存，需要与服务器验证缓存是否新鲜，在 3 个头部属性中的优先级最高。
-    - Pragma 和 Cache-Control 同时存在的时候，Pragma 的优先级高于 Cache-Control。
-    - 因为它优先级最高，当存在时一定不会命中强缓存。
-
-
+  - Pragma 只有一个属性值，就是 no-cache ，效果和 Cache-Control 中的 no-cache 一致，不使用强缓存，需要与服务器验证缓存是否新鲜，在 3 个头部属性中的优先级最高。
+  - Pragma 和 Cache-Control 同时存在的时候，Pragma 的优先级高于 Cache-Control。
+  - 因为它优先级最高，当存在时一定不会命中强缓存。
 
 #### 协商缓存
+
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211104153603.png)
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211013142135.png)
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211013142155.png)
-
 - 协商缓存命中返回 304
 - 请求头last-modified的日期与响应头的last-modified一致
 - 请求头if-none-match的hash与响应头的etag一致
-    - 这两种情况会返回Status Code: 304
-![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211104153626.png)
-当浏览器的强缓存失效的时候或者请求头中设置了不走强缓存，并且在请求头中设置了If-Modified-Since 或者 If-None-Match 的时候，会将这两个属性值到服务端去验证是否命中协商缓存，如果命中了协商缓存，会返回 304 状态，加载浏览器缓存，并且响应头会设置 Last-Modified 或者 ETag 属性。
-
--  ETag/If-None-Match
-    -  ETag/If-None-Match 的值是一串 hash 码，代表的是一个资源的标识符，当服务端的文件变化的时候，它的 hash码会随之改变，通过请求头中的 If-None-Match 和当前文件的 hash 值进行比较，如果相等则表示命中协商缓存。ETag 又有强弱校验之分，如果 hash 码是以 "W/" 开头的一串字符串，说明此时协商缓存的校验是弱校验的，只有服务器上的文件差异（根据 ETag 计算方式来决定）达到能够触发 hash 值后缀变化的时候，才会真正地请求资源，否则返回 304 并加载浏览器缓存。
-    -   If-Modified-Since是一个请求首部字段，并且只能用在GET或者HEAD请求中。
-    -   ETag优先级比Last-Modified高，同时存在时会以ETag为准。
-    -   发现有If-None-Match，则比较 If-None-Match 的 Etag 值，忽略If-Modified-Since的比较。
-![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210924073615.png)
+  - 这两种情况会返回Status Code: 304
+    ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211104153626.png)
+    当浏览器的强缓存失效的时候或者请求头中设置了不走强缓存，并且在请求头中设置了If-Modified-Since 或者 If-None-Match 的时候，会将这两个属性值到服务端去验证是否命中协商缓存，如果命中了协商缓存，会返回 304 状态，加载浏览器缓存，并且响应头会设置 Last-Modified 或者 ETag 属性。
+- ETag/If-None-Match
+  - ETag/If-None-Match 的值是一串 hash 码，代表的是一个资源的标识符，当服务端的文件变化的时候，它的 hash码会随之改变，通过请求头中的 If-None-Match 和当前文件的 hash 值进行比较，如果相等则表示命中协商缓存。ETag 又有强弱校验之分，如果 hash 码是以 "W/" 开头的一串字符串，说明此时协商缓存的校验是弱校验的，只有服务器上的文件差异（根据 ETag 计算方式来决定）达到能够触发 hash 值后缀变化的时候，才会真正地请求资源，否则返回 304 并加载浏览器缓存。
+  - If-Modified-Since是一个请求首部字段，并且只能用在GET或者HEAD请求中。
+  - ETag优先级比Last-Modified高，同时存在时会以ETag为准。
+  - 发现有If-None-Match，则比较 If-None-Match 的 Etag 值，忽略If-Modified-Since的比较。
+    ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210924073615.png)
 - Last-Modified/If-Modified-Since
-    -  Last-Modified/If-Modified-Since 的值代表的是文件的最后修改时间，第一次请求服务端会把资源的最后修改时间放到 Last-Modified 响应头中，第二次发起请求的时候，请求头会带上上一次响应头中的 Last-Modified 的时间，并放到 If-Modified-Since 请求头属性中，服务端根据文件最后一次修改时间和 If-Modified-Since 的值进行比较，如果相等，返回 304 ，并加载浏览器缓存。
-
-    
-ETag/If-None-Match 的出现主要解决了 Last-Modified/If-Modified-Since 所解决不了的问题：
-    - 某些情况下服务器无法获取资源的最后修改时间
-    - 如果文件的修改频率在秒级以下，Last-Modified/If-Modified-Since 会错误地返回 304。Last-Modified只能精确到秒
-    - 如果文件被修改了，但是内容没有任何变化的时候，Last-Modified/If-Modified-Since 会错误地返回 304。使用ETag可以正确缓存
-
-
-
+  - Last-Modified/If-Modified-Since 的值代表的是文件的最后修改时间，第一次请求服务端会把资源的最后修改时间放到 Last-Modified 响应头中，第二次发起请求的时候，请求头会带上上一次响应头中的 Last-Modified 的时间，并放到 If-Modified-Since 请求头属性中，服务端根据文件最后一次修改时间和 If-Modified-Since 的值进行比较，如果相等，返回 304 ，并加载浏览器缓存。
+- ETag/If-None-Match 的出现主要解决了 Last-Modified/If-Modified-Since 所解决不了的问题：
+  - 某些情况下服务器无法获取资源的最后修改时间
+  - 如果文件的修改频率在秒级以下，Last-Modified/If-Modified-Since 会错误地返回 304。Last-Modified只能精确到秒
+  - 如果文件被修改了，但是内容没有任何变化的时候，Last-Modified/If-Modified-Since 会错误地返回 304。使用ETag可以正确缓存
 不管用 Expires 还是 Cache-Control，他们都只能够控制缓存是否过期，但是在缓存过期之前，浏览器是无法得知服务器上的资源是否变化的。只有当缓存过期后，浏览器才会发请求询问服务器。
 - 我们不让 html 文件缓存，每次访问 html 都去请求服务器。所以浏览器每次都能拿到最新的html资源。
-    -  html 中 a.js 的版本号。
-    - 以版本号来区分，也可以以 MD5hash 值来区分
+  - html 中 a.js 的版本号。
+  - 以版本号来区分，也可以以 MD5hash 值来区分
 
 ```js
 <script src="http://test.com/a.js?version=0.0.2"></script>
@@ -7090,34 +7561,38 @@ ETag/If-None-Match 的出现主要解决了 Last-Modified/If-Modified-Since 所�
 
 <script src="http://test.com/a.【hash值】.js"></script>
 ```
+
 #### 缓存场景
+
 对于大部分的场景都可以使用强缓存配合协商缓存解决，但是在一些特殊的地方可能需要选择特殊的缓存策略。
 
 #### 刷新对于强缓存和协商缓存的影响
+
 - 当ctrl+f5强制刷新网页时，直接从服务器加载，跳过强缓存和协商缓存。
 - 当f5刷新网页时，跳过强缓存，但是会检查协商缓存。
 - 浏览器地址栏中写入URL，回车 浏览器发现缓存中有这个文件了，不用继续请求了，直接去缓存拿。
 
 ### DNS过程
+
 域名解析就是将域名转换为IP地址的过程。（因为想要访问一台服务器，最终是靠IP地址访问的，而不是靠域名访问的，他们的之间的映射关系保存在本地缓存和网络上的各种域名解析服务器中）
-
 - 第一步
-    - 客户端计算机发起 DNS 解析请求，将域名发送给同一网段的 DNS 服务器
+  - 客户端计算机发起 DNS 解析请求，将域名发送给同一网段的 DNS 服务器
 - 第二步
-    - 注册在客户端计算机上的 DNS 服务器会优先从缓存中查找该域名对应的 IP 地址，当缓存中的 IP 地址有效时则直接返回给客户端计算机。若失效或不存在时则将该域名发送给根域的 DNS 服务器，开始查询操作。
+  - 注册在客户端计算机上的 DNS 服务器会优先从缓存中查找该域名对应的 IP 地址，当缓存中的 IP 地址有效时则直接返回给客户端计算机。若失效或不存在时则将该域名发送给根域的 DNS 服务器，开始查询操作。
 - 第三步
-    - 根域服务器拿到需要解析的域名后，开始在记录中查询该域名对应的顶级域的 DNS 服务器信息，查到后将顶级域的DNS 服务器的 IP 地址回传给客户端委托 DNS 查询的服务器。
+  - 根域服务器拿到需要解析的域名后，开始在记录中查询该域名对应的顶级域的 DNS 服务器信息，查到后将顶级域的DNS 服务器的 IP 地址回传给客户端委托 DNS 查询的服务器。
 - 第四步
-    - 被委托查询域名信息的 DNS 服务器拿到该域名对应的顶级域的 DNS服务器的 IP（也就是 .com 域对应的 IP） 地址后 ，继续使用该 IP 地址向顶级域服务器发起解析请求。也就是去 .com 域对应的 DNS 服务器去查询。
+  - 被委托查询域名信息的 DNS 服务器拿到该域名对应的顶级域的 DNS服务器的 IP（也就是 .com 域对应的 IP） 地址后 ，继续使用该 IP 地址向顶级域服务器发起解析请求。也就是去 .com 域对应的 DNS 服务器去查询。
 - 第五步
-    - .com 域对应的 DNS 服务器收到解析请求后，开始查询域名下一级域对应的 DNS 服务器信息，查询到这一级域对应的 DNS 服务器信息后，将其对应的 IP 地址回传给客户端就近的DNS服务器。
+  - .com 域对应的 DNS 服务器收到解析请求后，开始查询域名下一级域对应的 DNS 服务器信息，查询到这一级域对应的 DNS 服务器信息后，将其对应的 IP 地址回传给客户端就近的DNS服务器。
 - 第六步
-    - 整个查询过程就这样一级接一级的查询下去，最终会找到完整域名所对应的服务器 IP 地址。找到后同样会回传给客户端委托查询域名信息的 DNS 服务器，然后该 DNS 服务器会将该 IP 地址发送回客户端计算机，同时将本次的查询结果保存在缓存中，以备下次查询是直接使用（有效期内）。
-
+  - 整个查询过程就这样一级接一级的查询下去，最终会找到完整域名所对应的服务器 IP 地址。找到后同样会回传给客户端委托查询域名信息的 DNS 服务器，然后该 DNS 服务器会将该 IP 地址发送回客户端计算机，同时将本次的查询结果保存在缓存中，以备下次查询是直接使用（有效期内）。
 
 ## 页面渲染和性能优化
 ### （浏览器从输入 url 到页面渲染的整个流程）页面渲染
+
 很多大公司面试喜欢问这样一道面试题，输入URL到看见页面发生了什么？
+
 ```md
 - DNS解析
 - 发起TCP连接
@@ -7126,6 +7601,7 @@ ETag/If-None-Match 的出现主要解决了 Last-Modified/If-Modified-Since 所�
 - 浏览器解析渲染页面
 - 连接结束。
 ```
+
 ```md
 浏览器地址栏输入 URL 并回车
 浏览器查找当前 URL 是否存在缓存，并比较缓存是否过期
@@ -7138,106 +7614,104 @@ DNS 解析 URL 对应的 IP
 ```
 
 #### DNS解析
+
 详情请见  面试题目中的DNS过程
 可以优化的点:
     - DNS缓存:从离浏览器的距离排序的话，有以下几种: 浏览器缓存，系统缓存，路由器缓存，IPS服务器缓存，根域名服务器缓存，顶级域名服务器缓存，主域名服务器缓存。
     - DNS负载均衡:DNS可以返回一个合适的机器的IP给用户，例如可以根据每台机器的负载量，该机器离用户地理位置的距离等等，这种过程就是DNS负载均衡。
+
 #### 发起TCP连接
+
 TCP提供一种可靠的传输，这个过程涉及到三次握手，四次挥手，TCP提供一种面向连接的，可靠的字节流服务。
 - 三次握手
-    - 第一次握手：
-        - 客户端发送syn包(Seq=x)到服务器，并进入SYN_SEND状态，等待服务器确认；
-    - 第二次握手
-        - 服务器收到syn包，必须确认客户的SYN（ack=x+1），同时自己也发送一个SYN包（Seq=y），即SYN+ACK包，此时服务器进入SYN_RECV状态；
-    - 第三次握手
-        - 客户端收到服务器的SYN＋ACK包，向服务器发送确认包ACK(ack=y+1)，此包发送完毕，客户端和服务器进入ESTABLISHED状态，完成三次握手。
-        - 握手过程中传送的包里不包含数据，三次握手完毕后，客户端与服务器才正式开始传送数据。理想状态下，TCP连接一旦建立，在通信双方中的任何一方主动关闭连接之前，TCP 连接都将被一直保持下去。
-    三次握手是为了防止失效的连接请求报文段突然又传送到主机B，因而产生错误。
-![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210924215349.png)
-
--  四次挥手
-    -  数据传输完毕后，双方都可释放连接。最开始的时候，客户端和服务器都是处于ESTABLISHED状态，假设客户端主动关闭，服务器被动关闭。
-    -  第一次挥手：
-        -  客户端发送一个FIN，用来关闭客户端到服务器的数据传送，也就是客户端告诉服务器：我已经不 会再给你发数据了(当然，在fin包之前发送出去的数据，如果没有收到对应的ack确认报文，客户端依然会重发这些数据)，但是，此时客户端还可 以接受数据。FIN=1，其序列号为seq=u（等于前面已经传送过来的数据的最后一个字节的序号加1），此时，客户端进入FIN-WAIT-1（终止等待1）状态。 TCP规定，FIN报文段即使不携带数据，也要消耗一个序号。
-    - 第二次握手：
-        - 服务器收到FIN包后，发送一个ACK给对方并且带上自己的序列号seq，确认序号为收到序号+1（与SYN相同，一个FIN占用一个序号）。此时，服务端就进入了CLOSE-WAIT（关闭等待）状态。TCP服务器通知高层的应用进程，客户端向服务器的方向就释放了，这时候处于半关闭状态，即客户端已经没有数据要发送了，但是服务器若发送数据，客户端依然要接受。这个状态还要持续一段时间，也就是整个CLOSE-WAIT状态持续的时间。此时，客户端就进入FIN-WAIT-2（终止等待2）状态，等待服务器发送连接释放报文（在这之前还需要接受服务器发送的最后的数据）。
-    - 第三次握手
-        - 服务器发送一个FIN，用来关闭服务器到客户端的数据传送，也就是告诉客户端，我的数据也发送完了，不会再给你发数据了。由于在半关闭状态，服务器很可能又发送了一些数据，假定此时的序列号为seq=w，此时，服务器就进入了LAST-ACK（最后确认）状态，等待客户端的确认。
-    - 第四次握手
-        - 主动关闭方收到FIN后，发送一个ACK给被动关闭方，确认序号为收到序号+1，此时，客户端就进入了TIME-WAIT（时间等待）状态。注意此时TCP连接还没有释放，必须经过2∗MSL（最长报文段寿命）的时间后，当客户端撤销相应的TCB后，才进入CLOSED状态。服务器只要收到了客户端发出的确认，立即进入CLOSED状态。同样，撤销TCB后，就结束了这次的TCP连接。可以看到，服务器结束TCP连接的时间要比客户端早一些。
-![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210924215839.png)
-
+  - 第一次握手：
+    - 客户端发送syn包(Seq=x)到服务器，并进入SYN_SEND状态，等待服务器确认；
+  - 第二次握手
+    - 服务器收到syn包，必须确认客户的SYN（ack=x+1），同时自己也发送一个SYN包（Seq=y），即SYN+ACK包，此时服务器进入SYN_RECV状态；
+  - 第三次握手
+    - 客户端收到服务器的SYN＋ACK包，向服务器发送确认包ACK(ack=y+1)，此包发送完毕，客户端和服务器进入ESTABLISHED状态，完成三次握手。
+    - 握手过程中传送的包里不包含数据，三次握手完毕后，客户端与服务器才正式开始传送数据。理想状态下，TCP连接一旦建立，在通信双方中的任何一方主动关闭连接之前，TCP 连接都将被一直保持下去。
+      三次握手是为了防止失效的连接请求报文段突然又传送到主机B，因而产生错误。
+      ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210924215349.png)
+- 四次挥手
+  - 数据传输完毕后，双方都可释放连接。最开始的时候，客户端和服务器都是处于ESTABLISHED状态，假设客户端主动关闭，服务器被动关闭。
+  - 第一次挥手：
+    - 客户端发送一个FIN，用来关闭客户端到服务器的数据传送，也就是客户端告诉服务器：我已经不 会再给你发数据了(当然，在fin包之前发送出去的数据，如果没有收到对应的ack确认报文，客户端依然会重发这些数据)，但是，此时客户端还可 以接受数据。FIN=1，其序列号为seq=u（等于前面已经传送过来的数据的最后一个字节的序号加1），此时，客户端进入FIN-WAIT-1（终止等待1）状态。 TCP规定，FIN报文段即使不携带数据，也要消耗一个序号。
+  - 第二次握手：
+    - 服务器收到FIN包后，发送一个ACK给对方并且带上自己的序列号seq，确认序号为收到序号+1（与SYN相同，一个FIN占用一个序号）。此时，服务端就进入了CLOSE-WAIT（关闭等待）状态。TCP服务器通知高层的应用进程，客户端向服务器的方向就释放了，这时候处于半关闭状态，即客户端已经没有数据要发送了，但是服务器若发送数据，客户端依然要接受。这个状态还要持续一段时间，也就是整个CLOSE-WAIT状态持续的时间。此时，客户端就进入FIN-WAIT-2（终止等待2）状态，等待服务器发送连接释放报文（在这之前还需要接受服务器发送的最后的数据）。
+  - 第三次握手
+    - 服务器发送一个FIN，用来关闭服务器到客户端的数据传送，也就是告诉客户端，我的数据也发送完了，不会再给你发数据了。由于在半关闭状态，服务器很可能又发送了一些数据，假定此时的序列号为seq=w，此时，服务器就进入了LAST-ACK（最后确认）状态，等待客户端的确认。
+  - 第四次握手
+    - 主动关闭方收到FIN后，发送一个ACK给被动关闭方，确认序号为收到序号+1，此时，客户端就进入了TIME-WAIT（时间等待）状态。注意此时TCP连接还没有释放，必须经过2∗MSL（最长报文段寿命）的时间后，当客户端撤销相应的TCB后，才进入CLOSED状态。服务器只要收到了客户端发出的确认，立即进入CLOSED状态。同样，撤销TCB后，就结束了这次的TCP连接。可以看到，服务器结束TCP连接的时间要比客户端早一些。
+      ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210924215839.png)
 - 为什么客户端最后还要等待2MSL？
-    - MSL（Maximum Segment Lifetime），TCP允许不同的实现可以设置不同的MSL值。
-    - 第一，保证客户端发送的最后一个ACK报文能够到达服务器，因为这个ACK报文可能丢失，站在服务器的角度看来，我已经发送了FIN+ACK报文请求断开了，客户端还没有给我回应，应该是我发送的请求断开报文它没有收到，于是服务器又会重新发送一次，而客户端就能在这个2MSL时间段内收到这个重传的报文，接着给出回应报文，并且会重启2MSL计时器。
-    - 第二，防止类似与“三次握手”中提到了的“已经失效的连接请求报文段”出现在本连接中。客户端发送完最后一个确认报文后，在这个2MSL时间中，就可以使本连接持续的时间内所产生的所有报文段都从网络中消失。这样新的连接中不会出现旧连接的请求报文。
-
+  - MSL（Maximum Segment Lifetime），TCP允许不同的实现可以设置不同的MSL值。
+  - 第一，保证客户端发送的最后一个ACK报文能够到达服务器，因为这个ACK报文可能丢失，站在服务器的角度看来，我已经发送了FIN+ACK报文请求断开了，客户端还没有给我回应，应该是我发送的请求断开报文它没有收到，于是服务器又会重新发送一次，而客户端就能在这个2MSL时间段内收到这个重传的报文，接着给出回应报文，并且会重启2MSL计时器。
+  - 第二，防止类似与“三次握手”中提到了的“已经失效的连接请求报文段”出现在本连接中。客户端发送完最后一个确认报文后，在这个2MSL时间中，就可以使本连接持续的时间内所产生的所有报文段都从网络中消失。这样新的连接中不会出现旧连接的请求报文。
 - 为什么建立连接是三次握手，关闭连接确是四次挥手呢？
-    - 建立连接的时候， 服务器在LISTEN状态下，收到建立连接请求的SYN报文后，把ACK和SYN放在一个报文里发送给客户端。
-而关闭连接时，服务器收到对方的FIN报文时，仅仅表示对方不再发送数据了但是还能接收数据，而自己也未必全部数据都发送给对方了，所以己方可以立即关闭，也可以发送一些数据给对方后，再发送FIN报文给对方来表示同意现在关闭连接，因此，己方ACK和FIN一般都会分开发送，从而导致多了一次。
-
+  - 建立连接的时候， 服务器在LISTEN状态下，收到建立连接请求的SYN报文后，把ACK和SYN放在一个报文里发送给客户端。
+    而关闭连接时，服务器收到对方的FIN报文时，仅仅表示对方不再发送数据了但是还能接收数据，而自己也未必全部数据都发送给对方了，所以己方可以立即关闭，也可以发送一些数据给对方后，再发送FIN报文给对方来表示同意现在关闭连接，因此，己方ACK和FIN一般都会分开发送，从而导致多了一次。
 #### 发送HTTP请求
 请看HTTP和缓存的总结：
 - 请求
-    - 请求行
-        - 请求行的格式为Method Request-URL HTTP-Version CRLF eg: GET index.html HTTP/1.1
-        - 常用的方法有: GET, POST, PUT, DELETE, OPTIONS, HEAD。
-        - 常见的请求方法区别：这里主要展示POST和GET的区别
-            - GET在浏览器回退时是无害的，而POST会再次提交请求。
-            - GET产生的URL地址可以被Bookmark，而POST不可以。
-            - GET请求会被浏览器主动cache，而POST不会，除非手动设置。
-            - GET请求只能进行url编码，而POST支持多种编码方式。
-            - GET请求参数会被完整保留在浏览器历史记录里，而POST中的参数不会被保留。
-            - GET请求在URL中传送的参数是有长度限制的，而POST么有。
-            - 对参数的数据类型，GET只接受ASCII字符，而POST没有限制。
-            - GET比POST更不安全，因为参数直接暴露在URL上，所以不能用来传递敏感信息。
-            - GET参数通过URL传递，POST放在Request body中。
-            - GET会产生一个TCP数据包，而POST会产生两个TCP数据包。
-                - 对于GET方式的请求，浏览器会把http header和data一并发送出去，服务器响应200(返回数据);
-                - 而对于POST，浏览器先发送header，服务器响应100 continue，浏览器再发送data，服务器响应200 ok(返回数据)。
-    - 请求报头
-        - 请求报头允许客户端向服务器传递请求的附加信息和客户端自身的信息。
-            - 请求报头中使用了Accept, Accept-Encoding, Accept-Language, Cache-Control, Connection, Cookie等字段。Accept用于指定客户端用于接受哪些类型的信息，Accept-Encoding与Accept类似，它用于指定接受的编码方式。Connection设置为Keep-alive用于告诉客户端本次HTTP请求结束之后并不需要关闭TCP连接，这样可以使下次HTTP请求使用相同的TCP通道，节省TCP连接建立的时间。
-    - 请求正文
-        - 当使用POST, PUT等方法时，通常需要客户端向服务器传递数据。这些数据就储存在请求正文中。在请求包头中有一些与请求正文相关的信息，例如: 现在的Web应用通常采用Rest架构，请求的数据格式一般为json。这时就需要设置Content-Type: application/json。
-    - 请求正文
-前面基础介绍，在本文档的缓存知识点这个专题下面。
+  - 请求行
+    - 请求行的格式为Method Request-URL HTTP-Version CRLF eg: GET index.html HTTP/1.1
+    - 常用的方法有: GET, POST, PUT, DELETE, OPTIONS, HEAD。
+    - 常见的请求方法区别：这里主要展示POST和GET的区别
+      - GET在浏览器回退时是无害的，而POST会再次提交请求。
+      - GET产生的URL地址可以被Bookmark，而POST不可以。
+      - GET请求会被浏览器主动cache，而POST不会，除非手动设置。
+      - GET请求只能进行url编码，而POST支持多种编码方式。
+      - GET请求参数会被完整保留在浏览器历史记录里，而POST中的参数不会被保留。
+      - GET请求在URL中传送的参数是有长度限制的，而POST么有。
+      - 对参数的数据类型，GET只接受ASCII字符，而POST没有限制。
+      - GET比POST更不安全，因为参数直接暴露在URL上，所以不能用来传递敏感信息。
+      - GET参数通过URL传递，POST放在Request body中。
+      - GET会产生一个TCP数据包，而POST会产生两个TCP数据包。
+        - 对于GET方式的请求，浏览器会把http header和data一并发送出去，服务器响应200(返回数据);
+        - 而对于POST，浏览器先发送header，服务器响应100 continue，浏览器再发送data，服务器响应200 ok(返回数据)。
+  - 请求报头
+    - 请求报头允许客户端向服务器传递请求的附加信息和客户端自身的信息。
+      - 请求报头中使用了Accept, Accept-Encoding, Accept-Language, Cache-Control, Connection, Cookie等字段。Accept用于指定客户端用于接受哪些类型的信息，Accept-Encoding与Accept类似，它用于指定接受的编码方式。Connection设置为Keep-alive用于告诉客户端本次HTTP请求结束之后并不需要关闭TCP连接，这样可以使下次HTTP请求使用相同的TCP通道，节省TCP连接建立的时间。
+  - 请求正文
+    - 当使用POST, PUT等方法时，通常需要客户端向服务器传递数据。这些数据就储存在请求正文中。在请求包头中有一些与请求正文相关的信息，例如: 现在的Web应用通常采用Rest架构，请求的数据格式一般为json。这时就需要设置Content-Type: application/json。
+  - 请求正文
+    前面基础介绍，在本文档的缓存知识点这个专题下面。
 - 缓存
-    - 强制缓存
-        - 当缓存数据库中有客户端需要的数据，客户端直接将数据从其中拿出来使用（如果数据未失效），当缓存服务器没有需要的数据时，客户端才会向服务端请求。
-        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211012164423.png)
-    - 协商缓存
-        - 又称对比缓存。客户端会先从缓存数据库拿到一个缓存的标识，然后向服务端验证标识是否失效，如果没有失效服务端会返回304，这样客户端可以直接去缓存数据库拿出数据，如果失效，服务端会返回新的数据
-        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211012164452.png)
-    - 强制缓存的优先级高于协商缓存，若两种缓存皆存在，且强制缓存命中目标，则协商缓存不再验证标识。
-    - 缓存的优点
-        - 减少了冗余的数据传递，节省宽带流量
-        - 减少了服务器的负担，大大提高了网站性能
-        - 加快了客户端加载网页的速度 这也正是HTTP缓存属于客户端缓存的原因。
+  - 强制缓存
+    - 当缓存数据库中有客户端需要的数据，客户端直接将数据从其中拿出来使用（如果数据未失效），当缓存服务器没有需要的数据时，客户端才会向服务端请求。
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211012164423.png)
+  - 协商缓存
+    - 又称对比缓存。客户端会先从缓存数据库拿到一个缓存的标识，然后向服务端验证标识是否失效，如果没有失效服务端会返回304，这样客户端可以直接去缓存数据库拿出数据，如果失效，服务端会返回新的数据
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211012164452.png)
+  - 强制缓存的优先级高于协商缓存，若两种缓存皆存在，且强制缓存命中目标，则协商缓存不再验证标识。
+  - 缓存的优点
+    - 减少了冗余的数据传递，节省宽带流量
+    - 减少了服务器的负担，大大提高了网站性能
+    - 加快了客户端加载网页的速度 这也正是HTTP缓存属于客户端缓存的原因。
 #### 服务器处理请求并返回HTTP报文
 请看HTTP和缓存的总结：
 - 响应
-    - 状态码 
-        - 状态码是由3位数组成，第一个数字定义了响应的类别，且有五种可能取值:
-            - 1xx：指示信息–表示请求已接收，继续处理。
-            - 2xx：成功–表示请求已被成功接收、理解、接受。
-            - 3xx：重定向–要完成请求必须进行更进一步的操作。
-            - 4xx：客户端错误–请求有语法错误或请求无法实现。
-            - 5xx：服务器端错误–服务器未能实现合法的请求。
-        - 常见状态码区别
-            - 200 成功:请求成功，通常服务器提供了需要的资源。
-            - 204 无内容:服务器成功处理了请求，但没有返回任何内容。
-            - 301 永久移动:请求的网页已永久移动到新位置。 服务器返回此响应（对 GET 或 HEAD 请求的响应）时，会自动将请求者转到新位置。
-            - 302 临时移动：服务器目前从不同位置的网页响应请求，但请求者应继续使用原有位置来进行以后的请求。
-            - 304 未修改：自从上次请求后，请求的网页未修改过。 服务器返回此响应时，不会返回网页内容。
-            - 400 错误请求：服务器不理解请求的语法。
-            - 401 未授权:请求要求身份验证。 对于需要登录的网页，服务器可能返回此响应。
-            - 403 禁止:服务器拒绝请求。
-            - 404 未找到:请求格式正确，但是由于含有语义错误，无法响应
-            - 500 服务器内部错误:服务器遇到错误，无法完成请求。
-    - 响应报头：响应报头字段有: Server, Connection...。
-    - 响应报文：服务器请求的HTML,CSS,JS文件就放在这里面
-
+  - 状态码
+    - 状态码是由3位数组成，第一个数字定义了响应的类别，且有五种可能取值:
+      - 1xx：指示信息–表示请求已接收，继续处理。
+      - 2xx：成功–表示请求已被成功接收、理解、接受。
+      - 3xx：重定向–要完成请求必须进行更进一步的操作。
+      - 4xx：客户端错误–请求有语法错误或请求无法实现。
+      - 5xx：服务器端错误–服务器未能实现合法的请求。
+    - 常见状态码区别
+      - 200 成功:请求成功，通常服务器提供了需要的资源。
+      - 204 无内容:服务器成功处理了请求，但没有返回任何内容。
+      - 301 永久移动:请求的网页已永久移动到新位置。 服务器返回此响应（对 GET 或 HEAD 请求的响应）时，会自动将请求者转到新位置。
+      - 302 临时移动：服务器目前从不同位置的网页响应请求，但请求者应继续使用原有位置来进行以后的请求。
+      - 304 未修改：自从上次请求后，请求的网页未修改过。 服务器返回此响应时，不会返回网页内容。
+      - 400 错误请求：服务器不理解请求的语法。
+      - 401 未授权:请求要求身份验证。 对于需要登录的网页，服务器可能返回此响应。
+      - 403 禁止:服务器拒绝请求。
+      - 404 未找到:请求格式正确，但是由于含有语义错误，无法响应
+      - 500 服务器内部错误:服务器遇到错误，无法完成请求。
+  - 响应报头：响应报头字段有: Server, Connection...。
+  - 响应报文：服务器请求的HTML,CSS,JS文件就放在这里面
 #### 浏览器解析渲染页面
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210926121230.png)
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210926125828.png)
@@ -7252,96 +7726,95 @@ TCP提供一种可靠的传输，这个过程涉及到三次握手，四次挥�
 **回流必定会发生重绘，重绘不一定会引发回流。**
 性能优化之回流重绘
 - 回流
-    - 当Render Tree中部分或全部元素的尺寸、结构、或某些属性发生改变时，浏览器重新渲染部分或全部文档的过程称为回流。
-    - 会导致回流的操作：
-        - 页面首次渲染
-        - 浏览器窗口大小发生改变
-        - 元素尺寸或位置发生改变（边距、填充、边框、宽度和高度）
-        - 元素内容变化（文字数量或图片大小等等）（比如用户在input框中输入文字）
-        - 元素字体大小变化
-        - 添加或者删除可见的DOM元素
-        - 激活CSS伪类（例如：:hover）
-        - 查询某些属性或调用某些方法
-        - 设置 style 属性的值
-        ````css
-            1. clientWidth、clientHeight、clientTop、clientLeft
-            2. offsetWidth、offsetHeight、offsetTop、offsetLeft
-            3. scrollWidth、scrollHeight、scrollTop、scrollLeft
-            4. scrollIntoView()、scrollIntoViewIfNeeded()
-            5. getComputedStyle()
-            6. getBoundingClientRect()
-            7. scrollTo()
-        ```
+  - 当Render Tree中部分或全部元素的尺寸、结构、或某些属性发生改变时，浏览器重新渲染部分或全部文档的过程称为回流。
+  - 会导致回流的操作：
+    - 页面首次渲染
+    - 浏览器窗口大小发生改变
+    - 元素尺寸或位置发生改变（边距、填充、边框、宽度和高度）
+    - 元素内容变化（文字数量或图片大小等等）（比如用户在input框中输入文字）
+    - 元素字体大小变化
+    - 添加或者删除可见的DOM元素
+    - 激活CSS伪类（例如：:hover）
+    - 查询某些属性或调用某些方法
+    - 设置 style 属性的值
+      ```css
+      1. clientWidth、clientHeight、clientTop、clientLeft
+      2. offsetWidth、offsetHeight、offsetTop、offsetLeft
+      3. scrollWidth、scrollHeight、scrollTop、scrollLeft
+      4. scrollIntoView()、scrollIntoViewIfNeeded()
+      5. getComputedStyle()
+      6. getBoundingClientRect()
+      7. scrollTo()
+      ```
 - 重绘
-    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210926130248.png)
-    - 当页面中元素样式的改变并不影响它在文档流中的位置时（例如：color、background-color、visibility等），浏览器会将新样式赋予给元素并重新绘制它，这个过程称为重绘。
+  - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210926130248.png)
+  - 当页面中元素样式的改变并不影响它在文档流中的位置时（例如：color、background-color、visibility等），浏览器会将新样式赋予给元素并重新绘制它，这个过程称为重绘。
 - 优化
-    - css方面优化
-        - 避免使用table布局。可能很小的一个小改动会造成整个 table 的重新布局。
-        - 尽可能在DOM树的最末端改变class。
-        - 避免设置多层内联样式。
-        - 动画实现的速度的选择，动画速度越快，回流次数越多，也可以选择使用 requestAnimationFrame。将动画效果应用到position属性为absolute或fixed的元素上。
-        - 避免使用CSS表达式（例如：calc()）。
-        - 使用 transform 替代 top
-        - 使用 visibility 替换 display: none ，因为前者只会引起重绘，后者会引发回流（改变了布局）
-        - CSS 选择符从右往左匹配查找，避免节点层级过多
-        - 将频繁重绘或者回流的节点设置为图层，图层能够阻止该节点的渲染行为影响别的节点。比如对于 video 标签来说，浏览器会自动将该节点变为图层。
-    - js方面的优化
-        - 不要把节点的属性值放在一个循环里当成循环里的变量。
-        - 避免频繁操作样式，最好一次性重写style属性，或者将样式列表定义为class并一次性更改class属性。
-        - 避免频繁操作DOM，创建一个documentFragment，在它上面应用所有DOM操作，最后再把它添加到文档中。
-        - 也可以先为元素设置display: none，操作结束后再把它显示出来。因为在display属性为none的元素上进行的DOM操作不会引发回流和重绘。
-        - 避免频繁读取会引发回流/重绘的属性，如果确实需要多次使用，就用一个变量缓存起来。
-        - 对具有复杂动画的元素使用绝对定位，使它脱离文档流，否则会引起父元素及后续元素频繁回流。
-
+  - css方面优化
+    - 避免使用table布局。可能很小的一个小改动会造成整个 table 的重新布局。
+    - 尽可能在DOM树的最末端改变class。
+    - 避免设置多层内联样式。
+    - 动画实现的速度的选择，动画速度越快，回流次数越多，也可以选择使用 requestAnimationFrame。将动画效果应用到position属性为absolute或fixed的元素上。
+    - 避免使用CSS表达式（例如：calc()）。
+    - 使用 transform 替代 top
+    - 使用 visibility 替换 display: none ，因为前者只会引起重绘，后者会引发回流（改变了布局）
+    - CSS 选择符从右往左匹配查找，避免节点层级过多
+    - 将频繁重绘或者回流的节点设置为图层，图层能够阻止该节点的渲染行为影响别的节点。比如对于 video 标签来说，浏览器会自动将该节点变为图层。
+  - js方面的优化
+    - 不要把节点的属性值放在一个循环里当成循环里的变量。
+    - 避免频繁操作样式，最好一次性重写style属性，或者将样式列表定义为class并一次性更改class属性。
+    - 避免频繁操作DOM，创建一个documentFragment，在它上面应用所有DOM操作，最后再把它添加到文档中。
+    - 也可以先为元素设置display: none，操作结束后再把它显示出来。因为在display属性为none的元素上进行的DOM操作不会引发回流和重绘。
+    - 避免频繁读取会引发回流/重绘的属性，如果确实需要多次使用，就用一个变量缓存起来。
+    - 对具有复杂动画的元素使用绝对定位，使它脱离文档流，否则会引起父元素及后续元素频繁回流。
 - JS的解析
-    - JS的解析是由浏览器的JS引擎完成的。由于JavaScript是单进程运行，也就是说一个时间只能干一件事，干这件事情时其他事情都有排队，但是有些人物比较耗时（例如IO操作），所以将任务分为同步任务和异步任务，所有的同步任务放在主线程上执行，形成执行栈，而异步任务等待，当执行栈被清空时才去看看异步任务有没有东西要搞，有再提取到主线程执行，这样往复循环，就形成了Event Loop事件循环，下面来看看大人物
+  - JS的解析是由浏览器的JS引擎完成的。由于JavaScript是单进程运行，也就是说一个时间只能干一件事，干这件事情时其他事情都有排队，但是有些人物比较耗时（例如IO操作），所以将任务分为同步任务和异步任务，所有的同步任务放在主线程上执行，形成执行栈，而异步任务等待，当执行栈被清空时才去看看异步任务有没有东西要搞，有再提取到主线程执行，这样往复循环，就形成了Event Loop事件循环，下面来看看大人物
 - Event Loop
-    - JavaScript是一门单线程语言，尽管H5中提出了Web-Worker，能够模拟实现多线程，但本质上还是单线程，说它是多线程就是扯淡。
-    - 前面的JS中有  Event Loop  这个知识点
+  - JavaScript是一门单线程语言，尽管H5中提出了Web-Worker，能够模拟实现多线程，但本质上还是单线程，说它是多线程就是扯淡。
+  - 前面的JS中有  Event Loop  这个知识点
 ### 性能优化
 - 性能优化原则
-    - 多使用内存、缓存或其他方法。
-    - 减少 CPU 计算量，减少网络加载耗时。
-    - 适用于所有编程的优化方法 —— 用空间来换时间。
+  - 多使用内存、缓存或其他方法。
+  - 减少 CPU 计算量，减少网络加载耗时。
+  - 适用于所有编程的优化方法 —— 用空间来换时间。
 - 性能优化的方法
-    -  让加载更快
-        -  减少资源体积
-            - 压缩代码： 可以通过压缩代码来减少资源体积，包括 js 文件、 css 文件和图片都可以进行压缩。同时服务器端 可以通过 gzip 算法来对资源进行压缩。
-        - 减少请求次数
-            - 合并代码： 比如说我们写了三四个文件，但通过打包可能就只剩下一个文件
-            - SSR服务器端渲染：
-                - 服务端把网页和数据一起加载，一起渲染。
-                - 早期的 JSP 、ASP 、PHP，现在的 vue SSR 、React SSR
-            - 缓存
-        - 使用更快的网络
-            - 通过 CDN 
-    -  让渲染更快
-        -  html、css、js和图片层面
-            -  css 放在 head ， JS 放在 body 最下面；
-            -  懒加载（图片懒加载，上滑加载更多）。
-        - 从DOM层面
-            - 对 DOM 查询进行缓存；
-            - 从频繁进行 DOM 操作，变为合并到一起进行 DOM 结构插入；
-        - 防抖 debounce 和 节流 throttle
+  - 让加载更快
+    - 减少资源体积
+      - 压缩代码： 可以通过压缩代码来减少资源体积，包括 js 文件、 css 文件和图片都可以进行压缩。同时服务器端 可以通过 gzip 算法来对资源进行压缩。
+    - 减少请求次数
+      - 合并代码： 比如说我们写了三四个文件，但通过打包可能就只剩下一个文件
+      - SSR服务器端渲染：
+        - 服务端把网页和数据一起加载，一起渲染。
+        - 早期的 JSP 、ASP 、PHP，现在的 vue SSR 、React SSR
+      - 缓存
+    - 使用更快的网络
+      - 通过 CDN
+  - 让渲染更快
+    - html、css、js和图片层面
+      - css 放在 head ， JS 放在 body 最下面；
+      - 懒加载（图片懒加载，上滑加载更多）。
+    - 从DOM层面
+      - 对 DOM 查询进行缓存；
+      - 从频繁进行 DOM 操作，变为合并到一起进行 DOM 结构插入；
+    - 防抖 debounce 和 节流 throttle
 ### 提高页面渲染效率
 基于上面介绍的浏览器渲染原理，DOM 和 CSSOM 结构构建顺序，初始化可以对页面渲染做些优化，提升页面性能。
-    - JS优化： <script> 标签加上 defer属性 和 async属性 用于在不阻塞页面文档解析的前提下，控制脚本的下载和执行。
-        - defer属性： 用于开启新的线程下载脚本文件，并使脚本在文档解析完成后执行。
-        - async属性： HTML5新增属性，用于异步下载脚本文件，下载完毕立即解释执行代码。
-    - CSS优化： <link> 标签的 rel属性 中的属性值设置为 preload 能够让你在你的HTML页面中可以指明哪些资源是在页面加载完成后即刻需要的,最优的配置加载顺序，提高渲染性能
-    - HTML文档结构层次尽量少，最好不深于六层；
-    - 脚本尽量后放，放在前即可；
-    - 少量首屏样式内联放在标签内；
-    - 样式结构层次尽量简单；
-    - 在脚本中尽量减少DOM操作，尽量缓存访问DOM的样式信息，避免过度触发回流；
-    - 减少通过JavaScript代码修改元素样式，尽量使用修改class名方式操作样式或动画；
-    - 动画尽量使用在绝对定位或固定定位的元素上；
-    - 隐藏在屏幕外，或在页面滚动时，尽量停止动画；
-    - 尽量缓存DOM查找，查找器尽量简洁；
-    - 涉及多域名的网站，可以开启域名预解析
-
+- JS优化： <script> 标签加上 defer属性 和 async属性 用于在不阻塞页面文档解析的前提下，控制脚本的下载和执行。
+  - asyncdefer属性： 用于开启新的线程下载脚本文件，并使脚本在文档解析完成后执行。
+  - async属性： HTML5新增属性，用于异步下载脚本文件，下载完毕立即解释执行代码。
+- CSS优化： <link> 标签的 rel属性 中的属性值设置为 preload 能够让你在你的HTML页面中可以指明哪些资源是在页面加载完成后即刻需要的,最优的配置加载顺序，提高渲染性能
+  - HTML文档结构层次尽量少，最好不深于六层；
+  - 脚本尽量后放，放在前即可；
+  - 少量首屏样式内联放在标签内；
+  - 样式结构层次尽量简单；
+  - 在脚本中尽量减少DOM操作，尽量缓存访问DOM的样式信息，避免过度触发回流；
+  - 减少通过JavaScript代码修改元素样式，尽量使用修改class名方式操作样式或动画；
+  - 动画尽量使用在绝对定位或固定定位的元素上；
+  - 隐藏在屏幕外，或在页面滚动时，尽量停止动画；
+  - 尽量缓存DOM查找，查找器尽量简洁；
+  - 涉及多域名的网站，可以开启域名预解析
 ### 提高首屏展示效率
+
 - Vue-Router路由懒加载（利用Webpack的代码切割）
 - 使用CDN加速，将通用的库从vendor进行抽离
 - Nginx的gzip压缩
@@ -7353,22 +7826,26 @@ TCP提供一种可靠的传输，这个过程涉及到三次握手，四次挥�
 - Service Worker缓存文件处理
 - 使用link标签的rel属性设置   prefetch（这段资源将会在未来某个导航或者功能要用到，但是本资源的下载顺序权重比较低，prefetch通常用于加速下一次导航）、preload（preload将会把资源得下载顺序权重提高，使得关键数据提前下载好，优化页面打开速度）
 
-
 基于上面介绍的浏览器渲染原理，DOM 和 CSSOM 结构构建顺序，初始化可以对页面渲染做些优化，提升页面性能。
 很多人在构建前端项目时会发现打包出来的chunk.vendors.xxx.js文件实在是太大,导致首屏加载速度很慢
     - 使用webpack-bundle-analyzer分析前端项目包大小, 找出问题源头.
+
 ```js
 // vue.config.js
 chainWebpack: (config) => {
   config.plugin('webpack-bundle-analyzer').use(require('webpack-bundle-analyzer').BundleAnalyzerPlugin);
 }
-````
+```
+
     - 去掉vuecli打包生成的map文件：这些文件用于错误时给出准确的提示,线上环境是不需要的。
+
 ```js
 // vue.config.js
 productionSourceMap: false
 ```
+
     - CDN引入需要的资源
+
 ```js
 // vue.config.js
 const cdn = {
@@ -7419,7 +7896,9 @@ chainWebpack: (config) => {
 <% } %>
 <% } %>
 ```
+
     - 开启gzip打包
+
 ```js
 // vue.config.js
 const path = require('path');
@@ -7453,7 +7932,9 @@ http {
               image/gif image/png;   
 }
 ```
+
     - 路由懒加载
+
 ```js
 // router.js
 const routes: Array<RouteConfig> = [
@@ -7465,29 +7946,41 @@ const routes: Array<RouteConfig> = [
 ];
 ```
 
-
-
 #### 首屏性能衡量的指标
-1. FPS：最能反映页面性能的指标FPS(frame per second)，一般系统设置屏幕的刷新率为60fps。小于24就会出现明显的卡顿
-2. DOMContentLoaded：DOM加载并解析完成会触发DOMContentLoaded事件，如果源码输出的内容太多，客户端解析DOM的时间也会变长，例如增加2000个嵌套层叠可能会相应增加50-200ms，尽量保证首屏输出即可，后续的内容只保留钩子，利用js渲染。
-3. 流畅度：FPS 值越高，视觉呈现越流畅，在等待的过程中可以加入一些视觉缓冲。
-4. 首屏加载时间：通过`window.performance.timing`来计算出来。
-```md
-1. DNS解析耗时: domainLookupEnd - domainLookupStart
-2. TCP连接耗时: connectEnd - connectStart
-3. SSL安全连接耗时: connectEnd - secureConnectionStart
-4. 网络请求耗时(TTFB): responseStart - requestStart
-5. 数据传输耗时: responseEnd - responseStart
-6. DOM解析耗时: domInteractive - responseEnd
-7. 资源加载耗时: loadEventStart - domContentLoadedEventEnd
-8. 首包时间: responseStart - domainLookupStart
-9. 首次渲染时间 / 白屏时间: responseEnd - fetchStart
-10. 首次可交互时间: domInteractive - fetchStart
-11. DOM Ready时间: domContentLoadEventEnd - fetchStart
-12. 页面完全加载时间: loadEventStart - fetchStart
-```
 
+1. FPS：最能反映页面性能的指标FPS(frame per second)，一般系统设置屏幕的刷新率为60fps。小于24就会出现明显的卡顿
+
+2. DOMContentLoaded：DOM加载并解析完成会触发DOMContentLoaded事件，如果源码输出的内容太多，客户端解析DOM的时间也会变长，例如增加2000个嵌套层叠可能会相应增加50-200ms，尽量保证首屏输出即可，后续的内容只保留钩子，利用js渲染。
+
+3. 流畅度：FPS 值越高，视觉呈现越流畅，在等待的过程中可以加入一些视觉缓冲。
+
+4. 首屏加载时间：通过`window.performance.timing`来计算出来。
+
+5. DNS解析耗时: domainLookupEnd - domainLookupStart
+
+6. TCP连接耗时: connectEnd - connectStart
+
+7. SSL安全连接耗时: connectEnd - secureConnectionStart
+
+8. 网络请求耗时(TTFB): responseStart - requestStart
+
+9. 数据传输耗时: responseEnd - responseStart
+
+10. DOM解析耗时: domInteractive - responseEnd
+
+11. 资源加载耗时: loadEventStart - domContentLoadedEventEnd
+
+12. 首包时间: responseStart - domainLookupStart
+
+13. 首次渲染时间 / 白屏时间: responseEnd - fetchStart
+
+14. 首次可交互时间: domInteractive - fetchStart
+
+15. DOM Ready时间: domContentLoadEventEnd - fetchStart
+
+16. 页面完全加载时间: loadEventStart - fetchStart
 #### 优化的思考角度
+
 ```md
 1. 首屏一定要快
 2. 滚屏一定要流畅
@@ -7497,6 +7990,7 @@ const routes: Array<RouteConfig> = [
 ```
 
 #### 为什么首屏会加载缓慢？
+
 ```md
 我先列一下目前我遇见影响加载的点：
 1. 静态资源的加载未处理，资源加载过多
@@ -7506,12 +8000,14 @@ const routes: Array<RouteConfig> = [
 
 #### 如何进行优化
 - 懒加载
-    - 优先加载主要模块，让用户第一眼能看到最重要的信息。比如只有某种情况才会加载的模块使用require()，按需加载，这个方法在webpack打包的时候把导入的模块单独打一个包，不会加入到首屏加载的包中，优化体积大小。
+  - 优先加载主要模块，让用户第一眼能看到最重要的信息。比如只有某种情况才会加载的模块使用require()，按需加载，这个方法在webpack打包的时候把导入的模块单独打一个包，不会加入到首屏加载的包中，优化体积大小。
+
 - 懒执行
-    - 一些需要点击或者hover才会触发的模块，就等触发的时候再加载。
+  - 一些需要点击或者hover才会触发的模块，就等触发的时候再加载。
 - 图片尺寸的控制和懒加载
-    - 尽量使用webp格式的照片，因为同样的视觉效果，其体积为其他的1/3大小。使用雪碧图来处理首屏上所有的小icon，走cdn缓存等。
+  - 尽量使用webp格式的照片，因为同样的视觉效果，其体积为其他的1/3大小。使用雪碧图来处理首屏上所有的小icon，走cdn缓存等。
 ### PV、UV、IP分别是什么意思？
+
 - PV（Page View）访问量, 即页面浏览量或点击量，衡量网站用户访问的网页数量；在一定统计周期内用户每打开或刷新一个页面就记录1次，多次打开或刷新同一页面则浏览量累计。
 
 - UV（Unique Visitor）独立访客，统计1天内访问某站点的用户数(以cookie为依据);访问网站的一台电脑客户端为一个访客。可以理解成访问某网站的电脑的数量。网站判断来访电脑的身份是通过来访电脑的cookies实现的。如果更换了IP后但不清除cookies，再访问相同网站，该网站的统计中UV数是不变的。如果用户不保存cookies访问、清除了cookies或者更换设备访问，计数会加1。00:00-24:00内相同的客户端多次访问只计为1个访客。
@@ -7527,6 +8023,7 @@ const routes: Array<RouteConfig> = [
 ### Vue手写渲染函数？？？？？？？
 ### Vue 的插件怎么注册 插件接口该怎么设计？？？？？？
 ### 简述MVVM
+  
 什么是MVVM？
 视图模型双向绑定，是Model-View-ViewModel的缩写，也就是把MVC中的Controller演变成ViewModel。Model层代表数据模型，View代表UI组件，ViewModel是View和Model层的桥梁，数据会绑定到viewModel层并自动将数据渲染到页面中，视图变化的时候会通知viewModel层更新数据。以前是操作DOM结构更新视图，现在是数据驱动视图。
 
@@ -7535,64 +8032,64 @@ MVVM的优点：
 2.可重用性。你可以把一些视图逻辑放在一个Model里面，让很多View重用这段视图逻辑。
 3.独立开发。开发人员可以专注于业务逻辑和数据的开发(ViewModel)，设计人员可以专注于页面设计。
 4.可测试。
+
 ### 说Vue的MVVM实现原理
+
 1. Vue作为MVVM模式的实现库的2种技术
-    1. 模板解析
-    2. 数据绑定
+   1. 模板解析
+   2. 数据绑定
 2. 模板解析：实现初始化显示
-    1. 解析大括号表达式
-    2. 解析指令
+   1. 解析大括号表达式
+   2. 解析指令
 3. 数据绑定：实现更新显示
-    1. 通过数据劫持实现
-![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210929170246.png)
-![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210918215643.png)
+   1. 通过数据劫持实现
+      ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210929170246.png)
+      ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210918215643.png)
 
 ### vue虚拟DOM的理解
 由于在浏览器中操作 DOM 是很昂贵的。频繁的操作 DOM，会产生一定的性能问题。这就是虚拟 Dom 的产生原因。Vue2 的 Virtual DOM 借鉴了开源库 snabbdom 的实现。Virtual DOM 本质就是用一个原生的 JS 对象去描述一个 DOM 节点，是对真实 DOM 的一层抽象。
 
-
 1. 什么是VDOM
-Virtual DOM 用JS模拟DOM结构用。JavaScript 对象结构表示 DOM 树的结构；然后用这个树构建一个真正的 DOM 树， 插到文档当中 当状态变更的时候，重新构造一棵新的对象树。然后用新的树和旧的树 进行比较，记录两棵树差异 把所记录的差异应用到所构建的真正的 DOM 树上，视图就 更新了。Virtual DOM 本质上就是在 JS 和 DOM 之间做了一个缓存。
+   Virtual DOM 用JS模拟DOM结构用。JavaScript 对象结构表示 DOM 树的结构；然后用这个树构建一个真正的 DOM 树， 插到文档当中 当状态变更的时候，重新构造一棵新的对象树。然后用新的树和旧的树 进行比较，记录两棵树差异 把所记录的差异应用到所构建的真正的 DOM 树上，视图就 更新了。Virtual DOM 本质上就是在 JS 和 DOM 之间做了一个缓存。
 
 建立一个与 dom 树对应的虚拟 dom 对象（ js 对象），以对象嵌套的方式来表示 dom 树，那么每次 dom 的更改就变成了 js 对象的属性的更改，这样一来就能查找 js 对象 的属性变化要比查询 dom 树的性能开销小。
 
 2. 为何要用vdom？
-DOM操作非常非常“rang贵”，将DOM对比操作放在JS层，提高效率。
-DOM结构的对比，放在JS层来做
+   DOM操作非常非常“rang贵”，将DOM对比操作放在JS层，提高效率。
+   DOM结构的对比，放在JS层来做
 
 3. vdom核心函数有哪些
-核心函数：
-    - h('标签名', {...属性名...}, [...子元素...])
-    - h('标签名', {...属性名...}, '.........')
-    - patch(container, vnode)
-    - patch(vnode, newVnode)
+- 核心函数：
+   - h('标签名', {...属性名...}, [...子元素...])
+   - h('标签名', {...属性名...}, '.........')
+   - patch(container, vnode)
+   - patch(vnode, newVnode)
 ### 为什么要有虚拟DOM节点，直接操作DOM节点的问题在哪里？
 虚拟DOM：对复杂的DOM结构提供便捷的工具，最小化的进行DOM操作。
 
 虚拟DOM不会进行重绘和回流，在虚拟DOM中进行频繁修改，然后一次性比较并修改真实DOM中需要修改的部分，最后在真实DOM中进行重绘和回流，见着过多的DOM节点重绘和回流的损耗。
 
 真实DOM的重绘和回流效率相当低，虚拟DOM有效地降低了大面积的对真实DOM进行重绘和回流，因为通过比较差异，只渲染局部。
+
 ### 虚拟 DOM 有什么优缺点
 - 优点：
-    - 保证性能下限： 框架的虚拟 DOM 需要适配任何上层 API 可能产生的操作，它的一些 DOM 操作的实现必须是普适的，所以它的性能并不是最优的；但是比起粗暴的 DOM 操作性能要好很多，因此框架的虚拟 DOM 至少可以保证在你不需要手动优化的情况下，依然可以提供还不错的性能，即保证性能的下限；
-    - 无需手动操作 DOM： 我们不再需要手动去操作 DOM，只需要写好 View-Model 的代码逻辑，框架会根据虚拟 DOM 和 数据双向绑定，帮我们以可预期的方式更新视图，极大提高我们的开发效率；
-    - 跨平台： 虚拟 DOM 本质上是 JavaScript 对象,而 DOM 与平台强相关，相比之下虚拟 DOM 可以进行更方便地跨平台操作，例如服务器渲染、weex 开发等等。
+  - 保证性能下限： 框架的虚拟 DOM 需要适配任何上层 API 可能产生的操作，它的一些 DOM 操作的实现必须是普适的，所以它的性能并不是最优的；但是比起粗暴的 DOM 操作性能要好很多，因此框架的虚拟 DOM 至少可以保证在你不需要手动优化的情况下，依然可以提供还不错的性能，即保证性能的下限；
+  - 无需手动操作 DOM： 我们不再需要手动去操作 DOM，只需要写好 View-Model 的代码逻辑，框架会根据虚拟 DOM 和 数据双向绑定，帮我们以可预期的方式更新视图，极大提高我们的开发效率；
+  - 跨平台： 虚拟 DOM 本质上是 JavaScript 对象,而 DOM 与平台强相关，相比之下虚拟 DOM 可以进行更方便地跨平台操作，例如服务器渲染、weex 开发等等。
 - 缺点:
-    - 无法进行极致优化： 虽然虚拟 DOM + 合理的优化，足以应对绝大部分应用的性能需求，但在一些性能要求极高的应用中虚拟 DOM 无法进行针对性的极致优化。
-    - 首次渲染大量 DOM 时，由于多了一层虚拟 DOM 的计算，会比 innerHTML 插入慢。
+  - 无法进行极致优化： 虽然虚拟 DOM + 合理的优化，足以应对绝大部分应用的性能需求，但在一些性能要求极高的应用中虚拟 DOM 无法进行针对性的极致优化。
+  - 首次渲染大量 DOM 时，由于多了一层虚拟 DOM 的计算，会比 innerHTML 插入慢。
 ### Vue 组件修饰符  ????????
-
 ### vue组件间传值的方法有哪些?????????
-
 ### Vue2.x底层实现原理
 Vue是采用数据劫持结合发布者-订阅者模式的方式，通过Object.defineProperty()来劫持各个属性的setter和getter，在数据变动时发布消息给订阅者，触发相应的监听回调
 Vue是一个典型的MVVM框架，模型（Model）只是普通的javascript对象，修改它则试图（View）会自动更新。这种设计让状态管理变得非常简单而直观
 
 - Observer（数据监听器）:Observer的核心是通过Object.defineProprtty()来监听数据的变动，这个函数内部可以定义setter和getter，每当数据发生变化，就会触发setter。这时候Observer就要通知订阅者，订阅者就是Watcher
 - Watcher（订阅者）: Watcher订阅者作为Observer和Compile之间通信的桥梁，主要做的事情是：
-    - 自身实例化时往属性订阅器(dep)里面添加自己
-    - 自身必须有一个update()方法
-    - 待属性变动dep.notice()通知时，能调用自身的update()方法，并触发Compile中绑定的回调
+  - 自身实例化时往属性订阅器(dep)里面添加自己
+  - 自身必须有一个update()方法
+  - 待属性变动dep.notice()通知时，能调用自身的update()方法，并触发Compile中绑定的回调
 - Compile（指令解析器）: Compile主要做的事情是解析模板指令，将模板中变量替换成数据，然后初始化渲染页面视图，并将每个指令对应的节点绑定更新函数，添加鉴定数据的订阅者，一旦数据有变动，收到通知，更新试图
 
 ### Vue2.x响应式原理
@@ -7600,7 +8097,6 @@ Vue是一个典型的MVVM框架，模型（Model）只是普通的javascript对�
 - vue2.0中，响应式实现的核心就是 ES5的Object.defineProperty(obj, prop, descriptor). 通过Object.defineProperty()劫持data和props各个属性的getter和setter，getter做依赖收集，setter派发更新。整体来说是一个 数据劫持 + 发布-订阅者模式。
 
 vue 初始化时会用Object.defineProperty()给data中每一个属性添加getter和setter，同时创建dep和watcher进行依赖收集与派发更新，最后通过diff算法对比新老vnode差异，通过patch即时更新DOM
-
 
 具体来说， ① vue初始化阶段(beforeCreate之后create之前)，遍历data/props，调用Object.defineProperty给每个属性加上getter、setter。② 每个组件、每个computed都会实例化一个watcher（当然也包括每个自定义watcher），订阅渲染/计算所用到的所用data/props/computed，一旦数据发生变化，setter被调用，会通知渲染watcher重新计算、更新组件。
 
@@ -7625,20 +8121,14 @@ vue 初始化时会用Object.defineProperty()给data中每一个属性添加gett
 - key的作用主要是为了让vue可以区分元素，更高效的对比更新虚拟DOM;
 - Vue在patch过程中判断两个节点是否是相同节点,key是一个必要条件，是唯一标识，如不定义key，Vue只能认为比较的两个节点是同一个，这导致了频繁更新元素，使得整个patch过程比较低效，影响性能;
 - 从源码中可以知道，Vue判断两个节点是否相同时主要判断两者的key和元素类型等，因此如果不设置key,它的值就是undefined，则可能永远认为这是两个相同的节点，只能去做更新操作，这造成了大量的dom更新操作，明显是不可取的。
-
-
-
 - key的作用是为了在diff算法执行时更快的找到对应的节点，提高diff速度，更高效的更新虚拟DOM;
 - 更准确 : 因为带 key 就不是就地复用了,在 sameNode 函数 a.key === b.key 对比中可以避免就地复用的情况。所以会更加准确,如果不加 key,会导致之前节点的状态被保留下来,会产生一系列的 bug。
 - 更快速 : key 的唯一性可以被 Map 数据结构充分利用,相比于遍历查找的时间复杂度 O(n),Map 的时间复杂度仅仅为 O(1)
 - key 的特殊 attribute 主要用在 Vue 的虚拟 DOM 算法，在新旧 nodes 对比时辨识 VNodes。如果不使用 key，Vue 会使用一种最大限度减少动态元素并且尽可能的尝试就地修改/复用相同类型元素的算法。而使用 key 时，它会基于 key 的变化重新排列元素顺序，并且会移除 key 不存在的元素。
-
-
-
 - vue和react都是采用diff算法来对比新旧虚拟节点，从而更新节点。
-    - 在vue的diff函数中，会根据新节点的key去对比旧节点数组中的key，从而找到相应旧节点。如果没找到就认为是一个新增节点。而如果没有key，那么就会采用遍历查找的方式去找到对应的旧节点。一种一个map映射，另一种是遍历查找。相比而言。map映射的速度更快。
+  - 在vue的diff函数中，会根据新节点的key去对比旧节点数组中的key，从而找到相应旧节点。如果没找到就认为是一个新增节点。而如果没有key，那么就会采用遍历查找的方式去找到对应的旧节点。一种一个map映射，另一种是遍历查找。相比而言。map映射的速度更快。
 - 为了在数据变化时强制更新组件，以避免“就地复用”带来的副作用。
-    - 当 Vue.js 用 v-for 更新已渲染过的元素列表时，它默认用“就地复用”策略。如果数据项的顺序被改变，Vue 将不会移动 DOM 元素来匹配数据项的顺序，而是简单复用此处每个元素，并且确保它在特定索引下显示已被渲染过的每个元素。重复的key会造成渲染错误。
+  - 当 Vue.js 用 v-for 更新已渲染过的元素列表时，它默认用“就地复用”策略。如果数据项的顺序被改变，Vue 将不会移动 DOM 元素来匹配数据项的顺序，而是简单复用此处每个元素，并且确保它在特定索引下显示已被渲染过的每个元素。重复的key会造成渲染错误。
 
 ```js
 // 判断两个vnode的标签和key是否相同 如果相同 就可以认为是同一节点就地复用
@@ -7657,13 +8147,14 @@ function makeIndexByKey(children) {
 // 生成的映射表
 let map = makeIndexByKey(oldCh);
 ```
+
 ### Vue2.x双向绑定的实现原理
 当一个Vue实例创建时，Vue会遍历data选项的属性，用 Object.defineProperty 将它们转为 getter/setter并且在内部追踪相关依赖，在属性被访问和修改时通知变化。每个组件实例都有相应的 watcher 程序实例，它会在组件渲染的过程中把属性记录为依赖，之后当依赖项的 setter 被调用时，会通知 watcher重新计算，从而致使它关联的组件得以更新。
-
 ### Vue2.xnextTick的实现
 nextTick是Vue提供的一个全局API,是在下次DOM更新循环结束之后执行延迟回调，在修改数据之后使用$nextTick，则可以在回调中获取更新后的DOM；
 
 在下次 DOM 更新循环结束之后执行延迟回调，在修改数据之后立即使用 nextTick 来获取更新后的 DOM。 nextTick主要使用了宏任务和微任务。 根据执行环境分别尝试采用Promise、MutationObserver、setImmediate，如果以上都不行则采用setTimeout定义了一个异步方法，多次调用nextTick会将方法存入队列中，通过这个异步方法清空当前队列。
+
 ```js
 let callbacks = [];
 let pending = false;
@@ -7715,6 +8206,7 @@ export function nextTick(cb) {
   }
 }
 ```
+
 ### Vue2.x的diff算法
 渲染真实的DOM开销是很大的，修改了某个数据，如果直接渲染到真实dom上会引起整个DOM树的重绘和重排。
 Virtual Dom 根据真实DOM生成的一个Virtual DOM，当Virtual DOM某个节点的数据改变后生成一个新的Vnode，然后Vnode和oldVnode作对比，发现有不一样的地方就直接修改在真实的DOM上，然后使oldVnode的值为Vnode.
@@ -7730,12 +8222,14 @@ Computed本质是一个具备缓存的watcher，依赖的属性发生变化就�
 - 没有的话,仅仅把 this.dirty = true (当计算属性依赖于其他数据时，属性并不会立即重新计算，只有之后其他地方需要读取属性的时候，它才会真正计算，即具备 lazy（懒计算）特性。)
 
 ### Vue2.x的Watch的运行原理
+
 watch没有缓存性，更多的是观察的作用，可以监听某些数据执行回调。当我们需要深度监听对象中的属性时，可以打开deep：true选项，这样便会对对象中的每一项进行监听。这样会带来性能问题，优化的话可以使用字符串形式监听
 注意：Watcher : 观察者对象 , 实例分为渲染 watcher (render watcher),计算属性 watcher (computed watcher),侦听器 watcher（user watcher）三种
 
 Watch没有缓存性，更多的是观察的作用，可以监听某些数据执行回调。当我们需要深度监听对象中的属性时，可以打开deep：true选项，这样便会对对象中的每一项进行监听。这样会带来性能问题，优化的话可以使用字符串形式监听，如果没有写到组件中，不要忘记使用unWatch手动注销哦。
 
 ### Vue2.x的声明周期
+
 - beforeCreate 在实例初始化之后，数据观测(data observer) 和 event/watcher 事件配置之前被调用。在当前阶段 data、methods、computed 以及 watch 上的数据和方法都不能被访问
 - created 实例已经创建完成之后被调用。在这一步，实例已完成以下的配置：数据观测(data observer)，属性和方法的运算， watch/event 事件回调。这里没有$el,如果非要想与 Dom 进行交互，可以通过 vm.$nextTick 来访问 Dom
 - beforeMount 发生在挂载之前，在这之前template模板已导入渲染函数编译。而当前阶段虚拟Dom已经创建完成，即将开始渲染。在此时也可以对数据进行更改，不会触发updated。
@@ -7762,15 +8256,18 @@ Watch没有缓存性，更多的是观察的作用，可以监听某些数据执
 
 销毁过程：
 父beforeDestroy->子beforeDestroy->子destroyed->父destroyed
+
 ### Vue2.x是如何实现数组响应式的？
+
 vue 的开发者对数组改变数据的 7 个方法做了一些改动。
+
 ```js
 ...
 // 取出 Array的原型prototype 存储在 arrayProto变量中，
 const arrayProto = Array.prototype
 // 在这个原型基础之上create一个新的对象 arrayMethods
 export const arrayMethods = Object.create(arrayProto)
- 
+
 const methodsToPatch = [
   'push',
   'pop',
@@ -7780,7 +8277,7 @@ const methodsToPatch = [
   'sort',
   'reverse'
 ]
- 
+
 /**
  * Intercept mutating methods and emit events
  */
@@ -7819,8 +8316,10 @@ methodsToPatch.forEach(function (method) {
 如果异步请求不需要依赖 Dom 推荐在 created 钩子函数中调用异步请求，因为在 created 钩子函数中调用异步请求有以下优点：
 能更快获取到服务端数据，减少页面 loading 时间；
 ssr 不支持 beforeMount 、mounted 钩子函数，所以放在 created 中有助于一致性；
+
 ### Vue模版编译原理知道吗，能简单说一下吗？
 Vue的编译过程就是将template转化为render函数的过程。会经历以下阶段：
+
 ```md
 第一步是将 模板字符串 转换成 element ASTs（解析器）
 第二步是对 AST 进行静态节点标记，主要用来做虚拟DOM的渲染优化（优化器）
@@ -7855,12 +8354,15 @@ export function compileToFunctions(template) {
   return renderFn;
 }
 ```
+
 ### keep-alive实现原理
+
 keep-alive 是 Vue 内置的一个组件，可以实现组件缓存，当组件切换时不会对当前组件进行卸载。
+
 - 常用的两个属性 include/exclude，允许组件有条件的进行缓存。
 - 两个生命周期 activated/deactivated，用来得知当前组件是否处于活跃状态。
 - keep-alive 的中还运用了 LRU(最近最少使用) 算法，选择最近最久未使用的组件予以淘汰。（LRU（Least recently used）算法根据数据的历史访问记录来进行淘汰数据，其核心思想是“如果数据最近被访问过，那么将来被访问的几率也更高”。
-）
+  ）
 
 keep-alive实例会缓存对应组件的VNode,如果命中缓存，直接从缓存对象返回对应VNode。
 
@@ -7946,84 +8448,88 @@ export default {
   },
 };
 ```
+
 ### v-if和v-show的区别
+
 v-show和v-if都是用来显示隐藏元素，v-if还有一个v-else配合使用，两者达到的效果都一样，性能方面去有很大的区别。
+
 - v-show
-    - 而 v-show 有更高的初始渲染开销。
-    - v-show不管条件是真还是假，第一次渲染的时候都会编译出来，也就是标签都会添加到DOM中。
-    - 之后切换的时候，通过display: none;样式来显示隐藏元素。可以说只是改变css的样式，几乎不会影响什么性能。
-    - 如果需要非常频繁地切换，则使用 v-show 较好；
+  - 而 v-show 有更高的初始渲染开销。
+  - v-show不管条件是真还是假，第一次渲染的时候都会编译出来，也就是标签都会添加到DOM中。
+  - 之后切换的时候，通过display: none;样式来显示隐藏元素。可以说只是改变css的样式，几乎不会影响什么性能。
+  - 如果需要非常频繁地切换，则使用 v-show 较好；
+
 - v-if
-    - v-if 有更高的切换开销
-    - 在首次渲染的时候，如果条件为假，什么也不操作，页面当作没有这些元素。
-    - 当条件为真的时候，开始局部编译，动态的向DOM元素里面添加元素。当条件从真变为假的时候，开始局部编译（编译会被缓存起来），卸载这些元素，也就是删除。
-    - 如果在运行时条件很少改变，则使用 v-if 较好。
+  - v-if 有更高的切换开销
+  - 在首次渲染的时候，如果条件为假，什么也不操作，页面当作没有这些元素。
+  - 当条件为真的时候，开始局部编译，动态的向DOM元素里面添加元素。当条件从真变为假的时候，开始局部编译（编译会被缓存起来），卸载这些元素，也就是删除。
+  - 如果在运行时条件很少改变，则使用 v-if 较好。
+
 - 性能方面
-    - v-if绝对是更消耗性能的，因为v-if在显示隐藏过程中有DOM的添加和删除，v-show就简单多了，只是操作css。
+  - v-if绝对是更消耗性能的，因为v-if在显示隐藏过程中有DOM的添加和删除，v-show就简单多了，只是操作css。
 
 - 闪烁问题
-    - 用v-if或者v-show就会出现div闪现，或者部分闪烁的结果。解决方法：可以在根元素添加v-cloak来解决，并且设置它的css样式即可。
+  - 用v-if或者v-show就会出现div闪现，或者部分闪烁的结果。解决方法：可以在根元素添加v-cloak来解决，并且设置它的css样式即可。
 ```js
-<style>
-/* 在引入的css文件中写入这个*/
-    [v-cloak]{
-        display: none;
-    }
-</style>
-<body>
-    <!-- 添加这个v-cloak -->
-    <div id='app' v-cloak>
-        <div v-if="isShow">
-        content
-        </div>
+  <style>
+  /* 在引入的css文件中写入这个*/
+  [v-cloak]{
+    display: none;
+  }
+  </style>
+  <body>
+  <!-- 添加这个v-cloak -->
+  <div id='app' v-cloak>
+    <div v-if="isShow">
+    content
     </div>
-</body>
-<script>
-    new Vue({
-        el: '#app',
-        data () {
-            return {
-                isShow: false
-            }
+  </div>
+  </body>
+  <script>
+  new Vue({
+    el: '#app',
+    data () {
+        return {
+            isShow: false
         }
-    })
-</script>
+    }
+  })
+  </script>
 ```
 ### Vue的数据为什么频繁变化但只会更新一次
 - 检测到数据变化
 - 开启一个队列
 - 在同一事件循环中缓冲所有数据改变
 - 如果同一个 watcher (watcherId相同)被多次触发，只会被推入到队列中一次
-
 不优化，每一个数据变化都会执行: setter->Dep->Watcher->update->run
 优化后：执行顺序update -> queueWatcher -> 维护观察者队列（重复id的Watcher处理） -> waiting标志位处理 -> 处理$nextTick（在为微任务或者宏任务中异步更新DOM）
 
 ### Vue3.0 有哪些新特性
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211006221811.png)
 - Composition API
-    - Vue2中OptionsAPI
-        - 相关业务的代码需要遵循option的配置写到特定的区域，导致后续维护非常的复杂，代码可复用性也不高。最难受的是敲代码的时候不得不上下反复横跳
-    - Vue3中的CompositionAPI
-        - 功能相关的代码都聚合起来了，代码变得井然有序，不再频繁地上下反复横跳。
-        - 而Composition API带来的出色代码组织和复用能力，让你可以把功能相关的代码抽离出去成为一个可复用的函数JS、TS文件，在.vue文件中通过函数的调用把刚刚这些函数的返回值组合起来，最后返回模板真正需要使用到的东西。（React Hook）
-        - 与React Hooks对比
-            - 同样的逻辑组合、复用能力
-            - 只调用一次
-                - 符合 JS 直觉
-                - 没有闭包变量问题
-                - 没有内存/GC 压力
-                - 不存在内联回调导致子组件永远更新的问题
+  - Vue2中OptionsAPI
+    - 相关业务的代码需要遵循option的配置写到特定的区域，导致后续维护非常的复杂，代码可复用性也不高。最难受的是敲代码的时候不得不上下反复横跳
+  - Vue3中的CompositionAPI
+    - 功能相关的代码都聚合起来了，代码变得井然有序，不再频繁地上下反复横跳。
+    - 而Composition API带来的出色代码组织和复用能力，让你可以把功能相关的代码抽离出去成为一个可复用的函数JS、TS文件，在.vue文件中通过函数的调用把刚刚这些函数的返回值组合起来，最后返回模板真正需要使用到的东西。（React Hook）
+    - 与React Hooks对比
+      - 同样的逻辑组合、复用能力
+      - 只调用一次
+        - 符合 JS 直觉
+        - 没有闭包变量问题
+        - 没有内存/GC 压力
+        - 不存在内联回调导致子组件永远更新的问题
+
 - Fragment
-    - 这个新特性比较简单，就是在模板中可以写多个根节点。
-        - 减少无意义的根节点元素
-        - 可以平级递归组件
+  - 这个新特性比较简单，就是在模板中可以写多个根节点。
+    - 减少无意义的根节点元素
+    - 可以平级递归组件
 ```js
-<template>
+  <template>
   <quick-sort :list="left" v-if="left.length"></quick-sort>
   <span class="item">{{ flag }}</span>
   <quick-sort :list="right" v-if="right.length"></quick-sort>
-</template>
-
+  </template>
 
 <script lang="ts">
 import {defineComponent, ref} from "vue"
@@ -8051,6 +8557,7 @@ export default defineComponent({
   }
 })
 </script>
+
 ```
 - Suspense
     - 可以理解为异步组件的爹。用于方便地控制异步组件的一个挂起和完成状态。
@@ -8085,15 +8592,16 @@ export default defineComponent({
 })
 </script>
 ```
+
 - Teleport
-    - 组件任意门，让你的组件可以任意地丢到html中的任一个DOM下。
+  - 组件任意门，让你的组件可以任意地丢到html中的任一个DOM下。
 ```js
 <template>
-  <h1>Teleport——任意门</h1>
-  <div class="customButton" @click="handleToggle">偷袭</div>
-  <teleport to="body">
-    <TeleportModal v-if="isOpen" @click="handleToggle"></TeleportModal>
-  </teleport>
+<h1>Teleport——任意门</h1>
+<div class="customButton" @click="handleToggle">偷袭</div>
+<teleport to="body">
+<TeleportModal v-if="isOpen" @click="handleToggle"></TeleportModal>
+</teleport>
 </template>
 
 <script lang="ts">
@@ -8117,6 +8625,7 @@ export default defineComponent({
   }
 })
 </script>
+
 ```
 - createRenderer API
     - Vue3中我们可以自由方便地去构建Web（浏览器）平台或非Web平台的自定义渲染器。
@@ -8124,65 +8633,63 @@ export default defineComponent({
     - 调用createRenderer以后的返回值是一个renderer，createApp这个方法就是这个renderer的一个属性方法，用它替代原生的createApp方法就可以使用我们自己的自定义渲染器了~
 ### Vue3.0 是如何变得更快更小的
 - 如何更快
-    - Object.defineProperty => Proxy（响应式原理）
-        - Proxy不仅消除了Vue2中现有的限制（比如对象新属性的增加、数组元素的直接修改不会触发响应式机制，这也是很多新手以为所谓的bug），而且有着更好的性能：
-        - 在Vue2中对数据的侦听劫持是在组件初始化时去遍历递归一个对象，给其中的每一个属性用Object.defineProperty设置它的getter和setter，然后再把处理好的这些对象挂到组件实例的this上面，所以这种方式的数据侦听是在属性层面的，这也是为什么增加对象属性无法被监听的原因，同时这种初始化的操作对于CPU来说还是比较昂贵的一个操作。对于javascript而言，一个对象肯定越稳定越小性能就越好。
-        - Proxy之后组件的初始化就不需要这么做这么费时的操作了，因为Proxy就是真正意义给一个对象包上一层代理从而去完成数据侦听劫持的操作，所以总的来说这个复杂度是直接少了一个数量级的。只要你对这个代理后的对象访问或修改里面的东西都能被这层代理所感知到，进而去动态地决定返回什么东西给你，并且也不再需要把选项的这些东西再重复挂到组件实例的this上面，因为你访问的时候是有这个信息知道你访问的东西是属于props还是data还是其他的，vue只需要根据这个信息去对应的数据结构里面拿出来就可以了，单就这一点而言你就可以感觉到组件的内存占用已经少了一半。
-        - proxy是在对象层面上的代理，所以你在对象上新增属性是可以被代理到的。
-        - Proxy还可以代理数组，所以就算你直接修改数组里面的元素也是可以被代理到的。
+  - Object.defineProperty => Proxy（响应式原理）
+    - Proxy不仅消除了Vue2中现有的限制（比如对象新属性的增加、数组元素的直接修改不会触发响应式机制，这也是很多新手以为所谓的bug），而且有着更好的性能：
+    - 在Vue2中对数据的侦听劫持是在组件初始化时去遍历递归一个对象，给其中的每一个属性用Object.defineProperty设置它的getter和setter，然后再把处理好的这些对象挂到组件实例的this上面，所以这种方式的数据侦听是在属性层面的，这也是为什么增加对象属性无法被监听的原因，同时这种初始化的操作对于CPU来说还是比较昂贵的一个操作。对于javascript而言，一个对象肯定越稳定越小性能就越好。
+    - Proxy之后组件的初始化就不需要这么做这么费时的操作了，因为Proxy就是真正意义给一个对象包上一层代理从而去完成数据侦听劫持的操作，所以总的来说这个复杂度是直接少了一个数量级的。只要你对这个代理后的对象访问或修改里面的东西都能被这层代理所感知到，进而去动态地决定返回什么东西给你，并且也不再需要把选项的这些东西再重复挂到组件实例的this上面，因为你访问的时候是有这个信息知道你访问的东西是属于props还是data还是其他的，vue只需要根据这个信息去对应的数据结构里面拿出来就可以了，单就这一点而言你就可以感觉到组件的内存占用已经少了一半。
+      - proxy是在对象层面上的代理，所以你在对象上新增属性是可以被代理到的。
+      - Proxy还可以代理数组，所以就算你直接修改数组里面的元素也是可以被代理到的。
     - 突破Virtual DOM瓶颈
-        - 所以Virtual DOM的更新性能从与模板整体大小相关，提升到了只与动态内容的数量
-        - 传统的Virtual DOM 树
-            - 当数据发生改变的时候，两棵vdom的树会进行diff比较，找到需要更新的节点再patch为实际的DOM更新到浏览器上。这个过程在Vue2中已经优化到了组件的粒度，通过渲染Watcher去准确找到需要更新的组件，将整个组件内的vdom tree进行diff。
-            - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211007071032.png)
-        - Vue3.0的
-            - Vue3重写了Virtual Dom，以利用模板的静态分析优势去将更新的粒度进一步缩小到动态元素甚至是动态的属性。
-            - 通过compiler对模板的静态分析，在优化模式下将静态的内容进行hosting，也就是把静态节点提升到外面去，实际生成vnode的就只有动态的元素<p class="text">{{ msg }}</p>，再分析这个元素内可能发生变化的东西，对这个元素打上patchFlag，表示这个元素可能发生变化的类型是文本内容textContent还是属性类class等等。
-            - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211007071416.png)
-            - 完全静态的元素已经被提升到render函数上面去了，实际会创建vnode的就只有一个含有动态文本内容的p元素。
-            - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211007071459.png)
-            - v-if / v-for
-                - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211007071825.png)
-                - 将模版基于动态节点指令切割为嵌套的区块
-                - 每个区块内部的节点结构是固定的
-                - 每个区块只需要以一个平面数组追踪自身包含的动态节点
+      - 所以Virtual DOM的更新性能从与模板整体大小相关，提升到了只与动态内容的数量
+      - 传统的Virtual DOM 树
+        - 当数据发生改变的时候，两棵vdom的树会进行diff比较，找到需要更新的节点再patch为实际的DOM更新到浏览器上。这个过程在Vue2中已经优化到了组件的粒度，通过渲染Watcher去准确找到需要更新的组件，将整个组件内的vdom tree进行diff。
+        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211007071032.png)
+      - Vue3.0的
+        - Vue3重写了Virtual Dom，以利用模板的静态分析优势去将更新的粒度进一步缩小到动态元素甚至是动态的属性。
+        - 通过compiler对模板的静态分析，在优化模式下将静态的内容进行hosting，也就是把静态节点提升到外面去，实际生成vnode的就只有动态的元素<p class="text">{{ msg }}</p>，再分析这个元素内可能发生变化的东西，对这个元素打上patchFlag，表示这个元素可能发生变化的类型是文本内容textContent还是属性类class等等。
+        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211007071416.png)
+        - 完全静态的元素已经被提升到render函数上面去了，实际会创建vnode的就只有一个含有动态文本内容的p元素。
+        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211007071459.png)
+        - v-if / v-for
+            - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211007071825.png)
+            - 将模版基于动态节点指令切割为嵌套的区块
+            - 每个区块内部的节点结构是固定的
+            - 每个区块只需要以一个平面数组追踪自身包含的动态节点
     - 更多编译时优化
         - Slot默认编译为函数
-            - 这个让使用插槽的父子组件之间的更新关系不再强耦合
+          - 这个让使用插槽的父子组件之间的更新关系不再强耦合
         - 利用模板静态分析对vnode生成的类型标记——patchFlag
-            - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211007072244.png)
-            - vnode的patchFlag通过 | 操作符去组合起来，vnode的patchFlag和某个特定类型所代表的patchFlag就用 & 操作符计算一下，如果得到的结果为0，则说明这个vnode的这个类型的属性是不会变的，不为0则相反。
+          - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211007072244.png)
+          - vnode的patchFlag通过 | 操作符去组合起来，vnode的patchFlag和某个特定类型所代表的patchFlag就用 & 操作符计算一下，如果得到的结果为0，则说明这个vnode的这个类型的属性是不会变的，不为0则相反。
 - 如何更小
     - 最主要的就是充分利用了Tree-shaking（支持摇树优化）的特性
-        - tree shaking以后，进入bundle的只有被引入并且真正会被使用的代码块。在Vue3中许多渐进式的特性都使用了第二种的写法来进行重写，而且模板本身又是Tree shaking友好的。
-        - Vue3最重要的变化之一就是引入了Tree-Shaking，Tree-Shaking带来的bundle体积更小是显而易见的。
-            - 在2.x版本中，很多函数都挂载在全局Vue对象上，比如nextTick、nextTick、set等函数，因此虽然我们可能用不到，但打包时只要引入了vue这些全局函数仍然会打包进bundle中。
-            - 在Vue3中，所有的API都通过ES6模块化的方式引入，这样就能让webpack或rollup等打包工具在打包时对没有用到API进行剔除，最小化bundle体积；
+      - tree shaking以后，进入bundle的只有被引入并且真正会被使用的代码块。在Vue3中许多渐进式的特性都使用了第二种的写法来进行重写，而且模板本身又是Tree shaking友好的。
+      - Vue3最重要的变化之一就是引入了Tree-Shaking，Tree-Shaking带来的bundle体积更小是显而易见的。
+        - 在2.x版本中，很多函数都挂载在全局Vue对象上，比如nextTick、nextTick、set等函数，因此虽然我们可能用不到，但打包时只要引入了vue这些全局函数仍然会打包进bundle中。
+        - 在Vue3中，所有的API都通过ES6模块化的方式引入，这样就能让webpack或rollup等打包工具在打包时对没有用到API进行剔除，最小化bundle体积；
 ### Vue3.0的性能优化
 - 源码优化
     - 更好的代码管理方式：monorepo 根据功能将不同的模块拆分到packages目录下不同的子目录中。这样使得模块拆分更细化，职责划分更明确，模块之间的依赖关系也更加明确，开发人员也更容易阅读、理解和更改所有模块源码，提高代码的可维护性。
     - 采用typescript开发，也省去了单独维护d.ts文件的麻烦。
-
 - 性能优化
     - 源码体积优化：移除了一些冷门的feature（比如filter、inline-template等），引入tree-shaking技术减少打包体积。
     - 数据劫持优化：使用Proxy代替vue2.x中的defineProperty，能够深层监听数组对象的变化。
     - 编译优化：检测出模板中的静态节点、子树甚至数据对象，并在生成的代码中将它们提升到渲染函数之外。这样可以避免在每次渲染时重新创建这些对象，从而大大提高内存使用率并减少垃圾回收的频率。
     - 语法API优化：推出composition API优化逻辑组合和优化逻辑复用。
-
 ### Vue3.0和Vue2.0的差别
 - 响应式原理不同
     - 使用proxy代替defineProperty
     - defineProperty只能响应首次渲染时候的属性，Proxy需要的是整体，不需要关心里面有什么属性，而且Proxy的配置项有13种，可以做更细致的事情，这是之前的defineProperty无法达到的
 - Diff算法的提升
     - 以往的渲染策略
-        - vue2.x提供类似于HTML的模板语法，但是，它是将模板编译成渲染函数来返回虚拟DOM树。Vue框架通过递归遍历两个虚拟DOM树，并比较每个节点上的每个属性，来确定实际DOM的哪些部分需要更新。
+      - vue2.x提供类似于HTML的模板语法，但是，它是将模板编译成渲染函数来返回虚拟DOM树。Vue框架通过递归遍历两个虚拟DOM树，并比较每个节点上的每个属性，来确定实际DOM的哪些部分需要更新。
     - 潜在的问题
-        - 由于现代JavaScript引擎执行的高级优化，这种有点暴力的算法通常非常快速，但是DOM的更新仍然涉及许多不必要的CPU工作
+      - 由于现代JavaScript引擎执行的高级优化，这种有点暴力的算法通常非常快速，但是DOM的更新仍然涉及许多不必要的CPU工作
     - Vue3的突破
-        - 编译器和运行时需要协同工作：编译器分析模板并生成带有优化提示的代码，而运行时尽可能获取提示并采用快速路径。
-            - 首先，在DOM树级别。我们注意到，在没有动态改变节点结构的模板指令（例如v-if和v-for）的情况下，节点结构保持完全静态。如果我们将一个模板分成由这些结构指令分隔的嵌套“块”，则每个块中的节点结构将再次完全静态。当我们更新块中的节点时，我们不再需要递归遍历DOM树 - 该块内的动态绑定可以在一个平面数组中跟踪。这种优化通过将需要执行的树遍历量减少一个数量级来规避虚拟DOM的大部分开销。
-            - 其次，编译器积极地检测模板中的静态节点、子树甚至数据对象，并在生成的代码中将它们提升到渲染函数之外。这样可以避免在每次渲染时重新创建这些对象，从而大大提高内存使用率并减少垃圾回收的频率。
-            - 第三，在元素级别。编译器还根据需要执行的更新类型，为每个具有动态绑定的元素生成一个优化标志。例如，具有动态类绑定和许多静态属性的元素将收到一个标志，提示只需要进行类检查。运行时将获取这些提示并采用专用的快速路径。
+      - 编译器和运行时需要协同工作：编译器分析模板并生成带有优化提示的代码，而运行时尽可能获取提示并采用快速路径。
+        - 首先，在DOM树级别。我们注意到，在没有动态改变节点结构的模板指令（例如v-if和v-for）的情况下，节点结构保持完全静态。如果我们将一个模板分成由这些结构指令分隔的嵌套“块”，则每个块中的节点结构将再次完全静态。当我们更新块中的节点时，我们不再需要递归遍历DOM树 - 该块内的动态绑定可以在一个平面数组中跟踪。这种优化通过将需要执行的树遍历量减少一个数量级来规避虚拟DOM的大部分开销。
+        - 其次，编译器积极地检测模板中的静态节点、子树甚至数据对象，并在生成的代码中将它们提升到渲染函数之外。这样可以避免在每次渲染时重新创建这些对象，从而大大提高内存使用率并减少垃圾回收的频率。
+        - 第三，在元素级别。编译器还根据需要执行的更新类型，为每个具有动态绑定的元素生成一个优化标志。例如，具有动态类绑定和许多静态属性的元素将收到一个标志，提示只需要进行类检查。运行时将获取这些提示并采用专用的快速路径。
 - typeScript的支持
     - vue2是支持类型的，用的是Facebook的Flow做类型检查，但是因为某些情况下推断有问题，所以改为支持ts。
 - 生命周期不同
@@ -8194,15 +8701,15 @@ export default defineComponent({
 - Composition API
     - 很多个API组合的一套API
     - setup
-        - setup替代了以前的 beforeCreate 和 created ，类似于初始化的功
+      - setup替代了以前的 beforeCreate 和 created ，类似于初始化的功
     - ref 、toRef、 toRefs
-        - ref 就当作简单的响应式变量 
-        - toRef 就是把不是响应式的对象转化成响应式
-        - toRefs 就是把响应式的reactive对象，分解成无数的响应式 ref
-        - 注意
-            - 1. ref 响应式的数据，在函数里读取的时候需要 .value获取
-            - 2. dom里不需要我们.value 框架替我们自动解构了
-            - 3. 组件return的时候将 reactive的对象 toRefs ，可以使代码更简洁，又不会丢失数据的响应式
+      - ref 就当作简单的响应式变量 
+      - toRef 就是把不是响应式的对象转化成响应式
+      - toRefs 就是把响应式的reactive对象，分解成无数的响应式 ref
+      - 注意
+        - 1. ref 响应式的数据，在函数里读取的时候需要 .value获取
+        - 2. dom里不需要我们.value 框架替我们自动解构了
+        - 3. 组件return的时候将 reactive的对象 toRefs ，可以使代码更简洁，又不会丢失数据的响应式
     ```js
     import { ref , toRef , toRefs } from 'vue'
     setup(){
@@ -8212,32 +8719,32 @@ export default defineComponent({
      //这里将对象转化成响应性，并设置key值,函数中读取值要toR._object
      let toR = toRef(obj,'toR')
      const state = reactive({
-    	num:1,
-    	name:'baby张'
+        num:1,
+        name:'baby张'
     })
      return {
-    	tor,
-    	roR,
-    	//toRefs针对的是使用了reactive的响应式对象，可以理解为将对象拆分成多个响应式ref，外界可以读取到响应式的所有属性
-    	...toRefs(state)
-    	}
+        tor,
+        roR,
+        //toRefs针对的是使用了reactive的响应式对象，可以理解为将对象拆分成多个响应式ref，外界可以读取到响应式的所有属性
+        ...toRefs(state)
+        }
      }
     ```
     - reactive
-        - reactive 内部是可以使用计算属性等各种方法，它只是把数据实现响应式而已
-        - reactive 后return 的数据最好是用toRefs 转化一下，好处谁用谁知道
+      - reactive 内部是可以使用计算属性等各种方法，它只是把数据实现响应式而已
+      - reactive 后return 的数据最好是用toRefs 转化一下，好处谁用谁知道
     - watch、watchEffect
-        - watch则是一对多的关系
-        - watch
-            - watch里第一个参数是监听需要的变量，第二个是执行的回调函数，
-        - watchEffect
-            - watchEffect只要里面的变量发生了改变就会执行,并且第一次渲染会立即执行,没有变化前后返回参数，无法监听整个reactive
-        - 区别
-            - watch 需要具体监听参数，watchEffect 不需要传入监听参数
-            - watch 的回调函数跟以前一样有前后对比的参数，watchEffect 啥都没有
-            - watch 只有监听属性变化才执行，watchEffect 第一次会立即执行
-            - watch 和 watchEffect 都无法监听未被绑定的属性
-            - watch 可以直接监听 ref 和 reactive 绑定的对象，watchEffect 不可以（ref的值要.value，reactive的值要具体到内部属性），只会执行第一次
+      - watch则是一对多的关系
+      - watch
+         - watch里第一个参数是监听需要的变量，第二个是执行的回调函数，
+      - watchEffect
+        - watchEffect只要里面的变量发生了改变就会执行,并且第一次渲染会立即执行,没有变化前后返回参数，无法监听整个reactive
+      - 区别
+        - watch 需要具体监听参数，watchEffect 不需要传入监听参数
+        - watch 的回调函数跟以前一样有前后对比的参数，watchEffect 啥都没有
+        - watch 只有监听属性变化才执行，watchEffect 第一次会立即执行
+        - watch 和 watchEffect 都无法监听未被绑定的属性
+        - watch 可以直接监听 ref 和 reactive 绑定的对象，watchEffect 不可以（ref的值要.value，reactive的值要具体到内部属性），只会执行第一次
     ```js
          //这里的watchEffect只要里面的变量发生了改变就会执行,并且第一次渲染会立即执行,没有变化前后返回参数，无法监听整个reactive
         watchEffect(() => {
@@ -8254,7 +8761,7 @@ export default defineComponent({
     const state = reactive({
       count: 0,
     });
-    
+
     //侦听时返回值得getter函数
     watch(
       () => state.count,
@@ -8264,7 +8771,7 @@ export default defineComponent({
       }
     );
     state.count++;
-    
+
     const count = ref(0);
     //直接侦听ref
     watch(count, (count, prevCount) => {
@@ -8297,7 +8804,7 @@ export default defineComponent({
         },
       },
     });
-    
+
     watch(
       () => _.cloneDeep(deepObj),
       (val, old) => {
@@ -8306,12 +8813,12 @@ export default defineComponent({
       },
       { deep: true }
     );
-    
+
     deepObj.a.b.c = "new hello";
     ```
     - computed
-        - computed是多对一的关系
-        - computed是一个函数，它接收一个回调函数作为参数，返回一个基于该值的响应式Ref对象。也可以接收一个对象形式（对象中只有set和get）作为参数。
+      - computed是多对一的关系
+      - computed是一个函数，它接收一个回调函数作为参数，返回一个基于该值的响应式Ref对象。也可以接收一个对象形式（对象中只有set和get）作为参数。
     ```js
     <script lang="ts">
         import { defineComponent, ref, computed } from "vue";
@@ -8351,8 +8858,8 @@ export default defineComponent({
           return h(p, context.attrs, context.slots)
         }
         export default Fun
-    ```    
-### Vue3.0双向绑定的实现原理    
+    ``` 
+### Vue3.0双向绑定的实现原理
 
 ### Vue3.0响应式数据原理
 Vue3.x改用Proxy替代Object.defineProperty。因为Proxy可以直接监听对象和数组的变化，并且有多达13种拦截方法。并且作为新标准将受到浏览器厂商重点持续的性能优化。
@@ -8365,54 +8872,52 @@ Proxy只会代理对象的第一层。
 
 
 - Vue3 数据劫持底层主要是使用 ES6 的 Proxy 实现。
-    - Proxy 的优势如下:
-        - Proxy 可以直接监听对象（const proxy = new Proxy(target, handler)）；defineProperty 需要遍历对象属性进行监听。
-        - Proxy 可以直接监听对象新增的属性；defineProperty 只能劫持一开始就存在的属性，新增属性需要手动 Observer。
-        - Proxy 可以直接监听数组的变化；defineProperty 无法监听数组的变化。
-        - Proxy 有多达 13 种拦截方法：不限于 get、set、has、deleteProperty、apply、ownKeys、construct 等等；除开 get 和 set 其他都是 defineProperty 不具备的。
-        - Proxy 返回的是一个新对象，我们可以只操作新的对象达到目的；defineProperty 只能遍历对象属性直接修改；
-    - Proxy 的劣势如下:
-        - ES6 的 Proxy 的存在浏览器兼容性问题。
-        - Proxy 和 Reflect 结合实现 Vue3 底层数据劫持原理。Reflect 设计的目的是为了优化 Object 的一些操作方法以及合理的返回 Object 操作返回的结果，对于一些命令式的 Object 行为，Reflect 对象可以将其变为函数式的行为。比如 （'name' in obj） = Reflect.has(obj, 'name')
+  - Proxy 的优势如下:
+    - Proxy 可以直接监听对象（const proxy = new Proxy(target, handler)）；defineProperty 需要遍历对象属性进行监听。
+    - Proxy 可以直接监听对象新增的属性；defineProperty 只能劫持一开始就存在的属性，新增属性需要手动 Observer。
+    - Proxy 可以直接监听数组的变化；defineProperty 无法监听数组的变化。
+    - Proxy 有多达 13 种拦截方法：不限于 get、set、has、deleteProperty、apply、ownKeys、construct 等等；除开 get 和 set 其他都是 defineProperty 不具备的。
+    - Proxy 返回的是一个新对象，我们可以只操作新的对象达到目的；defineProperty 只能遍历对象属性直接修改；
+  - Proxy 的劣势如下:
+    - ES6 的 Proxy 的存在浏览器兼容性问题。
+    - Proxy 和 Reflect 结合实现 Vue3 底层数据劫持原理。Reflect 设计的目的是为了优化 Object 的一些操作方法以及合理的返回 Object 操作返回的结果，对于一些命令式的 Object 行为，Reflect 对象可以将其变为函数式的行为。比如 （'name' in obj） = Reflect.has(obj, 'name')
 ### Vue3.0的diff算法
 Vue3.x借鉴了 ivi算法和 inferno算法
 在创建VNode时就确定其类型，以及在mount/patch的过程中采用位运算来判断一个VNode的类型，在这个基础之上再配合核心的Diff算法
 该算法中还运用了动态规划的思想求解最长递归子序列。
 ### Vue3.0的computed的实现原理
-
 ### Vue3.0的Watch的运行原理
 
 ### Vue项目中实现路由按需加载（路由懒加载）的3中方式
 - vue异步组件
 - es6提案的import()
 - webpack的require.ensure()
-
 ### Vue的性能优化？
 - 编码阶段
-    - 尽量减少data中的数据，data中的数据都会增加getter和setter，会收集对应的watcher
-    - v-if和v-for不能连用
-    - 如果需要使用v-for给每项元素绑定事件时使用事件代理
-    - SPA 页面采用keep-alive缓存组件
-    - 在更多的情况下，使用v-if替代v-show
-    - key保证唯一
-    - 使用路由懒加载、异步组件
-    - 防抖、节流
-    - 第三方模块按需导入
-    - 长列表滚动到可视区域动态加载
-    - 图片懒加载
+  - 尽量减少data中的数据，data中的数据都会增加getter和setter，会收集对应的watcher
+  - v-if和v-for不能连用
+  - 如果需要使用v-for给每项元素绑定事件时使用事件代理
+  - SPA 页面采用keep-alive缓存组件
+  - 在更多的情况下，使用v-if替代v-show
+  - key保证唯一
+  - 使用路由懒加载、异步组件
+  - 防抖、节流
+  - 第三方模块按需导入
+  - 长列表滚动到可视区域动态加载
+  - 图片懒加载
 - SEO优化
-    - 预渲染
-    - 服务端渲染SSR
+  - 预渲染
+  - 服务端渲染SSR
 - 打包优化
-    - 压缩代码
-    - Tree Shaking/Scope Hoisting
-    - 使用cdn加载第三方模块
-    - 多线程打包happypack
-    - splitChunks抽离公共文件
-    - sourceMap优化
+  - 压缩代码
+  - Tree Shaking/Scope Hoisting
+  - 使用cdn加载第三方模块
+  - 多线程打包happypack
+  - splitChunks抽离公共文件
+  - sourceMap优化
 - 用户体验
-    - 骨架屏
-    - PWA
+  - 骨架屏
+  - PWA
 - 使用缓存(客户端缓存、服务端缓存)优化、服务端开启gzip压缩等。
 ### vue 中使用了哪些设计模式
 1. 工厂模式 - 传入参数即可创建实例
@@ -8429,13 +8934,13 @@ vuex 和 vue-router 的插件注册方法 install 判断如果系统存在实例
 - history实际采用了HTML5中提供的API来实现，主要有history.pushState()和history.replaceState()。
 
 - hash 模式
-    - location.hash 的值实际就是 URL 中#后面的东西 它的特点在于：hash 虽然出现 URL 中，但不会被包含在 HTTP 请求中，对后端完全没有影响，因此改变 hash 不会重新加载页面。
-    - 可以为 hash 的改变添加监听事件
-    - `window.addEventListener("hashchange", funcRef, false);`
-    - 每一次改变 hash（window.location.hash），都会在浏览器的访问历史中增加一个记录利用 hash 的以上特点，就可以来实现前端路由“更新视图但不重新请求页面”的功能了
+  - location.hash 的值实际就是 URL 中#后面的东西 它的特点在于：hash 虽然出现 URL 中，但不会被包含在 HTTP 请求中，对后端完全没有影响，因此改变 hash 不会重新加载页面。
+  - 可以为 hash 的改变添加监听事件
+  - `window.addEventListener("hashchange", funcRef, false);`
+  - 每一次改变 hash（window.location.hash），都会在浏览器的访问历史中增加一个记录利用 hash 的以上特点，就可以来实现前端路由“更新视图但不重新请求页面”的功能了
 - history 模式
-    - 利用了 HTML5 History Interface 中新增的 pushState() 和 replaceState() 方法。
-    - 这两个方法应用于浏览器的历史记录站，在当前已有的 back、forward、go 的基础之上，它们提供了对历史记录进行修改的功能。这两个方法有个共同的特点：当调用他们修改浏览器历史记录栈后，虽然当前 URL 改变了，但浏览器不会刷新页面，这就为单页应用前端路由“更新视图但不重新请求页面”提供了基础。
+  - 利用了 HTML5 History Interface 中新增的 pushState() 和 replaceState() 方法。
+  - 这两个方法应用于浏览器的历史记录站，在当前已有的 back、forward、go 的基础之上，它们提供了对历史记录进行修改的功能。这两个方法有个共同的特点：当调用他们修改浏览器历史记录栈后，虽然当前 URL 改变了，但浏览器不会刷新页面，这就为单页应用前端路由“更新视图但不重新请求页面”提供了基础。
 ### vue-router 中路由方法 pushState 和 replaceState 能否触发 popSate 事件
 - 不能
 - HTML5 新接口，可以改变网址(存在跨域限制)而不刷新页面，这个强大的特性后来用到了单页面应用
@@ -8449,47 +8954,55 @@ window.history.pushState(state, title, targetURL);
 window.history.replaceState(state, title, targetURL);
 @类似于pushState,但是会直接替换掉当前url,而不会在history中留下记录
 ```
+
 - popstate 事件会在点击后退、前进按钮(或调用 history.back()、history.forward()、history.go()方法)时触发
 
 ### vue-router 路由钩子函数是什么 执行顺序是什么
+
 路由钩子的执行流程, 钩子函数种类有:全局守卫、路由守卫、组件守卫。
 
 - 完整的导航解析流程:
-    - 导航被触发。
-    - 在失活的组件里调用 beforeRouteLeave 守卫。
-    - 调用全局的 beforeEach 守卫。
-    - 在重用的组件里调用 beforeRouteUpdate 守卫。重用的组件。
-    - 在路由配置里调用 beforeEnter。
-    - 解析异步路由组件。
-    - 在被激活的组件里调用 beforeRouteEnter。
-    - 调用全局的 beforeResolve 守卫。
-    - 导航被确认。
-    - 调用全局的 afterEach 钩子。
-    - 触发 DOM 更新。
-    - 调用 beforeRouteEnter 守卫中传给 next 的回调函数，创建好的组件实例会作为回调函数的参数传入。
+  - 导航被触发。
+  - 在失活的组件里调用 beforeRouteLeave 守卫。
+  - 调用全局的 beforeEach 守卫。
+  - 在重用的组件里调用 beforeRouteUpdate 守卫。重用的组件。
+  - 在路由配置里调用 beforeEnter。
+  - 解析异步路由组件。
+  - 在被激活的组件里调用 beforeRouteEnter。
+  - 调用全局的 beforeResolve 守卫。
+  - 导航被确认。
+  - 调用全局的 afterEach 钩子。
+  - 触发 DOM 更新。
+  - 调用 beforeRouteEnter 守卫中传给 next 的回调函数，创建好的组件实例会作为回调函数的参数传入。
 
 ### vue-router跳转方式有哪些
+
 - router.push(location, onComplete?, onAbort?)
-    - 想要导航到不同的 URL，则使用 router.push 方法。这个方法会向 history 栈添加一个新的记录，所以，当用户点击浏览器后退按钮时，则回到之前的 URL。
+  - 想要导航到不同的 URL，则使用 router.push 方法。这个方法会向 history 栈添加一个新的记录，所以，当用户点击浏览器后退按钮时，则回到之前的 URL。
+
 - router.replace(location, onComplete?, onAbort?)
-    - 跟 router.push 很像，唯一的不同就是，它不会向 history 添加新记录，而是跟它的方法名一样 —— 替换掉当前的 history 记录。
+  - 跟 router.push 很像，唯一的不同就是，它不会向 history 添加新记录，而是跟它的方法名一样 —— 替换掉当前的 history 记录。
+
 - router.go(n)
-    - 这个方法的参数是一个整数，意思是在 history 记录中向前或者后退多少步，类似 window.history.go(n)。
+  - 这个方法的参数是一个整数，意思是在 history 记录中向前或者后退多少步，类似 window.history.go(n)。
 ### vue-router添加参数
+
 - vue-router传递参数
-    - 编程式的导航 router.push
-        - this.$router.push({ name: 'news', params: { userId: 123 }})
-            - 命名路由搭配params，刷新页面参数会丢失
-        - this.$router.push({ path: '/news', query: { userId: 123 }});
-            - 查询参数搭配query，刷新页面数据不会丢失
-    - 声明式的导航 <router-link>
-        - <router-link :to="{ name: 'news', params: { userId: 1111}}">click to news page</router-link>
+  - 编程式的导航 router.push
+    - this.$router.push({ name: 'news', params: { userId: 123 }})
+      - 命名路由搭配params，刷新页面参数会丢失
+    - this.$router.push({ path: '/news', query: { userId: 123 }});
+      - 查询参数搭配query，刷新页面数据不会丢失
+  - 声明式的导航 <router-link>
+    - <router-link :to="{ name: 'news', params: { userId: 1111}}">click to news page</router-link>
 ### location.href和vue-router的区别
+
 - vue-router使用pushState进行路由更新，静态跳转，页面不会重新加载；location.href会触发浏览器，页面重新加载一次
 - vue-router使用diff算法，实现按需加载，减少dom操作
 - vue-router是路由跳转或同一个页面跳转；location.href是不同页面间跳转；
 - vue-router是异步加载this.$nextTick(()=>{获取url})；location.href是同步加载
 ## Vuex
+
 ### Vuex个人理解
 vue一般是单项数据流，当我们的应用遇到多个组件共享状态时，单向数据流的简洁性很容易被破坏：
 多个视图依赖于同一状态、来自不同视图的行为需要变更同一状态。
@@ -8497,20 +9010,23 @@ vue一般是单项数据流，当我们的应用遇到多个组件共享状态�
 
 vuex 是专门为 vue 提供的全局状态管理系统，用于多个组件中数据共享、数据缓存等。（无法持久化、内部核心原理是通过创造一个全局实例 new Vue）
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211015154102.png)
+
 ### Vuex是怎么实现的？
+
 install函数：用来注册插件到vue里（说白了就是在vue中执行这个函数，并把vue当作参数传入此函数，使用vue的方法和绑定store到各个组件上）
 
 store类：state、getters、mutations、actions、modules、plugins
 辅助函数：mapState、mapActions、mapMutations
 
-
 #### 怎么让每个vue组件都能拿到$store？
+
 给每个实例注入$store。
 
 在install方法里面，用vue.mixin混入，在beforeCreate的生命周期的钩子函数，使得当每个组件实例化的时候都会调用这个函数，给自己赋值一个store属性
+
 ```js
 let Vue
-const install = (_Vue) => { 
+const install = (_Vue) => {
   Vue = _Vue
   // 使用vue的混入方法，在创建之前，给每个组件都增加$store属性
   Vue.mixin({
@@ -8518,11 +9034,11 @@ const install = (_Vue) => {
     beforeCreate () {
       // 根实例有store属性
       if (this.$options && this.$options.store) {
-        this.$store = this.$options.store  
+        this.$store = this.$options.store
       } else {
       // 根实例上没有的store属性，往父亲节点找
       // new Vue({store}) 这里已经在根组件挂载有store属性
-        this.$store = this.$parent && this.$parent.$store 
+        this.$store = this.$parent && this.$parent.$store
       }
     }
   })
@@ -8533,6 +9049,7 @@ export default {
 ```
 #### 怎么实现state数据响应式？
 利用vue的响应式原理，让state的修改都可以更新回视图，而不是单纯获取state数据。
+
 ```js
 class Store {
   constructor (options) {
@@ -8553,10 +9070,12 @@ class Store {
   }
 }
 ```
+
 #### getters怎么实现？
 getters从根本上就是computed，给你返回一些派生的状态（对数据进行过滤操作）。
 
 遍历用户传入的参数获取属性名，利用Object.defineProperty的get获取方法执行的结果，赋值到getters对象对应的属性名上，用户通过this.getters.myName就可以调用对应的值
+
 ```js
 // 简化代码，封装遍历方法
 const forEach = (obj, callback) => {
@@ -8573,11 +9092,13 @@ forEach(getters, (getterName, fn) => {
   })
 })
 ```
+
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106190231.png)
 
 #### commit怎么去触发mutation
 1）不能直接改变 store 中的状态。改变 store 中的状态的唯一方法是提交 (commit) mutation。
 2）每个 mutation 都有一个字符串的 事件类型 (type) 和 一个 回调函数 (handler)。调用 store.commit(type, payload) 方法来触发mutations中的相关方法。
+
 ```js
 forEach(mutations, (mutationName, fn) => {
       store.mutations[mutationName] || (store.mutations[mutationName] = [])
@@ -8591,6 +9112,7 @@ commit = (type, payload) => {
   this.mutations[type].forEach(fn => fn(payload))
 }
 ```
+
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106190533.png)
 
 #### dispatch怎么触发actions？
@@ -8604,7 +9126,7 @@ forEach(actions, (actionName, fn) => {
     store.actions[actionName] || (store.actions[actionName] = [])
     store.actions[actionName].push((payload) => {
       fn(store, payload)  // 参数是vuex.store实例
-   	})
+       })
 })
 
 // 用户通过this.$store.dispatch('syncAdd', 10) 传入属性名和荷载，找到对应的函数，遍历执行
@@ -8612,12 +9134,16 @@ dispatch = (type, payload) => {
     this.actions[type].forEach(fn => fn(payload))
 }
 ```
+
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106190646.png)
+
 #### plugins是怎么实现？(持久化插件plugins)
+
 作用是：把state都存储在localStorage里面，刷新不会丢失数据
 原理：发布订阅模式
 实例store的时候，遍历plugins里面的函数，并执行 this.subscribe() 订阅到sote._subscribe数组上
 当监测到mutation有变化的时候，依次执行所有的订阅
+
 ```js
 // store.js
 const persits = (store) => {
@@ -8648,7 +9174,7 @@ const installModule = (store, state, path, rootModule) => {
     })
   }
 }
-  
+
 class Store {
   constructor (options) {
     // 将用户的状态放到store中
@@ -8662,8 +9188,8 @@ class Store {
     // 只循环一次，现在需要把子modules里面的getters、mutations、actions都放到对应的对象里
     /** 保存一份到本身实例 */
     this._options = options
-	this._subscribes=[]
-	// 实例store的时候，遍历plugins里面的函数，并执行 this.subscribe() 订阅
+    this._subscribes=[]
+    // 实例store的时候，遍历plugins里面的函数，并执行 this.subscribe() 订阅
     options.plugins.forEach(plugin => plugin(this))
   }
   subscribe (fn) {
@@ -8697,6 +9223,7 @@ computed: {
 },
 ```
 …mapState相当于解构赋值给computed，浅拷贝。
+
 ```js
 let mapState = {
   name: 'ccc',
@@ -8721,11 +9248,12 @@ console.log(mapState) // {name: "ccc", age: 1, child :{count:3}}
 ② 如果是字符串，说明是用命名空间来获取值，则通过第一个参数（命名空间名）去根实例store._modulesNamespaceMap上找到对应的module模块，再通过第二个参数（key）找到state上对应的value返回
 
 总结：都是通过key值在state上找到value值，组装成对象返回，然后再解构赋值到computed上
+
 #### 命名空间
 namespaced：vuex中的store分模块管理，需要在store的index.js中引入各个模块，为了解决不同模块命名冲突的问题，将不同模块的namespaced:true，之后在不同页面中引入getter、actions、mutations时，需要加上所属的模块名
 
-
 当使用 mapState, mapGetters, mapActions 和 mapMutations 这些函数来绑定带命名空间的模块时，写起来可能比较繁琐：
+
 ```js
 // store.js
 const moduleE = {
@@ -8736,13 +9264,12 @@ const moduleE = {
   }
 }
 export default new Vuex.Store({
-  modules: { 
-	// 将模块挂载到根store
+  modules: {
+    // 将模块挂载到根store
     moduleE, // 等同于moduleE : 等同于moduleE, 上面模块的命名空间是moduleE
     // eee: moduleE, // 下面模块的命名空间是 eee
  }
 });
-
 
 
 
@@ -8754,7 +9281,6 @@ computed: {
 // })
   ...mapState('moduleE', ['name'])
 }
-
 
 
 // 实现原理
@@ -8771,6 +9297,7 @@ computed: {
      ])
   },
 ```
+
 命名空间原理：
 1）安装每一个模块的时候，判断有没有namespaced，为否时，则给他设置false，为true则找到moduleName和对应module，挂载到根_modulesNamespaceMap={}对象上
 
@@ -8780,15 +9307,15 @@ computed: {
 ### Vuex是什么？原理是什么？怎么使用？哪种功能场景使用它？
 - 状态管理库，类似 React 中的 Rudux
 - vuex是一个专门为vue构建的状态集管理，主要是为了解决组件间状态共享的问题，强调的是数据的集中式管理，说白了主要是便于维护便于解耦所以不是所有的项目都适合使用vuex，如果你不是构建大型项目使用vuex反而使你的项目代码繁琐多余
--  state mutations getters actions modules
+- state mutations getters actions modules
 
 ### 为什么 Vuex的mutation中不能做异步操作？
 Vuex中所有的状态更新的唯一途径都是mutation，异步操作通过 Action 来提交 mutation实现，这样使得我们可以方便地跟踪每一个状态的变化，从而让我们能够实现一些工具帮助我们更好地了解我们的应用。 每个mutation执行完成后都会对应到一个新的状态变更，这样devtools就可以打个快照存下来，然后就可以实现 time-travel 了。如果mutation支持异步操作，就没有办法知道状态是何时更新的，无法很好的进行状态的追踪，给调试带来困难。
-
 ### Vuex 页面刷新数据丢失怎么解决
-需要做 vuex 数据持久化 一般使用本地存储的方案来保存数据 可以自己设计存储方案 也可以使用第三方插件
 
+需要做 vuex 数据持久化 一般使用本地存储的方案来保存数据 可以自己设计存储方案 也可以使用第三方插件
 ### vuex中如何组合使用多个 action。
+
 业务逻辑场景：存在2个action，actionA和actionB，先执行完actionA才能执行actionB。
 
 ```js
@@ -8825,15 +9352,17 @@ actions:{
     }
 }
 ```
-## Webpack Vite Rollup
-### Webpack流程
-- webpack到底是如何对我们的项目进行打包的呢？
-    - 事实上webpack在处理应用程序时，它会根据命令或者配置文件找到入口文件；
-    - 从入口开始，会生成一个  依赖关系图，这个依赖关系图会包含应用程序中所需的所有模块（比如.js文件、css文件、图片、 字体等）；
-    - 然后遍历图结构，打包一个个模块（根据文件的不同使用不同的loader来解析）生成AST语法树，；
-    - 找出每个文件的依赖项（遍历）。
-    - 根据AST语法树，生成浏览器能够运行的代码
 
+## Webpack Vite Rollup
+
+### Webpack流程
+
+- webpack到底是如何对我们的项目进行打包的呢？
+  - 事实上webpack在处理应用程序时，它会根据命令或者配置文件找到入口文件；
+  - 从入口开始，会生成一个  依赖关系图，这个依赖关系图会包含应用程序中所需的所有模块（比如.js文件、css文件、图片、 字体等）；
+  - 然后遍历图结构，打包一个个模块（根据文件的不同使用不同的loader来解析）生成AST语法树，；
+  - 找出每个文件的依赖项（遍历）。
+  - 根据AST语法树，生成浏览器能够运行的代码
 
 Webpack 的运行流程是一个串行的过程：
 - 初始化参数：从配置文件和 Shell 语句中读取与合并参数，得出最终的参数
@@ -8845,16 +9374,17 @@ Webpack 的运行流程是一个串行的过程：
 - 输出完成：在确定好输出内容后，根据配置确定输出的路径和文件名，把文件内容写入到文件系统
 ### Webpack特点
 - 代码分割
-    - Webpack 有两种组织模块依赖的方式，同步和异步。异步依赖作为分割点，形成一个新的块。在优化了依赖树后，每一个异步区块都作为一个文件被打包。
+  - Webpack 有两种组织模块依赖的方式，同步和异步。异步依赖作为分割点，形成一个新的块。在优化了依赖树后，每一个异步区块都作为一个文件被打包。
 - Loader(加载器)
-    - Webpack 本身只能处理原生的 JavaScript 模块，但是 loader 转换器可以将各种类型的资源转换成 JavaScript 模块。这样，任何资源都可以成为 Webpack 可以处理的模块。
+  - Webpack 本身只能处理原生的 JavaScript 模块，但是 loader 转换器可以将各种类型的资源转换成 JavaScript 模块。这样，任何资源都可以成为 Webpack 可以处理的模块。
 - 智能解析
-    - Webpack 有一个智能解析器，几乎可以处理任何第三方库，无论它们的模块形式是 CommonJS、 AMD 还是普通的 JS 文件。
+  - Webpack 有一个智能解析器，几乎可以处理任何第三方库，无论它们的模块形式是 CommonJS、 AMD 还是普通的 JS 文件。
 - 插件系统
-    - Webpack 还有一个功能丰富的插件系统。大多数内容功能都是基于这个插件系统运行的，还可以开发和使用开源的 Webpack 插件，来满足各式各样的需求。
+  - Webpack 还有一个功能丰富的插件系统。大多数内容功能都是基于这个插件系统运行的，还可以开发和使用开源的 Webpack 插件，来满足各式各样的需求。
 - 支持热模块替换(HMR)
 - 在开发应用时使用 Webpack，开发库时使用 Rollup。
 ### Webpack的loader和plugins的区别
+  
 Loader 本质就是一个函数，在该函数中对接收到的内容进行转换，返回转换后的结果。 因为 Webpack 只认识 JavaScript，所以 Loader 就成了翻译官，对其他类型的资源进行转译的预处理工作。
 
 Plugin 就是插件，基于事件流框架 Tapable，插件可以扩展 Webpack 的功能，在 Webpack 运行的生命周期中会广播出许多事件，Plugin 可以监听这些事件，在合适的时机通过 Webpack 提供的 API 改变输出结果。
@@ -8863,6 +9393,7 @@ Loader 在 module.rules 中配置，作为模块的解析规则，类型为数�
 
 Plugin 在 plugins 中单独配置，类型为数组，每一项是一个 Plugin 的实例，参数都通过构造函数传入。
 ### 有哪些常见的Loader？你用过哪些Loader？
+
 - raw-loader：加载文件原始内容（utf-8）
 - file-loader：把文件输出到一个文件夹中，在代码中通过相对 URL 去引用输出的文件 (处理图片和字体)
 - url-loader：与 file-loader 类似，区别是用户可以设置一个阈值，大于阈值会交给 file-loader 处理，小于阈值时返回文件 base64 形式编码 (处理图片和字体)
@@ -8887,6 +9418,7 @@ Plugin 在 plugins 中单独配置，类型为数组，每一项是一个 Plugin
 - cache-loader: 可以在一些性能开销较大的 Loader 之前添加，目的是将结果缓存到磁盘里
 
 ### 有哪些常见的Plugin？你用过哪些Plugin？
+
 - define-plugin：定义环境变量 (Webpack4 之后指定 mode 会自动配置)
 - ignore-plugin：忽略部分文件
 - html-webpack-plugin：简化 HTML 文件创建 (依赖于 html-loader)
@@ -8902,6 +9434,7 @@ Plugin 在 plugins 中单独配置，类型为数组，每一项是一个 Plugin
 - webpack-bundle-analyzer: 可视化 Webpack 输出文件的体积 (业务组件、依赖第三方模块)
 
 ### 是否写过Loader？简单描述一下编写loader的思路？
+
 Loader 支持链式调用，所以开发上需要严格遵循“单一职责”，每个 Loader 只负责自己需要负责的事情。
 
 - Loader 运行在 Node.js 中，我们可以调用任意 Node.js 自带的 API 或者安装第三方模块进行调用
@@ -8910,25 +9443,22 @@ Loader 支持链式调用，所以开发上需要严格遵循“单一职责”�
 - Loader 是无状态的，我们不应该在 Loader 中保留状态
 - 使用 loader-utils 和 schema-utils 为我们提供的实用工具
 - 加载本地 Loader 方法
-    - Npm link
-    - ResolveLoader
+  - Npm link
+  - ResolveLoader
 ### 是否写过Plugin？简单描述一下编写Plugin的思路？
 webpack在运行的生命周期中会广播出许多事件，Plugin 可以监听这些事件，在特定的阶段钩入想要添加的自定义功能。Webpack 的 Tapable 事件流机制保证了插件的有序性，使得整个系统扩展性良好。
-
 - compiler 暴露了和 Webpack 整个生命周期相关的钩子
 - compilation 暴露了与模块和依赖有关的粒度更小的事件钩子
 - 插件需要在其原型上绑定apply方法，才能访问 compiler 实例
 - 传给每个插件的 compiler 和 compilation对象都是同一个引用，若在一个插件中修改了它们身上的属性，会影响后面的插件
 - 找出合适的事件点去完成想要的功能
-    - emit 事件发生时，可以读取到最终输出的资源、代码块、模块及其依赖，并进行修改(emit 事件是修改 Webpack 输出资源的最后时机)
-    - watch-run 当依赖的文件发生变化时会触发
-- 异步的事件需要在插件处理完任务时调用回调函数通知 Webpack 进入下一个流程，不然会卡住
+  - emit 事件发生时，可以读取到最终输出的资源、代码块、模块及其依赖，并进行修改(emit 事件是修改 Webpack 输出资源的最后时机)
+  - watch-run 当依赖的文件发生变化时会触发
 
+- 异步的事件需要在插件处理完任务时调用回调函数通知 Webpack 进入下一个流程，不然会卡住
 ### webpack Plugin 和 Loader 的区别
 - Loader
-    - 用于对模块源码的转换，loader 描述了 webpack 如何处理非 javascript 模块，并且在 bundle 中引入这些依赖。loader 可以将文件从不同的语言（如 TypeScript）转换为 JavaScript，或者将内联图像转换为 data URL。比如说：CSS-Loader，Style-Loader 等。
-- 
-
+  - 用于对模块源码的转换，loader 描述了 webpack 如何处理非 javascript 模块，并且在 bundle 中引入这些依赖。loader 可以将文件从不同的语言（如 TypeScript）转换为 JavaScript，或者将内联图像转换为 data URL。比如说：CSS-Loader，Style-Loader 等。
 ### source map是什么？生产环境怎么用？
 source map 是将编译、打包、压缩后的代码映射回源代码的过程。打包压缩后的代码不具备良好的可读性，想要调试源码就需要 soucre map。map文件只要不打开开发者工具，浏览器是不会加载的。
 
@@ -8936,102 +9466,105 @@ source map 是将编译、打包、压缩后的代码映射回源代码的过程
 - hidden-source-map：借助第三方错误监控平台 Sentry 使用
 - nosources-source-map：只会显示具体行数以及查看源代码的错误栈。安全性比 sourcemap 高
 - sourcemap：通过 nginx 设置将 .map 文件只对白名单开放(公司内网)
-
 注意：避免在生产中使用 inline- 和 eval-，因为它们会增加 bundle 体积大小，并降低整体性能。
 
 ### 文件监听原理呢？
 在发现源码发生变化时，自动重新构建出新的输出文件。
-
 Webpack开启监听模式，有两种方式：
 - 启动 webpack 命令时，带上 --watch 参数
 - 在配置 webpack.config.js 中设置 watch:true
-缺点：每次需要手动刷新浏览器。
-
+  缺点：每次需要手动刷新浏览器。
 原理：轮询判断文件的最后编辑时间是否变化，如果某个文件发生了变化，并不会立刻告诉监听者，而是先缓存起来，等 aggregateTimeout 后再执行。
+
 ```js
 module.export = {
-    // 默认false,也就是不开启    
-    watch: true,    
-    // 只有开启监听模式时，watchOptions才有意义    
-    watchOptions: {        
-        // 默认为空，不监听的文件或者文件夹，支持正则匹配        
-        ignored: /node_modules/,       
-         // 监听到变化发生后会等300ms再去执行，默认300ms       
-        aggregateTimeout:300,        
-        // 判断文件是否发生变化是通过不停询问系统指定文件有没有变化实现的，默认每秒问1000次        
-        poll:1000    
+    // 默认false,也就是不开启
+    watch: true,
+    // 只有开启监听模式时，watchOptions才有意义
+    watchOptions: {
+        // 默认为空，不监听的文件或者文件夹，支持正则匹配
+        ignored: /node_modules/,
+         // 监听到变化发生后会等300ms再去执行，默认300ms
+        aggregateTimeout:300,
+        // 判断文件是否发生变化是通过不停询问系统指定文件有没有变化实现的，默认每秒问1000次
+        poll:1000
     }
 }
 ```
+
 ### 文件指纹是什么？怎么用？
+
 文件指纹是打包后输出的文件名的后缀。
 - Hash：和整个项目的构建相关，只要项目文件有修改，整个项目构建的 hash 值就会更改
 - Chunkhash：和 Webpack 打包的 chunk 有关，不同的 entry 会生出不同的 chunkhash
 - Contenthash：根据文件内容来定义 hash，文件内容不变，则 contenthash 不变
-
 - JS的文件指纹设置
-    - 设置 output 的 filename，用 chunkhash。
-```js
-module.exports = {
+  - 设置 output 的 filename，用 chunkhash。
+    ```js
+    module.exports = {
     entry: {
-        app: './scr/app.js',
-        search: './src/search.js'
+      app: './scr/app.js',
+      search: './src/search.js'
     },
     output: {
-        filename: '[name][chunkhash:8].js',
-        path: __dirname + '/dist'
+      filename: '[name][chunkhash:8].js',
+      path: __dirname + '/dist'
     }
-}
-```
+    }
+    ```
+
 - CSS的文件指纹设置
-    - 设置 MiniCssExtractPlugin 的 filename，使用 contenthash。
-```js
-module.exports = {
+  - 设置 MiniCssExtractPlugin 的 filename，使用 contenthash。
+    ```js
+    module.exports = {
     entry: {
-        app: './scr/app.js',
-        search: './src/search.js'
+      app: './scr/app.js',
+      search: './src/search.js'
     },
     output: {
-        filename: '[name][chunkhash:8].js',
-        path: __dirname + '/dist'
+      filename: '[name][chunkhash:8].js',
+      path: __dirname + '/dist'
     },
     plugins: [new MiniCssExtractPlugin({
-        filename: `[name][contenthash:8].css`
+      filename: `[name][contenthash:8].css`
     })]
-}
-```
+    }
+    ```
 - 图片的文件指纹设置
-    - 设置file-loader的name，使用hash。
-        - 占位符名称及含义
-            - ext 资源后缀名
-            - name 文件名称
-            - path 文件的相对路径
-            - folder 文件所在的文件夹
-            - contenthash 文件的内容hash，默认是md5生成
-            - hash 文件内容的hash，默认是md5生成
-            - emoji 一个随机的指代文件内容的emoj
-```js
-const path = require('path');
-module.exports = {
-    entry: './src/index.js',
-    output: {
+  - 设置file-loader的name，使用hash。
+    - 占位符名称及含义
+      - ext 资源后缀名
+      - name 文件名称
+      - path 文件的相对路径
+      - folder 文件所在的文件夹
+      - contenthash 文件的内容hash，默认是md5生成
+      - hash 文件内容的hash，默认是md5生成
+      - emoji 一个随机的指代文件内容的emoj
+
+        ```js
+        const path = require('path');
+        module.exports = {
+        entry: './src/index.js',
+        output: {
         filename: 'bundle.js',
         path: path.resolve(__dirname, 'dist')
-    },
-    module: {
+        },
+        module: {
         rules: [{
-            test: /\.(png|svg|jpg|gif)$/,
-            use: [{
-                loader: 'file-loader',
-                options: {
-                    name: 'img/[name][hash:8].[ext]'
-                }
-            }]
+        test: /\.(png|svg|jpg|gif)$/,
+        use: [{
+          loader: 'file-loader',
+          options: {
+              name: 'img/[name][hash:8].[ext]'
+          }
         }]
-    }
-}
-```
+        }]
+        }
+        }
+        ```
+        
 ### Webpack 的热更新（HMR）原理
+
 HMR即Hot Module Replacement是指当你对代码修改并保存后，webpack将会对代码进行重新打包，并将改动的模块发送到浏览器端，浏览器用新的模块替换掉旧的模块，去实现局部更新页面而非整体刷新页面。
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211008171751.png)
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211008172241.png)
@@ -9040,14 +9573,15 @@ HMR即Hot Module Replacement是指当你对代码修改并保存后，webpack将
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211008173220.png)
 
 右侧Server端使用webpack-dev-server去启动本地服务，内部实现主要使用了webpack、express、websocket。
+
 - 用express启动本地服务，当浏览器访问资源时对此做响应。
 - 服务端和客户端使用websocket实现长连接
 - webpack监听源文件的变化，即当开发者保存文件时触发webpack的重新编译。
-    - 每次编译都会生成hash值、已改动模块的json文件、已改动模块代码的js文件
-    - 编译完成后通过socket向客户端推送当前编译的hash戳
+  - 每次编译都会生成hash值、已改动模块的json文件、已改动模块代码的js文件
+  - 编译完成后通过socket向客户端推送当前编译的hash戳
 - 客户端的websocket监听到有文件改动推送过来的hash戳，会和上一次对比
-    - 一致则走缓存
-    - 不一致则通过ajax和jsonp向服务端获取最新资源
+  - 一致则走缓存
+  - 不一致则通过ajax和jsonp向服务端获取最新资源
 - 使用内存文件系统去替换有修改的内容实现局部刷新
 ### webpack 打包构建 AST 以后做了什么
 ### 如何对bundle体积进行监控和分析？
@@ -9056,42 +9590,41 @@ VSCode 中有一个插件 Import Cost 可以帮助我们对引入模块的大小
 - 使用高版本的 Webpack 和 Node.js。
 - 多进程/多实例构建：thread-loader
 - 压缩代码
-    - 多进程并行压缩
-        - webpack-paralle-uglify-plugin
-    - 通过 mini-css-extract-plugin 提取 Chunk 中的 CSS 代码到单独文件，通过 css-loader 的 minimize 选项开启 cssnano 压缩 CSS。
+  - 多进程并行压缩
+    - webpack-paralle-uglify-plugin
+  - 通过 mini-css-extract-plugin 提取 Chunk 中的 CSS 代码到单独文件，通过 css-loader 的 minimize 选项开启 cssnano 压缩 CSS。
 - 图片压缩
-    - 使用基于 Node 库的 imagemin (很多定制选项、可以处理多种图片格式)
-    - 配置 image-webpack-loader
+  - 使用基于 Node 库的 imagemin (很多定制选项、可以处理多种图片格式)
+  - 配置 image-webpack-loader
 - 缩小打包作用域
-    - exclude/include (确定 loader 规则范围)
-    - resolve.modules 指明第三方模块的绝对路径 (减少不必要的查找)
-    - resolve.mainFields 只采用 main 字段作为入口文件描述字段 (减少搜索步骤，需要考虑到所有运行时依赖的第三方模块的入口文件描述字段)
-    - resolve.extensions 尽可能减少后缀尝试的可能性
-    - noParse 对完全不需要解析的库进行忽略 (不去解析但仍会打包到 bundle 中，注意被忽略掉的文件里不应该包含 import、require、define 等模块化语句)
-    - IgnorePlugin (完全排除模块)
-    - 合理使用alias
+  - exclude/include (确定 loader 规则范围)
+  - resolve.modules 指明第三方模块的绝对路径 (减少不必要的查找)
+  - resolve.mainFields 只采用 main 字段作为入口文件描述字段 (减少搜索步骤，需要考虑到所有运行时依赖的第三方模块的入口文件描述字段)
+  - resolve.extensions 尽可能减少后缀尝试的可能性
+  - noParse 对完全不需要解析的库进行忽略 (不去解析但仍会打包到 bundle 中，注意被忽略掉的文件里不应该包含 import、require、define 等模块化语句)
+  - IgnorePlugin (完全排除模块)
+  - 合理使用alias
 - 提取页面公共资源
-    - 基础包分离：
-        - 使用 html-webpack-externals-plugin，将基础包通过 CDN 引入，不打入 bundle 中
-        - 使用 SplitChunksPlugin 进行(公共脚本、基础包、页面公共文件)分离(Webpack4内置) ，替代了 CommonsChunkPlugin 插件
+  - 基础包分离：
+    - 使用 html-webpack-externals-plugin，将基础包通过 CDN 引入，不打入 bundle 中
+    - 使用 SplitChunksPlugin 进行(公共脚本、基础包、页面公共文件)分离(Webpack4内置) ，替代了 CommonsChunkPlugin 插件
 - DLL
-    - 使用 DllPlugin 进行分包，使用 DllReferencePlugin(索引链接) 对 manifest.json 引用，让一些基本不会改动的代码先打包成静态资源，避免反复编译浪费时间。
+  - 使用 DllPlugin 进行分包，使用 DllReferencePlugin(索引链接) 对 manifest.json 引用，让一些基本不会改动的代码先打包成静态资源，避免反复编译浪费时间。
 - 充分利用缓存提升二次构建速度
-    - babel-loader 开启缓存
-    - terser-webpack-plugin 开启缓存
-    - 使用 cache-loader 或者 hard-source-webpack-plugin
+  - babel-loader 开启缓存
+  - terser-webpack-plugin 开启缓存
+  - 使用 cache-loader 或者 hard-source-webpack-plugin
 - Tree shaking
-    - 打包过程中检测工程中没有引用过的模块并进行标记，在资源压缩时将它们从最终的bundle中去掉(只能对ES6 Modlue生效) 开发中尽可能使用ES6 Module的模块，提高tree shaking效率
-    - 禁用 babel-loader 的模块依赖解析，否则 Webpack 接收到的就都是转换过的 CommonJS 形式的模块，无法进行 tree-shaking
-    - 去除无用 CSS 代码
+  - 打包过程中检测工程中没有引用过的模块并进行标记，在资源压缩时将它们从最终的bundle中去掉(只能对ES6 Modlue生效) 开发中尽可能使用ES6 Module的模块，提高tree shaking效率
+  - 禁用 babel-loader 的模块依赖解析，否则 Webpack 接收到的就都是转换过的 CommonJS 形式的模块，无法进行 tree-shaking
+  - 去除无用 CSS 代码
 - Scope hoisting
-    - 构建后的代码会存在大量闭包，造成体积增大，运行代码时创建的函数作用域变多，内存开销变大。Scope hoisting 将所有模块的代码按照引用顺序放在一个函数作用域里，然后适当的重命名一些变量以防止变量名冲突
-    - 必须是ES6的语法，因为有很多第三方库仍采用 CommonJS 语法，为了充分发挥 Scope hoisting 的作用，需要配置 mainFields 对第三方模块优先采用 jsnext:main 中指向的ES6模块化语法
+  - 构建后的代码会存在大量闭包，造成体积增大，运行代码时创建的函数作用域变多，内存开销变大。Scope hoisting 将所有模块的代码按照引用顺序放在一个函数作用域里，然后适当的重命名一些变量以防止变量名冲突
+  - 必须是ES6的语法，因为有很多第三方库仍采用 CommonJS 语法，为了充分发挥 Scope hoisting 的作用，需要配置 mainFields 对第三方模块优先采用 jsnext:main 中指向的ES6模块化语法
 - Code Splitting: 将代码按路由维度或者组件分块(chunk),这样做到按需加载,同时可以充分利⽤浏览器缓存
 - 动态Polyfill
-    - 建议采用 polyfill-service 只给用户返回需要的polyfill，社区维护。
-
-### 代码分割，那代码分割的本质是什么？有什么意义呢？
+  - 建议采用 polyfill-service 只给用户返回需要的polyfill，社区维护。
+### 代码分割，那代码分割的本质是什么？有什么意义呢
 代码分割的本质其实就是在源代码直接上线和打包成唯一脚本main.bundle.js这两种极端方案之间的一种更适合实际场景的中间状态。
 
 代码分割：用可接受的服务器性能压力增加来换取更好的用户体验。
@@ -9102,19 +9635,19 @@ VSCode 中有一个插件 Import Cost 可以帮助我们对引入模块的大小
 大多数JavaScript Parser遵循 estree 规范，Babel 最初基于 acorn 项目(轻量级现代 JavaScript 解析器) 。
 Babel 是一个 JavaScript 编译器。他把最新版的 javascript 编译成当下可以执行的版本，简言之，利用 babel 就可以让我们在当前的项目中随意的使用这些新最新的 es6，甚至 es7 的语法。
 
-
 Babel大概分为三大部分：解析（parse），转换（transform），生成（generate）。
 - 解析：将代码转换成 AST
-    - 将代码解析成抽象语法树（AST），每个 js 引擎（比如 Chrome 浏览器中的 V8 引擎）都有自己的 AST 解析器，而 Babel 是通过 Babylon 实现的。在解析过程中有两个阶段：词法分析和语法分析，词法分析阶段把字符串形式的代码转换为令牌（tokens）流，令牌类似于 AST 中节点；而语法分析阶段则会把一个令牌流转换成 AST 的形式，同时这个阶段会把令牌中的信息转换成 AST 的表述结构。
+  - 将代码解析成抽象语法树（AST），每个 js 引擎（比如 Chrome 浏览器中的 V8 引擎）都有自己的 AST 解析器，而 Babel 是通过 Babylon 实现的。在解析过程中有两个阶段：词法分析和语法分析，词法分析阶段把字符串形式的代码转换为令牌（tokens）流，令牌类似于 AST 中节点；而语法分析阶段则会把一个令牌流转换成 AST 的形式，同时这个阶段会把令牌中的信息转换成 AST 的表述结构。
+
 - 转换：访问 AST 的节点进行变换操作生产新的 AST
-    - 在这个阶段，Babel 接受得到 AST 并通过 babel-traverse 对其进行深度优先遍历，在此过程中对节点进行添加、更新及移除操作。这部分也是 Babel 插件介入工作的部分。
+  - 在这个阶段，Babel 接受得到 AST 并通过 babel-traverse 对其进行深度优先遍历，在此过程中对节点进行添加、更新及移除操作。这部分也是 Babel 插件介入工作的部分。
 - 生成：以新的 AST 为基础生成代码
-    - 将经过转换的 AST 通过 babel-generator 再转换成 js 代码，过程就是深度优先遍历整个 AST，然后构建可以表示转换后代码的字符串。
+  - 将经过转换的 AST 通过 babel-generator 再转换成 js 代码，过程就是深度优先遍历整个 AST，然后构建可以表示转换后代码的字符串。
 ### webpack5 和 webpack4 的区别
 1. Tree Shaking
 - webpack4.0
-tree-shaking 就可以把没有用的那些东西剔除掉，来减少最终的bundle体积。
-```js
+  tree-shaking 就可以把没有用的那些东西剔除掉，来减少最终的bundle体积。
+  ```js
   // webpack.config.js中
   module.exports = {
      optimization: {
@@ -9124,16 +9657,14 @@ tree-shaking 就可以把没有用的那些东西剔除掉，来减少最终的b
        minimize : true // 启动压缩
      }
   }
-```
+  ```
 - webpack5.0
-webpack5的 `mode=“production”` 自动开启 `tree-shaking`。
-
+  webpack5的 `mode=“production”` 自动开启 `tree-shaking`。
 2. 压缩代码
 - webpack4
-    - `webpack4 上需要下载安装 terser-webpack-plugin 插件，并且需要以下配置`
+  - `webpack4 上需要下载安装 terser-webpack-plugin 插件，并且需要以下配置`
 ```js
 const TerserPlugin = require('terser-webpack-plugin')
-
 module.exports = { 
 // ...other config
 optimization: {
@@ -9148,6 +9679,7 @@ optimization: {
       }
     }) ]
  }
+
 ```
 - webpack5
 内部本身就自带 js 压缩功能，他内置了 terser-webpack-plugin 插件，我们不用再下载安装。而且在 mode=“production” 的时候会自动开启 js 压缩功能。
@@ -9164,15 +9696,16 @@ optimization: {
 
 3. webpack 缓存
 - webpack4.0
-    - `npm install hard-source-webpack-plugin -D`
+  - `npm install hard-source-webpack-plugin -D`
 ```js
 const HardSourceWebpackPlugin = require('hard-source-webpack-plugin') 
- 
+
 module.exports = { 
 plugins: [
   // 其它 plugin... 
   new HardSourceWebpackPlugin(), 
 ] }
+
 ```
 - webpack5 缓存配置
     - webpack5 内部内置了 cache 缓存机制。直接配置即可。
@@ -9188,21 +9721,22 @@ module.exports= {
   }
 }
 ```
+
 4. 对loader的优化
 - webpack 4 加载资源需要用不同的 loader
-    - raw-loader 将文件导入为字符串
-    - url-loader 将文件作为 data url 内联到 bundle文件中
-    - file-loader 将文件发送到输出目录中
+  - raw-loader 将文件导入为字符串
+  - url-loader 将文件作为 data url 内联到 bundle文件中
+  - file-loader 将文件发送到输出目录中
 - webpack5 的资源模块类型替换 loader
-    - asset/resource 替换 file-loader(发送单独文件)
-    - asset/inline 替换 url-loader （导出 url）
-    - asset/source 替换 raw-loader（导出源代码）
-    - asset
+  - asset/resource 替换 file-loader(发送单独文件)
+  - asset/inline 替换 url-loader （导出 url）
+  - asset/source 替换 raw-loader（导出源代码）
+  - asset
 5. 启动服务的差别
 - webpack4 启动服务
-    - 通过 webpack-dev-server 启动服务
+  - 通过 webpack-dev-server 启动服务
 - webpack5 启动服务
-    - 内置使用 webpack serve 启动，但是他的日志不是很好，所以一般都加都喜欢用 webpack-dev-server 优化。
+  - 内置使用 webpack serve 启动，但是他的日志不是很好，所以一般都加都喜欢用 webpack-dev-server 优化。
 6. devtool的差别
 sourceMap需要在 webpack.config.js里面直接配置 devtool 就可以实现了。而 devtool有很多个选项值，不同的选项值，不同的选项产生的 .map 文件不同，打包速度不同。
 一般情况下，我们一般在开发环境配置用“cheap-eval-module-source-map”，在生产环境用‘none’。
@@ -9221,7 +9755,7 @@ v5: devtool: 'eval-cheap-module-source-map'
 - babel-loader开启缓存cache
 - splitChunks（老版本用CommonsChunkPlugin）：提取公共模块，将符合引用次数(minChunks)的模块打包到一起，利用浏览器缓存
 - Tree Shaking 摇树：基于ES6提供的模块系统对代码进行静态分析, 并在压缩阶段将代码中的死代码（dead code)移除，减少代码体积。
-### Webpack 打包体积优化思路 
+### Webpack 打包体积优化思路
 - webpack-bundle-analyzer插件可以可视化的查看webpack打包出来的各个文件体积大小，以便我们定位大文件，进行体积优化
 - 提取第三方库或通过引用外部文件的方式引入第三方库
 - 代码压缩插件UglifyJsPlugin
@@ -9231,55 +9765,104 @@ v5: devtool: 'eval-cheap-module-source-map'
 - 去除不必要插件，开发环境与生产环境用不同配置文件
 - SpritesmithPlugin雪碧图，将多个小图片打包成一张，用background-image，backgroud-pisition，width，height控制显示部分
 - url-loader 文件大小小于设置的尺寸变成base-64编码文本，大与尺寸由file-loader拷贝到目标目录
-### Tree Shaking 摇树
-虽然依赖了某个模块，但其实只使用其中的某些功能。通过 tree-shaking，将没有使用的模块摇掉，这样来达到删除无用代码的目的。基于ES6提供的模块系统对代码进行静态分析,并将代码中的死代码（dead code)移除的一种技术。因此，利用Tree Shaking技术可以很方便地实现我们代码上的优化，减少代码体积。
-
-- 摇树删除代码的原理
-    -  webpack基于ES6提供的模块系统，对代码的依赖树进行静态分析，把import & export标记为3类：
-        -  所有import标记为/* harmony import */
-        -  被使用过的export标记为/harmony export([type])/，其中[type]和webpack内部有关，可能是binding，immutable等；
-        -  没有被使用的export标记为/* unused harmony export [FuncName] */，其中[FuncName]为export的方法名，之后使用Uglifyjs（或者其他类似的工具）进行代码精简，把没用的都删除。
-- 为何基于es6模块实现（ES6 module 特点：）：
-    - 只能作为模块顶层的语句出现
-    - import的模块名只能是字符串常量
-    - import binding是immutable的
-
-- 条件：
-    - 首先源码必须遵循 ES6 的模块规范 (import & export)，如果是 CommonJS 规范 (require) 则无法使用。
-    - 编写的模块代码不能有副作用，如果在代码内部改变了外部的变量则不会被移除。
+### happyPack ： 多线程打包
 ```js
-// 在开发模式下，设置 usedExports: true ，打包时只会标记出哪些模块没有被使用，不会删除，因为可能会影响 source-map的标记位置的准确性。
+// @file: webpack.config.js
+const HappyPack = require('happypack');
+
 {
+    module：{
+        rules: [{
+          test: /.js$/,
+          // 1) replace your original list of loaders with "happypack/loader": 
+          // loaders: [ 'babel-loader' ],
+          // 1） 替换原先的loader为  happypack/loader
+          use: 'happypack/loader',
+          include: [ /* ... */ ],
+          exclude: [ /* ... */ ]
+        }
+      ]
+    },
+  plugins :[
+      // 2) create the plugin: 
+      // 2) 创建插件
+      new HappyPack({
+          // 3) re-add the loaders you replaced above in #1:
+        // 3) 重新添加刚才被替换的loader
+        loaders: [ 'babel-loader' ]
+      })
+  ] 
+}
+// 项目比较小的时候启用多线程反而会拖慢打包速度，因为多线程之前开启、销毁、通信都需要额外的性能支出
+```
+### ParallelUglifyPlugin： 多线程压缩JS代码
+webpack有默认的代码压缩功能，如果项目比较大、文件比较多，则引入多线程压缩能节省时间。
+```js
+const ParallelUglifyPlugin  = require('webpack-parallel-uglify-plugin');
+{
+    plugins:[
+    // window.ENV = "production"
+    new webpack.DefinePlugin({ENV:JSON.stringify('production')}),
+    // 打包之前清空文件夹
+    new CleanWebpackPlugin(),
+    // 压缩css
+    new MiniCssExtractPlugin({
+      filename:'css/[name]_[contenthash:8].css'
+    }),
+    new HappyPack({
+      loaders: [ 'babel-loader?cacheDirectory=true' ]
+    }),
+    new ParallelUglifyPlugin({})
+  ]
+}
+```
+
+### Tree Shaking 摇树
+
+虽然依赖了某个模块，但其实只使用其中的某些功能。通过 tree-shaking，将没有使用的模块摇掉，这样来达到删除无用代码的目的。基于ES6提供的模块系统对代码进行静态分析,并将代码中的死代码（dead code)移除的一种技术。因此，利用Tree Shaking技术可以很方便地实现我们代码上的优化，减少代码体积。
+- 摇树删除代码的原理
+  - webpack基于ES6提供的模块系统，对代码的依赖树进行静态分析，把import & export标记为3类：
+    - 所有import标记为/* harmony import */
+    - 被使用过的export标记为/harmony export([type])/，其中[type]和webpack内部有关，可能是binding，immutable等；
+    - 没有被使用的export标记为/* unused harmony export [FuncName] */，其中[FuncName]为export的方法名，之后使用Uglifyjs（或者其他类似的工具）进行代码精简，把没用的都删除。
+- 为何基于es6模块实现（ES6 module 特点：）：
+  - 只能作为模块顶层的语句出现
+  - import的模块名只能是字符串常量
+  - import binding是immutable的
+- 条件：
+  - 首先源码必须遵循 ES6 的模块规范 (import & export)，如果是 CommonJS 规范 (require) 则无法使用。
+  - 编写的模块代码不能有副作用，如果在代码内部改变了外部的变量则不会被移除。
+  ```js
+    // 在开发模式下，设置 usedExports: true ，打包时只会标记出哪些模块没有被使用，不会删除，因为可能会影响 source-map的标记位置的准确性。
+    {
     mode: 'develpoment',
     optimization: {
-        // 优化导出的模块
-        usedExports: true
+      // 优化导出的模块
+      usedExports: true
     },
-}
-// 在生产模式下默认开启 usedExports: true ，打包压缩时就会将没用到的代码移除
-{
+    }
+    // 在生产模式下默认开启 usedExports: true ，打包压缩时就会将没用到的代码移除
+    {
     mode: 'production',
     //  这个属性的作用就是集中配置webpack内部的优化功能
     optimizition: {
-        // 只导出外部使用的模块成员 负责标记枯树叶
-        usedExports: true,
-        minimize: true, // 自动压缩代码 负责摇掉枯树叶
-        /**
-         * webpack打包默认会将一个模块单独打包到一个闭包中
-         * webpack3中新增的API 将所有模块都放在一个函数中 ，尽可能将所有模块合并在一起，
-         * 提升效率，减少体积  达到作用域提升的效果
-         */
-        concatenateModules: true,
+      // 只导出外部使用的模块成员 负责标记枯树叶
+      usedExports: true,
+      minimize: true, // 自动压缩代码 负责摇掉枯树叶
+      /**
+       * webpack打包默认会将一个模块单独打包到一个闭包中
+       * webpack3中新增的API 将所有模块都放在一个函数中 ，尽可能将所有模块合并在一起，
+       * 提升效率，减少体积  达到作用域提升的效果
+       */
+      concatenateModules: true,
     },
-
-}
-```
+  }
+  ```
 - 使用摇树的注意事项：
     - 使用 ES6 模块语法编写代码
     - 工具类函数尽量以单独的形式输出，不要集中成一个对象或者类
     - 声明 sideEffects
     - 自己在重构代码时也要注意副作用
-
 - tree-shaking & babel 使用babel-loader处理js代码会导致tree-shaking失效的原因
     - treeshaking 使用的前提必须是ES module组织的代码，也就是说交给ESMOdule处理的代码必须是ESM。当我们使用babel-loader处理js代码之后就有可能将ESM 转换 成commonjs规范（preset-env插件工作的时候就会将esm => coommonjs）
     - 收到配置preset-env的modules：false,确保不会开启自动转换的插件(在最新版本的babel-loader中自动帮我们关闭了转换成commonjs规范的功能)
@@ -9308,6 +9891,7 @@ module.exports = {
 
 #### 理论基础
 在 CommonJs、AMD、CMD 等旧版本的 JavaScript 模块化方案中，导入导出行为是高度动态，难以预测的。
+
 ```js
 if(process.env.NODE_ENV === 'development'){
   require('./bar');
@@ -9315,6 +9899,7 @@ if(process.env.NODE_ENV === 'development'){
 }
 ```
 而 ESM 方案则从规范层面规避这一行为，它要求所有的导入导出语句只能出现在模块顶层，且导入导出的模块名必须为字符串常量。ESM 下模块之间的依赖关系是高度确定的，与运行状态无关，编译工具只需要对 ESM 模块做静态分析，就可以从代码字面量中推断出哪些模块值未曾被其它模块使用，这是实现 Tree Shaking 技术的必要条件。
+
 ```js
 // index.js
 import {bar} from './bar';
@@ -9323,33 +9908,28 @@ console.log(bar);
 // bar.js
 export const bar = 'bar';
 export const foo = 'foo';
-
-
 //bar.js 模块导出了 bar 、foo ，但只有 bar 导出值被其它模块使用，经过 Tree Shaking 处理后，foo 变量会被视作无用代码删除。
 ```
-
 #### 实现原理
+
 Tree Shaking 是先找出 已使用 的代码，自然剩下的则是 未使用 的代码，最后通过注释的方式分别标注。区分 已使用 和 未使用 的代码后，通过 压缩器 将 未使用 的代码删除。
 
 由于 Tree Shaking 是通过 ES6 Import 和 Export 实现找出 已使用 和 未使用 的代码， 所以 Tree Shaking 使用前提： 是源码必须遵循 ES6 的模块规范 (import & export)，如果是 CommonJS 规范 (require) 则无法使用。
 
-Webpack 中，Tree-shaking 的实现一是先标记出模块导出值中哪些没有被用过(标记的效果就是删除没有被其它模块使用的导出语句)，二是使用 Terser 删掉这些没被用到的导出语句。标记过程大致可划分为三个步骤：
+- Webpack 中，Tree-shaking 的实现一是先标记出模块导出值中哪些没有被用过(标记的效果就是删除没有被其它模块使用的导出语句)，二是使用 Terser 删掉这些没被用到的导出语句。标记过程大致可划分为三个步骤：
     - Make 阶段，收集模块导出变量并记录到模块依赖关系图 ModuleGraph 变量中
     - Seal 阶段，遍历 ModuleGraph 标记模块导出变量有没有被使用
     - 生成产物时，若变量没有被其它模块使用则删除对应的导出语句
 真正执行“Shaking”操作的是 Terser 插件。未使用的变量和模块经过标记后，已经变成一段 Dead Code —— 不可能被执行到的代码，这个时候只需要用 Terser 提供的 DCE 功能就可以删除这一段定义语句，以此实现完整的 Tree Shaking 效果。
-    
     - 收集模块导出
     - 标记模块导出
     - 生成代码
     - 删除 Dead Code
     - 结束
-
 - Dead Code 一般具有以下几个特征
-    - 代码不会被执行，不可到达
-    - 代码执行的结果不会被用到
-    - 代码只会影响死变量（只写不读）
-    - 
+  - 代码不会被执行，不可到达
+  - 代码执行的结果不会被用到
+  - 代码只会影响死变量（只写不读）
 ### Rollup原理
 Rollup中，一个文件就是一个模块。每一个模块都会根据文件的代码生成一个 AST 语法抽象树，Rollup 需要对每一个 AST 节点进行分析。
 
@@ -9360,18 +9940,19 @@ Rollup中，一个文件就是一个模块。每一个模块都会根据文件�
 最后将所有引入的代码打包在一起。生成代码。
 ### Rollup特点
 - Tree-shaking
-    - 这个特点，是Rollup最初推出时的一大特点。Rollup通过对代码的静态分析，分析出冗余代码，在最终的打包文件中将这些冗余代码删除掉，进一步缩小代码体积。
+  - 这个特点，是Rollup最初推出时的一大特点。Rollup通过对代码的静态分析，分析出冗余代码，在最终的打包文件中将这些冗余代码删除掉，进一步缩小代码体积。
 - ES2015模块打包支持
-    - Rollup直接不需要通过babel将import转化成Commonjs的require方式，极大地利用ES2015模块的优势。
+  - Rollup直接不需要通过babel将import转化成Commonjs的require方式，极大地利用ES2015模块的优势。
 - 在开发应用时使用 Webpack，开发库时使用 Rollup。
-
 ### Vite
+
 Vite(读音类似于[weɪt]，法语，快的意思) 是一个由原生 ES Module 驱动的 Web 开发构建工具。在开发环境下基于浏览器原生 ES imports 开发，在生产环境下基于 Rollup 打包。
+
 ### Vite 的特点
 - 闪电般的冷启动速度
 - 即时热模块更换（热更新）
 - 真正的按需编译
-Vite 要求项目完全由 ES Module 模块组成，common.js 模块不能直接在 Vite 上使用。因此不能直接在生产环境使用。在打包上依旧还是使用 rollup 等传统打包工具。因此 Vite 目前更像是一个类似于 webpack-dev-server 的开发工具.
+  Vite 要求项目完全由 ES Module 模块组成，common.js 模块不能直接在 Vite 上使用。因此不能直接在生产环境使用。在打包上依旧还是使用 rollup 等传统打包工具。因此 Vite 目前更像是一个类似于 webpack-dev-server 的开发工具.
 ### Vite 的基本实现原理
 Vite 的基本实现原理，就是启动一个 koa 服务器拦截浏览器请求ES Module的请求。通过 path 找到目录下对应的文件做一定的处理最终以 ES Modules 格式返回给客户端
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211008174614.png)
@@ -9381,32 +9962,23 @@ Vite 的基本实现原理，就是启动一个 koa 服务器拦截浏览器请�
 因此 Vite 在拦截的请求里，对直接引用 node_modules 的模块都做了路径的替换，换成了 /@modules/ 并返回回去。而后浏览器收到后，会发起对 /@modules/xxx 的请求，然后被 Vite 再次拦截，并由 Vite 内部去访问真正的模块，并将得到的内容再次做同样的处理后，返回给浏览器。
 ### Vite 热更新(Hot Module Reload)原理
 Vite 的热加载原理，其实就是在客户端与服务端建立了一个 websocket 链接，当代码被修改时，服务端发送消息通知客户端去请求修改模块的代码，完成热更新。
-
 ### Webpack & Vite 原理对比
 Webpack 之所以慢，是因为 Webpack 会将许多资源构成一个或者多个 bundle 。当我们修改模块中的一个子模块b.js，整个bundle.js 都需要重新打包，随着项目规模的扩大，重新打包(热更新)的时间越来越长。
 
 跳过打包的过程，当需要某个模块时再通过请求去获取。Vite 一个由原生 ES Module（esbuild 是一个全新的js打包工具，支持如babel, 压缩等的功能）驱动的 Web 开发构建工具，完全做到按需加载。
-
 ### ES6 Module和Commonjs区别
-
 #### commonjs 使用与原理
-
 在使用  规范下，有几个显著的特点。
-
 - 在 `commonjs` 中每一个 js 文件都是一个单独的模块，我们可以称之为 module；
 - 该模块中，包含 CommonJS 规范的核心变量: exports、module.exports、require；
 - exports 和 module.exports 可以负责对模块中的内容进行导出；
 - require 函数可以帮助我们导入其他模块（自定义模块、系统模块、第三方库模块）中的内容；
-
-----------------------------------------------------------------------------------------------------
 
 - 在当前目录下的 `node_modules` 目录查找。
 - 如果没有，在父级目录的 `node_modules` 查找，如果没有在父级目录的父级目录的 `node_modules` 中查找。
 - 沿着路径向上递归，直到根目录下的 `node_modules` 目录。
 - 在查找过程中，会找 `package.json` 下 main 属性指向的文件，如果没有  `package.json` ，在 node 环境下会以此查找 `index.js` ，`index.json` ，`index.node`。
 <img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20210831134529.png" style="zoom:33%;" />
-
-
 #### common.js 和 es6 中模块
 CommonJS 是一种模块规范，最初被应用于 Nodejs，成为 Nodejs 的模块规范。运行在浏览器端的 JavaScript 由于也缺少类似的规范，在 ES6 出来之前，前端也实现了一套相同的模块规范 (例如: AMD)，用来对前端模块进行管理。自 ES6 起，引入了一套新的 ES6 Module 规范，在语言标准的层面上实现了模块功能，而且实现得相当简单，有望成为浏览器和服务器通用的模块解决方案。
 
@@ -9418,8 +9990,6 @@ CommonJS 是一种模块规范，最初被应用于 Nodejs，成为 Nodejs 的�
 6. CommonJs 是单个值导出，ES6 Module 可以导出多个
 7. CommonJs 是动态语法可以写在判断里，ES6 Module 静态语法只能写在顶层
 8. CommonJs 的 this 是当前模块，ES6 Module 的 this 是 undefined
-
-
 
 ```js
 //Commonjs
@@ -9447,6 +10017,7 @@ export default 'hello'
 import str from './hello.js'
 console.log(str)
 ```
+
 ## 微前端
 ### 微前端是什么, 有哪些特点和优势
 ### 微前端实现的主要原理
@@ -9455,10 +10026,10 @@ console.log(str)
 ### 讲讲 window.history 的原理, 为什么 popState 能够实现前端路由
 ### 主应用修改了路由, 子应用如何感知到
 ### 介绍 monorepo 概念
-
 ## 工具
 ### Git
 #### Git 的工作区域和流程
+
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210923223618.png)
 
 - Workspace：工作区，就是平时进行开发改动的地方，是当前看到最新的内容，在开发的过程也就是对工作区的操作
@@ -9477,67 +10048,64 @@ console.log(str)
 - git commit :提交暂存的更改，
 - git pull:从远程仓库拉取代码并合并到本地
 - git branch :和分支相关
-
 #### git merge 和 git rebase 的区别
 - git rebase 的使用
-    - rebase 翻译为变基，他的作用和 merge 很相似，用于把一个分支的修改合并到当前分支上。
+  - rebase 翻译为变基，他的作用和 merge 很相似，用于把一个分支的修改合并到当前分支上。
 - git merge 和 git rebase 的区别
-    - 不同于 git rebase 的是，git merge 在不是 fast-forward（快速合并）的情况下，会产生一条额外的合并记录，类似 Merge branch 'xxx' into 'xxx' 的一条提交信息。
-    - 另外，在解决冲突的时候，用 merge 只需要解决一次冲突即可，简单粗暴，而用 rebase 的时候 ，需要依次解决每次的冲突，才可以提交。
-
+  - 不同于 git rebase 的是，git merge 在不是 fast-forward（快速合并）的情况下，会产生一条额外的合并记录，类似 Merge branch 'xxx' into 'xxx' 的一条提交信息。
+  - 另外，在解决冲突的时候，用 merge 只需要解决一次冲突即可，简单粗暴，而用 rebase 的时候 ，需要依次解决每次的冲突，才可以提交。
 ## 前端工程化
 ### 前端工程化规范
+
 一切能提升前端开发效率，提高前端应用质量的手段和工具都是前端工程化。前端工程化是一个标准化过程，所有的项目都有共同的起点，通过制定脚手架（一般区分前后台项目），内置webpack、mock服务、开发规范（eslint）、单元测试等功能，约束每个项目的模样、玩法大体一样。总结就是将前端开发流程，标准化、规范化、工具化、自动化、简单化，提升了应用质量及开发效率。
 
 - 前端工程化主要包括四个方面：模块化、组件化、规范化、自动化。
-    - 模块化
-        - 指将一个文件拆分成多个相互依赖的文件，最后进行统一的打包和加载，这样能够很好的保证高效的多人协作。
-        - JS 模块化：CommonJS、AMD、CMD 以及 ES6 Module。
-        - CSS 模块化：Sass、Less、Stylus、BEM、CSS Modules 等。其中预处理器和 BEM 都会有的一个问题就是样式覆盖。而 CSS Modules 则是通过 JS 来管理依赖，最大化的结合了 JS 模块化和 CSS 生态，比如 Vue 中的 style scoped。
-        - 资源模块化：任何资源都能以模块的形式进行加载，目前大部分项目中的文件、CSS、图片等都能直接通过 JS 做统一的依赖关系处理。
-    - 组件化
-        - 指对ui层面的拆分。其中主要包括细粒度和通用性这两块的考虑。
-        - 不同于模块化，模块化是对文件、对代码和资源拆分，而组件化则是对 UI 层面的拆分。
-        - 通常，我们会需要对页面进行拆分，将其拆分成一个一个的零件，然后分别去实现这一个个零件，最后再进行组装。在我们的实际业务开发中，对于组件的拆分我们需要做不同程度的考量，其中主要包括细粒度和通用性这两块的考虑。对于业务组件，你更多需要考量的是针对你负责业务线的一个适用度，即你设计的业务组件是否成为你当前业务的 “通用” 组件。
-    - 规范化
-        - 指的是我们在工程开发初期以及开发期间制定的系列规范。
-            - 项目目录结构
-            - 编码规范：对于编码这块的约束，一般我们都会采用一些强制措施，比如 ESLint、StyleLint 等。
-            - 联调规范
-            - 文件命名规范
-            - 样式管理规范：目前流行的样式管理有 BEM、Sass、Less、Stylus、CSS Modules 等方式。
-            - git flow 工作流：其中包含分支命名规范、代码合并规范等。
-            - 定期 code review … 等等
-    - 自动化
-        - 自动化工具在自动化合并、构建、打包都能为我们节省很多工作。而这些只是前端自动化其中的一部分，前端自动化还包含了持续集成、自动化测试等方方面面。
-        - 从最早先的 grunt、gulp 等，再到目前的 webpack、parcel。这些自动化工具在自动化合并、构建、打包都能为我们节省很多工作。而这些只是前端自动化其中的一部分，前端自动化还包含了持续集成、自动化测试等方方面面。
-
-
+  - 模块化
+    - 指将一个文件拆分成多个相互依赖的文件，最后进行统一的打包和加载，这样能够很好的保证高效的多人协作。
+    - JS 模块化：CommonJS、AMD、CMD 以及 ES6 Module。
+    - CSS 模块化：Sass、Less、Stylus、BEM、CSS Modules 等。其中预处理器和 BEM 都会有的一个问题就是样式覆盖。而 CSS Modules 则是通过 JS 来管理依赖，最大化的结合了 JS 模块化和 CSS 生态，比如 Vue 中的 style scoped。
+    - 资源模块化：任何资源都能以模块的形式进行加载，目前大部分项目中的文件、CSS、图片等都能直接通过 JS 做统一的依赖关系处理。
+  - 组件化
+    - 指对ui层面的拆分。其中主要包括细粒度和通用性这两块的考虑。
+    - 不同于模块化，模块化是对文件、对代码和资源拆分，而组件化则是对 UI 层面的拆分。
+    - 通常，我们会需要对页面进行拆分，将其拆分成一个一个的零件，然后分别去实现这一个个零件，最后再进行组装。在我们的实际业务开发中，对于组件的拆分我们需要做不同程度的考量，其中主要包括细粒度和通用性这两块的考虑。对于业务组件，你更多需要考量的是针对你负责业务线的一个适用度，即你设计的业务组件是否成为你当前业务的 “通用” 组件。
+  - 规范化
+    - 指的是我们在工程开发初期以及开发期间制定的系列规范。
+      - 项目目录结构
+      - 编码规范：对于编码这块的约束，一般我们都会采用一些强制措施，比如 ESLint、StyleLint 等。
+      - 联调规范
+      - 文件命名规范
+      - 样式管理规范：目前流行的样式管理有 BEM、Sass、Less、Stylus、CSS Modules 等方式。
+      - git flow 工作流：其中包含分支命名规范、代码合并规范等。
+      - 定期 code review … 等等
+  - 自动化
+    - 自动化工具在自动化合并、构建、打包都能为我们节省很多工作。而这些只是前端自动化其中的一部分，前端自动化还包含了持续集成、自动化测试等方方面面。
+    - 从最早先的 grunt、gulp 等，再到目前的 webpack、parcel。这些自动化工具在自动化合并、构建、打包都能为我们节省很多工作。而这些只是前端自动化其中的一部分，前端自动化还包含了持续集成、自动化测试等方方面面。
 
 - 前端工程化具体包含哪些知识
-    - 脚手架
-        - 脚手架包括什么
-            - 通用的项目目录模版
-            - 通用的Webpack配置
-            - 统一的Eslint校验规则
-            - 统一的单元测试框架配置：单元测试覆盖率、测试的目录等
-            - 统一的Dockerfile和jenkinsfile (用来打包成镜像和部署流水线定义)
-            - 统一babel的配置（.babelrc或babel.config.js）
-            - 统一的常量配置（缓存字段等等）
-            - 不同环境的配置文件（development、test、production）
-        - 如何开发脚手架
-            - 创建一个文件夹，做为脚手架的起点，执行npm init生成package.json文件
-            - 工欲善其事必先利其器，安装以下npm包
-                - 可用于控制台选择的工具：inquirer(交互、选择)
-                - 可处理控制台命令的工具：commander（定义脚手架命令）
-                - download-git-repo：下载远程模板工具，负责下载远程仓库的模板项目
-                - 可改变输出log颜色的工具：chalk
-                - 可执行shell命令的工具: child_process
-    - 构建工具（webpack）
-    - MOCK服务
-    - 开发规范
-    - 单元测试
-    - 项目部署
+  - 脚手架
+    - 脚手架包括什么
+      - 通用的项目目录模版
+      - 通用的Webpack配置
+      - 统一的Eslint校验规则
+      - 统一的单元测试框架配置：单元测试覆盖率、测试的目录等
+      - 统一的Dockerfile和jenkinsfile (用来打包成镜像和部署流水线定义)
+      - 统一babel的配置（.babelrc或babel.config.js）
+      - 统一的常量配置（缓存字段等等）
+      - 不同环境的配置文件（development、test、production）
+    - 如何开发脚手架
+      - 创建一个文件夹，做为脚手架的起点，执行npm init生成package.json文件
+      - 工欲善其事必先利其器，安装以下npm包
+        - 可用于控制台选择的工具：inquirer(交互、选择)
+        - 可处理控制台命令的工具：commander（定义脚手架命令）
+        - download-git-repo：下载远程模板工具，负责下载远程仓库的模板项目
+        - 可改变输出log颜色的工具：chalk
+        - 可执行shell命令的工具: child_process
+  - 构建工具（webpack）
+  - MOCK服务
+  - 开发规范
+  - 单元测试
+  - 项目部署
 ## 前端性能优化
 ### 通过哪些平台进行性能测试 ？？？？？？？
 ### 前端性能优化
@@ -9551,16 +10119,16 @@ console.log(str)
 - 抽象提取公共样式，减少代码量
 - 属性值为0时，不加单位
 - 属性值为小于1的小数时，省略小数点前面的0
-- 使用CSS Sprites将多张图片拼接成一张图片，通过CSS background 属性来访问图片内容 
+- 使用CSS Sprites将多张图片拼接成一张图片，通过CSS background 属性来访问图片内容
 #### JS
 - 节流、防抖
 - 长列表滚动到可视区域动态加载（大数据渲染）
 - 图片懒加载（src）
 - DOM 操作优化
-    - 批量添加dom可先createElement创建并添加节点，最后一次性加入dom
-    - 批量绑定事件，使用事件委托绑定父节点实现，利用了事件冒泡的特性
-    - 如果可以使用innerHTML代替appendChild
-    - 在 DOM 操作时添加样式时尽量增加 class 属性，而不是通过 style 操作样式，以减少重排（Reflow）
+  - 批量添加dom可先createElement创建并添加节点，最后一次性加入dom
+  - 批量绑定事件，使用事件委托绑定父节点实现，利用了事件冒泡的特性
+  - 如果可以使用innerHTML代替appendChild
+  - 在 DOM 操作时添加样式时尽量增加 class 属性，而不是通过 style 操作样式，以减少重排（Reflow）
 #### 网络
 - 减少 HTTP 请求数量
 - 利用浏览器缓存，公用依赖包（如vue、Jquery、ui组件等）单独打包/单文件在一起，避免重复请求
@@ -9570,164 +10138,272 @@ console.log(str)
 
 ## 前端性能优化
 ### 前端性能优化
+
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108160432.png)
 - 从过程趋势来看，性能优化可分为网络层面和渲染层面；从结果趋势来看，性能优化可分为时间层面和体积层面。简单来说就是要在访问网站时使其快准狠地立马呈现在用户眼前。
 - 所有的性能优化都围绕着两大层面两小层面实现，核心层面是网络层面和渲染层面，辅助层面是时间层面和体积层面，而辅助层面则充满在核心层面里。
 #### 九大策略
 - 九大策略
-    - 网络层面
-        - 网络层面的性能优化，无疑是如何让资源体积更小加载更快，因此笔者从以下四方面做出建议。
-        - 构建策略：基于构建工具(Webpack/Rollup/Parcel/Esbuild/Vite/Gulp)
-            - 该策略主要围绕webpack做相关处理，同时也是接入最普遍的性能优化策略。其他构建工具的处理也是大同小异，可能只是配置上不一致。说到webpack的性能优化，无疑是从时间层面和体积层面入手。
-            - 对两层面分别做出6个性能优化建议总共12个性能优化建议，为了方便记忆均使用四字词语概括，方便大家消化。⏱表示减少打包时间，📦表示减少打包体积。
-            - 减少打包时间：缩减范围、缓存副本、定向搜索、提前构建、并行构建、可视结构
-                - 缩减范围
-                    - 配置include/exclude缩小Loader对文件的搜索范围，好处是避免不必要的转译。node_modules目录的体积这么大，那得增加多少时间成本去检索所有文件啊？
-                    - include/exclude通常在各大Loader里配置，src目录通常作为源码目录，可做如下处理。当然include/exclude可根据实际情况修改。
-                    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108162258.png)
-                - 缓存副本
-                    - 配置cache缓存Loader对文件的编译副本，好处是再次编译时只编译修改过的文件。未修改过的文件干嘛要随着修改过的文件重新编译呢？
-                    - 大部分Loader/Plugin都会提供一个可使用编译缓存的选项，通常包含cache字眼。以babel-loader和eslint-webpack-plugin为例。
-                    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108162230.png)
-                - 定向搜索
-                    - 配置resolve提高文件的搜索速度，好处是定向指定必须文件路径。若某些第三方库以常规形式引入可能报错或希望程序自动索引特定类型文件都可通过该方式解决。
-                    - alias映射模块路径，extensions表明文件后缀，noParse过滤无依赖文件。通常配置alias和extensions就足够。
-                    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108162147.png)
-                - 提前构建
-                    - 配置DllPlugin将第三方依赖提前打包，好处是将DLL与业务代码完全分离且每次只构建业务代码。这是一个古老配置，在webpack v2时已存在，不过现在webpack v4+已不推荐使用该配置，因为其版本迭代带来的性能提升足以忽略DllPlugin所带来的效益。
-                    - DLL意为动态链接库，指一个包含可由多个程序同时使用的代码库。在前端领域里可认为是另类缓存的存在，它把公共代码打包为DLL文件并存到硬盘里，再次打包时动态链接DLL文件就无需再次打包那些公共代码，从而提升构建速度，减少打包时间。
-                    - 配置DLL总体来说相比其他配置复杂，配置流程可大致分为三步。
-                    - 首先告知构建脚本哪些依赖做成DLL并生成DLL文件和DLL映射表文件。
-                    - 然后在package.json里配置执行脚本且每次构建前首先执行该脚本打包出DLL文件。
-                    - 最后链接DLL文件并告知webpack可命中的DLL文件让其自行读取。使用html-webpack-tags-plugin在打包时自动插入DLL文件。
-                    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108162105.png) 
-                - 并行构建
-                    - 配置Thread将Loader单进程转换为多进程，好处是释放CPU多核并发的优势。在使用webpack构建项目时会有大量文件需解析和处理，构建过程是计算密集型的操作，随着文件增多会使构建过程变得越慢。
-                    - 运行在Node里的webpack是单线程模型，简单来说就是webpack待处理的任务需一件件处理，不能同一时刻处理多件任务。
-                    - 文件读写与计算操作无法避免，能不能让webpack同一时刻处理多个任务，发挥多核CPU电脑的威力以提升构建速度呢？thread-loader来帮你，根据CPU个数开启线程。
-                    - 在此需注意一个问题，若项目文件不算多就不要使用该性能优化建议，毕竟开启多个线程也会存在性能开销。
-                    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108162347.png)
-                - 可视结构
-                    - 配置BundleAnalyzer分析打包文件结构，好处是找出导致体积过大的原因。从而通过分析原因得出优化方案减少构建时间。BundleAnalyzer是webpack官方插件，可直观分析打包文件的模块组成部分、模块体积占比、模块包含关系、模块依赖关系、文件是否重复、压缩体积对比等可视化数据。
-                    - 可使用webpack-bundle-analyzer配置，有了它，我们就能快速找到相关问题。
-                    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108162454.png)
-            - 减少打包体积：分割代码、摇树优化、动态垫片、按需加载、作用提升、压缩资源
-                - 分割代码
-                    - 分割各个模块代码，提取相同部分代码，好处是减少重复代码的出现频率。webpack v4使用splitChunks替代CommonsChunksPlugin实现代码分割。
-                    - splitChunks配置较多，详情可参考官网，在此笔者贴上常用配置。
-                    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108162551.png)
-                - 摇树优化
-                    - 删除项目中未被引用代码，好处是移除重复代码和未使用代码。摇树优化首次出现于rollup，是rollup的核心概念，后来在webpack v2里借鉴过来使用。
-                    - 摇树优化只对ESM规范生效，对其他模块规范失效。摇树优化针对静态结构分析，只有import/export才能提供静态的导入/导出功能。因此在编写业务代码时必须使用ESM规范才能让摇树优化移除重复代码和未使用代码。
-                    - 在webpack里只需将打包环境设置成生产环境就能让摇树优化生效，同时业务代码使用ESM规范编写，使用import导入模块，使用export导出模
-                    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108162636.png)
-                - 动态垫片
-                    - 通过垫片服务根据UA返回当前浏览器代码垫片，好处是无需将繁重的代码垫片打包进去。每次构建都配置@babel/preset-env和core-js根据某些需求将Polyfill打包进来，这无疑又为代码体积增加了贡献。
-                    - @babel/preset-env提供的useBuiltIns可按需导入Polyfill。
-                        - false：无视target.browsers将所有Polyfill加载进来
-                        - entry：根据target.browsers将部分Polyfill加载进来(仅引入有浏览器不支持的Polyfill，需在入口文件import "core-js/stable")
-                        - usage：根据target.browsers和检测代码里ES6的使用情况将部分Polyfill加载进来(无需在入口文件import "core-js/stable")
-                        - 在此推荐大家使用动态垫片。动态垫片可根据浏览器UserAgent返回当前浏览器Polyfill，其思路是根据浏览器的UserAgent从browserlist查找出当前浏览器哪些特性缺乏支持从而返回这些特性的Polyfill。对这方面感兴趣的同学可参考polyfill-library和polyfill-service的源码。
-                        - 在此提供两个动态垫片服务，可在不同浏览器里点击以下链接看看输出不同的Polyfill。相信IExplore还是最多Polyfill的，它自豪地说：我就是我，不一样的烟火。
-                            - 官方CDN服务：https://link.juejin.cn/?target=https%3A%2F%2Fpolyfill.io%2Fv3%2Fpolyfill.min.js
-                            - 阿里CDN服务：https://link.juejin.cn/?target=https%3A%2F%2Fpolyfill.alicdn.com%2Fpolyfill.min.js
-                        - 使用html-webpack-tags-plugin在打包时自动插入动态垫片。
-                        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108162956.png)
-                - 按需加载
-                    - 将路由页面/触发性功能单独打包为一个文件，使用时才加载，好处是减轻首屏渲染的负担。因为项目功能越多其打包体积越大，导致首屏渲染速度越慢。
-                    - 首屏渲染时只需对应JS代码而无需其他JS代码，所以可使用按需加载。webpack v4提供模块按需切割加载功能，配合import()可做到首屏渲染减包的效果，从而加快首屏渲染速度。只有当触发某些功能时才会加载当前功能的JS代码。
-                    - webpack提供魔术注解命名切割模块，若无注解则切割出来的模块无法分辨出属于哪个业务模块，所以一般都是一个业务模块共用一个切割模块的注解名称
-                    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108163220.png)
-                - 作用提升
-                    - 分析模块间依赖关系，把打包好的模块合并到一个函数中，好处是减少函数声明和内存花销。作用提升首次出现于rollup，是rollup的核心概念，后来在webpack v3里借鉴过来使用。
-                    - 在未开启作用提升前，构建后的代码会存在大量函数闭包。由于模块依赖，通过webpack打包后会转换成IIFE，大量函数闭包包裹代码会导致打包体积增大(模块越多越明显)。在运行代码时创建的函数作用域变多，从而导致更大的内存开销。
-                    - 在开启作用提升后，构建后的代码会按照引入顺序放到一个函数作用域里，通过适当重命名某些变量以防止变量名冲突，从而减少函数声明和内存花销。
-                    - 在webpack里只需将打包环境设置成生产环境就能让作用提升生效，或显式设置concatenateModules。
-                    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108163405.png)
-                - 压缩资源
-                    - 压缩HTML/CSS/JS代码，压缩字体/图像/音频/视频，好处是更有效减少打包体积。极致地优化代码都有可能不及优化一个资源文件的体积更有效。
-                    - 针对HTML代码，使用html-webpack-plugin开启压缩功能。
-                    - 针对CSS/JS代码，分别使用以下插件开启压缩功能。其中OptimizeCss基于cssnano封装，Uglifyjs和Terser都是webpack官方插件，同时需注意压缩JS代码需区分ES5和ES6。
-                        - optimize-css-assets-webpack-plugin：压缩CSS代码
-                        - uglifyjs-webpack-plugin：压缩ES5版本的JS代码
-                        - terser-webpack-plugin：压缩ES6版本的JS代码
-                    - 针对字体/音频/视频文件，还真没相关Plugin供我们使用，就只能拜托大家在发布项目到生产服前使用对应的压缩工具处理了。针对图像文件，大部分Loader/Plugin封装时均使用了某些图像处理工具，而这些工具的某些功能又托管在国外服务器里，所以导致经常安装失败。
-                    - webpack压缩图像  这个值得开发
-                - 
-        - 图像策略：基于图像类型(JPG/PNG/SVG/WebP/Base64)
-            - 该策略主要围绕图像类型做相关处理，同时也是接入成本较低的性能优化策略。只需做到以下两点即可。
-            - 图像选型：了解所有图像类型的特点及其何种应用场景最合适
-                - 图像选型一定要知道每种图像类型的体积/质量/兼容/请求/压缩/透明/场景等参数相对值，这样才能迅速做出判断在何种场景使用何种类型的图像。
-                - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108164555.png)
-            - 图像压缩：在部署到生产环境前使用工具或脚本对其压缩处理
-                -  图像压缩可在上述构建策略-压缩资源里完成，也可自行使用工具完成。由于现在大部分webpack图像压缩工具不是安装失败就是各种环境问题(你懂的)，所以笔者还是推荐在发布项目到生产服前使用图像压缩工具处理，这样运行稳定也不会增加打包时间。
-                -  ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108164658.png)
-        - 分发策略：基于内容分发网络(CDN)
-            - 该策略主要围绕内容分发网络做相关处理，同时也是接入成本较高的性能优化策略，需足够资金支持。
-            - 虽然接入成本较高，但大部分企业都会购买一些CDN服务器，所以在部署的事情上就不用过分担忧，尽管使用就好。该策略尽量遵循以下两点就能发挥CDN最大作用
-                - 所有静态资源走CDN：开发阶段确定哪些文件属于静态资源
-                - 把静态资源与主页面置于不同域名下：避免请求带上Cookie
-                - 内容分发网络简称CDN，指一组分布在各地存储数据副本并可根据就近原则满足数据请求的服务器。其核心特征是缓存和回源，缓存是把资源复制到CDN服务器里，回源是资源过期/不存在就向上层服务器请求并复制到CDN服务器里。
-                - 使用CDN可降低网络拥塞，提高用户访问响应速度和命中率。构建在现有网络基础上的智能虚拟网络，依靠部署在各地服务器，通过中心平台的调度、负载均衡、内容分发等功能模块，使用户就近获取所需资源，这就是CDN的终极使命。
-                - 基于CDN的就近原则所带来的优点，可将网站所有静态资源全部部署到CDN服务器里。那静态资源包括哪些文件？通常来说就是无需服务器产生计算就能得到的资源，例如不常变化的样式文件、脚本文件和多媒体文件(字体/图像/音频/视频)等。
-        - 缓存策略：基于浏览器缓存(强缓存/协商缓存)
-            - 该策略主要围绕浏览器缓存做相关处理，同时也使接入成本最低的性能优化策略。其显著减少网络传输所带来的损耗，提升网页访问速度，是一种很值得使用的性能优化策略。
-            - 为了让浏览器缓存发挥最大作用，该策略尽量遵循以下五点就能发挥浏览器缓存最大作用。
-                - 考虑拒绝一切缓存策略：Cache-Control:no-store
-                - 考虑资源是否每次向服务器请求：Cache-Control:no-cache
-                - 考虑资源是否被代理服务器缓存：Cache-Control:public/private
-                - 考虑资源过期时间：Expires:t/Cache-Control:max-age=t,s-maxage=t
-                - 考虑协商缓存：Last-Modified/Etag
-            - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108171545.png)
-            - 整个缓存策略机制很明了，先走强缓存，若命中失败才走协商缓存。若命中强缓存，直接使用强缓存；若未命中强缓存，发送请求到服务器检查是否命中协商缓存；若命中协商缓存，服务器返回304通知浏览器使用本地缓存，否则返回最新资源。
-            - 有两种较常用的应用场景值得使用缓存策略一试，当然更多应用场景都可根据项目需求制定。
-                - 频繁变动资源：设置Cache-Control:no-cache，使浏览器每次都发送请求到服务器，配合Last-Modified/ETag验证资源是否有效
-                - 不常变化资源：设置Cache-Control:max-age=31536000，对文件名哈希处理，当代码修改后生成新的文件名，当HTML文件引入文件名发生改变才会下载最新文件
-    - 渲染层面
-        - 渲染层面的性能优化，无疑是如何让代码解析更好执行更快。因此笔者从以下五方面做出建议。
-        - CSS策略：基于CSS规则
-            - 避免出现超过三层的嵌套规则
-            - 避免为ID选择器添加多余选择器
-            - 避免使用标签选择器代替类选择器
-            - 避免使用通配选择器，只对目标节点声明规则
-            - 避免重复匹配重复定义，关注可继承属性
-        - DOM策略：基于DOM操作
-            - 缓存DOM计算属性
-            - 避免过多DOM操作
-            - 使用DOMFragment缓存批量化DOM操作
-        - 阻塞策略：基于脚本加载
-            - 脚本与DOM/其它脚本的依赖关系很强：对<script>设置defer
-            - 脚本与DOM/其它脚本的依赖关系不强：对<script>设置async
-        - 回流重绘策略：基于回流重绘
-            - 缓存DOM计算属性
-            - 使用类合并样式，避免逐条改变样式
-            - 使用display控制DOM显隐，将DOM离线化
-        - 异步更新策略：基于异步更新
-            - 在异步任务中修改DOM时把其包装成微任务
-        - 上述五方面都是编写代码时完成，充满在整个项目流程的开发阶段里。因此在开发阶段需时刻注意以下涉及到的每一点，养成良好的开发习惯，性能优化也自然而然被使用上了。
-        - 渲染层面的性能优化更多表现在编码细节上，而并非实体代码。简单来说就是遵循某些编码规则，才能将渲染层面的性能优化发挥到最大作用。回流重绘策略在渲染层面的性能优化里占比较重，也是最常规的性能优化之一。
-    - 上述四方面都是一步接着一步完成，充满在整个项目流程里。构建策略和图像策略处于开发阶段，分发策略和缓存策略处于生产阶段，因此在每个阶段都可检查是否按顺序接入上述策略。通过这种方式就能最大限度增加性能优化应用场景。
+  - 网络层面
+    - 网络层面的性能优化，无疑是如何让资源体积更小加载更快，因此笔者从以下四方面做出建议。
+    - 构建策略：基于构建工具(Webpack/Rollup/Parcel/Esbuild/Vite/Gulp)
+      - 该策略主要围绕webpack做相关处理，同时也是接入最普遍的性能优化策略。其他构建工具的处理也是大同小异，可能只是配置上不一致。说到webpack的性能优化，无疑是从时间层面和体积层面入手。
+      - 对两层面分别做出6个性能优化建议总共12个性能优化建议，为了方便记忆均使用四字词语概括，方便大家消化。⏱表示减少打包时间，📦表示减少打包体积。
+      - 减少打包时间：缩减范围、缓存副本、定向搜索、提前构建、并行构建、可视结构
+        - 缩减范围
+          - 配置include/exclude缩小Loader对文件的搜索范围，好处是避免不必要的转译。node_modules目录的体积这么大，那得增加多少时间成本去检索所有文件啊？
+          - include/exclude通常在各大Loader里配置，src目录通常作为源码目录，可做如下处理。当然include/exclude可根据实际情况修改。
+          - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108162258.png)
+        - 缓存副本
+          - 配置cache缓存Loader对文件的编译副本，好处是再次编译时只编译修改过的文件。未修改过的文件干嘛要随着修改过的文件重新编译呢？
+          - 大部分Loader/Plugin都会提供一个可使用编译缓存的选项，通常包含cache字眼。以babel-loader和eslint-webpack-plugin为例。
+          - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108162230.png)
+        - 定向搜索
+          - 配置resolve提高文件的搜索速度，好处是定向指定必须文件路径。若某些第三方库以常规形式引入可能报错或希望程序自动索引特定类型文件都可通过该方式解决。
+          - alias映射模块路径，extensions表明文件后缀，noParse过滤无依赖文件。通常配置alias和extensions就足够。
+          - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108162147.png)
+        - 提前构建
+          - 配置DllPlugin将第三方依赖提前打包，好处是将DLL与业务代码完全分离且每次只构建业务代码。这是一个古老配置，在webpack v2时已存在，不过现在webpack v4+已不推荐使用该配置，因为其版本迭代带来的性能提升足以忽略DllPlugin所带来的效益。
+          - DLL意为动态链接库，指一个包含可由多个程序同时使用的代码库。在前端领域里可认为是另类缓存的存在，它把公共代码打包为DLL文件并存到硬盘里，再次打包时动态链接DLL文件就无需再次打包那些公共代码，从而提升构建速度，减少打包时间。
+          - 配置DLL总体来说相比其他配置复杂，配置流程可大致分为三步。
+          - 首先告知构建脚本哪些依赖做成DLL并生成DLL文件和DLL映射表文件。
+          - 然后在package.json里配置执行脚本且每次构建前首先执行该脚本打包出DLL文件。
+          - 最后链接DLL文件并告知webpack可命中的DLL文件让其自行读取。使用html-webpack-tags-plugin在打包时自动插入DLL文件。
+          - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108162105.png) 
+        - 并行构建
+          - 配置Thread将Loader单进程转换为多进程，好处是释放CPU多核并发的优势。在使用webpack构建项目时会有大量文件需解析和处理，构建过程是计算密集型的操作，随着文件增多会使构建过程变得越慢。
+          - 运行在Node里的webpack是单线程模型，简单来说就是webpack待处理的任务需一件件处理，不能同一时刻处理多件任务。
+          - 文件读写与计算操作无法避免，能不能让webpack同一时刻处理多个任务，发挥多核CPU电脑的威力以提升构建速度呢？thread-loader来帮你，根据CPU个数开启线程。
+          - 在此需注意一个问题，若项目文件不算多就不要使用该性能优化建议，毕竟开启多个线程也会存在性能开销。
+          - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108162347.png)
+        - 可视结构
+          - 配置BundleAnalyzer分析打包文件结构，好处是找出导致体积过大的原因。从而通过分析原因得出优化方案减少构建时间。BundleAnalyzer是webpack官方插件，可直观分析打包文件的模块组成部分、模块体积占比、模块包含关系、模块依赖关系、文件是否重复、压缩体积对比等可视化数据。
+          - 可使用webpack-bundle-analyzer配置，有了它，我们就能快速找到相关问题。
+          - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108162454.png)
+      - 减少打包体积：分割代码、摇树优化、动态垫片、按需加载、作用提升、压缩资源
+        - 分割代码
+          - 分割各个模块代码，提取相同部分代码，好处是减少重复代码的出现频率。webpack v4使用splitChunks替代CommonsChunksPlugin实现代码分割。
+          - splitChunks配置较多，详情可参考官网，在此笔者贴上常用配置。
+          - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108162551.png)
+        - 摇树优化
+          - 删除项目中未被引用代码，好处是移除重复代码和未使用代码。摇树优化首次出现于rollup，是rollup的核心概念，后来在webpack v2里借鉴过来使用。
+          - 摇树优化只对ESM规范生效，对其他模块规范失效。摇树优化针对静态结构分析，只有import/export才能提供静态的导入/导出功能。因此在编写业务代码时必须使用ESM规范才能让摇树优化移除重复代码和未使用代码。
+          - 在webpack里只需将打包环境设置成生产环境就能让摇树优化生效，同时业务代码使用ESM规范编写，使用import导入模块，使用export导出模
+          - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108162636.png)
+        - 动态垫片
+          - 通过垫片服务根据UA返回当前浏览器代码垫片，好处是无需将繁重的代码垫片打包进去。每次构建都配置@babel/preset-env和core-js根据某些需求将Polyfill打包进来，这无疑又为代码体积增加了贡献。
+          - @babel/preset-env提供的useBuiltIns可按需导入Polyfill。
+            - false：无视target.browsers将所有Polyfill加载进来
+            - entry：根据target.browsers将部分Polyfill加载进来(仅引入有浏览器不支持的Polyfill，需在入口文件import "core-js/stable")
+            - usage：根据target.browsers和检测代码里ES6的使用情况将部分Polyfill加载进来(无需在入口文件import "core-js/stable")
+            - 在此推荐大家使用动态垫片。动态垫片可根据浏览器UserAgent返回当前浏览器Polyfill，其思路是根据浏览器的UserAgent从browserlist查找出当前浏览器哪些特性缺乏支持从而返回这些特性的Polyfill。对这方面感兴趣的同学可参考polyfill-library和polyfill-service的源码。
+            - 在此提供两个动态垫片服务，可在不同浏览器里点击以下链接看看输出不同的Polyfill。相信IExplore还是最多Polyfill的，它自豪地说：我就是我，不一样的烟火。
+              - 官方CDN服务：https://link.juejin.cn/?target=https%3A%2F%2Fpolyfill.io%2Fv3%2Fpolyfill.min.js
+              - 阿里CDN服务：https://link.juejin.cn/?target=https%3A%2F%2Fpolyfill.alicdn.com%2Fpolyfill.min.js
+            - 使用html-webpack-tags-plugin在打包时自动插入动态垫片。
+            - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108162956.png)
+        - 按需加载
+          - 将路由页面/触发性功能单独打包为一个文件，使用时才加载，好处是减轻首屏渲染的负担。因为项目功能越多其打包体积越大，导致首屏渲染速度越慢。
+          - 首屏渲染时只需对应JS代码而无需其他JS代码，所以可使用按需加载。webpack v4提供模块按需切割加载功能，配合import()可做到首屏渲染减包的效果，从而加快首屏渲染速度。只有当触发某些功能时才会加载当前功能的JS代码。
+          - webpack提供魔术注解命名切割模块，若无注解则切割出来的模块无法分辨出属于哪个业务模块，所以一般都是一个业务模块共用一个切割模块的注解名称
+          - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108163220.png)
+        - 作用提升
+          - 分析模块间依赖关系，把打包好的模块合并到一个函数中，好处是减少函数声明和内存花销。作用提升首次出现于rollup，是rollup的核心概念，后来在webpack v3里借鉴过来使用。
+          - 在未开启作用提升前，构建后的代码会存在大量函数闭包。由于模块依赖，通过webpack打包后会转换成IIFE，大量函数闭包包裹代码会导致打包体积增大(模块越多越明显)。在运行代码时创建的函数作用域变多，从而导致更大的内存开销。
+          - 在开启作用提升后，构建后的代码会按照引入顺序放到一个函数作用域里，通过适当重命名某些变量以防止变量名冲突，从而减少函数声明和内存花销。
+          - 在webpack里只需将打包环境设置成生产环境就能让作用提升生效，或显式设置concatenateModules。
+          - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108163405.png)
+        - 压缩资源
+          - 压缩HTML/CSS/JS代码，压缩字体/图像/音频/视频，好处是更有效减少打包体积。极致地优化代码都有可能不及优化一个资源文件的体积更有效。
+          - 针对HTML代码，使用html-webpack-plugin开启压缩功能。
+          - 针对CSS/JS代码，分别使用以下插件开启压缩功能。其中OptimizeCss基于cssnano封装，Uglifyjs和Terser都是webpack官方插件，同时需注意压缩JS代码需区分ES5和ES6。
+            - optimize-css-assets-webpack-plugin：压缩CSS代码
+            - uglifyjs-webpack-plugin：压缩ES5版本的JS代码
+            - terser-webpack-plugin：压缩ES6版本的JS代码
+          - 针对字体/音频/视频文件，还真没相关Plugin供我们使用，就只能拜托大家在发布项目到生产服前使用对应的压缩工具处理了。针对图像文件，大部分Loader/Plugin封装时均使用了某些图像处理工具，而这些工具的某些功能又托管在国外服务器里，所以导致经常安装失败。
+          - webpack压缩图像  这个值得开发
+        -
+    - 图像策略：基于图像类型(JPG/PNG/SVG/WebP/Base64)
+      - 该策略主要围绕图像类型做相关处理，同时也是接入成本较低的性能优化策略。只需做到以下两点即可。
+      - 图像选型：了解所有图像类型的特点及其何种应用场景最合适
+        - 图像选型一定要知道每种图像类型的体积/质量/兼容/请求/压缩/透明/场景等参数相对值，这样才能迅速做出判断在何种场景使用何种类型的图像。
+        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108164555.png)
+      - 图像压缩：在部署到生产环境前使用工具或脚本对其压缩处理
+        - 图像压缩可在上述构建策略-压缩资源里完成，也可自行使用工具完成。由于现在大部分webpack图像压缩工具不是安装失败就是各种环境问题(你懂的)，所以笔者还是推荐在发布项目到生产服前使用图像压缩工具处理，这样运行稳定也不会增加打包时间。
+        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108164658.png)
+    - 分发策略：基于内容分发网络(CDN)
+      - 该策略主要围绕内容分发网络做相关处理，同时也是接入成本较高的性能优化策略，需足够资金支持。
+      - 虽然接入成本较高，但大部分企业都会购买一些CDN服务器，所以在部署的事情上就不用过分担忧，尽管使用就好。该策略尽量遵循以下两点就能发挥CDN最大作用
+        - 所有静态资源走CDN：开发阶段确定哪些文件属于静态资源
+        - 把静态资源与主页面置于不同域名下：避免请求带上Cookie
+        - 内容分发网络简称CDN，指一组分布在各地存储数据副本并可根据就近原则满足数据请求的服务器。其核心特征是缓存和回源，缓存是把资源复制到CDN服务器里，回源是资源过期/不存在就向上层服务器请求并复制到CDN服务器里。
+        - 使用CDN可降低网络拥塞，提高用户访问响应速度和命中率。构建在现有网络基础上的智能虚拟网络，依靠部署在各地服务器，通过中心平台的调度、负载均衡、内容分发等功能模块，使用户就近获取所需资源，这就是CDN的终极使命。
+        - 基于CDN的就近原则所带来的优点，可将网站所有静态资源全部部署到CDN服务器里。那静态资源包括哪些文件？通常来说就是无需服务器产生计算就能得到的资源，例如不常变化的样式文件、脚本文件和多媒体文件(字体/图像/音频/视频)等。
+    - 缓存策略：基于浏览器缓存(强缓存/协商缓存)
+      - 该策略主要围绕浏览器缓存做相关处理，同时也使接入成本最低的性能优化策略。其显著减少网络传输所带来的损耗，提升网页访问速度，是一种很值得使用的性能优化策略。
+      - 为了让浏览器缓存发挥最大作用，该策略尽量遵循以下五点就能发挥浏览器缓存最大作用。
+        - 考虑拒绝一切缓存策略：Cache-Control:no-store
+        - 考虑资源是否每次向服务器请求：Cache-Control:no-cache
+        - 考虑资源是否被代理服务器缓存：Cache-Control:public/private
+        - 考虑资源过期时间：Expires:t/Cache-Control:max-age=t,s-maxage=t
+        - 考虑协商缓存：Last-Modified/Etag
+      - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108171545.png)
+      - 整个缓存策略机制很明了，先走强缓存，若命中失败才走协商缓存。若命中强缓存，直接使用强缓存；若未命中强缓存，发送请求到服务器检查是否命中协商缓存；若命中协商缓存，服务器返回304通知浏览器使用本地缓存，否则返回最新资源。
+      - 有两种较常用的应用场景值得使用缓存策略一试，当然更多应用场景都可根据项目需求制定。
+        - 频繁变动资源：设置Cache-Control:no-cache，使浏览器每次都发送请求到服务器，配合Last-Modified/ETag验证资源是否有效
+        - 不常变化资源：设置Cache-Control:max-age=31536000，对文件名哈希处理，当代码修改后生成新的文件名，当HTML文件引入文件名发生改变才会下载最新文件
+  - 渲染层面
+    - 渲染层面的性能优化，无疑是如何让代码解析更好执行更快。因此笔者从以下五方面做出建议。
+    - CSS策略：基于CSS规则
+      - 避免出现超过三层的嵌套规则
+      - 避免为ID选择器添加多余选择器
+      - 避免使用标签选择器代替类选择器
+      - 避免使用通配选择器，只对目标节点声明规则
+      - 避免重复匹配重复定义，关注可继承属性
+    - DOM策略：基于DOM操作
+      - 缓存DOM计算属性
+      - 避免过多DOM操作
+      - 使用DOMFragment缓存批量化DOM操作
+    - 阻塞策略：基于脚本加载
+      - 脚本与DOM/其它脚本的依赖关系很强：对<script>设置defer
+      - 脚本与DOM/其它脚本的依赖关系不强：对<script>设置async
+    - 回流重绘策略：基于回流重绘
+      - 缓存DOM计算属性
+      - 使用类合并样式，避免逐条改变样式
+      - 使用display控制DOM显隐，将DOM离线化
+    - 异步更新策略：基于异步更新
+      - 在异步任务中修改DOM时把其包装成微任务
+    - 上述五方面都是编写代码时完成，充满在整个项目流程的开发阶段里。因此在开发阶段需时刻注意以下涉及到的每一点，养成良好的开发习惯，性能优化也自然而然被使用上了。
+    - 渲染层面的性能优化更多表现在编码细节上，而并非实体代码。简单来说就是遵循某些编码规则，才能将渲染层面的性能优化发挥到最大作用。回流重绘策略在渲染层面的性能优化里占比较重，也是最常规的性能优化之一。
+  - 上述四方面都是一步接着一步完成，充满在整个项目流程里。构建策略和图像策略处于开发阶段，分发策略和缓存策略处于生产阶段，因此在每个阶段都可检查是否按顺序接入上述策略。通过这种方式就能最大限度增加性能优化应用场景。
 #### 六大指标
 根据性能优化的重要性和实际性划分出九大策略和六大指标，其实它们都是一条条活生生的性能优化建议。有些性能优化建议接不接入影响都不大，因此将九大策略定位高于六大指标。针对九大策略还是建议在开发阶段和生产阶段接入，在项目复盘时可将六大指标的条条框框根据实际应用场景接入。
 
 - 六大指标基本囊括大部分性能优化细节，可作为九大策略的补充。笔者根据每条性能优化建议的特征将指标划分为以下六方面。
-    - 加载优化：资源在加载时可做的性能优化
-        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108172559.png)
-    - 执行优化：资源在执行时可做的性能优化
-        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108172613.png)
-    - 渲染优化：资源在渲染时可做的性能优化
-        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108172624.png)
-    - 样式优化：样式在编码时可做的性能优化
-        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108172638.png)
-    - 脚本优化：脚本在编码时可做的性能优化
-        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108172654.png)
-    - V8引擎优化：针对V8引擎特征可做的性能优化  
-        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108172704.png)
-
-
+  - 加载优化：资源在加载时可做的性能优化
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108172559.png)
+  - 执行优化：资源在执行时可做的性能优化
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108172613.png)
+  - 渲染优化：资源在渲染时可做的性能优化
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108172624.png)
+  - 样式优化：样式在编码时可做的性能优化
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108172638.png)
+  - 脚本优化：脚本在编码时可做的性能优化
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108172654.png)
+  - V8引擎优化：针对V8引擎特征可做的性能优化  
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108172704.png)
 ## 手写相关函数
 ### 手写相关函数1
+#### 手写字符串模板
+
+```js
+function render(template, data) {
+    const reg = /\{\{(\w+)\}\}/; // 模板字符串正则
+    if (reg.test(template)) { // 判断模板里是否有模板字符串
+        const name = reg.exec(template)[1]; // 查找当前模板里第一个模板字符串的字段
+        template = template.replace(reg, data[name]); // 将第一个模板字符串渲染
+        return render(template, data); // 递归的渲染并返回渲染后的结构
+    }
+    return template; // 如果模板没有模板字符串直接返回
+}
+
+
+// 测试验证
+let template = '我是{{name}}，年龄{{age}}，性别{{sex}}';
+let person = {
+    name: '布兰',
+    age: 12
+}
+render(template, person); // 我是布兰，年龄12，性别undefined
+```
+
+#### 手写异步并发数限制
+
+```js
+/**
+ * 关键点
+ * 1. new promise 一经创建，立即执行
+ * 2. 使用 Promise.resolve().then 可以把任务加到微任务队列，防止立即执行迭代方法
+ * 3. 微任务处理过程中，产生的新的微任务，会在同一事件循环内，追加到微任务队列里
+ * 4. 使用 race 在某个任务完成时，继续添加任务，保持任务按照最大并发数进行执行
+ * 5. 任务完成后，需要从 doingTasks 中移出
+ */
+function limit(count, array, iterateFunc) {
+  const tasks = []
+  const doingTasks = []
+  let i = 0
+  const enqueue = () => {
+    if (i === array.length) {
+      return Promise.resolve()
+    }
+    const task = Promise.resolve().then(() => iterateFunc(array[i++]))
+    tasks.push(task)
+    const doing = task.then(() => doingTasks.splice(doingTasks.indexOf(doing), 1))
+    doingTasks.push(doing)
+    const res = doingTasks.length >= count ? Promise.race(doingTasks) : Promise.resolve()
+    return res.then(enqueue)
+  };
+  return enqueue().then(() => Promise.all(tasks))
+}
+
+// test
+const timeout = i => new Promise(resolve => setTimeout(() => resolve(i), i))
+limit(2, [1000, 1000, 1000, 1000], timeout).then((res) => {
+  console.log(res)
+})
+```
+
+#### 手写异步串行 | 异步并行
+
+```js
+// 字节面试题，实现一个异步加法
+function asyncAdd(a, b, callback) {
+  setTimeout(function () {
+    callback(null, a + b);
+  }, 500);
+}
+
+// 解决方案
+// 1. promisify
+const promiseAdd = (a, b) => new Promise((resolve, reject) => {
+  asyncAdd(a, b, (err, res) => {
+    if (err) {
+      reject(err)
+    } else {
+      resolve(res)
+    }
+  })
+})
+
+// 2. 串行处理
+async function serialSum(...args) {
+  return args.reduce((task, now) => task.then(res => promiseAdd(res, now)), Promise.resolve(0))
+}
+
+// 3. 并行处理
+async function parallelSum(...args) {
+  if (args.length === 1) return args[0]
+  const tasks = []
+  for (let i = 0; i < args.length; i += 2) {
+    tasks.push(promiseAdd(args[i], args[i + 1] || 0))
+  }
+  const results = await Promise.all(tasks)
+  return parallelSum(...results)
+}
+
+// 测试
+(async () => {
+  console.log('Running...');
+  const res1 = await serialSum(1, 2, 3, 4, 5, 8, 9, 10, 11, 12)
+  console.log(res1)
+  const res2 = await parallelSum(1, 2, 3, 4, 5, 8, 9, 10, 11, 12)
+  console.log(res2)
+  console.log('Done');
+})()
+```
+
 #### 手写js版本号比较
+
 ```js
 function Version(curV,reqV){
     curV = curV ? curV.replace(/[vV]/, "") : "0.0.0";
@@ -9757,8 +10433,39 @@ function Version(curV,reqV){
     }
   }
 ```
+
+#### 写版本号排序的方法
+
+```md
+题目描述:有一组版本号如下['0.1.1', '2.3.3', '0.302.1', '4.2', '4.3.5', '4.3.4.5']。现在需要对其进行排序，排序的结果为 ['4.3.5','4.3.4.5','2.3.3','0.302.1','0.1.1']
+```
+
+```js
+arr.sort((a, b) => {
+  let i = 0;
+  const arr1 = a.split(".");
+  const arr2 = b.split(".");
+
+  while (true) {
+    const s1 = arr1[i];
+    const s2 = arr2[i];
+    i++;
+    if (s1 === undefined || s2 === undefined) {
+      return arr2.length - arr1.length;
+    }
+
+    if (s1 === s2) continue;
+
+    return s2 - s1;
+  }
+});
+console.log(arr);
+```
+
 #### 封装localStorage
+
 因为localStorage是永久存储的，不支持设置过期时间，而我们有时又不希望把本地的存储一起发往服务器，所以也不会使用cookie，基于这样的业务场景，就对localStorage进行了二次封装，让它具备过期时间的特点。
+
 ```js
 class Storage {
   constructor (express) {
@@ -9794,7 +10501,9 @@ class Storage {
   }
 }
 ```
+
 #### 获取当前页面url参数
+
 - 传统方式,查找location.search
 - 新API URL SearchParams
 
@@ -9820,7 +10529,9 @@ function query(name) {
 }
 console.log(query('b'))
 ```
+
 #### 将url参数解析为JS对象
+
 - 传统方式， 分析 srarch
 - 使用 URLSearchParams
 
@@ -9847,8 +10558,37 @@ function queryToObj() {
     })
     return res
 }
+
+
+
+
+function queryToObj(url) {
+    const paramsStr = /.+\?(.+)$/.exec(url)[1]; // 将 ? 后面的字符串取出来
+    const paramsArr = paramsStr.split('&'); // 将字符串以 & 分割后存到数组中
+    let paramsObj = {};
+    // 将 params 存到对象中
+    paramsArr.forEach(param => {
+        if (/=/.test(param)) { // 处理有 value 的参数
+            let [key, val] = param.split('='); // 分割 key 和 value
+            val = decodeURIComponent(val); // 解码
+            val = /^\d+$/.test(val) ? parseFloat(val) : val; // 判断是否转为数字
+
+            if (paramsObj.hasOwnProperty(key)) { // 如果对象有 key，则添加一个值
+                paramsObj[key] = [].concat(paramsObj[key], val);
+            } else { // 如果对象没有这个 key，创建 key 并设置值
+                paramsObj[key] = val;
+            }
+        } else { // 处理没有 value 的参数
+            paramsObj[param] = true;
+        }
+    })
+
+    return paramsObj;
+}
 ```
+
 #### 手写深度比较（isEqual）
+
 ```js
 // 判断对象是否是对象还是数组
 function isObject(obj) {
@@ -9907,7 +10647,9 @@ const obj2 = {
 }
 console.log(isEqual(obj1, obj2)) //true
 ```
+
 #### 手写-如何找到数组中第一个没出现的最小正整数
+
 ```js
 给你一个未排序的整数数组 nums ，请你找出其中没有出现的最小的正整数。
 请你实现时间复杂度为 O(n) 并且只使用常数级别额外空间的解决方案。
@@ -9927,9 +10669,10 @@ console.log(isEqual(obj1, obj2)) //true
 输入：nums = [7,8,9,11,12]
 输出：1
 ```
+
 - 第一版 O(n^2) 的方法
-```js
-const firstMissingPositive = (nums) => {
+  ```js
+  const firstMissingPositive = (nums) => {
   let i = 0;
   let res = 1;
   while (i < nums.length) {
@@ -9941,11 +10684,12 @@ const firstMissingPositive = (nums) => {
     }
   }
   return res;
-};
-```
+  };
+  ```
+
 - 第二版 时间空间均为 O(n)
-```js
-const firstMissingPositive = (nums) => {
+  ```js
+  const firstMissingPositive = (nums) => {
   const set = new Set();
   for (let i = 0; i < nums.length; i++) {
     set.add(nums[i]);
@@ -9955,11 +10699,12 @@ const firstMissingPositive = (nums) => {
       return i;
     }
   }
-};
-```
+  };
+  ```
+
 - 最终版 时间复杂度为 O(n) 并且只使用常数级别空间
-```js
-const firstMissingPositive = (nums) => {
+  ```js
+  const firstMissingPositive = (nums) => {
   for (let i = 0; i < nums.length; i++) {
     while (
       nums[i] >= 1 &&
@@ -9978,12 +10723,13 @@ const firstMissingPositive = (nums) => {
     }
   }
   return nums.length + 1; // 发现元素 1~nums.length 占满了数组，一个没缺
-};
-```
+  };
+  ```
 #### 手写-怎么在制定数据源里面生成一个长度为 n 的不重复随机数组
+
 - 第一版 时间复杂度为 O(n^2)
-```js
-function getTenNum(testArray, n) {
+  ```js
+  function getTenNum(testArray, n) {
   let result = [];
   for (let i = 0; i < n; ++i) {
     const random = Math.floor(Math.random() * testArray.length);
@@ -9995,13 +10741,14 @@ function getTenNum(testArray, n) {
     result.push(cur);
   }
   return result;
-}
-const testArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
-const resArr = getTenNum(testArray, 10);
-```
+  }
+  const testArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+  const resArr = getTenNum(testArray, 10);
+  ```
+
 - 第二版 标记法 / 自定义属性法 时间复杂度为 O(n)
-```js
-function getTenNum(testArray, n) {
+  ```js
+  function getTenNum(testArray, n) {
   let hash = {};
   let result = [];
   let ranNum = n;
@@ -10014,13 +10761,14 @@ function getTenNum(testArray, n) {
     }
   }
   return result;
-}
-const testArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
-const resArr = getTenNum(testArray, 10);
-```
+  }
+  const testArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+  const resArr = getTenNum(testArray, 10);
+  ```
+
 - 第三版 交换法 时间复杂度为 O(n)
-```js
-function getTenNum(testArray, n) {
+  ```js
+  function getTenNum(testArray, n) {
   const cloneArr = [...testArray];
   let result = [];
   for (let i = 0; i < n; i++) {
@@ -10030,17 +10778,16 @@ function getTenNum(testArray, n) {
     cloneArr[ran] = cloneArr[cloneArr.length - i - 1];
   }
   return result;
-}
-const testArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
-const resArr = getTenNum(testArray, 14);
-```
+  }
+  const testArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+  const resArr = getTenNum(testArray, 14);
+  ```
 #### 手写-字符串最长的不重复子串
-```js
-const lengthOfLongestSubstring = function (s) {
+  ```js
+  const lengthOfLongestSubstring = function (s) {
   if (s.length === 0) {
     return 0;
   }
-
   let left = 0;
   let right = 1;
   let max = 0;
@@ -10057,28 +10804,28 @@ const lengthOfLongestSubstring = function (s) {
     right++;
   }
   return max;
-};
-```
+  };
+  ```
 #### 手写-查找数组公共前缀
 ```js
 const longestCommonPrefix = function (strs) {
-  const str = strs[0];
-  let index = 0;
-  while (index < str.length) {
-    const strCur = str.slice(0, index + 1);
-    for (let i = 0; i < strs.length; i++) {
-      if (!strs[i] || !strs[i].startsWith(strCur)) {
-        return str.slice(0, index);
-      }
+const str = strs[0];
+let index = 0;
+while (index < str.length) {
+  const strCur = str.slice(0, index + 1);
+  for (let i = 0; i < strs.length; i++) {
+    if (!strs[i] || !strs[i].startsWith(strCur)) {
+      return str.slice(0, index);
     }
-    index++;
   }
-  return str;
+  index++;
+}
+return str;
 };
 ```
 #### 手写-判断括号字符串是否有效
-```js
-const isValid = function (s) {
+  ```js
+  const isValid = function (s) {
   if (s.length % 2 === 1) {
     return false;
   }
@@ -10098,25 +10845,26 @@ const isValid = function (s) {
       }
     }
   }
-
+  
   if (stack.length) {
     return false;
   }
-
+  
   return true;
-};
-```
+  };
+  ```
+  
 #### 手写-实现一个对象的 flatten 方法
 ```js
-const obj = {
- a: {
+  const obj = {
+  a: {
         b: 1,
         c: 2,
         d: {e: 5}
     },
- b: [1, 3, {a: 2, b: 3}],
- c: 3
-}
+  b: [1, 3, {a: 2, b: 3}],
+  c: 3
+  }
 
 flatten(obj) 结果返回如下
 // {
@@ -10129,9 +10877,6 @@ flatten(obj) 结果返回如下
 //  'b[2].b': 3
 //   c: 3
 // }
-
-
-
 
 function isObject(val) {
   return typeof val === "object" && val !== null;
@@ -10162,6 +10907,7 @@ function flatten(obj) {
   return res;
 }
 flatten();
+
 ```
 #### 手写-将虚拟 Dom 转化为真实 Dom（类似的递归题-必考）
 ```js
@@ -10189,52 +10935,9 @@ function _render(vnode) {
   return dom;
 }
 ```
-#### 手写-防抖节流
-```js
-// 防抖
-function debounce(fn, delay = 300) {
-  //默认300毫秒
-  let timer;
-  return function () {
-    const args = arguments;
-    if (timer) {
-      clearTimeout(timer);
-    }
-    timer = setTimeout(() => {
-      fn.apply(this, args); // 改变this指向为调用debounce所指的对象
-    }, delay);
-  };
-}
 
-window.addEventListener(
-  "scroll",
-  debounce(() => {
-    console.log(111);
-  }, 1000)
-);
-
-// 节流
-// 设置一个标志
-function throttle(fn, delay) {
-  let flag = true;
-  return () => {
-    if (!flag) return;
-    flag = false;
-    timer = setTimeout(() => {
-      fn();
-      flag = true;
-    }, delay);
-  };
-}
-
-window.addEventListener(
-  "scroll",
-  throttle(() => {
-    console.log(111);
-  }, 1000)
-);
-```
 #### 手写-发布订阅模式
+
 ```js
 class EventEmitter {
   constructor() {
@@ -10271,26 +10974,22 @@ class EventEmitter {
 }
 // 使用如下
 // const event = new EventEmitter();
-
 // const handle = (...rest) => {
 //   console.log(rest);
 // };
-
 // event.on("click", handle);
-
 // event.emit("click", 1, 2, 3, 4);
-
 // event.off("click", handle);
-
 // event.emit("click", 1, 2);
-
 // event.once("dbClick", () => {
 //   console.log(123456);
 // });
 // event.emit("dbClick");
 // event.emit("dbClick");
 ```
+
 #### 手写 promise.all 和 race
+
 ```js
   //静态方法
   static all(promiseArr) {
@@ -10377,7 +11076,7 @@ class MyPromise {
         // 保存成功之后的值
         this.value = value
 
-        
+
         // 异步执行的时候 判断成功回调是否存在 如果存在 调用
         // this.successCallback && this.successCallback(this.value)
         while(this.successCallback.length){
@@ -10590,20 +11289,24 @@ function resolvePromise(promise2,x,resolve,reject) {
     }
 }
 ```
+
 #### 手写new
+
 ```js
-function myNew(Con, ...args) {
+function myNew(Func, ...args) {
   // 创建一个空的对象
   let obj = {};
   // 隐式原型链接到该函数的原型，obj 可以访问到构造函数原型中的属性
-  obj.__proto__ = Con.prototype;
+  obj.__proto__ = Func.prototype;
   // 绑定 this 实现继承，obj 可以访问到构造函数中的属性
-  let ret = Con.call(obj, ...args);
+  const ret = Func.call(obj, ...args);
   // 优先返回构造函数返回的对象
   return ret instanceof Object ? ret : obj;
 }
 ```
+
 #### 手写简单的闭包
+
 ```js
 function a() {
     var i = 0
@@ -10623,13 +11326,15 @@ console.log(x())
 ```
 
 #### 手写trim函数
+
 ```js
 String.prototype.trim = function() {
     return this.replace(/^\s+|\s+$/gm,'');
 }
-````
+```
 
 #### 手写compose函数组合函数
+
 ```js
 function compose(..args){
     return function(value){
@@ -10654,6 +11359,7 @@ const compose = (...fns) => {
 ```
 
 #### 手写柯里化函数
+
 ```js
 // 柯里化后的函数
 let curried = _.curry(getSum)
@@ -10662,7 +11368,6 @@ curried(1,2,3);
 curried(1)(2)(3);
 curried(1,2)(3);
 ```
-
 
 ```js
 function curry(fn){
@@ -10675,12 +11380,13 @@ function curry(fn){
         return fn(...args);
     }
 }
-````
+```
 
 ```md
 实现一个 add 方法
 题目描述:实现一个 add 方法 使计算结果能够满足如下预期： add(1)(2)(3)()=6 add(1,2,3)(4)()=10
 ```
+
 ```js
 function add(...args) {
   let allArgs = [...args];
@@ -10698,7 +11404,28 @@ function add(...args) {
 }
 ```
 
+#### 手写偏函数
+
+什么是偏函数？偏函数就是将一个 n 参的函数转换成固定 x 参的函数，剩余参数（n - x）将在下次调用全部传入。
+
+```js
+// 例子
+function add(a, b, c) {
+    return a + b + c
+}
+let partialAdd = partial(add, 1)
+partialAdd(2, 3)
+
+
+function partial(fn, ...args) {
+    return (...arg) => {
+        return fn(...args, ...arg)
+    }
+}
+```
+
 #### 手写bind、call、apply函数
+
 这道题其实理清楚`apply`,`call`,`bind`的特点就行了。首先`apply`,`call`,`bind`都是强制绑定`this`,而`apply`和`call`都是立即执行，只有`bind`是返回一个函数，所以可以将`apply`和`call`放在一起分析。
 
 通过上面的`apply`,`call`,`bind`用法可以得知：
@@ -10817,7 +11544,7 @@ class myJQuery extends jQuery {
 
     }
     style(data) {
-        
+
     }
 }
 
@@ -10825,7 +11552,6 @@ class myJQuery extends jQuery {
 // $p.get(1)
 // $p.each((elem) => console.log(elem.nodeName))
 // $p.on('click', () => alert('clicked'))
-
 ```
 
 #### 手写Ajax
@@ -10953,7 +11679,7 @@ p2.getName();
 
 ```js
 Array.prototype.myForEach = function (func, context) {
-  	let arr = Array.prototype.slice.call(this)
+      let arr = Array.prototype.slice.call(this)
     for (var i = 0; i < arr.length; i++) {
         func.call(context, arr[i], i, this)
     }
@@ -10961,7 +11687,9 @@ Array.prototype.myForEach = function (func, context) {
 ```
 
 #### 手写map函数
+
 ```javascript
+// 遍历数组的每一项，并执行回调函数的操作，返回一个对每一项进行操作后的新数组，
 Array.prototype.map = function(fn) {
     const result = [];
     for (let i=0;i<this.length;i++) {
@@ -10984,11 +11712,11 @@ const selfMap = function (fn,context){
   let mappedArr = []
   for(let i = 0;i < arr.length;i++){
     if(!arr.hasOwnProperty(i)) continue
-    mappedArr.push(fn.call(context,arr[i],i,this))	
+    mappedArr.push(fn.call(context,arr[i],i,this))    
   }
   return mappedArr
 }
-值得一提的是，map 的第二个参数为第一个参数回调中的 this 指向，如果第一个参数为箭头函数，那设置第二个 this 会因为箭头函数的词法绑定而失效
+// 值得一提的是，map 的第二个参数为第一个参数回调中的 this 指向，如果第一个参数为箭头函数，那设置第二个 this 会因为箭头函数的词法绑定而失效
 
 
 //使用reduce实现数组map方法
@@ -10998,10 +11726,10 @@ const selfMap2 = function(fn,context){
     return [...pre,fn.call(context,cur,index,this)]
   },[])
 }
-
 ```
 
 #### 手写filter函数
+
 ```javascript
 Array.prototype.filter = function (fn){
     const result = [];
@@ -11035,7 +11763,9 @@ const selfFilter2 = function(fn,context){
 ```
 
 #### 手写reduce函数
+
 ```javascript
+// 对数组累积执行回调函数，返回最终计算结果
 Array.prototype.reduce = function (fn,initValue){
     let result = initValue?initValue:this[0]
     for (let i=0;i<this.length;i++) {
@@ -11063,7 +11793,7 @@ const findRealELementIndex = function(arr,initiIndex){
 const selfReduce = function(fn,initalValue){
   let arr = Array.prototype.slice.call(this)
   let res
-  
+
   if(initalValue === undefined){
     res = arr[findRealElementIndex(arr)]
     for(let i = 0;i < arr.lenght -1;i++){
@@ -11106,6 +11836,7 @@ Array.prototype.myReduce = function (func, initialValue) {
 ```
 
 #### 手写every函数
+
 ```javascript
 Array.prototype.every = function (fn){
     let bool = true;
@@ -11124,6 +11855,7 @@ console.log(result)
 ```
 
 #### 手写some函数
+
 ```javascript
 Array.prototype.some = function (fn){
     let bool = false;
@@ -11158,11 +11890,10 @@ const selfSome = function(fn,context){
 }
 
 执行 some 方法的数组如果是一个空数组，最终始终会返回 false，而另一个数组的 every 方法中的数组如果是一个空数组，会始终返回 true
-
-
 ```
 
 #### 手写find方法
+
 ```javascript
 // 只查找第一个
 Array.prototype.find = function (fn){
@@ -11182,6 +11913,7 @@ console.log(result)
 ```
 
 #### 类数组转化为数组的方法
+
 ```js
 // 类数组拥有 length 属性 可以使用下标来访问元素 但是不能使用数组的方法 如何把类数组转化为数组?
 
@@ -11200,6 +11932,7 @@ Array.prototype.concat.apply([], arrayLike)
 ```
 
 #### 手写拉平数组(数组扁平化)
+
 ```javascript
 // 利用es6语法flat(num)方法将数组拉平
 // 该方法不传参数默认只会拉平一层，如果想拉平多层嵌套的数组，需要传入一个整数，表示要拉平的层级。该返回返回一个新的数组，对原数组没有影响。
@@ -11237,7 +11970,8 @@ console.log(result3)
 //使用reduce实现数组的flat方法
 ```
 
-#### 实现一个对象的 flatten 方法
+#### 实现一个对象的扁平化方法
+
 ```js
 const obj = {
  a: {
@@ -11261,6 +11995,7 @@ flatten(obj) 结果返回如下
 //   c: 3
 // }
 ```
+
 ```js
 function isObject(val) {
   return typeof val === "object" && val !== null;
@@ -11291,11 +12026,42 @@ function flatten(obj) {
   return res;
 }
 flatten();
+
+
+
+
+
+
+
+
+// 没有数组的情况
+function objectFlat(obj = {}) {
+  const res = {}
+  function flat(item, preKey = '') {
+    Object.entries(item).forEach(([key, val]) => {
+      const newKey = preKey ? `${preKey}.${key}` : key
+      if (val && typeof val === 'object') {
+        flat(val, newKey)
+      } else {
+        res[newKey] = val
+      }
+    })
+  }
+  flat(obj)
+  return res
+}
+
+// 测试
+const source = { a: { b: { c: 1, d: 2 }, e: 3 }, f: { g: 2 } }
+console.log(objectFlat(source));
+// { 'a.b.c': 1, 'a.b.d': 2, 'a.e': 3, 'f.g': 2 }
 ```
 
 #### 手写图片懒加载&惰性函数
+
 实现图片懒加载其核心的思想就是将 img 的 src 属性先使用一张本地占位符，或者为空。然后真实的图片路径再定义一个 data-set 属性存起来，待达到一定条件的时将 data-img 的属性值赋给 src。
 如下是通过scroll滚动事件监听来实现的图片懒加载，当图片都加载完毕移除事件监听，并且将移除 html 标签。
+
 ```javascript
 const lazyLoad = function(imgs){
     let count = 0
@@ -11320,6 +12086,7 @@ const lazyLoad = function(imgs){
 scroll滚动事件容易造成性能问题。那可以通过 IntersectionObserver 自动观察 img 标签是否进入可视区域。
 实例化 IntersectionObserver 实例，接受两个参数：callback 是可见性变化时的回调函数，option 是配置对象（该参数可选）。
 当 img 标签进入可视区域时会执行实例化时的回调，同时给回调传入一个 entries 参数，保存着实例观察的所有元素的一些状态，比如每个元素的边界信息，当前元素对应的 DOM 节点，当前元素进入可视区域的比率，每当一个元素进入可视区域，将真正的图片赋值给当前 img 标签，同时解除对其的观察。
+
 ```javascript
 const lazyLoad = function(imgs){
   const observer = new InteractionObserver((entities)=>{
@@ -11334,7 +12101,167 @@ const lazyLoad = function(imgs){
 }
 ```
 
+#### 手写Object.create
+
+Object.create()方法创建一个新对象，使用现有的对象来提供新创建的对象的__proto__。
+
+```js
+Object.create2 = function(proto, propertyObject = undefined) {
+    if (typeof proto !== 'object' && typeof proto !== 'function') {
+        throw new TypeError('Object prototype may only be an Object or null.')
+    if (propertyObject == null) {
+        new TypeError('Cannot convert undefined or null to object')
+    }
+    function F() {}
+    F.prototype = proto
+    const obj = new F()
+    if (propertyObject != undefined) {
+        Object.defineProperties(obj, propertyObject)
+    }
+    if (proto === null) {
+        // 创建一个没有原型对象的对象，Object.create(null)
+        obj.__proto__ = null
+    }
+    return obj
+}
+```
+
+#### 手写Object.assign
+
+```js
+Object.assign2 = function(target, ...source) {
+    if (target == null) {
+        throw new TypeError('Cannot convert undefined or null to object')
+    }
+    let ret = Object(target) 
+    source.forEach(function(obj) {
+        if (obj != null) {
+            for (let key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    ret[key] = obj[key]
+                }
+            }
+        }
+    })
+    return ret
+}
+```
+
+#### 手写JSON.stringify
+JSON.stringify([, replacer [, space]) 方法是将一个 JavaScript 值(对象或者数组)转换为一个 JSON 字符串。此处模拟实现，不考虑可选的第二个参数 replacer 和第三个参数 space。
+- 基本数据类型：
+  - undefined 转换之后仍是 undefined(类型也是 undefined)
+  - boolean 值转换之后是字符串 "false"/"true"
+  - number 类型(除了 NaN 和 Infinity)转换之后是字符串类型的数值
+  - symbol 转换之后是 undefined
+  - null 转换之后是字符串 "null"
+  - string 转换之后仍是string
+  - NaN 和 Infinity 转换之后是字符串 "null"
+- 函数类型：转换之后是 undefined
+- 如果是对象类型(非函数)
+  - 如果是一个数组：如果属性值中出现了 undefined、任意的函数以及 symbol，转换成字符串 "null" ；
+  - 如果是 RegExp 对象：返回 {} (类型是 string)；
+  - 如果是 Date 对象，返回 Date 的 toJSON 字符串值；
+  - 如果是普通对象；
+    - 如果有 toJSON() 方法，那么序列化 toJSON() 的返回值。
+    - 如果属性值中出现了 undefined、任意的函数以及 symbol 值，忽略。
+    - 所有以 symbol 为属性键的属性都会被完全忽略掉。
+- 对包含循环引用的对象（对象之间相互引用，形成无限循环）执行此方法，会抛出错误。
+  ```js
+  function jsonStringify(data) {
+    let dataType = typeof data;
+    if (dataType !== 'object') {
+        let result = data;
+        //data 可能是 string/number/null/undefined/boolean
+        if (Number.isNaN(data) || data === Infinity) {
+            //NaN 和 Infinity 序列化返回 "null"
+            result = "null";
+        } else if (dataType === 'function' || dataType === 'undefined' || dataType === 'symbol') {
+            //function 、undefined 、symbol 序列化返回 undefined
+            return undefined;
+        } else if (dataType === 'string') {
+            result = '"' + data + '"';
+        }
+        //boolean 返回 String()
+        return String(result);
+    } else if (dataType === 'object') {
+        if (data === null) {
+            return "null"
+        } else if (data.toJSON && typeof data.toJSON === 'function') {
+            return jsonStringify(data.toJSON());
+        } else if (data instanceof Array) {
+            let result = [];
+            //如果是数组
+            //toJSON 方法可以存在于原型链中
+            data.forEach((item, index) => {
+                if (typeof item === 'undefined' || typeof item === 'function' || typeof item === 'symbol') {
+                    result[index] = "null";
+                } else {
+                    result[index] = jsonStringify(item);
+                }
+            });
+            result = "[" + result + "]";
+            return result.replace(/'/g, '"');
+        } else {
+            //普通对象
+            /**
+             * 循环引用抛错(暂未检测，循环引用时，堆栈溢出)
+             * symbol key 忽略
+             * undefined、函数、symbol 为属性值，被忽略
+             */
+            let result = [];
+            Object.keys(data).forEach((item, index) => {
+                if (typeof item !== 'symbol') {
+                    //key 如果是symbol对象，忽略
+                    if (data[item] !== undefined && typeof data[item] !== 'function'
+                        && typeof data[item] !== 'symbol') {
+                        //键值如果是 undefined、函数、symbol 为属性值，忽略
+                        result.push('"' + item + '"' + ":" + jsonStringify(data[item]));
+                    }
+                }
+            });
+            return ("{" + result + "}").replace(/'/g, '"');
+        }
+    }
+  }
+  ```
+#### 手写JSON.parse
+- 介绍 2 种方法实现：
+  - eval 实现；
+  - new Function 实现；
+```js
+// eval 实现
+var json = '{"a":"1", "b":2}';
+var obj = eval("(" + json + ")");  // obj 就是 json 反序列化之后得到的对象
+
+
+
+// // 但是直接调用 eval 会存在安全问题，如果数据中可能不是 json 数据，而是可执行的 JavaScript 代码，那很可能会造成 XSS 攻击。因此，在调用 eval 之前，需要对数据进行校验。
+var rx_one = /^[\],:{}\s]*$/;
+var rx_two = /\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g;
+var rx_three = /"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g;
+var rx_four = /(?:^|:|,)(?:\s*\[)+/g;
+
+if (
+    rx_one.test(
+        json.replace(rx_two, "@")
+            .replace(rx_three, "]")
+            .replace(rx_four, "")
+    )
+) {
+    var obj = eval("(" +json + ")");
+}
+```
+
+```js
+// new Function 实现
+// Function 与 eval 有相同的字符串参数特性。
+var json = '{"name":"小姐姐", "age":20}';
+var obj = (new Function('return ' + json))();
+```
+
 #### 手写预加载
+
 ```javascript
 let images = [...document.querySelectorAll('img')]
 const loadedImages = function(...imgs){
@@ -11360,10 +12287,61 @@ const loadedImages = function(...imgs){
 }
 ```
 
-#### 手写节流&防抖
+#### 手写-防抖节流1
+
+```js
+// 防抖
+function debounce(fn, delay = 300) {
+  //默认300毫秒
+  let timer;
+  return function () {
+    const args = arguments;
+    if (timer) {
+      clearTimeout(timer);
+    }
+    timer = setTimeout(() => {
+      fn.apply(this, args); // 改变this指向为调用debounce所指的对象
+    }, delay);
+  };
+}
+
+window.addEventListener(
+  "scroll",
+  debounce(() => {
+    console.log(111);
+  }, 1000)
+);
+
+
+
+
+// 节流
+// 设置一个标志
+function throttle(fn, delay) {
+  let flag = true;
+  return () => {
+    if (!flag) return;
+    flag = false;
+    timer = setTimeout(() => {
+      fn();
+      flag = true;
+    }, delay);
+  };
+}
+
+window.addEventListener(
+  "scroll",
+  throttle(() => {
+    console.log(111);
+  }, 1000)
+);
+```
+
+#### 手写-节流防抖2
 针对高频的触发的函数，我们一般都会思考通过节流或者防抖去实现性能上的优化。
 节流实现原理是通过定时器以和时间差做判断。定时器有延迟的能力，事件一开始不会立即执行，事件结束后还会再执行一次；而时间差事件一开始就立即执行，时间结束之后也会立即停止。
 结合两者的特性封装节流函数：
+
 ```javascript
 //防抖
 function debounce(handle, delay) {
@@ -11403,6 +12381,118 @@ function throttle(fn, gapTime) {
   }
 }
 ```
+
+#### 手写-防抖节流3
+```js
+// 触发高频事件 N 秒后只会执行一次，如果 N 秒内事件再次触发，则会重新计时。
+// 简单版：函数内部支持使用 this 和 event 对象；
+function debounce(func, wait) {
+    var timeout;
+    return function () {
+        var context = this;
+        var args = arguments;
+        clearTimeout(timeout)
+        timeout = setTimeout(function(){
+            func.apply(context, args)
+        }, wait);
+    }
+}
+// 最终版：除了支持 this 和 event 外，还支持以下功能：
+// 支持立即执行；
+// 函数可能有返回值；
+// 支持取消功能；
+function debounce(func, wait, immediate) {
+    var timeout, result;
+
+    var debounced = function () {
+        var context = this;
+        var args = arguments;
+
+        if (timeout) clearTimeout(timeout);
+        if (immediate) {
+            // 如果已经执行过，不再执行
+            var callNow = !timeout;
+            timeout = setTimeout(function(){
+                timeout = null;
+            }, wait)
+            if (callNow) result = func.apply(context, args)
+        } else {
+            timeout = setTimeout(function(){
+                func.apply(context, args)
+            }, wait);
+        }
+        return result;
+    };
+
+    debounced.cancel = function() {
+        clearTimeout(timeout);
+        timeout = null;
+    };
+
+    return debounced;
+}
+```
+
+```js
+// 触发高频事件，且 N 秒内只执行一次。
+// 简单版：使用时间戳来实现，立即执行一次，然后每 N 秒执行一次。
+function throttle(func, wait) {
+    var context, args;
+    var previous = 0;
+
+    return function() {
+        var now = +new Date();
+        context = this;
+        args = arguments;
+        if (now - previous > wait) {
+            func.apply(context, args);
+            previous = now;
+        }
+    }
+}
+
+
+// 最终版：支持取消节流；另外通过传入第三个参数，options.leading 来表示是否可以立即执行一次，opitons.trailing 表示结束调用的时候是否还要执行一次，默认都是 true。注意设置的时候不能同时将 leading 或 trailing 设置为 false。
+function throttle(func, wait, options) {
+    var timeout, context, args, result;
+    var previous = 0;
+    if (!options) options = {};
+
+    var later = function() {
+        previous = options.leading === false ? 0 : new Date().getTime();
+        timeout = null;
+        func.apply(context, args);
+        if (!timeout) context = args = null;
+    };
+
+    var throttled = function() {
+        var now = new Date().getTime();
+        if (!previous && options.leading === false) previous = now;
+        var remaining = wait - (now - previous);
+        context = this;
+        args = arguments;
+        if (remaining <= 0 || remaining > wait) {
+            if (timeout) {
+                clearTimeout(timeout);
+                timeout = null;
+            }
+            previous = now;
+            func.apply(context, args);
+            if (!timeout) context = args = null;
+        } else if (!timeout && options.trailing !== false) {
+            timeout = setTimeout(later, remaining);
+        }
+    };
+
+    throttled.cancel = function() {
+        clearTimeout(timeout);
+        previous = 0;
+        timeout = null;
+    }
+    return throttled;
+}
+```
+
 #### JS函数防抖和函数节流
 
 1. 函数防抖(debounce)
@@ -11420,7 +12510,6 @@ function throttle(fn, gapTime) {
    - **函数节流是指一定时间内js方法只跑一次。**
 
 对于函数防抖，有以下几种应用场景：
-
 - 防止表单多次提交。
 - 对于输入框连续输入进行AJAX验证时，用函数防抖能有效减少请求次数。搜索框输入查询（监听输入框输入内容，设定每隔一段时间访问接口。
 - 判断`scroll`是否滑到底部，`滚动事件`+`函数防抖`
@@ -11428,7 +12517,6 @@ function throttle(fn, gapTime) {
 - 手机号，邮箱验证输入检测
 
 总的来说，适合多次事件**一次响应**的情况
-
 ```js
 // 包含立即执行
 function debounce(fn, wait = 200, immediate = false) {
@@ -11499,17 +12587,14 @@ var fn = function () {
 setInterval(debounce(fn,500),1000) // 第一次在1500ms后触发，之后每1000ms触发一次
 
 setInterval(debounce(fn,2000),1000) // 不会触发一次（我把函数防抖看出技能读条，如果读条没完成就用技能，便会失败而且重新读条）
-
 ```
 
 对于函数节流，有如下几个场景：
-
 - 游戏中的刷新率
 - DOM元素拖拽
 - Canvas画笔功能
 
 总的来说，适合**大量事件**按时间做**平均**分配触发。
-
 ```js
 function throttle(fn, gapTime) {
   let timer = null
@@ -11530,12 +12615,12 @@ let fn = ()=>{
 }
 
 setInterval(throttle(fn,1000),10)
-
 ```
 
 函数防抖和函数节流是**在时间轴上控制函数的执行次数**。防抖可以类比为`电梯不断上乘客`,节流可以看做`幻灯片限制频率播放电影`。
 
 #### 冒泡排序--时间复杂度 n^2
+
 ```js
 function bubbleSort(arr) {
   // 缓存数组长度
@@ -11556,7 +12641,9 @@ function bubbleSort(arr) {
 }
 // console.log(bubbleSort([3, 6, 2, 4, 1]));
 ```
+
 #### 选择排序--时间复杂度 n^2
+
 ```js
 function selectSort(arr) {
   // 缓存数组长度
@@ -11583,7 +12670,9 @@ function selectSort(arr) {
 }
 // console.log(quickSort([3, 6, 2, 4, 1]));
 ```
+
 #### 插入排序--时间复杂度 n^2
+
 ```js
 function insertSort(arr) {
   for (let i = 1; i < arr.length; i++) {
@@ -11599,7 +12688,9 @@ function insertSort(arr) {
 }
 // console.log(insertSort([3, 6, 2, 4, 1]));
 ```
+
 #### 快排--时间复杂度 nlogn~ n^2 之间
+
 ```js
 function quickSort(arr) {
   if (arr.length < 2) {
@@ -11612,7 +12703,9 @@ function quickSort(arr) {
 }
 // console.log(quickSort([3, 6, 2, 4, 1]));
 ```
+
 #### 归并排序--时间复杂度 nlog(n)
+
 ```js
 function merge(left, right) {
   let res = [];
@@ -11647,7 +12740,9 @@ function mergeSort(arr) {
 }
 // console.log(mergeSort([3, 6, 2, 4, 1]));
 ```
+
 #### 二分查找--时间复杂度 log2(n)
+
 ```js
 function search(arr, target, start, end) {
   let targetIndex = -1;
@@ -11677,7 +12772,9 @@ function search(arr, target, start, end) {
 //   console.log("目标元素不在数组中");
 // }
 ```
+
 #### 大数相加
+
 ```js
 // 题目描述:实现一个add方法完成两个大数相加
 let a = "9007199254740991";
@@ -11687,6 +12784,7 @@ function add(a ,b){
    //...
 }
 ```
+
 ```js
 function add(a ,b){
    //取两个数字的最大长度
@@ -11709,8 +12807,11 @@ function add(a ,b){
    return sum;
 }
 ```
+
 #### LRU 算法
+
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211018153230.png)
+
 ```js
 //  一个Map对象在迭代时会根据对象中元素的插入顺序来进行
 // 新添加的元素会被插入到map的末尾，整个栈倒序查看
@@ -11758,6 +12859,7 @@ class LRUCache {
 ```
 
 #### 树形结构转成列表
+
 ```js
 [
     {
@@ -11788,6 +12890,7 @@ class LRUCache {
     ...
 ]
 ```
+
 ```js
 function treeToList(data) {
   let res = [];
@@ -11804,7 +12907,9 @@ function treeToList(data) {
   return res;
 }
 ```
+
 #### 列表转成树形结构
+
 ```js
 [
     {
@@ -11836,6 +12941,7 @@ function treeToList(data) {
     }
 ]
 ```
+
 ```js
 function listToTree(data) {
   let temp = {};
@@ -11858,6 +12964,7 @@ function listToTree(data) {
 ```
 
 #### 实现模板字符串解析功能
+
 ```js
 let template = '我是{{name}}，年龄{{age}}，性别{{sex}}';
 let data = {
@@ -11866,6 +12973,7 @@ let data = {
 }
 render(template, data); // 我是姓名，年龄18，性别undefined
 ```
+
 ```js
 function render(template, data) {
   let computed = template.replace(/\{\{(\w+)\}\}/g, function (match, key) {
@@ -11876,6 +12984,7 @@ function render(template, data) {
 ```
 
 #### 将虚拟 Dom 转化为真实 Dom
+
 ```js
 {
   tag: 'DIV',
@@ -11909,6 +13018,7 @@ function render(template, data) {
   </span>
 </div>
 ```
+
 ```js
 // 真正的渲染函数
 function _render(vnode) {
@@ -11934,7 +13044,9 @@ function _render(vnode) {
   return dom;
 }
 ```
+
 #### 分片思想解决大数据量渲染问题
+
 ```js
 // 题目描述:渲染百万条结构简单的大数据时 怎么使用分片思想优化渲染
 
@@ -11966,12 +13078,15 @@ function loop(curTotal, curIndex) {
 }
 loop(total, index);
 ```
+
 #### Object.is 实现
+
 ```md
 Object.is不会转换被比较的两个值的类型，这点和===更为相似，他们之间也存在一些区别。
     1. NaN在===中是不相等的，而在Object.is中是相等的
     2. +0和-0在===中是相等的，而在Object.is中是不相等的
 ```
+
 ```js
 Object.is = function (x, y) {
   if (x === y) {
@@ -11986,7 +13101,9 @@ Object.is = function (x, y) {
   return x !== x && y !== y;
 };
 ```
+
 #### 动态规划求解硬币找零问题
+
 ```md
 给定不同面额的硬币 coins 和一个总金额 amount。编写一个函数来计算可以凑成总金额所需的最少的硬币个数。如果没有任何一种硬币组合能组成总金额，返回 -1
 
@@ -11999,6 +13116,7 @@ Object.is = function (x, y) {
 输入: coins = [2], amount = 3
 输出: -1
 ```
+
 ```js
 const coinChange = function (coins, amount) {
   // 用于保存每个目标总额对应的最小硬币个数
@@ -12026,32 +13144,9 @@ const coinChange = function (coins, amount) {
   return f[amount];
 }
 ```
-#### 写版本号排序的方法
-```md
-题目描述:有一组版本号如下['0.1.1', '2.3.3', '0.302.1', '4.2', '4.3.5', '4.3.4.5']。现在需要对其进行排序，排序的结果为 ['4.3.5','4.3.4.5','2.3.3','0.302.1','0.1.1']
-```
-```js
-arr.sort((a, b) => {
-  let i = 0;
-  const arr1 = a.split(".");
-  const arr2 = b.split(".");
 
-  while (true) {
-    const s1 = arr1[i];
-    const s2 = arr2[i];
-    i++;
-    if (s1 === undefined || s2 === undefined) {
-      return arr2.length - arr1.length;
-    }
-
-    if (s1 === s2) continue;
-
-    return s2 - s1;
-  }
-});
-console.log(arr);
-```
 #### 实现 LazyMan
+
 ```md
 实现一个LazyMan，可以按照以下方式调用:
 LazyMan(“Hank”)输出:
@@ -12074,6 +13169,7 @@ Wake up after 5
 Hi This is Hank!
 Eat supper
 ```
+
 ```js
 class _LazyMan {
   constructor(name) {
@@ -12126,6 +13222,7 @@ function LazyMan(name) {
   return new _LazyMan(name);
 }
 ```
+
 #### 类的继承方式(优缺点)
 
 1. **借助构造函数实现继承**
@@ -12133,10 +13230,10 @@ function LazyMan(name) {
 使用`借用构造函数`的方式，这种方式是通过在子类型的函数中调用超类型的构造函数来实现的，这一种方法解决了不能向超类型传递参数的缺点，但是它存在的一个问题就是无法实现函数方法的复用，并且超类型原型定义的方法子类型也没有办法访问到。
 
 ```js
-			function Parent1 () {
+            function Parent1 () {
           this.name = 'parent1';
       }
-			// 子类无法继承父类原型链上的方法
+            // 子类无法继承父类原型链上的方法
       Parent1.prototype.say = function () {};
       function Child1 () {
           //修改执行上下文
@@ -12162,10 +13259,10 @@ function LazyMan(name) {
 
       var s1 = new Child2();
       var s2 = new Child2();
-			// s1.__proto__ === s2.__proto__  true
+            // s1.__proto__ === s2.__proto__  true
       console.log(s1.play, s2.play);
       // 原型链继承的同一个对象引用，创建对个实例，实例使用的都是一个对象，修改一个另一个也跟着变，因为是一个。
-			s1.play.push(4);
+            s1.play.push(4);
 ```
 
 3. **组合方式**（构造函数+原型链）
@@ -12174,8 +13271,8 @@ function LazyMan(name) {
 
 ```js
       // 解决了上面两种的每个问题
-			// 父类多次实例化问题
-			function Parent3 () {
+            // 父类多次实例化问题
+            function Parent3 () {
           this.name = 'parent3';
           this.play = [1, 2, 3];
       }
@@ -12183,7 +13280,7 @@ function LazyMan(name) {
           Parent3.call(this);
           this.type = 'child3';
       }
-			// 就是为了继承父类的原型对象
+            // 就是为了继承父类的原型对象
       Child3.prototype = new Parent3();
       var s3 = new Child3();
       var s4 = new Child3();
@@ -12192,8 +13289,9 @@ function LazyMan(name) {
 ```
 
 4. **组合继承优化1**
-```js
-			function Parent4 () {
+   
+   ```js
+            function Parent4 () {
           this.name = 'parent4';
           this.play = [1, 2, 3];
       }
@@ -12201,25 +13299,25 @@ function LazyMan(name) {
           Parent4.call(this);
           this.type = 'child4';
       }
-			// 就是为了继承父类的原型对象
-			// 在原型对象中有constructor属性，因为子类和父类都是一个原型对象，所以属性值都是一样的
-			// Child4.prototype.constructor = Child4  加上这句话也不行，因为Child4.prototype = Parent4.prototype是一个对象，你改变Child4.prototype 就等于改变 Parent4.prototype
+            // 就是为了继承父类的原型对象
+            // 在原型对象中有constructor属性，因为子类和父类都是一个原型对象，所以属性值都是一样的
+            // Child4.prototype.constructor = Child4  加上这句话也不行，因为Child4.prototype = Parent4.prototype是一个对象，你改变Child4.prototype 就等于改变 Parent4.prototype
       Child4.prototype = Parent4.prototype;
       var s5 = new Child4();
       var s6 = new Child4();
       console.log(s5, s6);
-
+   
       console.log(s5 instanceof Child4, s5 instanceof Parent4);
-			// 但是使用这种的时候  你去找我这实例是谁产生的，竟然是父类（不是我们想要的）
+            // 但是使用这种的时候  你去找我这实例是谁产生的，竟然是父类（不是我们想要的）
       console.log(s5.constructor);
-```
+   ```
 
 5. **组合继承优化2**
 
 `原型式继承`，原型式继承的主要思路就是基于已有的对象来创建新的对象，实现的原理是，向函数中传入一个对象，然后返回一个以这个对象为原型的对象。这种继承的思路主要不是为了实现创造一种新的类型，只是对某个对象实现一种简单继承，ES5 中定义的 Object.create() 方法就是原型式继承的实现。缺点与原型链方式相同。
 
 ```js
-			function Parent5 () {
+            function Parent5 () {
           this.name = 'parent5';
           this.play = [1, 2, 3];
       }
@@ -12227,9 +13325,9 @@ function LazyMan(name) {
           Parent5.call(this);
           this.type = 'child5';
       }
-			// 对象关联 一个新的对象  子类和父类的原型进行隔离
+            // 对象关联 一个新的对象  子类和父类的原型进行隔离
       Child5.prototype = Object.create(Parent5.prototype);
-			Child5.prototype.constructor = Child5
+            Child5.prototype.constructor = Child5
 ```
 
 （1）第一种是以`原型链的方式来实现继承`，但是这种实现方式存在的缺点是，在包含有引用类型的数据时，会被所有的实例对象所共享，容易造成修改的混乱。还有就是在创建子类型的时候不能向超类型传递参数。
@@ -12245,6 +13343,7 @@ function LazyMan(name) {
 （6）第六种方式是`寄生式组合继承`，组合继承的缺点就是使用超类型的实例做为子类型的原型，导致添加了不必要的原型属性。寄生式组合继承的方式是使用超类型的原型的副本来作为子类型的原型，这样就避免了创建不必要的属性。
 
 #### settimeout 模拟实现 setinterval(带清除定时器的版本)
+
 ```js
 // 题目描述:setinterval 用来实现循环定时调用 可能会存在一定的问题 能用 settimeout 解决吗
 function mySettimeout(fn, t) {
@@ -12438,6 +13537,57 @@ var deepClone = function (target, map = new WeakMap()) {
 
 
 
+// 方法3
+function deepCopy(obj, cache = new WeakMap()) {
+  if (!obj instanceof Object) return obj
+  // 防止循环引用
+  if (cache.get(obj)) return cache.get(obj)
+  // 支持函数
+  if (obj instanceof Function) {
+    return function () {
+      return obj.apply(this, arguments)
+    }
+  }
+  // 支持日期
+  if (obj instanceof Date) return new Date(obj)
+  // 支持正则对象
+  if (obj instanceof RegExp) return new RegExp(obj.source, obj.flags)
+  // 还可以增加其他对象，比如：Map, Set等，根据情况判断增加即可，面试点到为止就可以了
+
+  // 数组是 key 为数字素银的特殊对象
+  const res = Array.isArray(obj) ? [] : {}
+  // 缓存 copy 的对象，用于处理循环引用的情况
+  cache.set(obj, res)
+
+  Object.keys(obj).forEach((key) => {
+    if (obj[key] instanceof Object) {
+      res[key] = deepCopy(obj[key], cache)
+    } else {
+      res[key] = obj[key]
+    }
+  });
+  return res
+}
+
+// 测试
+const source = {
+  name: 'Jack',
+  meta: {
+    age: 12,
+    birth: new Date('1997-10-10'),
+    ary: [1, 2, { a: 1 }],
+    say() {
+      console.log('Hello');
+    }
+  }
+}
+source.source = source
+const newObj = deepCopy(source)
+console.log(newObj.meta.ary[2] === source.meta.ary[2]); // false
+console.log(newObj.meta.birth === source.meta.birth); // false
+
+
+
 
 
 
@@ -12616,7 +13766,7 @@ function deepClone(obj, cache = new WeakMap()) {
 const deepCopy = (sourceObj) => {
   // 如果不是对象则退出（可停止递归）
   if(typeof sourceObj !== 'object') return;
-  
+
   // 深拷贝初始值：对象/数组
   let newObj = (sourceObj instanceof Array) ? [] : {};
 
@@ -12658,10 +13808,502 @@ console.log(objA === objB); // false
 console.log(objA.others === objB.others); // false
 console.log(objA, objB); // 对象内容一样
 ```
+
+#### vue reactive
+
+```js
+// Dep module
+class Dep {
+  static stack = []
+  static target = null
+  deps = null
+
+  constructor() {
+    this.deps = new Set()
+  }
+
+  depend() {
+    if (Dep.target) {
+      this.deps.add(Dep.target)
+    }
+  }
+
+  notify() {
+    this.deps.forEach(w => w.update())
+  }
+
+  static pushTarget(t) {
+    if (this.target) {
+      this.stack.push(this.target)
+    }
+    this.target = t
+  }
+
+  static popTarget() {
+    this.target = this.stack.pop()
+  }
+}
+
+// reactive
+function reactive(o) {
+  if (o && typeof o === 'object') {
+    Object.keys(o).forEach(k => {
+      defineReactive(o, k, o[k])
+    })
+  }
+  return o
+}
+
+function defineReactive(obj, k, val) {
+  let dep = new Dep()
+  Object.defineProperty(obj, k, {
+    get() {
+      dep.depend()
+      return val
+    },
+    set(newVal) {
+      val = newVal
+      dep.notify()
+    }
+  })
+  if (val && typeof val === 'object') {
+    reactive(val)
+  }
+}
+
+// watcher
+class Watcher {
+  constructor(effect) {
+    this.effect = effect
+    this.update()
+  }
+
+  update() {
+    Dep.pushTarget(this)
+    this.value = this.effect()
+    Dep.popTarget()
+    return this.value
+  }
+}
+
+// 测试代码
+const data = reactive({
+  msg: 'aaa'
+})
+
+new Watcher(() => {
+  console.log('===> effect', data.msg);
+})
+
+setTimeout(() => {
+  data.msg = 'hello'
+}, 1000)
+```
+
+#### 手写通过Promise实现sleep方法
+
+很多编程语言里都有sleep()，delay()等方法，它能让我们的程序不那么着急的去执行下一步操作，而是延迟、等待一段时间。
+
+```js
+function sleep(s){
+    s = s || 0;
+    s  = parseInt(s) * 1000;
+    let now = +new Date();
+    let timer = null;
+    return new Promise((resolve, reject)=>{
+        timer = setInterval(()=>{
+            if( now + s < +new Date()){
+                clearInterval(timer);
+                resolve(true);
+            }
+        }, 10)
+    })
+}
+
+
+(async function() {
+  console.log('Do some thing, ' + new Date());
+  await sleep(3000);
+  console.log('Do other things, ' + new Date());
+})();
+```
 ## Git
 ### git命令
 ### 一个业务场景：a，b，c，d，要删除c的提交，git怎么操作（git revert）
+## 色子点数
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211111101458.png)
+
+```html
+<div class="dice">
+    <div class="row1">
+        <div class="one-face">
+            <span class="pot"></span>
+        </div>
+
+        <div class="three-face">
+            <span class="pot"></span>
+            <span class="pot"></span>
+            <span class="pot"></span>
+        </div>
+    </div>
+
+    <div class="row2">
+        <div class="two-face">
+            <span class="pot"></span>
+            <span class="pot"></span>
+        </div>
+        <div class="four-face">
+            <div class="column">
+                <span class="pot"></span>
+                <span class="pot"></span>
+            </div>
+            <div class="column">
+                <span class="pot"></span>
+                <span class="pot"></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<style>
+    body{
+        background-color: black;               
+    }
+    .dice{
+        display:flex;
+        justify-content: center;
+        align-items: center;
+    }
+    [class $='face']{
+        margin:16px;/*设置所有外边距属性*/
+        padding:4px;/*设置所有填充属性*/
+        background-color: lightgray;
+        width: 120px;
+        height:120px;
+        -o-object-fit: contain;
+        object-fit: contain;/*指定元素的内容应该如何去适应指定容器的高度与宽度。contain-保持原有尺寸比例。内容被缩放。*/
+        -webkit-box-shadow: inset 0 5px white, inset 0 -5px #bbb, inset 5px 0 #d7d7d7, inset -5px 0 #d7d7d7 ;
+        /*inset-从外层的阴影（开始时）改变阴影内侧阴影;5px-阴影大小;0-模糊距离*/
+        box-shadow: inset 0 5px white, inset 0 -5px #bbb, inset 5px 0 #d7d7d7, inset -5px 0 #d7d7d7 ;
+        border-radius: 10%;                 
+    }
+    .pot{
+        display: block;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        margin: 4px;
+        background-color: #333;
+        -webkit-box-shadow: inset 0 3px #111,inset 0 -3px #555;
+        box-shadow: inset 0 3px #111,inset 0 -3px #555;
+    }
+    .one-face{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .two-face,
+    .three-face,
+    .four-face{
+        display: flex;
+        justify-content: space-between;
+    }
+    .two-face .pot:nth-of-type(2){/*匹配属于父元素的特定类型的第 N 个子元素的每个元素*/
+        align-self: flex-end;
+    }
+    [class^='row']{
+        display: flex;
+        flex-direction: column;
+    }
+    .three-face .pot:nth-of-type(2){
+        align-self: center;
+    }
+    .three-face .pot:nth-of-type(3){
+        align-self: flex-end;
+    }
+    .four-face .column{
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+</style>
+```
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211111101717.png)
+
+```html
+<div class="one-first-left-face">
+    <span class="pot"></span>
+</div>
+
+body{
+    background-color: black;
+}
+.dice{
+    display:flex;
+    justify-content: center;/*水平方式对齐*/
+    align-items: center;/*垂直方向对齐*/
+    flex-wrap: wrap;/*换行*/   
+}
+[class $='face']{
+    margin:16px;
+    padding:4px;
+    background-color: lightgray;
+    width: 120px;
+    height:120px;
+    -o-object-fit: contain;
+    object-fit: contain;
+    -webkit-box-shadow: inset 0 5px white, inset 0 -5px #bbb, inset 5px 0 #d7d7d7, inset -5px 0 #d7d7d7 ;
+    box-shadow: inset 0 5px white, inset 0 -5px #bbb, inset 5px 0 #d7d7d7, inset -5px 0 #d7d7d7 ;
+    border-radius: 10%;   
+}
+.pot{
+    display: block;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    margin: 4px;
+    background-color: #333;
+    -webkit-box-shadow: inset 0 3px #111,inset 0 -3px #555;
+    box-shadow: inset 0 3px #111,inset 0 -3px #555;
+}
+.one-first-center-face{
+    display: flex;
+    justify-content: center;
+}
+.one-first-right-face{
+    display: flex;
+    justify-content: flex-end;
+}
+
+.one-sec-left-face{
+    display: flex;
+    align-items: center;
+}
+.one-sec-center-face{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.one-sec-right-face{
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.one-thi-left-face{
+    display: flex;
+    align-items: flex-end;
+}
+.one-thi-center-face{
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+}
+.one-thi-right-face{
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+}
+```
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211111101754.png)
+
+```js
+<div class="dice">
+    <div class="two-top-face">
+        <span class="pot"></span>
+        <span class="pot"></span>
+    </div>
+    <div class="two-left-face">
+        <span class="pot"></span>
+        <span class="pot"></span>
+    </div>
+    <div class="two-center-face">
+        <span class="pot"></span>
+        <span class="pot"></span>
+    </div>
+    <div class="two-one-center-face">
+        <span class="pot"></span>
+        <span class="pot"></span>
+    </div>
+
+    <div class="four-face">
+        <div class="column">
+            <span class="pot"></span>
+        </div>
+        <div class="column">
+            <span class="pot"></span>
+        </div>
+        <div class="column">
+            <span class="pot"></span>
+            <span class="pot"></span>
+        </div>
+    </div>
+
+    <div class="six-face">
+        <div class="column">
+            <span class="pot"></span>
+            <span class="pot"></span>
+        </div>
+        <div class="column">
+            <span class="pot"></span>
+            <span class="pot"></span>
+        </div>
+        <div class="column">
+            <span class="pot"></span>
+            <span class="pot"></span>
+        </div>
+    </div>
+    <div class="six-sec-face">
+        <div class="column">
+            <span class="pot"></span>
+            <span class="pot"></span>
+            <span class="pot"></span>
+        </div>
+        <div class="column">
+            <span class="pot"></span>
+            <span class="pot"></span>
+            <span class="pot"></span>
+        </div>
+    </div>
+    <div class="six-thi-face">
+        <div class="column">
+            <span class="pot"></span>
+            <span class="pot"></span>
+            <span class="pot"></span>
+        </div>
+        <div class="column">
+            <span class="pot"></span>
+        </div>
+        <div class="column">
+            <span class="pot"></span>
+            <span class="pot"></span>
+        </div>
+    </div>
+
+    <div class="nine-face">
+        <div class="column">
+            <span class="pot"></span>
+            <span class="pot"></span>
+            <span class="pot"></span>
+        </div>
+        <div class="column">
+            <span class="pot"></span>
+            <span class="pot"></span>
+            <span class="pot"></span>
+        </div>
+        <div class="column">
+            <span class="pot"></span>
+            <span class="pot"></span>
+            <span class="pot"></span>
+        </div>
+    </div>
+</div>
+
+
+
+body{
+    background-color: black;               
+}
+.dice{
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+[class $='face']{
+    margin:16px;
+    padding:4px;
+    background-color: lightgray;
+    width: 120px;
+    height:120px;
+    -o-object-fit: contain;
+    object-fit: contain;
+    -webkit-box-shadow: inset 0 5px white, inset 0 -5px #bbb, inset 5px 0 #d7d7d7, inset -5px 0 #d7d7d7 ;
+    box-shadow: inset 0 5px white, inset 0 -5px #bbb, inset 5px 0 #d7d7d7, inset -5px 0 #d7d7d7 ;
+    border-radius: 10%;   
+}
+.pot{
+    display: block;
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    margin: 4px;
+    background-color: #333;
+    -webkit-box-shadow: inset 0 3px #111,inset 0 -3px #555;
+    box-shadow: inset 0 3px #111,inset 0 -3px #555;
+}
+.two-top-face,
+.four-face,
+.six-face,
+.six-sec-face,
+.nine-face
+{
+    display: flex;
+    justify-content: space-between;
+}
+.two-left-face{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.two-center-face{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+.two-one-center-face{
+    display: flex;
+    justify-content: flex-start;
+}
+.two-one-center-face .pot:nth-of-type(2){
+    align-self: center;
+}
+.four-face .column{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.six-face .column{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.six-sec-face .column{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.six-thi-face{
+   display:flex;
+   flex-wrap:wrap;
+
+}
+.six-thi-face .column{
+    display:flex;
+    flex-basis: 100%;
+    justify-content: space-between;
+}
+.six-thi-face .column:nth-child(2){
+   justify-content: center;
+}
+.six-thi-face .column:nth-child(3){
+   justify-content: space-between;
+}
+
+.nine-face .column{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+```
+
 ## 其他
 ### 最近关注的技术，细说一个你比较了解的
 ### 平时会在哪里学习技术，看哪些资料
-
