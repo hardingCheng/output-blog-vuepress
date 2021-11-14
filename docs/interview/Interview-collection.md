@@ -10,7 +10,6 @@ web后端：就是用户看不见摸不着的数据库交互处理的业务逻�
 ## HTML
 
 ### 如何理解 html 语义化?
-
 - 就是用正确的标签做正确的事
   - 头部：header
   - 导航：nav
@@ -130,7 +129,152 @@ web后端：就是用户看不见摸不着的数据库交互处理的业务逻�
   ```
 
 ## CSS
-### 实现瀑布流的方法？？？？？？？
+### 实现瀑布流的方法？
+#### 什么是瀑布流布局
+瀑布流又称瀑布流式布局，是一种比较流行的页面布局方式，专业的英文名称为[Masonry Layouts]。与传统的分页显示不同，视觉表现为参差不齐的多栏布局。
+#### 瀑布流布局的优点
+- 节省空间，外表美观，更有艺术性。
+- 对于触屏设备非常友好，通过向上滑动浏览
+- 用户浏览时的观赏和思维不容易被打断，留存更容易。
+#### 瀑布流布局的缺点
+- 用户无法了解内容总长度，对内容没有宏观掌控。
+- 用户无法了解现在所处的具体位置，不知道离终点还有多远。
+- 回溯时不容易定位到之前看到的内容。
+- 容易造成页面加载的负荷。
+- 容易造成用户浏览的疲劳，没有短暂的休息时间。
+#### 瀑布流布局适用场景
+- 内容以图片为主的时候。图片占用空间比较大，并且大脑理解的速度相比理解文字要快，短时间内可以扫过的内容很多，所以如果用分页显示的话用户务必会频繁的翻页，影响沉浸式的体验，而瀑布流可以解决这个问题。
+- 信息与信息之间相对独立时。如果信息关联性强，用户务必会进行大量的回溯操作去查看之前或者之后的信息，相反，如果信息相对独立的话，可以使用瀑布流，让用户同时接受来自不同地方的信息。
+- 信息与搜索匹配比较模糊时。瀑布流给人的直观印象，就是同时显示的信息与用户搜索的匹配度大致一样，而分页显示的直观印象则是越靠上的信息被认为与用户的搜索越匹配。因此，当信息与搜索匹配度没有明显区分度时，可以采用瀑布流。
+- 用户目的性不强的时候。如果用户有特定需要查找的信息，分页查找定位更方便，而当目的性较弱的时候，瀑布流可以增加用户停留的时间和意想不到的收获。
+#### 瀑布流布局前端技术方案
+- css
+- 1.1 multi-column 多栏布局
+    - multi-column实现瀑布流主要依赖以下几个属性：
+        - column-count: 设置共有几列
+        - column-width: 设置每列宽度，列数由总宽度与每列宽度计算得出
+        - column-gap: 设置列与列之间的间距
+    - column-count和column-width都可以用来定义分栏的数目，而且并没有明确的优先级之分。优先级的计算取决与具体的场景。
+    - 计算column-count和column-width转换后具体的列数，哪个小就用哪个。
+    - 我们希望的是每个元素都是独立的，前后不断开，此时我们需要使用break-inside来实现。
+        - break-inside: auto | avoid
+            - auto: 元素可以中断
+            - avoid: 元素不能中断
+    - 但由于multi-column布局中子元素的排列顺序是先从上往下再从左至右，所以这种方式仅适用于数据固定不变的情况，对于滚动加载更多等可动态添加数据的情况就并不适用了。
+```css
+.masonry{
+    column-count: 3;
+    column-gap: 10px;
+}
+.masonry .item{
+    border:1px solid #999;
+    margin-bottom: 10px;
+    break-inside: avoid;
+}
+.masonry .item img{
+    width: 100%;
+}
+```
+- grid 布局实现瀑布流
+    - 网格布局（Grid）是最强大的 CSS 布局方案。
+    - 它将网页划分成一个个网格，可以任意组合不同的网格，做出各种各样的布局。以前，只能通过复杂的 CSS 框架达到的效果，现在浏览器内置了。
+```css
+.wrap-waterfall--grid img{vertical-align: top;width: 100px}
+.wrap-waterfall--grid .list{
+    display: grid;
+    grid-gap: 10px;
+    /* 可以看到，网格大小，占据位置是需要提前设定的 */
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: minmax(50px, auto);
+}
+```
+-  Flexbox 实现瀑布流
+    -  flex布局默认情况下是水平排列，可以修改为垂直排列并且允许换行达到纵向瀑布流的效果。
+    -  局限性：必须用固定高度使内容换行，填充比较难以控制；不固定高度的话要结合js才能实现
+```html
+<template>
+  <div class="masonry">
+    <div class="colmun">
+      <img class="item" :src="i.img" :key="i.id" v-for="i in data1">
+    </div>
+    <div class="colmun">
+      <img class="item" :src="i.img" :key="i.id" v-for="i in data2">
+    </div>
+    <div class="colmun">
+      <img class="item" :src="i.img" :key="i.id" v-for="i in data3">
+    </div>
+  </div>
+</template>
+
+
+<script>
+import data from "./data.json";
+
+export default {
+  data() {
+    let data1 = [], //第一列
+      data2 = [], //第二列
+      data3 = [], //第三列
+      i = 0;
+
+    while (i < data.length) {
+      data1.push(data[i++]);
+      if (i < data.length) {
+        data2.push(data[i++]);
+      }
+      if (i < data.length) {
+        data3.push(data[i++]);
+      }
+    }
+    return {
+      //第一列
+      data1,
+      //第二列
+      data2,
+      //第三列
+      data3
+    };
+  }
+};
+</script>
+
+<style lang="scss" scoped>
+.masonry {
+  display: flex;
+  flex-direction: row;
+  .colmun {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 0 2px;
+    .item {
+      margin-bottom: 5px;
+      width: 100%;
+    }
+  }
+}
+</style>
+```
+- grid-template-rows: masonry
+    - 看了以上的各种css方案，都有各自的弊端，实际使用场景一般也不会通过纯css做瀑布流布局。
+    - CSS 新属性 grid-template-rows: masonry 轻松实现瀑布流布局，一行代码即可搞定。
+    - 看了caniuse，兼容性感人。
+
+
+- js
+- 原生js
+    - 确定每行放几张图片， 每行的个数（column）=页面宽度（pageWidth）/（图片盒子宽度+图片间距）
+    - 确定一行多少个之后首先需要将第一行排列好 （绝对定位的方式，使用js排列好）
+    - 找出每一行的最小高度，排列完每一张图片之后更新最小高度
+    
+
+- 第三方库
+- 第三方库
+    -  vue-waterfall
+    -  @egjs/vue-infinitegrid，
+
+
+
 ### 伪类与伪元素列举一下？
 #### 伪类
 ##### 条件伪类
@@ -2228,7 +2372,115 @@ Promise 也不建议在这里面进行，因为 Promise 的回调属性 Event lo
 - css雪碧图
 
 ## JS
-### 图片懒加载的原理？？？？？？？？？？
+### 图片懒加载的原理？
+#### 懒加载概念
+对于页面有很多静态资源的情况下（比如网商购物页面），为了节省用户流量和提高页面性能，可以在用户浏览到当前资源（当前窗口（可视区域）的大小）的时候，再对资源进行请求和加载。
+#### 懒加载实现原理
+我们的图片要显示出来的话一般是借用img标签，然后把src属性写上图片的地址，才能把图片显示出来，那就想，我们先把图片不显示出来，就来写一个自定义属性字段，把这个属性字段的值写成图片地址，当图片在可视区域的范围的时候，就把自定义属性的值作为src的值。这就实现了懒加载。
+```html
+<img src="" lazyload="true" data-original="https://t7.baidu.com/itu=1732966997,2981886582&fm=193&f=GIF" alt="" class="image-item">
+```
+data-original是我们自己定义的属性字段，它的值为我们要的图片地址。lazyload="true"是为了当图片加载出来后将图片不在需要懒加载了。
+#### 可视区域怎么找呢？
+使用：document.documentElement.clientHeight可以获取到当前屏幕的高度。
+当我们获取到高度之后，在想，如果这个图片在这个区域内，就让图片显示出来。
+
+然后在想：当页面发生上滑的时候，可视区域的图片就会发生改变，所以当鼠标滚轮滚动的时候，在可视区域的图片就可能出去可视区域了，不在的可能这时候就进来了可视区域。所以我们要写一个监听事件。
+当我们拿到所有的img时，利用循环去判断他们是否在可视区域内，在就加载出来，不在就暂时不加载。 所以需要满足的条件是图片的顶部在可视区域的高度里面，图片的底部也要在可视区域里面，也就是图片没有被划出去。
+```js
+//获取可视区域的高度
+var viewHeight = document.documentElement.clientHeight
+document.addEventListener('scroll', function () {
+    //获取到页面上所有的img
+    //判断某个是否进入可视区域
+    //如果进入，就把它自身的data-original的值取出来放到src
+    var arr = document.querySelectorAll('img[data-original][lazyload]')
+    // console.log(arr);
+    /* for(var i of arr){
+        if(arr[i].offsettop()<i){
+            
+        }
+    } */
+    arr.forEach(item => {
+        let rect = item.getBoundingClientRect() //用于一次性获取某个容器相对于浏览器上下左右的位置
+        if (rect.top < viewHeight && rect.bottom >= 0) {
+            item.src = item.dataset.original
+            item.removeAttribute('data-original')
+            item.removeAttribute('lazyload')
+        }
+    })
+})
+```
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    .image-item {
+        height: 300px;
+        display: block;
+        margin-bottom: 50px;
+    }
+</style>
+
+<body>
+    <img src="" lazyload="true" data-original="https://t7.baidu.com/it/u=1732966997,2981886582&fm=193&f=GIF" alt=""
+        class="image-item">
+    <img src="" lazyload="true" data-original="https://t7.baidu.com/it/u=1785207335,3397162108&fm=193&f=GIF" alt=""
+        class="image-item">
+    <img src="" lazyload="true" data-original="https://t7.baidu.com/it/u=2581522032,2615939966&fm=193&f=GIF" alt=""
+        class="image-item">
+    <img src="" lazyload="true" data-original="https://t7.baidu.com/it/u=3423293041,3900166648&fm=193&f=GIF" alt=""
+        class="image-item">
+    <img src="" lazyload="true" data-original="https://t7.baidu.com/it/u=1417505637,1247476664&fm=193&f=GIF" alt=""
+        class="image-item">
+    <img src="" lazyload="true" data-original="https://t7.baidu.com/it/u=3659156856,3928250034&fm=193&f=GIF" alt=""
+        class="image-item">
+    <img src="" lazyload="true" data-original="https://t7.baidu.com/it/u=1416385889,2308474651&fm=193&f=GIF" alt=""
+        class="image-item">
+    <img src="" lazyload="true" data-original="https://t7.baidu.com/it/u=1599162854,1822154160&fm=193&f=GIF" alt=""
+        class="image-item">
+    <img src="" lazyload="true" data-original="https://t7.baidu.com/it/u=1476844859,894832600&fm=193&f=GIF" alt=""
+        class="image-item">
+    <img src="" lazyload="true" data-original="https://t7.baidu.com/it/u=3728410568,989468460&fm=193&f=GIF" alt=""
+        class="image-item">
+    <img src="" lazyload="true" data-original="https://t7.baidu.com/it/u=3696285528,2808863331&fm=193&f=GIF" alt=""
+        class="image-item">
+
+</body>
+<script>
+    //获取可视区域的高度
+    var viewHeight = document.documentElement.clientHeight
+    document.addEventListener('scroll', function () {
+        //获取到页面上所有的img
+        //判断某个是否进入可视区域
+        //如果进入，就把它自身的data-original的值取出来放到src
+        var arr = document.querySelectorAll('img[data-original][lazyload]')
+        // console.log(arr);
+        /* for(var i of arr){
+        if(arr[i].offsettop()<i){
+            
+        }
+    } */
+        arr.forEach(item => {
+            let rect = item.getBoundingClientRect()//用于一次性获取某个容器相对于浏览器上下左右的位置
+            if (rect.top < viewHeight && rect.bottom >= 0) {
+                item.src = item.dataset.original
+                item.removeAttribute('data-original')
+                item.removeAttribute('lazyload')
+            }
+        })
+    })
+</script>
+</html>
+```
+
 ### JS的一些取反的特殊值？？？？？？？？？
 ### 箭头函数和普通函数有什么区别？如果把箭头函数转换为不用箭头函数的形式，如何转换?
 1. 语法更加简洁、清晰
