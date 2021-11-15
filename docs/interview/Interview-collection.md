@@ -337,18 +337,7 @@ export default {
 
 ### CSS动画属性有哪些????????????
 
-![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211111102545.png)
-![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211111102814.png)
-![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211111102905.png)
 
-```html
-animation: name duration timing-function delay iteration-count direction play-state;
-
-
-div{
-    animation:mymove 2s ease-in-out 3s infinite alternate running;
-}
-```
 ### css的块元素和行内元素，有哪些，区别，转换
 - 块级元素：会自动占据一定矩形空间，可以通过设置高度、宽度、内外边距等属性，来调整的这个矩形的样子。
 - 行内元素：则没有自己的独立空间，它是依附于其他块级元素存在的，因此，对行内元素设置高度、宽度、内外边距等属性，都是无效的。
@@ -2480,8 +2469,24 @@ document.addEventListener('scroll', function () {
 </script>
 </html>
 ```
+### JS中七种为false和六种错误
+- 七种情况在JS中对应的布尔值都为false
+    - false
+    - 0
+    - null
+    - undefined
+    - ""      空字符串（双引号）
+    - ''      空字符串（单引号）
+    - NaN
 
-### JS的一些取反的特殊值？？？？？？？？？
+- js的六种错误
+    - SyntaxError：语法错误
+    - Uncaught ReferenceError：引用错误
+    - RangeError：范围错误
+    - TypeError类型错误
+    - URIError，URL错误
+    - EvalError eval()函数执行错误
+
 ### 箭头函数和普通函数有什么区别？如果把箭头函数转换为不用箭头函数的形式，如何转换?
 1. 语法更加简洁、清晰
    箭头函数的定义要比普通函数定义简洁、清晰得多，很快捷。
@@ -8448,12 +8453,188 @@ SPA是怎么实现的呢？为什么不需要重新加载页面就能达到页�
     - 初次加载时耗时多
     - 页面复杂度提高很多
 ### 认为 node.js，vue，react 各种出现的原因和各自优缺点是啥？？？？？？？
-### React和Vue的区别？？？？？？？
-### vue框架有哪些有点和缺点？？？？？？？？
-### Vue设置自定义指令？？？？？？
-### Vue手写渲染函数？？？？？？？
-### Vue 组件修饰符  ????????
-### vue组件间传值的方法有哪些?????????
+### Vue框架有哪些有点和缺点?
+优点：渐进式，组件化，轻量级，虚拟dom，响应式，单页面路由，数据与视图分开。
+缺点：单页面不利于seo，不支持IE8以下，首屏加载时间长。
+### React和Vue的区别？
+- 相同点：
+    - 1.都使用了虚拟dom
+    - 2.组件化开发
+    - 3.都是单向数据流(父子组件之间，不建议子修改父传下来的数据)
+    - 4.都支持服务端渲染
+- 不同点：
+    - 1.React的JSX，Vue的template
+    - 2.数据变化，React手动(setState)，Vue自动(初始化已响应式处理，Object.defineProperty，Proxy)
+    - 3.React单向绑定，Vue双向绑定
+    - 4.React的Redux，Vue的Vuex
+### Vue设置自定义指令？？？？？？？ 全栈然叔的课程是有的，介绍的很详细
+- Vue指令
+    - Vue的指令以v-开头，作用在HTML元素上，将指令绑定在元素上，给绑定的元素添加一些特殊行为。
+    - `<h1 v-if="yes">Yes</h1>`
+- Vue2.0自定义指令
+    - `Vue.directive(id, definition)`
+    - 传入的两个参数，id是指指令ID，definition是指定义对象。其中，定义对象可以提供一些钩子函数。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211115073324.png)
+```js
+Vue.directive('my-directive', {
+  bind: function(){
+    //做绑定的准备工作
+    //比如添加事件监听器，或是其他只需要执行一次的复杂操作
+  },
+  inserted: function(){
+    //...
+  },
+  update: function(){
+    //根据获得的新值执行对应的更新
+    //对于初始值也会调用一次
+  },
+  componentUpdated: function(){
+    //...
+  },
+  unbind: function(){
+    //做清理操作
+    //比如移除bind时绑定的事件监听器
+  }
+})
+```
+### Vue手写渲染函数？？？？？？？全栈然叔的课程是有的，介绍的很详细
+### Vue 组件修饰符？？？？？？？
+### Vue组件间传值的方法有哪些?
+1. props、$emit()
+```js
+export default {
+    name: 'Child',
+    props: {
+        // 父组件通过 <Child @change="changeName" :name="parentName" />
+        name: {
+            type: String, //类型
+            default: '', //默认值
+            required: true,//是否必填
+            validator: function (value) { 
+                return value > 10 
+            }
+        }
+    },
+    methods: {
+        changeName () {
+            this.$emit('change', 需要传递的参数)
+        }
+    }
+}
+```
+2. vuex 全局状态管理
+3. provide、inject传值
+provice/inject传值的方式，适合所有的向下传值类型，层级可以很深，多用于组件开发。业务开发中很少用到。
+```js
+// A组件
+// provide作为一个属性使用，和data，methods等统级，将要传递给子孙的属性放在里面
+provide() {
+    return {
+      toSon: 'this is to my son'
+    }
+},
+
+
+
+// B、C等子孙组件
+// inject是一个对象
+inject: {
+    toSon: {
+      default: '' // 设置接收属性的默认值
+    }
+ },
+ 
+// inject也可以是一个数组
+inject:['toSon']
+```
+4. attr、listeners传值
+这两个属性都是绑在组件B上面的，组件B起到一个承上启下的作用。attr用于将A组件传递过来的属性，下传给C组件listeners用于将C组件发射的数据，上传给A组件inheritAttrs用于设置属性，当设置为false时候，dom上则不会出现属性。
+```js
+// A组件
+<component-b
+      :pagination="pagination" // 将属性传递给B和C
+      v-on:propToComponentA="listenComponentC" // 监听c组件的事件
+ />
+ 
+ methods: {
+     listenComponentC(data) {}
+ }
+
+
+
+// B组件
+<component-c  v-bind="$attrs" v-on="$listeners"/>
+inheritAttrs: false
+
+
+// C组件
+  inheritAttrs: false,
+  created() {
+   console.log(this.$attrs)
+   //输出可以发现$attrs对象是A组件传递过来的属性
+  },
+  methods: {
+    propToComponentA() {
+      const data = {
+        name: '古天乐'
+      }
+      // b组件，c组件都可以监听事件propToComponentA
+      this.$emit('propToComponentA',data)
+    }
+  },
+```
+5. children、parent
+- $children
+    - 在父组件中，通过children可以获得所有无序的子组件组成的数组。 注意，当你想用children调用儿子组件中的方法或者参数时候，一定是需要等挂在完毕，在mounted中调用，或者是$nextTick
+- $parent
+    - 子组件可以通过this.$parent获取父组件实例。同样的，打点调用父组件的方法。
+6. 中央事件总线 emit/on
+- 创建全局响应式变量
+    - 一般在main.js中定义一个全局变量，挂在到window下
+```js
+import Vue from 'vue'
+window.eventBus = new Vue()
+// 也可以挂载到vue原型链上,二选其一
+Vue.prototype.$eventBus = new Vue();
+```
+- 事件挂载到eventBus
+```js
+// c组件发射了一名为dataFrom的事件，并挂载了数据this.dataA
+this.$eventBus.$emit('dataFrom', this.dataA);
+```
+- 接收eventBus的事件
+```js
+// 因为$eventBus是全局，且响应式的，任何一个组件都可以进行接收
+this.$eventBus.$on('dataFrom',  function (data) {
+     // handle data code
+});
+
+// 如果想接收一次事件后移除，就用$once
+this.$eventBus.$once('dataFrom',  function (data) {
+     // handle data code
+});
+
+// 移除事件监听
+$this.$eventBus.$off('dataFrom')
+```
+7. 使用$refs获取组件实例，进而获取数据
+### Vue模版编译原理
+- 将模板字符串转换成 elment ASTs (解析器)
+- 对AST进行静态标注，即不需要修改的地方标注出来，后面的虚拟Dom对比时便会忽略这个，提升新能
+- 将AST生成render函数
+### Vue事件绑定原理
+```js
+// 原生事件绑定
+<div @click="fn()"></div>
+
+// 组件绑定
+<my-component @click.native="fn" @click="fn1"></my- component>
+```
+原生事件绑定是通过addEventListener绑定给真实元素的。
+组件事件绑定是通过Vue自定义的$on实现的。
+
+- 原生事件是通过addEventListener来绑定的
+- Vue是通过Vue实例的$on实现的，他是基于订阅观察者模式的，维护一个事件中心，在执行on的时候录入元素和事件，在执行emit的时候触发对应的元素上的事件
 ### Vue 的插件怎么注册 插件接口该怎么设计？？？？？？
 ### 简述MVVM
 什么是MVVM？
@@ -8466,7 +8647,6 @@ MVVM的优点：
 4.可测试。
 
 ### 说Vue的MVVM实现原理
-
 1. Vue作为MVVM模式的实现库的2种技术
    1. 模板解析
    2. 数据绑定
@@ -10836,6 +11016,244 @@ console.log(str)
     - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108172704.png)
 ## 手写相关函数
 ### 手写相关函数1
+#### 手写String的indexof
+```js
+/**
+ * String实现-1：正则表达式实现
+ * 
+ * @param {*} str
+ * @param {*} searchVal
+ * @param {number} [fromIndex=0]
+ * @returns
+ */
+function sIndexOf(str, searchVal, fromIndex = 0) {
+  const len = arr.length;
+  if (fromIndex < 0) fromIndex = 0
+  if (fromIndex >= len) return -1
+  // 定义匹配规则
+  let reg = new RegExp(`${searchVal}`, 'g') // 为了支持lastIndex，自定义开始匹配位置，需要开启'g'，全局匹配
+  // 初始化开始搜索位置
+  reg.lastIndex = fromIndex
+  // 执行匹配
+  let ret = reg.exec(str)
+  // console.log(ret)
+  // 返回匹配结果
+  return ret ? ret.index : -1
+}
+
+/**
+ * String实现-2：循环遍历。 需要支持searchVal为多字符串时的匹配。
+ *
+ * @param {*} str
+ * @param {*} searchVal
+ * @param {number} [fromIndex=0]
+ * @returns
+ */
+function sIndexOf2(str, searchVal, fromIndex = 0) {
+  let strLen = str.length
+  let searchValLen = (searchVal + '').length
+  if (fromIndex < 0) fromIndex = 0
+  if (fromIndex >= strLen) return -1
+  for (let i = fromIndex; i <= strLen - searchValLen; i++) {
+    if (searchVal == str.slice(i, searchValLen + i)) return i
+  }
+  return -1
+}
+
+/**
+ * Array实现: 循环遍历
+ *
+ * @param {*} arr
+ * @param {*} searchVal
+ * @param {number} [fromIndex=0]
+ * @returns
+ */
+function aIndexOf(arr, searchVal, fromIndex = 0) {
+  const len = arr.length;
+  if (fromIndex < 0) fromIndex += len
+  if (fromIndex >= len) return -1
+  for (let i = fromIndex; i < len; i++) {
+    if (arr[i] === searchVal) return i
+  }
+  return -1
+}
+
+// 最终实现
+String.prototype._indexOf = Array.prototype._indexOf = function (searchVal, fromIndex) {
+  let data = this
+  let isArray = Array.isArray(data)
+  let isString = Object.prototype.toString.call(data) == '[object String]'
+  if (!isArray && !isString) throw new TypeError('String or Array')
+  if (isArray) return aIndexOf(data, searchVal, fromIndex)
+  if (isString) return sIndexOf(data, searchVal, fromIndex)
+}
+```
+#### 手写斐波那契数列
+```js
+// 第一种方法
+function fibonacci(n) {
+    /*
+        斐波那契数列前两项都是1，所以判断n是否等于1或者2，如果是则直接返回1
+    */
+    n = n && parseInt(n);
+    if (n == 1 || n == 2) {
+        return 1;
+    };
+    // 使用arguments.callee实现递归
+    return arguments.callee(n - 2) + arguments.callee(n - 1);
+}
+let sum = fibonacci(8)
+console.log(sum) // 21
+
+
+
+
+// 第二种方法
+function fibonacci(nub) {
+    let n = nub && parseInt(nub);
+    let n1 = 1; // 初始 n = 1时候的值为1
+    let n2 = 1; // 初始 n = 2时候的值为1
+    let f;    // 声明变量sum 接受第 n 个的斐波那契数
+    
+    // n 等于 1 或 n 等于 2 的时候直接返回1
+    if(n == 1 || n == 2) {
+        return 1;
+    }
+    for(let i = 2; i < n; i++) {
+        f = n1 + n2;
+        n1 = n2;
+        n2 = f;
+    } 
+    return f
+}
+let sum = fibonacci(8) 
+console.log(8) // 21
+
+
+
+
+// 第三种方法
+function fibonacci(n) {
+    n = n && parseInt(n);
+    let n1 = 1; 
+    let n2 = 1;
+    // n 等于 1 或 n 等于 2 的时候直接返回1
+    if(n == 1 || n == 2) {
+        return 1;
+    }
+    // 使用解构赋值，n1 等于 n2，n2 等于 n1 + n2 最后返回 n2
+    for (let i = 2; i < n; i++) {
+        [n1, n2] = [n2, n1 + n2]
+    }
+    return n2
+}
+```
+#### JS实现驼峰命名与横线命名的转换
+驼峰  ---> 横线
+```js
+// 将骆驼命名规则的字符串转换成使用短横线命名法的字符串, 并且全小写 .例如: 'getElementById' => 'get-element-by-id'
+
+// 方法1：正则表达式
+function getKebabCase(str) {
+    let temp = str.replace(/[A-Z]/g, function(i) {
+        return '_' + i.toLowerCase();
+    })
+    if (temp.slice(0,1) === '_') {
+        temp = temp.slice(1);   //如果首字母是大写，执行replace时会多一个_，需要去掉
+    }
+    return temp;
+}
+console.log(getKebabCase('getElementById')); // get-element-by-id
+// 方法2：reduce方法
+function getKebabCase(prev, cur, index, array) {
+    if (/[A-Z]/.test(cur)) {
+        cur = cur.toLowerCase();
+        if (index === 0) {
+            return prev + cur;
+        } else {
+            return prev + '_' + cur;
+        }
+    } else {
+        return prev + cur;
+    }
+}
+
+function toKebabCase(arr) {
+    if (typeof arr === 'string') {
+        arr = arr.split('');
+    }
+    return arr.reduce(getKebabCase, '');
+}
+
+let s = 'getElementById'
+let test1 = toKebabCase(s); // get-element-by-id
+let test2 = [].reduce.call(s, getKebabCase, '');  // get-element-by-id
+
+// 方法3：利用数组方法
+function getKebabCase(str) {
+    let arr = str.split('');
+    let result = arr.map((item) => {
+        if (item.toUpperCase() === item) {
+            return '_' + item.toLowerCase();
+        } else {
+            return item;
+        }
+    }).join('');
+    return result;
+}
+console.log(getKebabCase('getElementById')); // get-element-by-id
+```
+横线 ---> 驼峰
+```js
+// 将短横线命名规则的字符串转换成使用驼峰命名法的字符串. 例如: 'get-element-by-id ' => 'getElementById'
+
+// 方法1： 正则表达式
+function getCamelCase(str) {
+    return str.replace(/-([a-z])/g, function(all, i) {
+        return i.toLowerCase();
+    })
+}
+
+
+// 方法2： 利用数组方法
+function getCamelCase(str) {
+    let arr = str.split('-');
+    return arr.map((item, index) => {
+        if (index === 0) {
+            return item; // 看是大驼峰还是小驼峰
+        } else {
+           return item.chartAt(0).toUpperCase() + item.slice(1); 
+        }
+    }).join('');
+}
+
+```
+#### 手写事件委托
+```html
+<ul>
+    <li>111</li>
+    <li>222</li>
+    <li>333</li>
+    <li>444</li>
+</ul>
+
+// 没用事件委托
+$("li").on("mouseover",function(){
+　　　$(this).css("background-color","gray").siblings().css("background-color","white");
+})
+
+
+// 用了时间委托
+$("ul").on("mouseover", function(e) {
+    $(e.target).css("background-color", "gray").siblings().css("background-color", "white");
+})
+```
+- 第一步：给父元素绑定事件
+    - 给元素ul添加绑定事件，绑定mouseover事件设置css（也可通过addEventListener为点击事件click添加绑定）
+- 第二步：监听子元素的冒泡事件
+    - 这里默认是冒泡，点击子元素li会向上冒泡
+- 第三步：找到是哪个子元素的事件
+    - 通过匿名回调函数的参数e用来接收事件对象，通过target获取触发事件的目标（可以通过判断target的类型来确定是哪一类的子元素对象执行事件）
 #### 手写字符串模板
 
 ```js
