@@ -335,7 +335,134 @@ export default {
 2. 伪元素表示的是被选择元素的某个部分，这个部分看起来像一个独立的元素，但是是"假元素"，只存在于css中，所以叫"伪"的元素，例如:before和:after
 3. 核心区别在于，是否创造了“新的元素”
 
-### CSS动画属性有哪些????????????
+### CSS动画属性有哪些?
+transition、animation和transform是CSS3中三个制作动画的重要属性。
+#### transition
+transition允许css的属性值在一定的时间区间内平滑地过渡。这种效果可以在鼠标单击、获得焦点、被点击或对元素任何改变中触发，并圆滑地以动画效果改变CSS的属性值。
+```css
+transition ：transition-property || transition-duration || transition-timing-function || transition-delay;
+```
+- transition主要包含四个属性值：
+    - 执行变换的属性：transition-property，
+        - `transition-property: none || all || property;`
+        - transition-property是用来指定当元素其中一个属性改变时执行transition效果。
+        - none: 没有属性会获得过渡效果；
+        - all: 所有属性都将获得过渡效果,也是其默认值；
+        - property: 定义应用过渡效果的 CSS 属性名称列表，列表以逗号分隔。
+    - 变换延续的时间：transition-duration，
+        - `transition-duration: time;`
+        - transition-duration是用来指定元素 转换过程的持续时间，取值time为数值，单位为s（秒）或者ms(毫秒)，其默认值是0，也就是变换时是即时的。
+    - 在延续时间段，变换的速率变化：transition-timing-function，
+        - `transition-timing-function: linear || ease || ease-in || ease-out || ease-in-out || cubic-bezier(n,n,n,n);`
+        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211115220429.png)
+    - 变换延迟时间：transition-delay。
+        - transition-delay: time;
+        - transition-delay是用来指定一个动画开始执行的时间，也就是说当改变元素属性值后多长时间开始执行transition效果，其取值time为数值，单位为s（秒）或者ms(毫秒)， 默认大小是"0"，也就是变换立即执行，没有延迟。
+- 注意事项
+    - 不是所有的CSS属性都支持transition
+    - transition需要明确知道，开始状态和结束状态的具体数值，才能计算出中间状态。比如，height从0px变化到100px，transition可以算出中间状态。但是，transition没法算出0px到auto的中间状态，也就是说，如果开始或结束的设置是height: auto，那么就不会产生动画效果。
+    - transition需要事件触发，所以没法在网页加载时自动发生。
+    - transition是一次性的，不能重复发生，除非一再触发。
+```html
+<div class="one"></div>
+
+.one {
+        width: 100px;
+        height: 100px;
+        margin: 200px auto;
+        background-color: #cd4a48;
+        -webkit-transition: width, height 2s ease;
+        -moz-transition: width, height 2s ease;
+        -ms-transition: width, height 2s ease;
+        -o-transition: width, height 2s ease;
+        transition: width, height 2s ease;
+    }
+
+    .one:hover {
+        width: 300px;
+        height: 300px;
+    }
+```
+#### animation
+不同于transition只能定义首尾两个状态，animation可以定义任意多的关键帧，因而能实现更复杂的动画效果。
+```css
+animation: animation-name || animation-duration || animation-timing-function || animation-delay ||animation-iteration-count || animation-direction
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211115220651.png)
+- 其他属性
+    - 除了上述主要用到的六个属性外，还要额外介绍两个属性。
+    - animation-fill-mode
+        - 动画结束以后，会立即从结束状态跳回到起始状态。如果想让动画保持在结束状态，需要使用animation-fill-mode属性。
+        - `animation-fill-mode: none || backwards || both`
+            - none：默认值，回到动画没开始时的状态。
+            - forwards：当动画完成后，保持最后一个属性值（在最后一个关键帧中定义）。
+            - backwards：在 animation-delay所指定的一段时间内，在动画显示之前，应用开始属性值（在第一个关键帧中定义）。
+            - both: 根据animation-direction轮流应用forwards和backwards规则。
+    - animation-play-state
+        - 有时，动画播放过程中，会突然停止。这时，默认行为是跳回到动画的开始状态。
+        - 如果想让动画保持突然终止时的状态，就要使用animation-play-state属性。
+        - `animation-play-state:running || paused`
+        - animation-play-state主要是用来控制元素动画的播放状态。其主要有两个值，running和paused其中running为默认值。通过paused将正在播放的动画停下了，通过running将暂停的动画重新播放，这个属性目前很少内核支持。
+
+
+
+- keyframe
+    - 在介绍animation具体使用之前，要先介绍keyframe。
+    - @keyframes 让开发者通过指定动画中特定时间点必须展现的关键帧样式（或者说停留点）来控制CSS动画的中间环节。这让开发者能够控制动画中的更多细节而不是全部让浏览器自动处理。
+    - 要使用关键帧, 先创建一个带名称的@keyframes规则，以便后续使用 animation-name这个属性来调用指定的@keyframes. 每个@keyframes 规则包含多个关键帧，也就是一段样式块语句，每个关键帧有一个百分比值作为名称，代表在动画进行中，在哪个阶段触发这个帧所包含的样式。
+    - `@keyframes animationname {keyframes-selector {css-styles;}}`
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211115220746.png)
+```html
+<div class="one"></div>
+
+.one {
+        width: 100px;
+        height: 100px;
+        margin: 200px auto;
+        background-color: #cd4a48;
+        position: relative;
+        animation: moveHover 5s ease-in-out 0.2s;
+
+    }
+
+
+    @keyframes moveHover {
+        0% {
+            top: 0px;
+            left: 0px;
+            background: #cd4a48;
+        }
+        50% {
+            top: 200px;
+            left: 200px;
+            background:#A48992;
+        }
+        100% {
+            top: 350px;
+            left:350px;
+            background: #FFB89A;
+        }
+    }
+```
+#### transform
+transform就是变形，主要包括旋转rotate、扭曲skew、缩放scale和移动translate以及矩阵变形matrix。
+```css
+transform: none || transform-functions
+```
+none:表示不进么变换；transform-function表示一个或多个变换函数，以空格分开；换句话说就是我们同时对一个元素进行transform的多种属性操作，例如rotate、scale、translate三种。
+
+- translate
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211115221107.png)
+- scale
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211115221126.png)
+- rotate
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211115221144.png)
+- skew
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211115221205.png)
+- transform-origin
+    - 以上变化的默认参照点是元素的中心点，不过可以通过transform-origin设置元素的参照点。
+    - `transform-origin: X || Y || Z`
+    - 其中X，Y，Z对应三维坐标，X，Y，Z的值可以是em，px。此外，X，Y可以是百分值，其中X也可以是字符参数值left，center，right。Y和X一样除了百分值外还可以设置字符值top，center，bottom。
 
 
 ### css的块元素和行内元素，有哪些，区别，转换
@@ -2361,6 +2488,32 @@ Promise 也不建议在这里面进行，因为 Promise 的回调属性 Event lo
 - css雪碧图
 
 ## JS
+### JS如何实现多线程
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211115222810.png)
+JS为我们提供了一个Worker的类，它的作用就是为了解决这种阻塞的现象。当我们使用这个类的时候，它就会向浏览器申请一个新的线程。这个线程就用来单独执行一个js文件。
+```js
+var worker = new Worker(js文件路径);    //这个语句就会申请一个线程用来执行这个js文件。
+
+// 　在主线程中有一些方法来实现对新线程的控制和数据的接收。在这里，我们只说比较常用的几个方法。
+//postMessage(msg);
+//postMessage方法把在新线程执行的结果发送到浏览器的js引擎线程里
+worker.onmessage = function(){
+    //获取在新线程中执行的js文件发送的数据 用event.data接收数据
+    console.log( event.data )
+};
+setTimeout( function(){
+    worker.terminate();
+    //terminate方法用于关闭worker线程
+},2000)
+    
+setTimeout( function(){
+    worker = new Worker("js/test22.js");
+    //再次开启worker线程
+},3000)
+
+
+// 新线程中使用postMessage()方法可以向主线程中发送一些数据，主线程中使用worker的onmessage事件来接收这些数据，这样就实现了js的多线程执行和多线程之间数据的传递。
+```
 ### 图片懒加载的原理？
 #### 懒加载概念
 对于页面有很多静态资源的情况下（比如网商购物页面），为了节省用户流量和提高页面性能，可以在用户浏览到当前资源（当前窗口（可视区域）的大小）的时候，再对资源进行请求和加载。
@@ -6491,10 +6644,41 @@ if (!bool.valueOf()) {
 - 观察者模式 (响应式数据原理)
 - 装饰模式: (@装饰器的用法)
 - 策略模式 策略模式指对象有某个行为,但是在不同的场景中,该行为有不同的实现方案-比如选项的合并策略
+
+
 ## TS
 ### typescript 中, enum 实现原理？？？？？？？？？
 ### 列举你知道哪些 typescript 工具类型？？？？？？？？？
 ### typescript 工具类型返回的是 type 还是 interface?？？？？？？？？？
+
+
+## Node
+### Node是什么
+Node.js 是一个开源与跨平台的 JavaScript 运行时环境。在浏览器外运行 V8 JavaScript 引擎（Google Chrome 的内核），利用事件驱动、非阻塞和异步输入输出模型等技术提高性能。我们可以理解为：Node.js 就是一个服务器端的、非阻塞式I/O的、事件驱动的JavaScript运行环境。
+
+- 理解Node，有几个基础的概念：非阻塞异步和事件驱动。
+    - 非阻塞异步： Nodejs采用了非阻塞型I/O机制，在做I/O操作的时候不会造成任何的阻塞，当完成之后，以时间的形式通知执行操作。例如，在执行了访问数据库的代码之后，将立即转而执行其后面的代码，把数据库返回结果的处理代码放在回调函数中，从而提高了程序的执行效率。
+    - 事件驱动： 事件驱动就是当进来一个新的请求的时，请求将会被压入一个事件队列中，然后通过一个循环来检测队列中的事件状态变化，如果检测到有状态变化的事件，那么就执行该事件对应的处理代码，一般都是回调函数。比如，读取一个文件，文件读取完毕后，就会触发对应的状态，然后通过对应的回调函数来进行处理。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211115221852.png)
+
+### Node的应用场景及存在的缺点
+#### 优缺点
+- Node.js适合用于I/O密集型应用，值的是应用在运行极限时，CPU占用率仍然比较低，大部分时间是在做 I/O硬盘内存读写操作。
+- 缺点如下：
+    - 不适合CPU密集型应用
+    - 只支持单核CPU，不能充分利用CPU
+    - 可靠性低，一旦代码某个环节崩溃，整个系统都崩溃
+#### 应用场景
+- 在熟悉了Nodejs的优点和弊端后，我们可以看到它适合以下的应用场景：
+    - 善于I/O，不善于计算。因为Nodejs是一个单线程，如果计算（同步）太多，则会阻塞这个线程。
+    - 大量并发的I/O，应用程序内部并不需要进行非常复杂的处理。
+    - 与 WeSocket 配合，开发长连接的实时交互应用程序。
+- 具体的使用场景如下：
+    - 用户表单收集系统、后台管理系统、实时交互系统、考试系统、联网软件、高并发量的web应用程序。
+    - 基于web、canvas等多人联网游戏。
+    - 基于web的多人实时聊天客户端、聊天室、图文直播。
+    - 单页面浏览器应用程序。
+    - 操作数据库、为前端和移动端提供基于json的API。
 ## HTTP
 ### JWT
 #### 什么是 JWT
@@ -15341,6 +15525,20 @@ body{
     justify-content: space-between;
 }
 ```
+## 数据库
+### 三大范式
+目前关系数据库有六种范式：第一范式（1NF）、第二范式（2NF）、第三范式（3NF）、巴斯-科德范式（BCNF）、第四范式(4NF）和第五范式（5NF，又称完美范式）。
+
+而通常我们用的最多的就是第一范式（1NF）、第二范式（2NF）、第三范式（3NF），也就是本文要讲的“三大范式”。
+
+第一范式（1NF）：要求数据库表的每一列都是不可分割的原子数据项。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211115215727.png)
+第二范式（2NF）：在1NF的基础上，非码属性必须完全依赖于候选码（在1NF基础上消除非主属性对主码的部分函数依赖）
+第二范式需要确保数据库表中的每一列都和主键相关，而不能只与主键的某一部分相关（主要针对联合主键而言）。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211115215744.png)
+第三范式（3NF）：在2NF基础上，任何非主属性不依赖于其它非主属性（在2NF基础上消除传递依赖）
+第三范式需要确保数据表中的每一列数据都和主键直接相关，而不能间接相关。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211115215812.png)
 
 ## 其他
 ### 最近关注的技术，细说一个你比较了解的
