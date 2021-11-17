@@ -129,6 +129,8 @@ web后端：就是用户看不见摸不着的数据库交互处理的业务逻�
   ```
 
 ## CSS
+### min-width、max-width、width的包含(优先级关系)关系？？？？？？？？？？
+### 哪些CSS属性是不被IE兼容的？
 ### 实现瀑布流的方法？
 #### 什么是瀑布流布局
 瀑布流又称瀑布流式布局，是一种比较流行的页面布局方式，专业的英文名称为[Masonry Layouts]。与传统的分页显示不同，视觉表现为参差不齐的多栏布局。
@@ -2488,6 +2490,7 @@ Promise 也不建议在这里面进行，因为 Promise 的回调属性 Event lo
 - css雪碧图
 
 ## JS
+### js能表示的最大整数，小数在计算机内部的存储过程？？？？？？
 ### JS如何实现多线程
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211115222810.png)
 JS为我们提供了一个Worker的类，它的作用就是为了解决这种阻塞的现象。当我们使用这个类的时候，它就会向浏览器申请一个新的线程。这个线程就用来单独执行一个js文件。
@@ -4779,6 +4782,17 @@ JS里整数的计算是正确的，但是小数的计算是有误差的。
 
 对小数点以后的数乘以2，取结果的整数部分（不是1就是0），然后再用小数部分再乘以2，再取结果的整数部分……以此类推，直到小数部分为0或者位数已经够了就OK了。然后把取的整数部分按先后次序排列
 对浮点数进行运算的过程中，需要将十进制转换成二进制。
+
+前面讲到，在JavaScript中，使用浮点数标准IEEE 754表示数字的，在表示小数的时候，在转化二进制的时候有些数是不能完整转化的，比如0.3，转化成二进制是一个很长的循环的数，是超过了JavaScript能表示的范围的，所以近似等于0.30000000000000004。
+这个是二进制浮点数最大的问题（不仅 JavaScript，所有遵循 IEEE 754 规范的语言都是如此）。
+
+在这里我们要引入ES6中在Number对象上新增的一个极小的常量Number.EPSILON。它表示1与大于1的最小浮点数之差，等于2的-52次方。Number.EPSILON实际上是 JavaScript 能够表示的最小精度。误差如果小于这个值，就可以认为已经没有意义了，即不存在误差了。所以可以用这个来判断两个数浮点数是否想等：
+```js
+function numIsEqual(lef, rig) {
+    let EPSILON = Number.EPSILON ? Number.EPSILON : Math.pow(2,-52)
+    return Math.abs(lef - rig) < EPSILON
+}
+```
 
 ### Number()的存储空间是多大？假如接口返回一个超过最大字节的数字怎么办？
 
@@ -7144,6 +7158,7 @@ HTTPS 在内容传输的加密上使用的是对称加密，非对称加密只�
 - 为什么数据传输是用对称加密？
   - 首先：非对称加密的加解密效率是非常低的，而 http 的应用场景中通常端与端之间存在大量的交互，非对称加密的效率是无法接受的。
   - 另外：在 HTTPS 的场景中只有服务端保存了私钥，一对公私钥只能实现单向的加解密，所以 HTTPS 中内容传输加密采取的是对称加密，而不是非对称加密。
+### HTTP下向HTTPS发请求，请求能成功吗？如果反过来呢？
 ### HTTP1.0、HTTP1.1、http2.0 的区别
 #### HTTP1.0和HTTP1.1
 - HTTP1.0
@@ -7549,7 +7564,7 @@ RTP本身没有提供按时发送机制或其他服务质量（QoS）保证，�
     - 接受者也负责触发和处理任何的控制事件，包括拥塞控制和可靠性控制和他们的相对机制，例如RTT估计、带宽估计、应答和重传。
   - UDT总是试着将应用层数据打包成固定的大小，除非数据不够这么大。和TCP相似的是，这个固定的包大小叫做MSS（最大包大小）。由于期望UDT用来传输大块数据流，我们假定只能很小的一部分不规则的大小的包在UDT session中。MSS能够通过应用程式来安装，MTU是其最优值。
   - UDT拥塞控制算法将速率控制在窗口（流量控制）合并起来，前者调整包的发送周期，后者限制最大的位被应答的包。在速率控制中使用的参数通过带宽估计技术来更新，它继承来之基于接受的包方法。同时，速率控制周期是估计RTT的常量，流控制参数参考与对方的数据到达速度，另外接收端释放的缓冲区的大小。
-5. ### WebSocket与Ajax的区别
+### WebSocket与Ajax的区别
 - 本质不同
   - Ajax 即异步 JavaScript 和 XML，是一种创建交互式网页的应用的网页开发技术
   - websocket 是 HTML5 的一种新协议，实现了浏览器和服务器的实时通信
@@ -7562,6 +7577,7 @@ RTP本身没有提供按时发送机制或其他服务质量（QoS）保证，�
 - 发起人：
   - AJAX 客户端发起
   - WebSocket 服务器端和客户端相互推送
+### websocket如何建立连接，手写websocket建立过程？？？？？？？？？？
 ### 跨域的方案
 #### 同源是什么？
 如果两个URL的协议`protocol`、主机名`host`和端口号`port`都相同的话，则这两个URL是同源。
@@ -7883,13 +7899,37 @@ CORS（cross-origin resource sharing），跨源资源共享（一般俗称『�
     - Access-Control-Allow-Credentials（可选） – 和简单请求当中作用相同。
     - Access-Control-Max-Age（可选） – 以秒为单位的缓存时间。预请求的的发送并非免费午餐，允许时应当尽可能缓存。
   - 一旦预回应如期而至，所请求的权限也都已满足，则实际请求开始发送
-#### 使用Access-Control-Allow-Origin为什么可以解决跨域问题?
-#### 使用access-control-allow-origin解决跨域问题的流程是怎样的?
+#### 使用Access-Control-Allow-Origin为什么可以解决跨域问题?？？？？？？？
+#### 使用access-control-allow-origin解决跨域问题的流程是怎样的?？？？？？？
+### 什么叫同源？浏览器为什么要设置同源？同源策略都可以阻挡哪些恶意代码？
+- 什么叫同源
+    - 两个页面地址中的协议，域名，端口号一致，则表示同源
+- 为什么浏览器要使用同源策略
+    - 设置同源策略的主要目的是为了安全，如果没有同源限制，在浏览器中的cookie等其他数据可以任意读取，不同域下的DOM任意操作，ajax任意请求其他网站的数据，包括隐私数据。
+- 同源策略都可以阻挡哪些恶意代码
+    - 无法用js读取非同源的Cookie、LocalStorage 和 IndexDB 无法读取。
+    - 无法用js获取非同源的DOM 。
+    - 无法用js发送非同源的AJAX请求 。
+### 怎么实现接口防刷？
+1. ①通过前端按钮屏蔽（不安全） 
+2. ②前端每次请求都带上token与后端进行校验，检验通过后，后端在缓存中更改token值并且同请求数据一起返回给前端
+3. ③记录指定时间内请求过多的用户的IP，超过一定次数后直接拉入缓存黑名单，不响应其数据
 ### web安全的问题
 - SQL注入
-  - 后台人员使用用户输入的数据来组装SQL查询语句的时候不做防范， 遇到一些恶意的输入， 最后生成的SQL就会有问题。
-  - 系统一般都会加入 过滤 和 验证 机制， 可以有效预防SQL注入问题。
-- DOC攻击
+  - SQL注入（英语：SQL injection），也称SQL注入或SQL注码，是发生于应用程序与数据库层的安全漏洞。
+  - 简而言之，是在输入的字符串之中注入SQL指令，在设计不良的程序当中忽略了字符检查，那么这些注入进去的恶意指令就会被数据库服务器误认为是正常的SQL指令而运行，因此遭到破坏或是入侵。 
+      - SQL命令可查询、插入、更新、删除等，命令的串接。而以分号字符为不同命令的区别。（原本的作用是用于SubQuery或作为查询、插入、更新、删除……等的条件式）
+      - SQL命令对于传入的字符串参数是用单引号字符所包起来。（但连续2个单引号字符，在SQL数据库中，则视为字符串中的一个单引号字符）
+      - SQL命令中，可以注入注解（连续2个减号字符 -- 后的文字为注解，或“/”与“/”所包起来的文字为注解）
+      - 因此，如果在组合SQL的命令字符串时，未针对单引号字符作转义处理的话，将导致该字符变量在填入命令字符串时，被恶意窜改原本的SQL语法的作用。
+    -  SQL注入的防范措施
+        -  在组合SQL字符串时，先针对所传入的参数加入其他字符（将单引号字符前加上转义字符）
+        -  使用SQL防注入系统。
+        -  增强WAF的防御力。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211117074659.png)
+
+
+
 - 点击劫持
   - click-jacking，也被称为UI-覆盖攻击。
   - 攻击方式就是在某些操作的按钮上加一层透明的iframe。点击一下， 就入坑了。
@@ -7904,6 +7944,9 @@ if (top.location.hostname !== self.location.hostname) {
   top.location.href = self.location.href;
 }
 ```
+
+
+
 - 中间人攻击
   - 中间人攻击（Man-in-the-Middle Attack, MITM）是一种由来已久的网络入侵手段.
   - 如 SMB 会话劫持、DNS 欺骗等攻击都是典型的MITM攻击。
@@ -7922,33 +7965,76 @@ if (top.location.hostname !== self.location.hostname) {
 1、XSS 攻击
 - 概念
   - XSS（Cross Site Scripting）：跨域脚本攻击。
-- 原理
-  - 不需要你做任何的登录认证，它会通过合法的操作（比如在 url 中输入、在评论框中输入），向你的页面注入脚本（可能是 js、hmtl 代码块等）。
-- 防范
-  - 编码；对于用户输入进行编码。
-  - 过滤；移除用户输入和事件相关的属性。(过滤 script、style、iframe 等节点)
-  - 校正；使用 DOM Parse 转换，校正不配对的 DOM 标签。
-  - HttpOnly
-- 分类
-  - 反射型(非持久)：点击链接，执行脚本
-  - 存储型(持久)：恶意输入保存数据库，其他用户访问，执行脚本
-  - 基于 DOM：恶意修改 DOM 结构，基于客户端
+    -原理
+      - 不需要你做任何的登录认证，它会通过合法的操作（比如在 url 中输入、在评论框中输入），向你的页面注入脚本（可能是 js、hmtl 代码块等）。
+    - 防范
+      - 编码；对于用户输入进行编码。
+      - 过滤；移除用户输入和事件相关的属性。(过滤 script、style、iframe 等节点)
+      - 校正；使用 DOM Parse 转换，校正不配对的 DOM 标签。
+      - HttpOnly
+    - 分类
+      - 反射型(非持久)：点击链接，执行脚本
+      - 存储型(持久)：恶意输入保存数据库，其他用户访问，执行脚本
+      - 基于 DOM：恶意修改 DOM 结构，基于客户端
 2. CSRF 攻击
 - 概念
   - SRF（Cross-site request forgery）：跨站请求伪造。
-- 原理
-  - 登录受信任网站 A，并在本地生成 Cookie。（如果用户没有登录网站 A，那么网站 B 在诱导的时候，请求网站 A 的 api 接口时，会提示你登录）
-  - 在不登出 A 的情况下，访问危险网站 B（其实是利用了网站 A 的漏洞）。
-- 防范
-  - token 验证；
-  - 隐藏令牌；把 token 隐藏在 http 请求的 head 中。
-  - referer 验证；验证页面来源。
+    - 原理
+      - 登录受信任网站 A，并在本地生成 Cookie。（如果用户没有登录网站 A，那么网站 B 在诱导的时候，请求网站 A 的 api 接口时，会提示你登录）
+      - 在不登出 A 的情况下，访问危险网站 B（其实是利用了网站 A 的漏洞）。
+    - 防范
+      - token 验证；
+      - 隐藏令牌；把 token 隐藏在 http 请求的 head 中。
+      - referer 验证；验证页面来源。
 - 两者区别
   - CSRF：需要用户先登录网站 A，获取 cookie。XSS：不需要登录。
   - CSRF：是利用网站 A 本身的漏洞，去请求网站 A 的 api。XSS：是向网站 A 注入 JS 代码，然后执行 JS 里的代码，篡改网站 A 的内容。
-
+### DOS、 DDOS攻击原理和防范？
+- DOS
+    - 最基本的DoS攻击就是利用合理的客户端请求来占用过多的服务器资源，从而使合法用户无法得到服务器的响应。
+    - 传统的DoS攻击一般是采用一对一的方式，当攻击目标的CPU速度、内存或者网络带宽等各项性能指标不高的情况下，它的效果是明显的。
+    - 但随着计算机与网络技术的发展，计算机的处理能力显著增加，内存不断增大，同时也出现了千兆级别的网络，这使得DoS攻击逐渐失去了效果。
+- DDOS
+    - DDoS(Distributed Denial of Service)即分布式拒绝服务攻击，是目前最为强大、最难以防御的攻击方式之一。
+    - DDoS攻击手段迁在传统的DoS攻击基础之上产生的一类攻击方式，传统的DoS攻击一般是采用一对一的方式，当攻击目标的CPU速度、内存或者网络带宽等各项性能指标不高的情况下，它的效果是明显的。
+    - DDoS的原理就非常简单了，它指的是攻击者借助公共网络，将数量庞大的计算机设备联合起来作为攻击平台，对一个或多个目标发动攻击，从而达到瘫痪目标主机的目的。
+- DoS或DDoS攻击可以具体分成两种形式：带宽消耗型以及资源消耗型。它们都是透过大量合法或伪造的请求占用大量网络以及器材资源，以达到瘫痪网络以及系统的目的。
+    - 带宽消耗型攻击
+        - DDoS带宽消耗攻击可以分为两个不同的层次；洪泛攻击或放大攻击。
+            - 洪泛攻击的特点是利用僵尸程序发送大量流量至受损的受害者系统，目的在于堵塞其宽带。
+            - 放大攻击与其类似，是通过恶意放大流量限制受害者系统的宽带；其特点是利用僵尸程序通过伪造的源IP(即攻击目标IP)向某些存在漏洞的服务器发送请求，服务器在处理请求后向伪造的源IP发送应答，由于这些服务的特殊性导致应答包比请求包更长，因此使用少量的宽带就能使服务器发送大量的应答到目标主机上。
+            - UDP洪水攻击（User Datagram Protocol floods）
+                - UDP（用户数据报协议）是一种无连接协议，当数据包通过UDP发送时，所有的数据包在发送和接收时不需要进行握手验证。当大量UDP数据包发送给受害系统时，可能会导致带宽饱和从而使得合法服务无法请求访问受害系统。遭受DDoS UDP洪泛攻击时，UDP数据包的目的端口可能是随机或指定的端口，受害系统将尝试处理接收到的数据包以确定本地运行的服务。如果没有应用程序在目标端口运行，受害系统将对源IP发出ICMP数据包，表明“目标端口不可达”。某些情况下，攻击者会伪造源IP地址以隐藏自己，这样从受害系统返回的数据包不会直接回到僵尸主机，而是被发送到被伪造地址的主机。有时UDP洪泛攻击也可能影响受害系统周围的网络连接，这可能导致受害系统附近的正常系统遇到问题。然而，这取决于网络体系结构和线速
+            - ICMP洪水攻击（ICMP floods）
+                - ICMP（互联网控制消息协议）洪水攻击是通过向未良好设置的路由器发送广播信息占用系统资源的做法。
+            - 死亡之Ping（ping of death）
+                - 死亡之Ping是产生超过IP协议能容忍的数据包数，若系统没有检查机制，就会宕机。
+            - 泪滴攻击
+                - 每个资料要发送前，该数据包都会经过切割，每个小切割都会记录位移的信息，以便重组，但此攻击模式就是捏造位移信息，造成重组时发生问题，造成错误。
+    - 资源消耗型攻击
+        - 协议分析攻击（SYN flood，SYN洪水）
+            - 传送控制协议（TCP）同步（SYN）攻击。TCP进程通常包括发送者和接受者之间在数据包发送之前创建的完全信号交换。启动系统发送一个SYN请求，接收系统返回一个带有自己SYN请求的ACK（确认）作为交换。发送系统接着传回自己的ACK来授权两个系统间的通讯。若接收系统发送了SYN数据包，但没接收到ACK，接受者经过一段时间后会再次发送新的SYN数据包。接受系统中的处理器和内存资源将存储该TCP SYN的请求直至超时。DDoS TCP SYN攻击也被称为“资源耗尽攻击”，它利用TCP功能将僵尸程序伪装的TCP SYN请求发送给受害服务器，从而饱和服务处理器资源并阻止其有效地处理合法请求。它专门利用发送系统和接收系统间的三向信号交换来发送大量欺骗性的原IP地址TCP SYN数据包给受害系统。最终，大量TCP SYN攻击请求反复发送，导致受害系统内存和处理器资源耗尽，致使其无法处理任何合法用户的请求。
+        - LAND攻击
+            - 这种攻击方式与SYN floods类似，不过在LAND攻击包中的原地址和目标地址都是攻击对象的IP。这种攻击会导致被攻击的机器死循环，最终耗尽资源而死机。
+        - CC攻击（Distributed HTTP flood，分布式HTTP洪水攻击）
+            - CC攻击使用代理服务器向受害服务器发送大量貌似合法的请求（通常为HTTP GET)。攻击者创造性地使用代理，利用广泛可用的免费代理服务器发动DDoS攻击。许多免费代理服务器支持匿名，这使追踪变得非常困难。2004年，一位匿名为KiKi的中国黑客开发了一种用于发送HTTP请求的DDoS攻击工具以攻击名为“Collapsar”的NSFOCUS防火墙，因此该黑客工具被称为“Challenge Collapsar”（挑战黑洞，简称CC），这类攻击被称作“CC攻击”。
+        - 僵尸网络攻击
+            - 僵尸网络是指大量被命令与控制（C&C）服务器所控制的互联网主机群。攻击者传播恶意软件并组成自己的僵尸网络。僵尸网络难于检测的原因是，僵尸主机只有在执行特定指令时才会与服务器进行通讯，使得它们隐蔽且不易察觉。僵尸网络根据网络通讯协议的不同分为IRC、HTTP或P2P类等。
+        - 应用程序级洪水攻击（Application level floods）
+            - 与前面叙说的攻击方式不同，应用程序级洪水攻击主要是针对应用软件层的，也就是高于OSI的。它同样是以大量消耗系统资源为目的，通过向IIS这样的网络服务程序提出无节制的资源申请来破坏正常的网络服务。
+-  DoS攻击的防范措施
+    -  拒绝服务攻击的防御方式通常为入侵检测，流量过滤和多重验证，旨在堵塞网络带宽的流量将被过滤，而正常的流量可正常通过。
+    -  防火墙
+        -  防火墙可以设置规则，例如允许或拒绝特定通讯协议，端口或IP地址。当攻击从少数不正常的IP地址发出时，可以简单的使用拒绝规则阻止一切从攻击源IP发出的通信。复杂攻击难以用简单规则来阻止，例如80端口（网页服务）遭受攻击时不可能拒绝端口所有的通信，因为其同时会阻止合法流量。此外，防火墙可能处于网络架构中过后的位置，路由器可能在恶意流量达到防火墙前即被攻击影响。然而，防火墙能有效地防止用户从启动防火墙后的计算机发起攻击。
+    - 交换机
+        - 大多数交换机有一定的速度限制和访问控制能力。有些交换机提供自动速度限制、流量整形、后期连接、深度包检测和假IP过滤功能，可以检测并过滤拒绝服务攻击。例如SYN洪水攻击可以通过后期连接加以预防。基于内容的攻击可以利用深度包检测阻止。
+    - 路由器
+        - 和交换机类似，路由器也有一定的速度限制和访问控制能力，而大多数路由器很容易受到攻击影响。
+    - 黑洞引导
+        - 黑洞引导指将所有受攻击计算机的通信全部发送至一个“黑洞”（空接口或不存在的计算机地址）或者有足够能力处理洪流的网络设备商，以避免网络受到较大影响。
+    - 流量清洗
+        - 当流量被送到DDoS防护清洗中心时，通过采用抗DDoS软件处理，将正常流量和恶意流量区分开。正常的流量则回注回客户网站。这样一来可站点能够保持正常的运作，处理真实用户访问网站带来的合法流量。
 ### CDN
-
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210923075356.png)
 #### 简单介绍
 
@@ -8651,6 +8737,7 @@ SPA是怎么实现的呢？为什么不需要重新加载页面就能达到页�
     - 2.数据变化，React手动(setState)，Vue自动(初始化已响应式处理，Object.defineProperty，Proxy)
     - 3.React单向绑定，Vue双向绑定
     - 4.React的Redux，Vue的Vuex
+### v-model原理？？？？？？？？
 ### Vue设置自定义指令？？？？？？？ 全栈然叔的课程是有的，介绍的很详细
 - Vue指令
     - Vue的指令以v-开头，作用在HTML元素上，将指令绑定在元素上，给绑定的元素添加一些特殊行为。
@@ -8802,10 +8889,7 @@ this.$eventBus.$once('dataFrom',  function (data) {
 $this.$eventBus.$off('dataFrom')
 ```
 7. 使用$refs获取组件实例，进而获取数据
-### Vue模版编译原理
-- 将模板字符串转换成 elment ASTs (解析器)
-- 对AST进行静态标注，即不需要修改的地方标注出来，后面的虚拟Dom对比时便会忽略这个，提升新能
-- 将AST生成render函数
+
 ### Vue事件绑定原理
 ```js
 // 原生事件绑定
@@ -9110,7 +9194,10 @@ methodsToPatch.forEach(function (method) {
 如果异步请求不需要依赖 Dom 推荐在 created 钩子函数中调用异步请求，因为在 created 钩子函数中调用异步请求有以下优点：
 能更快获取到服务端数据，减少页面 loading 时间；
 ssr 不支持 beforeMount 、mounted 钩子函数，所以放在 created 中有助于一致性；
-
+### Vue模版编译原理
+- 将模板字符串转换成 elment ASTs (解析器)
+- 对AST进行静态标注，即不需要修改的地方标注出来，后面的虚拟Dom对比时便会忽略这个，提升新能
+- 将AST生成render函数
 ### Vue模版编译原理知道吗，能简单说一下吗？
 Vue的编译过程就是将template转化为render函数的过程。会经历以下阶段：
 
@@ -9723,6 +9810,34 @@ vuex 和 vue-router 的插件注册方法 install 判断如果系统存在实例
 5. 装饰模式: (@装饰器的用法)
 
 ## VueRouter
+### VueRouter的router 和 route的区别?
+- $route对象
+    - $route对象表示当前的路由信息，包含了当前 URL 解析得到的信息。包含当前的路径，参数，query对象等。
+    - $route.path 字符串，对应当前路由的路径，总是解析为绝对路径，如"/foo/bar"。
+    - $route.params 一个 key/value 对象，包含了 动态片段 和 全匹配片段，如果没有路由参数，就是一个空对象。
+    - $route.query 一个 key/value 对象，表示 URL 查询参数。例如，对于路径 /foo?user=1，则有$route.query.user == 1,如果没有查询参数，则是个空对象。
+    - $route.hash 当前路由的hash值 (不带#) ，如果没有 hash 值，则为空字符串。锚点*
+    - $route.fullPath 完成解析后的 URL，包含查询参数和hash的完整路径。
+    - $route.matched 数组，包含当前匹配的路径中所包含的所有片段所对应的配置参数对象。
+    - $route.name 当前路径名字
+    - $route.meta 路由元信息
+    - 路由钩子函数
+- $router对象
+    - $router对象是全局路由的实例，是router构造方法的实例。
+    - 路由实例方法：
+        - push
+            - 字符串this.$router.push('home')
+            - 对象this.$router.push({path:'home'})
+            - 命名的路由this.$router.push({name:'user',params:{userId:123}})
+            - 带查询参数，变成 /register?plan=123this.$router.push({path:'register',query:{plan:'123'}})
+        - go
+            - 页面路由跳转 
+            -  前进或者后退this.$router.go(-1)  // 后退
+        - replace
+            -  push方法会向 history 栈添加一个新的记录，而replace方法是替换当前的页面，
+            - 不会向 history 栈添加一个新的记录
+            - 一般使用replace来做404页面
+
 ### hash路由和history路由实现原理说一下 (history模式和hash模式的区别)
 - location.hash的值实际就是URL中#后面的东西。
 - history实际采用了HTML5中提供的API来实现，主要有history.pushState()和history.replaceState()。
@@ -10146,11 +10261,273 @@ actions:{
     }
 }
 ```
-
+## Vue-Cli
+### 实现一个vue-cli，整个思路是什么？??????
 ## Webpack Vite Rollup
+### package.json说说你知道的配置，browserlist作用是什么？？？？？？
+#### package.json
+从我们接触前端开始，每个项目的根目录下一般都会有一个package.json文件，这个文件定义了当前项目所需要的各种模块，以及项目的配置信息（比如名称、版本、许可证等）。
+
+当运行npm install命令的时候，会根据package.json文件中的配置自动下载所需的模块，也就是配置项目所需的运行和开发环境。
+
+package.json文件是一个JSON对象，这从他的后缀名.json就可以看出来，该对象的每一个成员就是当前项目的一项设置。比如name就是项目名称，version是版本号。
+
+当然很多人其实并不关心package.json的配置，他们应用的更多的是dependencies或devDependencies配置。
+```json
+{
+    "name": "hardingcheng",
+    "version":"0.0.1",
+    "description": "antd-theme",
+    "keywords":["node.js","antd", "theme"],
+    "homepage": "https://zhiqianduan.com",
+    "bugs":{"url":"http://path/to/bug","email":"yindong@xxxx.com"},
+    "license": "ISC",
+    "author": "yindong",
+    "contributors":[{"name":"yindong","email":"yindong@xxxx.com"}],
+    "files": "",
+    "main": "./dist/default.js",
+    "bin": "",
+    "man": "",
+    "directories": "",
+    "repository": {
+		"type": "git",
+		"url": "https://path/to/url"
+	},
+    "scripts": {
+      "start": "webpack serve --config webpack.config.dev.js --progress"
+    },
+    "config": { "port" : "8080" },
+    "dependencies": {},
+    "devDependencies": {
+        "@babel/core": "^7.14.3",
+        "@babel/preset-env": "^7.14.4",
+        "@babel/preset-react": "^7.13.13",
+        "babel-loader": "^8.2.2",
+        "babel-plugin-import": "^1.13.3",
+        "glob": "^7.1.7",
+        "less": "^3.9.0",
+        "less-loader": "^9.0.0",
+        "style-loader": "^2.0.0",
+        "webpack": "^5.38.1",
+        "webpack-cli": "^4.7.0",
+        "webpack-dev-server": "^3.11.2"
+    },
+    "peerDependencies": {
+        "tea": "2.x"
+    },
+    "bundledDependencies": [
+        "renderized", "super-streams"
+    ],
+    "engines": {"node": "0.10.x"},
+	  "os" : [ "win32", "darwin", "linux" ],
+    "cpu" : [ "x64", "ia32" ],
+    "private": false,
+    "publishConfig": {}
+  }
+```
+- 必须属性
+- name字段
+    - package.json文件中最重要的就是name和version字段，这两项是必填的。名称和版本一起构成一个标识符，该标识符被认为是完全唯一的。对包的更改应该与对版本的更改一起进行。
+    - package.json文件中最重要的就是name和version字段，这两项是必填的。名称和版本一起构成一个标识符，该标识符被认为是完全唯一的。对包的更改应该与对版本的更改一起进行。
+    - name必须小于等于214个字符，不能以.或_开头，不能有大写字母，因为名称最终成为URL的一部分因此不能包含任何非URL安全字符。npm官方建议我们不要使用与核心节点模块相同的名称。不要在名称中加js或node。如果需要可以使用engines来指定运行环境。
+    - 该名称会作为参数传递给require，因此它应该是简短的，但也需要具有合理的描述性。
+- version字段
+    - version一般的格式是x.x.x, 并且需要遵循该规则。
+    - package.json文件中最重要的就是name和version字段，这两项是必填的。名称和版本一起构成一个标识符，该标识符被认为是完全唯一的。每次发布时version不能与已存在的一致。
+
+
+- 描述信息
+- description字段
+    - description是一个字符串，用于编写描述信息。有助于人们在npm库中搜索的时候发现你的模块。
+- keywords字段
+    - keywords是一个字符串组成的数组，有助于人们在npm库中搜索的时候发现你的模块。
+- homepage字段
+    - homepage项目的主页地址。
+- bugs字段
+    - bugs用于项目问题的反馈issue地址或者一个邮箱。
+    ```json
+    "bugs": { 
+      "url" : "https://github.com/owner/project/issues",
+      "email" : "project@hostname.com"
+    }
+    ```
+- license字段
+    - license是当前项目的协议，让用户知道他们有何权限来使用你的模块，以及使用该模块有哪些限制。
+    - `"license" : "BSD-3-Clause"`
+- author字段 contributors字段
+    - author是具体一个人，contributors表示一群人，他们都表示当前项目的共享者。同时每个人都是一个对象。具有name字段和可选的url及email字段。
+    - contributors表示该项目包的贡献者，和author不同的是，该字段是一个数组，包含所有的贡献者
+    ```json
+    "author": {
+      "name" : "hardingcheng",
+      "email" : "hardingcheng@xx.com",
+      "url" : "https://hardingcheng.com/"
+    }
+    ```
+    
+    
+- 文件&目录 
+- files字段
+    - files属性的值是一个数组，内容是模块下文件名或者文件夹名，如果是文件夹名，则文件夹下所有的文件也会被包含进来（除非文件被另一些配置排除了）
+    - 可以在模块根目录下创建一个.npmignore文件，写在这个文件里边的文件即便被写在files属性里边也会被排除在外，这个文件的写法与.gitignore类似。
+- main字段
+    - main字段指定了加载的入口文件，require导入的时候就会加载这个文件。这个字段的默认值是模块根目录下面的index.js。
+- bin字段
+    - bin项用来指定每个内部命令对应的可执行文件的位置。如果你编写的是一个node工具的时候一定会用到bin字段。
+    - 当我们编写一个cli工具的时候，需要指定工具的运行命令，比如常用的webpack模块，他的运行命令就是webpack。
+    - 当我们执行webpack命令的时候就会执行bin/index.js文件中的代码。
+    - 在模块以依赖的方式被安装，如果存在bin选项。在node_modules/.bin/生成对应的文件，Npm会寻找这个文件，在node_modules/.bin/目录下建立符号链接。由于node_modules/.bin/目录会在运行时加入系统的PATH变量，因此在运行npm时，就可以不带路径，直接通过命令来调用这些脚本。
+    - 所有node_modules/.bin/目录下的命令，都可以用npm run [命令]的格式运行。在命令行下，键入npm run，然后按tab键，就会显示所有可以使用的命令。
+    ```json
+        "bin": {
+      "webpack": "bin/index.js",
+    }
+    ```
+- man字段
+    - man用来指定当前模块的man文档的位置。
+    - `"man" :[ "./doc/calc.1" ]`
+- directories字段
+    - directories制定一些方法来描述模块的结构, 用于告诉用户每个目录在什么位置。
+- repository字段
+    - 指定一个代码存放地址，对想要为你的项目贡献代码的人有帮助
+    ```json
+    "repository" : {
+      "type" : "git", 
+      "url" : "https://github.com/npm/npm.git"
+    }
+    ```
+    
+    
+
+
+- 脚本配置
+- scripts字段
+    - scripts指定了运行脚本命令的npm命令行缩写，比如start指定了运行npm run start时，所要执行的命令。
+    ```json
+    "scripts": {
+      "start": "node ./start.js"
+    }
+    ```
+    - 使用scripts字段可以快速的执行shell命令，可以理解为alias。
+    - scripts可以直接使用node_modules中安装的模块，这区别于直接运行需要使用npx命令。
+- config字段
+    - config字段用于添加命令行的环境变量。
+    ```json
+    {
+      "name" : "hardingcheng",
+      "config" : { "port" : "8080" },
+      "scripts" : { "start" : "node server.js" }
+    }
+    ```
+    - 然后，在server.js脚本就可以引用config字段的值。`console.log(process.env.npm_package_config_port); //8080`
+
+
+
+
+
+- 依赖配置
+- dependencies字段, devDependencies字段
+    - dependencies字段指定了项目运行所依赖的模块，devDependencies指定项目开发所需要的模块。
+    - 它们的值都是一个对象。该对象的各个成员，分别由模块名和对应的版本要求组成，表示依赖的模块及其版本范围。
+    - 当安装依赖的时候使用--save参数表示将该模块写入dependencies属性，--save-dev表示将该模块写入devDependencies属性。
+    - 对象的每一项通过一个键值对表示，前面是模块名称，后面是对应模块的版本号。版本号遵循“大版本.次要版本.小版本”的格式规定。
+    - 固定版本: 比如5.38.1，安装时只安装指定版本。
+    - 波浪号: 比如~5.38.1, 表示安装5.38.x的最新版本（不低于5.38.1），但是不安装5.39.x，也就是说安装时不改变大版本号和次要版本号。 
+    - 插入号: 比如ˆ5.38.1, ，表示安装5.x.x的最新版本（不低于5.38.1），但是不安装6.x.x，也就是说安装时不改变大版本号。 
+    - 需要注意的是，如果大版本号为0，则插入号的行为与波浪号相同，这是因为此时处于开发阶段，即使是次要版本号变动，也可能带来程序的不兼容。
+    - latest: 安装最新版本。
+- peerDependencies字段
+    - 当我们开发一个模块的时候，如果当前模块与所依赖的模块同时依赖一个第三方模块，并且依赖的是两个不兼容的版本时就会出现问题。
+    - 比如，你的项目依赖A模块和B模块的1.0版，而A模块本身又依赖B模块的2.0版。大多数情况下，这不构成问题，B模块的两个版本可以并存，同时运行。但是，有一种情况，会出现问题，就是这种依赖关系将暴露给用户。最典型的场景就是插件，比如A模块是B模块的插件。用户安装的B模块是1.0版本，但是A插件只能和2.0版本的B模块一起使用。这时，用户要是将1.0版本的B的实例传给A，就会出现问题。因此，需要一种机制，在模板安装的时候提醒用户，如果A和B一起安装，那么B必须是2.0模块。
+    - peerDependencies字段，就是用来供插件指定其所需要的主工具的版本。可以通过peerDependencies字段来限制。
+    ```json
+    {
+      "name": "myless",
+      "peerDependencies": {
+        "less": "3.9.x"
+      }
+    }
+    ```
+- bundledDependencies字段
+    - bundledDependencies指定发布的时候会被一起打包的模块.
+- optionalDependencies字段
+    - 如果一个依赖模块可以被使用， 同时你也希望在该模块找不到或无法获取时npm继续运行，你可以把这个模块依赖放到optionalDependencies配置中。这个配置的写法和dependencies的写法一样，不同的是这里边写的模块安装失败不会导致npm install失败。
+- engines字段
+    - engines字段指明了该模块运行的平台，比如Node或者npm的某个版本或者浏览器。
+    - `{ "engines" : { "node" : ">=0.10.3 <0.12", "npm" : "~1.0.20" } }`
+
+
+- 发布配置
+- os字段
+    - 可以指定你的模块只能在哪个操作系统上运行
+    - `"os" : [ "darwin", "linux", "win32" ]`
+- cpu字段
+    - 限制模块只能在某种架构的cpu下运行
+    - `"cpu" : [ "x64", "ia32" ]`
+- private字段
+    - 如果这个属性被设置为true，npm将拒绝发布它，这是为了防止一个私有模块被无意间发布出去。
+    - `"private": true`
+- publishConfig字段
+    - 这个配置是会在模块发布时生效，用于设置发布用到的一些值的集合。如果你不想模块被默认标记为最新的，或者默认发布到公共仓库，可以在这里配置tag或仓库地址。
+    - 通常publishConfig会配合private来使用，如果你只想让模块被发布到一个特定的npm仓库，如一个内部的仓库。
+    ```json
+    "private": true,
+    "publishConfig": {
+      "tag": "1.0.0",
+      "registry": "https://registry.npmjs.org/",
+      "access": "public"
+    }
+    ```
+- preferGlobal字段
+    - preferGlobal的值是布尔值，表示当用户不将该模块安装为全局模块时（即不用–global参数），要不要显示警告，表示该模块的本意就是安装为全局模块。
+    - `"preferGlobal": false`
+- browser字段
+    - browser指定该模板供浏览器使用的版本。Browserify这样的浏览器打包工具，通过它就知道该打包那个文件。
+    ```json
+    "browser": {
+      "tipso": "./node_modules/tipso/src/tipso.js"
+    },s
+    ```
+  
+  
+  
+- 第三方配置
+- typings
+    - typings字段用来指定TypeScript的入口文件：
+    - `"typings": "types/index.d.ts",`
+- eslintConfig
+    - eslint的配置可以写在单独的配置文件.eslintrc.json 中，也可以写在package.json文件的eslintConfig配置项中。
+- babel
+    - babel用来指定Babel的编译配置
+- unpkg
+    - 使用该字段可以让 npm 上所有的文件都开启 cdn 服务，该CND服务由unpkg提供：`"unpkg": "dist/vue.js"`
+- lint-staged
+    - lint-staged是一个在Git暂存文件上运行linters的工具，配置后每次修改一个文件即可给所有文件执行一次lint检查，通常配合gitHooks一起使用。
+    - 使用lint-staged时，每次提交代码只会检查当前改动的文件。
+- gitHooks
+    - itHooks用来定义一个钩子，在提交（commit）之前执行ESlint检查。在执行lint命令后，会自动修复暂存区的文件。修复之后的文件并不会存储在暂存区，所以需要用git add命令将修复后的文件重新加入暂存区。在执行pre-commit命令之后，如果没有错误，就会执行git commit命令
+    - 这里就是配合上面的lint-staged来进行代码的检查操作。
+- browserslist
+    - browserslist字段用来告知支持哪些浏览器及版本。Babel、Autoprefixer 和其他工具会用到它，以将所需的 polyfill 和 fallback 添加到目标浏览器。
+#### browserslist
+browserslist字段用来告知支持哪些浏览器及版本。Babel、Autoprefixer 和其他工具会用到它，以将所需的 polyfill 和 fallback 添加到目标浏览器。比如最上面的例子中的该字段值：
+```json
+"browserslist": {
+  "production": [
+    ">0.2%",
+    "not dead",
+    "not op_mini all"
+  ],
+  "development": [
+    "last 1 chrome version",
+    "last 1 firefox version",
+    "last 1 safari version"
+  ]
+}
+```
+这里指定了一个对象，里面定义了生产环境和开发环境的浏览器要求。上面的development就是指定开发环境中支持最后一个版本的chrome、Firefox、safari浏览器。这个属性是不同的前端工具之间共用目标浏览器和 node 版本的配置工具，被很多前端工具使用，比如Babel、Autoprefixer等。
 
 ### Webpack流程
-
 - webpack到底是如何对我们的项目进行打包的呢？
   - 事实上webpack在处理应用程序时，它会根据命令或者配置文件找到入口文件；
   - 从入口开始，会生成一个  依赖关系图，这个依赖关系图会包含应用程序中所需的所有模块（比如.js文件、css文件、图片、 字体等）；
@@ -11200,6 +11577,238 @@ console.log(str)
     - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108172704.png)
 ## 手写相关函数
 ### 手写相关函数1
+#### JS处理大数相加问题
+```js
+var number1 = 10000000000000000000000000 + 11111111111111111111111111   //理论上number1的值应该是21111111111111111111111111（javascript中会表示为科学计数法：2.111111111111111e+25）
+var number2 = 21111111111111111111111000
+console.log(number1 === number2)  //true
+```
+JavaScript Number的精度丢失问题。因为JavaScript的Number类型是遵循IEEE 754规范表示的，这就意味着JavaScript能精确表示的数字是有限的，JavaScript可以精确到个位的最大整数是9007199254740992，也就是2的53次方，超过这个范围就会精度丢失，造成JavaScript无法判断大小，从而会出现下面的现象：
+```js
+Math.pow(2, 53);    // 9007199254740992
+Math.pow(2, 53) === Math.pow(2, 53) + 1;    // true
+9007199254740992 === 9007199254740992 + 1;    // true
+```
+
+那当两个数据相加时，其中一个或者两个数据都超过了这个精度范围，直接相加结果就会不准了，那怎么解决呢？将Number转为String，然后将String转为Array，并且注意补齐较短的数组，将他们的长度标称一样再一一相加得到一个新数组，再讲和组成的新数组转为数字就可以了。
+```js
+function sumString(a, b) {
+  a = '0' + a;
+  b = '0' + b;  //加'0'首先是为了转为字符串，而且两个数相加后可能需要进位，这样保证了和的长度就是a、b中长的那个字符的长度
+  var arrA = a.split(''),  //将字符串转为数组
+      arrB = b.split(''),
+      res = [],  //相加结果组成的数组
+      temp = '',  //相同位数相加的值
+      carry = 0,  //同位数相加结果大于等于10时为1，否则为0
+      distance = a.length - b.length,  //计算两个数字字符串的长度差
+      len = distance > 0 ? a.length : b.length;  //和的长度
+  // 在长度小的那个值前加distance个0，保证两个数相加之前长度是想等的
+  if(distance > 0) {
+    for(let i = 0; i < distance; i++) {
+      arrB.unShift('0');
+    }
+  }else{
+    for(let i = 0; i < distance; i++) {
+      arrA.unShift('0');
+    }
+  }
+  // 现在得到了两个长度一致的数组，需要做的就是把他们想通位数的值相加，大于等于10的要进一
+  // 最终得到一个和组成的数组，将数组转为字符串，去掉前面多余的0就得到了最终的和
+  for(let i = len-1; i >= 0; i--) {
+    temp = Number(arrA[i]) + Number(arrB[i]) + carry;
+    if(temp >= 10) {
+      carry = 1;
+      res.unshift((temp + '')[1])
+    }
+    else{
+      carry = 0;
+      res.unshift(temp)
+    }
+  }
+  res = res.join('').replace(/^0/, '');
+  console.log(res);
+}
+```
+#### 大数相加并进行千分位展示
+```js
+// 核心都是通过数组的reduce,一个通过字符串
+var str = '123456789';
+//[9,8,7,6,5,4,3,2,1]
+function formatCash(str) {
+  //不考虑入参的判断
+  return String(str).split('').reverse().reduce((pre, next, index) => {
+    return (index % 3) ? (next + "" + pre) : (next + ',' + pre);
+  })
+}
+console.log(formatCash(str));
+
+
+
+// 核心都是通过数组的reduce,一个通过数组
+function f(str) {
+    const ret = Array.from(str).reverse().reduce((result,next,i,arr) => {
+        if((i+1)%3 === 0 && (i+1) !== arr.length) {
+            result.push(next,',')
+            return result;
+        }
+        result.push(next);
+        return result;
+        // return (index % 3) ? (next + "" + pre) : (next + ',' + pre);
+    },[])
+    return ret.reverse().join('');
+}
+
+
+
+// 除法+求模
+function format_with_mod(number) {
+    var n = number;
+    var r = ""; 
+    var temp;
+    do {
+        mod = n % 1000;
+        n = n / 1000;
+        temp = ~~mod;
+        r =  (n >= 1 ?`${temp}`.padStart(3, "0"): temp) + (!!r ? "," + r : "")
+    } while (n >= 1)
+
+    var strNumber = number + "";
+    var index = strNumber.indexOf(".");
+    if (index > 0) {
+        r += strNumber.substring(index);
+    }
+    return r;
+}
+
+
+
+
+// 正则
+function format_with_regex(number) {
+    var reg = /\d{1,3}(?=(\d{3})+$)/g;
+    return (number + '').replace(reg, '$&,');
+}
+
+function format_with_regex(number) {
+    var reg = /(\d)(?=(?:\d{3})+$)/g   
+    return (number + '').replace(reg, '$1,');
+}
+
+
+
+// toLocaleString
+function format_with_toLocaleString(number, minimumFractionDigits, maximumFractionDigits) {
+    minimumFractionDigits = minimumFractionDigits || 2;
+    maximumFractionDigits = (maximumFractionDigits || 2);
+    maximumFractionDigits = Math.max(minimumFractionDigits, maximumFractionDigits);
+
+    return number.toLocaleString("en-us", {
+        maximumFractionDigits: maximumFractionDigits || 2,
+        minimumFractionDigits: minimumFractionDigits || 2
+    })
+}
+
+
+
+
+// Intl.NumberFormat
+function format_with_Intl(number, minimumFractionDigits, maximumFractionDigits) {
+    minimumFractionDigits = minimumFractionDigits || 2;
+    maximumFractionDigits = (maximumFractionDigits || 2);
+    maximumFractionDigits = Math.max(minimumFractionDigits, maximumFractionDigits);
+
+    return new Intl.NumberFormat('en-us', {
+        maximumFractionDigits: maximumFractionDigits || 2,
+        minimumFractionDigits: minimumFractionDigits || 2
+    }).format(number)
+}
+```
+#### 金额千分位格式化函数
+```js
+const formatAmount=function (num) {
+    if(num)
+    {
+        console.log(num);
+
+        //将num中的$,去掉，将num变成一个纯粹的数据格式字符串
+        num = num.toString().replace(/\$|\,/g,'');
+        //如果num不是数字，则将num置0，并返回
+        if(''==num || isNaN(num)){return 'Not a Number ! ';}
+        //如果num是负数，则获取她的符号
+        var sign = num.indexOf("-")> 0 ? '-' : '';
+        //如果存在小数点，则获取数字的小数部分
+        var cents = num.indexOf(".")> 0 ? num.substr(num.indexOf(".")) : '';
+        cents = cents.length>1 ? cents : '' ;//注意：这里如果是使用change方法不断的调用，小数是输入不了的
+        //获取数字的整数数部分
+        num = num.indexOf(".")>0 ? num.substring(0,(num.indexOf("."))) : num ;
+        //如果没有小数点，整数部分不能以0开头
+        if('' == cents){ if(num.length>1 && '0' == num.substr(0,1)){return 'Not a Number ! ';}}
+        //如果有小数点，且整数的部分的长度大于1，则整数部分不能以0开头
+        else{if(num.length>1 && '0' == num.substr(0,1)){return 'Not a Number ! ';}}
+        //针对整数部分进行格式化处理，这是此方法的核心，也是稍难理解的一个地方，逆向的来思考或者采用简单的事例来实现就容易多了
+        /*
+          也可以这样想象，现在有一串数字字符串在你面前，如果让你给他家千分位的逗号的话，你是怎么来思考和操作的?
+          字符串长度为0/1/2/3时都不用添加
+          字符串长度大于3的时候，从右往左数，有三位字符就加一个逗号，然后继续往前数，直到不到往前数少于三位字符为止
+         */
+        for (var i = 0; i < Math.floor((num.length-(1+i))/3); i++)
+        {
+            num = num.substring(0,num.length-(4*i+3))+','+num.substring(num.length-(4*i+3));
+        }
+        //将数据（符号、整数部分、小数部分）整体组合返回
+        return (sign + num + cents);
+    }
+}
+```
+#### 手写数组随机排序？
+```js
+// 利用数组自带的sort方法
+// 这种方法是利用随机出一个正数或者负数来让数组里面的内容两两对比，是正数就是顺序，是负数则是倒序，这种方法的缺点就是随机性不高，不能完全随机，因为是两两对比，所以最后一个数在最后的可能性较大。
+var arr = [1,2,3,4,5,6,7,8,9,10]
+function foo(arr){
+    var cloneArray = arr.concat();
+    cloneArray.sort((n1,n2) => {
+        return Math.random() - 0.5
+    })
+    return cloneArray
+}
+console.log(foo(arr));
+
+
+// 利用递归函数对比
+// 递归的方法是利用递归函数的自调，定义一个随机数index（因为定了向下取整，所以范围为0~8）作为随机下标，然后将它对应的数从数组中取下压入到result数组中，从而实现随机排序，定义if判断，如果cloneArr的长度为空的话，则退出循环，这种随机的随机性很好，但是代码性能不太友好。
+var arr = [1,2,3,4,5,6,7,8,9,10]
+function foo(arr){
+    var result = []
+    var cloneArray = arr.concat();
+    (function(){
+        if(!cloneArray.length){return;}
+        var index = Math.floor(Math.random() * cloneArray.length)
+        result = result.concat(cloneArray.splice(index, 1))
+        arguments.callee()
+    })()
+    return result;
+}
+console.log(foo(arr));
+
+
+// 洗牌算法（推荐）
+// 洗牌算法呢是利用随机出的index下标对应的数，与数组从前到后相互切换，所以称为洗牌，代码运行效率相比前面几种高，随机性也很大。在这强烈推荐。
+var arr = [1,2,3,4,5,6,7,8,9,10]
+function foo(arr){
+    var cloneArray = arr.concat();
+    var length = cloneArray.length
+    for(var i = 0;i < len;i++){
+        var index = Math.floor(Math.random() * cloneArray.length)
+        var temp = cloneArray[index]
+        cloneArray[index] = cloneArray[i]
+        cloneArray[i] = temp
+    }
+    return cloneArray
+}
+console.log(foo(arr));
+
+```
 #### 手写String的indexof
 ```js
 /**
