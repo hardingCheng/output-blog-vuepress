@@ -8,7 +8,25 @@ web前端: 就是在用户可以看得见摸得着的东西。包括你浏览页
 web后端：就是用户看不见摸不着的数据库交互处理的业务逻辑。需要考虑的是如何实现功能、数据的存取、平台的稳定性与性能等。后端开发人员的目标是围绕前端构建程序，并提供所需的所有支持，并确保站点或应用始终正常运行。
 
 ## HTML
-
+### H5 新增的接口？
+- H5新特性
+  - 新增选择器 document.querySelector、document.querySelectorAll
+  - 拖拽释放(Drag and drop) API
+  - 媒体播放的 video 和 audio
+  - 本地存储 localStorage 和 sessionStorage
+  - 离线应用 manifest
+  - 桌面通知 Notifications
+  - 语意化标签 article、footer、header、nav、section
+  - 增强表单控件 calendar、date、time、email、url、search
+  - 地理位置 Geolocation
+  - 多任务 webworker
+  - 全双工通信协议 websocket
+  - 历史管理 history
+  - 跨域资源共享(CORS) Access-Control-Allow-Origin
+  - 页面可见性改变事件 visibilitychange
+  - 跨窗口通信 PostMessage
+  - Form Data 对象
+  - 绘画 canvas
 ### 如何理解 html 语义化?
 - 就是用正确的标签做正确的事
   - 头部：header
@@ -130,7 +148,7 @@ web后端：就是用户看不见摸不着的数据库交互处理的业务逻�
 
 ## CSS
 ### min-width、max-width、width的包含(优先级关系)关系？？？？？？？？？？
-### 哪些CSS属性是不被IE兼容的？
+### 哪些CSS属性是不被IE兼容的？？？？？？？？？？
 ### 实现瀑布流的方法？
 #### 什么是瀑布流布局
 瀑布流又称瀑布流式布局，是一种比较流行的页面布局方式，专业的英文名称为[Masonry Layouts]。与传统的分页显示不同，视觉表现为参差不齐的多栏布局。
@@ -2330,6 +2348,7 @@ border-radius: 水平半径 / 垂直半径;
   overflow: hidden;
 }
 ```
+### CSSOM 建立的过程中，有没有一些全局的 API 是暴露出来可供调用的 ？????????????
 ### RAF（requestAnimationFrame） 和 RIC（requestIdleCallback） 是什么
 #### 页面流畅与 FPS
 
@@ -2490,6 +2509,8 @@ Promise 也不建议在这里面进行，因为 Promise 的回调属性 Event lo
 - css雪碧图
 
 ## JS
+### 设计模式？？？？？？？？
+### WebComponent？？？？？？？？
 ### js能表示的最大整数，小数在计算机内部的存储过程？？？？？？
 ### JS如何实现多线程
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211115222810.png)
@@ -4695,6 +4716,8 @@ var deepClone = function (target, map = new WeakMap()) {
   - indexOf() 查找数组是否存在某个元素，返回下标
   - lastIndexOf() 查找指定元素在数组中的最后一个位置
   - ES7 includes() 查找数组是否包含某个元素 返回布尔
+### 数组的方法？？？？？？？？？？？
+### ES6往后了解哪些新特性?？？？？？？？？
 ### ES6
   https://juejin.cn/post/6844903959283367950
   ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210921221425.png)
@@ -4728,7 +4751,50 @@ WeakMap 对象是一组键值对的集合，其中的键是弱引用对象，而
 注意，WeakMap 弱引用的只是键名，而不是键值。键值依然是正常引用。
 
 WeakMap 中，每个键对自己所引用对象的引用都是弱引用，在没有其他引用和该键引用同一对象，这个对象将会被垃圾回收（相应的key则变成无效的），所以，WeakMap 的 key 是不可枚举的。
+### 可迭代接口怎么实现的？
+集合对象（数组、Set/Map集合）和字符串都是可迭代对象，这些对象都有默认的迭代器和Symbol.iterator属性。
+迭代器的本身是一个对象，这个对象有 next( ) 方法返回结果对象，这个结果对象有下一个返回值 value、迭代完成布尔值 done。
+```js
+function createIterator(iterms) {
+ let i = 0
+ return {
+  next() {
+   let done = (i >= iterms.length)
+   let value = !done ? iterms[i++] : undefined
+   return {
+    done,
+    value
+   }
+  }
+ }
+}
 
+let arrayIterator = createIterator([1, 2, 3])
+
+console.log(arrayIterator.next()) // { done: false, value: 1 }
+console.log(arrayIterator.next()) // { done: false, value: 2 }
+console.log(arrayIterator.next()) // { done: false, value: 3 }
+console.log(arrayIterator.next()) // { done: true, value: undefined }
+```
+### ES6 生成器创建一个迭代器?
+生成器函数的一个特点是，当执行完一句 yield 语句后函数会自动停止执行，再次调用迭代器的 next( ) 方法才会继续执行下一个 yield 语句。
+```js
+// let createIterator = function *(items) { // 生成器函数表达式
+function *createIterator(items) {
+ for (let i = 0; i < items.length; i++) {
+  yield items[i]
+ }
+}
+
+let someIterator = createIterator([123, 'someValue'])
+
+console.log(someIterator.next()) // { value: 123, done: false }
+console.log(someIterator.next()) // { value: 'someValue', done: false }
+console.log(someIterator.next()) // { value: undefined, done: true }
+
+
+```
+### ES6往后，除了可迭代接口还出现了什么新的接口？？？？？？？？
 ### CommonJS 和 ESmodules 模块化的区别
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211012163119.png)
 
@@ -6187,6 +6253,7 @@ function factorial(num, num1 = 0, num2 = 1) {
 5个 主线程，事件处理线程，渲染线程，http线程，事件触发线程
 ### js同步代码要loop很久，会不会阻塞后面代码的执行
 会的
+### 线程堵塞， 怎么解决？？？？？？？
 ### 事件循环（Event Loop）---- （JavaScript的运行机制）----JS异步
 #### 线程和进程的区别，JS是单线程的吗？
 
@@ -6661,6 +6728,8 @@ if (!bool.valueOf()) {
 
 
 ## TS
+### Typescript 有什么好处？？？？？？？？？
+### Typescript 有什么不好的地方吗？？？？？？？？？
 ### typescript 中, enum 实现原理？？？？？？？？？
 ### 列举你知道哪些 typescript 工具类型？？？？？？？？？
 ### typescript 工具类型返回的是 type 还是 interface?？？？？？？？？？
@@ -6694,6 +6763,9 @@ Node.js 是一个开源与跨平台的 JavaScript 运行时环境。在浏览器
     - 单页面浏览器应用程序。
     - 操作数据库、为前端和移动端提供基于json的API。
 ## HTTP
+
+### 两个页面之间的通信如何做？？？？？？
+### Service Worker?????????????
 ### JWT
 #### 什么是 JWT
 
@@ -7460,7 +7532,68 @@ HTTP数据请求的方式:XMLHttpRequest、ajax、fetch与axios
 
 127.0.0.1是本地循环地址，如果本地址无法ping通，则表明本地机tcp/ip协议不能正常工作。
 ping命令是使用的网络层协议ICMP
-
+### 网络通信协议？？？？？？？？（不完善）
+#### TCP/IP模型的主要协议
+- 应用层：FCP、HTTP、SMTP、DNS
+- 传输层：TCP、UDP
+- 互联网层：IP、ICMP、ARP、RARP
+#### HTTPS/SSL/TSL协议
+- https：http+ssl/tal 加密传输
+    - 一般认为工作在应用层，也有人说是传输层，是因为传输的是加密过的
+- SSL：Secure Sockets Layer安全套接层
+    - 对http传输数据进行加密
+- TSL：Transport Layer Security 传输安全协议
+    - SSL的继任者，升级版，或者叫标准化版
+#### FTP，DNS，TELNET，SMTP/POP3
+- FTP
+    - 默认端口：20
+    - 两个模式
+        - 主动模式Active Mode: 也叫 Port模式，Standard 模式： 服务器发起数据传输
+        - 被动模式Passive Mode: 也叫 PASV 模式，Passive模式： 服务器被动接收数据传输
+- DNS
+    - 提供域名解析服务，把域名解析成IP
+    - 默认端口：53
+- SMTP/POP3
+    - 邮件收发协议
+    - SMTP: 发送邮件协议，默认端口是25
+    - POP3:接收邮件协议， 默认端口110
+- Teknet
+    - 远程终端控制协议
+    - 默认端口：23
+    - 明文，不安全，已被SSL替代
+- TCP/UDP
+    - TCP
+        - 面向连接的可靠的协议<传输之前先建立连接，完成后断开连接>
+        - TCP三次握手开始：传递数据之前
+            - C->S：听得到吗？
+            - S->C：听到了，听得到吗？
+            - C->S：听到了
+            - 连接建立
+        - TCP结束连接前，四次挥手
+            - C->S：我话讲完，我不说了
+            - S->C：好，晓得的了
+            - S->C：我话也讲完，要挂了
+            - C->S：好，挂了
+    - UDP（QUIC）
+        - 提供的是非面向连接的、不可靠的数据流传输
+        - UDP在传输数据前不用在客户和服务器之间建立一个连接，且没有超时重发等机制，不保证数据按顺序传递，故而传输速度很快
+        - Eg. 邮件发送，视频直播，QQ消息等，只需要知道对方地址，不管对方是否在线接收
+    - TCP/UDP区别
+        - TCP是面向连接的服务，先建立连接再传输数据，之后再断开连接。 UDP是无连接的服务，不需要事先建立连接，直接发送数据；
+        - TCP保证数据的正确性，UDP可能丢包 eg.视频直播选标清比高清就是少了数据包。
+        - TCP 传输速度慢，UDP速度快
+- IP/ICMP
+    - IP协议
+        - ipv4、ipv6
+        - 网络位主机位前三位
+    - ICMP
+        - ping [-t] [-a] [-l] ip ：
+        - -t:不间断连续ping, 手动结束 ctrl+c <不加-t,默认ping 三次>
+        - -l: 指定包含字节数<用多少字节去ping> 默认是32字节。
+### 域名访问和ip访问区别
+1. ip访问对应某一台确定的服务器；
+2. 域名访问相当于在ip访问的基础上，做了一个反向代理的中间功能。例如：百度，很多人会同时使用，如果使用的是同一台服务器的话，服务器估计会扛不住，如果访问的是域名，中间的反向代理，可以将用户反向代理到不同的服务器上，减轻服务器压力。
+### 怎么进行域名和 IP 的换绑 ？？？？？？？？？
 ### TCP三次握手和四次挥手
 - 为什么要进行三次握手：为了确认对方的发送和接收能力。
   - 第一次握手：建立连接时，客户端发送syn包（syn=j）到服务器，并进入SYN_SENT状态，等待服务器确认；SYN：同步序列编号（Synchronize Sequence Numbers）。
@@ -8247,8 +8380,54 @@ http缓存机制主要在http响应头中设定，响应头中相关字段为Exp
   - 整个查询过程就这样一级接一级的查询下去，最终会找到完整域名所对应的服务器 IP 地址。找到后同样会回传给客户端委托查询域名信息的 DNS 服务器，然后该 DNS 服务器会将该 IP 地址发送回客户端计算机，同时将本次的查询结果保存在缓存中，以备下次查询是直接使用（有效期内）。
 
 ## 页面渲染和性能优化
-### （浏览器从输入 url 到页面渲染的整个流程）页面渲染
+### 浏览器渲染原理和关键渲染路径？
+浏览器将HTML，CSS，JavaScript转换为屏幕上所呈现的实际像素，这期间所经历的一系列步骤，叫做关键渲染路径（Critical Rendering Path）。
 
+首先，浏览器获取HTML并开始构建DOM（文档对象模型 - Document Object Model）。然后获取CSS并构建CSSOM（CSS对象模型 - CSS Object Model）。然后将DOM与CSSOM结合，创建渲染树（Render Tree）。然后找到所有内容都处于网页的哪个位置，也就是布局（Layout）这一步。最后，浏览器开始在屏幕上绘制像素。
+
+
+构建DOM -> 构建CSSOM -> 构建渲染树 -> 布局 -> 绘制。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211118092847.png)
+
+#### 构建DOM
+- 浏览器从磁盘和网络上读取html原始字节。并根据文本的指定编码，将它们转换为各个字符。
+- 令牌化
+- 词法分析
+- DOM构建
+
+#### CSS对象模型 CSSOM 
+在浏览器构建页面DOM时，在文档head部分遇到了一个link标记。该标记引用一个外部css样式表: style.css。浏览器发送请求获取到style.css以后，与处理html一样，我们需要将收到的css规则转换为某种某种浏览器能够识别的东西，因此我们会重复html过程: css 字节转换成字符，接着转换成令牌和节点， 最后链接到一个称为css对象模型的树结构中。
+
+#### 构建渲染树
+- 渲染树
+    - DOM树和CSSOM树合并后形成渲染树。
+    - 渲染树只包含渲染网页所需的节点。
+    - 布局计算每个对象的精确位置和大小。
+    - 最后一步是绘制，使用最终渲染树将像素渲染到屏幕上。
+- 构建渲染树的步骤
+    - 从DOM树的根开始，遍历每个可见节点。
+        - 一些节点不可见，比如说script，meta类似这样的tag，就不会被挂载到渲染树上。
+        - 一些节点如果被设置了display:none, 则不会被挂载到渲染树上。
+    - 对于每个可见的节点，找到合适的CSSOM规则去匹配它们。
+    - 将计算样式和可见节组合成render tree
+
+#### 布局
+- 当我们有了渲染树，我们就可以进入到布局阶段了。
+- 当构建完成渲染树后，我们确定了哪些节点是可见的以及它们的计算样式，但是我们尚未计算它们在视口内的确切位置和大小。 这个确定的阶段就是布局阶段，也称重排。
+- 布局流程的输出是一个盒模型，它会精确的捕获每一个元素在视口内的确切位置和尺寸。 所有的相对测量值都转换为屏幕上的绝对像素。
+- 现在我们知道了哪些节点可见，它们的计算样式和几何信息。我们终于可以将这些信息传递给最后一个阶段： 将渲染树中的每个节点转换成屏幕上的实际像素。这一步通常被称为"绘制" 或 "栅格化"
+#### 绘制（回流和重绘）？？？？？？？？？？、
+https://juejin.cn/post/7022245003254562852
+这个过程涉及两个比较重要的概念回流和重绘，DOM结点都是以盒模型形式存在，需要浏览器去计算位置和宽度等，这个过程就是回流。等到页面的宽高，大小，颜色等属性确定下来后，浏览器开始绘制内容，这个过程叫做重绘。浏览器刚打开页面一定要经过这两个过程的，但是这个过程非常非常非常消耗性能，所以我们应该尽量减少页面的回流和重绘。
+#### 总结渲染过程
+执行渲染树构建，布局和绘制所需时间将取决于文档大小，应用的样式，以及运行文档的设备：文档越大，浏览器就需要完成的工作越多，样式越复杂，绘制的时间就越长。
+
+- 处理html标记并构建dom树。
+- 处理css标记并构建CSSOM树。
+- 将dom和cssom树合并成一个渲染树。
+- 根据渲染树来布局，以计算每个节点的几何信息。
+- 将各个节点绘制到屏幕上。
+### （浏览器从输入 url 到页面渲染的整个流程）页面渲
 很多大公司面试喜欢问这样一道面试题，输入URL到看见页面发生了什么？
 
 ```md
@@ -8272,14 +8451,12 @@ DNS 解析 URL 对应的 IP
 ```
 
 #### DNS解析
-
 详情请见  面试题目中的DNS过程
 可以优化的点:
     - DNS缓存:从离浏览器的距离排序的话，有以下几种: 浏览器缓存，系统缓存，路由器缓存，IPS服务器缓存，根域名服务器缓存，顶级域名服务器缓存，主域名服务器缓存。
     - DNS负载均衡:DNS可以返回一个合适的机器的IP给用户，例如可以根据每台机器的负载量，该机器离用户地理位置的距离等等，这种过程就是DNS负载均衡。
 
 #### 发起TCP连接
-
 TCP提供一种可靠的传输，这个过程涉及到三次握手，四次挥手，TCP提供一种面向连接的，可靠的字节流服务。
 - 三次握手
   - 第一次握手：
@@ -8472,7 +8649,6 @@ TCP提供一种可靠的传输，这个过程涉及到三次握手，四次挥�
   - 尽量缓存DOM查找，查找器尽量简洁；
   - 涉及多域名的网站，可以开启域名预解析
 ### 提高首屏展示效率
-
 - Vue-Router路由懒加载（利用Webpack的代码切割）
 - 使用CDN加速，将通用的库从vendor进行抽离
 - Nginx的gzip压缩
@@ -8737,7 +8913,85 @@ SPA是怎么实现的呢？为什么不需要重新加载页面就能达到页�
     - 2.数据变化，React手动(setState)，Vue自动(初始化已响应式处理，Object.defineProperty，Proxy)
     - 3.React单向绑定，Vue双向绑定
     - 4.React的Redux，Vue的Vuex
-### v-model原理？？？？？？？？
+### v-model原理？
+#### v-model原理
+v-model实际上时语法糖，下面就是语法糖的构造过程。
+
+而v-model自定义指令下包裹的语法是input的value属性、input事件，整个过程是：
+```js
+<input v-modle="inputV" />
+// 等同于
+<input :value="inputV" @input="inputV = $event.target.value"/>
+
+// input属性绑定——inputV变量，也就是将值传给input；
+// input事件，该事件在input的值inputV改变时触发，事件触发时给inputV重新赋值，所赋的值是$event.target.value，也就是当前触发input事件对象的dom的value值，也就是该input的值。
+// 这就完成了v-model的数据双向绑定。
+
+
+
+
+
+// text和textarea元素：v-model使用value属性设置初始值并绑定变量，input事件更新值；
+// checkbox和radio元素：v-model使用checked属性设置初始值并绑定变量，change事件更新值；
+// select元素：v-model使用value属性设置初始值并绑定变量，change事件更新值；
+// 看似执行了v-model一个指令
+<input type="checkbox" v-model="checkedNames">
+// 实际上
+<input
+  type="checkbox" 
+  :value="checkedNames" 
+  @change="checkedNames = $event.target.value" 
+/>
+```
+#### 自定义组件的v-model
+```js
+// 父组件标签写法
+<my-component v-model="myData" />
+
+
+// 子组件写法，按照value值绑定和input事件更新值来拆解。
+props:{
+  value:{
+    type:String,
+    default:''
+  }
+}
+this.$emit('input', newData);
+
+// 这样就是在组件内部拿到了值，并且手动触发input事件更新了值，但在父组件只需要写入v-model指令即可，也算是父子组件传值的一种。
+```
+### .sync和v-model的区别
+#### v-model的作用
+双向绑定实现 单向数据流
+#### .sync作用
+实现父子组件数据之间的双向绑定，与v-model类似。
+类别在于：一个组件上只能有一个v-model，.sync修饰符可以有多个。
+```js
+// 正常父传子： 
+<com1 :a="num" :b="num2"></com1>
+​
+// 加上sync之后父传子： 
+<com1 :a.sync="num" .b.sync="num2"></com1> 
+​
+// 它等价于
+<com1 
+  :a="num" @update:a="val=>num=val"
+  :b="num2" @update:b="val=>num2=val"></com1> 
+// 相当于多了一个事件监听，事件名是update:a，回调函数中，会把接收到的值赋值给属性绑定的数据项中。
+
+
+// 父子组件中使用.sync通信 ,子组件用props接收传递的值(绑定的属性名自己决定) 在子组件中通过$emit方法触发'update:属性名'事件 实现父组件子组件值同时变化
+// 子组件
+$emit('update:属性名',要修改的值)
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211118100514.png)
+#### .sync与v-model区别是
+- 相同点：都是语法糖，都可以实现父子组件中的数据的双向通信。
+- 区别点：
+    - 格式不同。 v-model="num", :num.sync="num"
+    - v-model： @input + value
+    - :num.sync: @update:num
+    - v-model只能用一次；.sync可以有多个。
 ### Vue设置自定义指令？？？？？？？ 全栈然叔的课程是有的，介绍的很详细
 - Vue指令
     - Vue的指令以v-开头，作用在HTML元素上，将指令绑定在元素上，给绑定的元素添加一些特殊行为。
@@ -11577,6 +11831,17 @@ console.log(str)
     - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108172704.png)
 ## 手写相关函数
 ### 手写相关函数1
+#### 生成指定长度的随机字符串
+```js
+function generateRamStr(len, charSet) {
+  const chars = charSet || "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let randomStr = "";
+  for (var i = 0; i < len; i++) {
+    randomStr += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return randomStr;
+}
+```
 #### JS处理大数相加问题
 ```js
 var number1 = 10000000000000000000000000 + 11111111111111111111111111   //理论上number1的值应该是21111111111111111111111111（javascript中会表示为科学计数法：2.111111111111111e+25）
@@ -12535,7 +12800,7 @@ console.log(isEqual(obj1, obj2)) //true
   const testArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
   const resArr = getTenNum(testArray, 14);
   ```
-#### 手写-字符串最长的不重复子串
+#### 手写-字符串最长的不重复子串(最长不含重复字符的子字符串)
   ```js
   const lengthOfLongestSubstring = function (s) {
   if (s.length === 0) {
@@ -15758,9 +16023,11 @@ function sleep(s){
     }`
 
 ```
+### 手写相关函数2
 ## Git
-### git命令
-### 一个业务场景：a，b，c，d，要删除c的提交，git怎么操作（git revert）
+### CI/CD？？？？？？？？？
+### git命令？？？？？？？？
+### 一个业务场景：a，b，c，d，要删除c的提交，git怎么操作（git revert）？？？？？？？
 ## 色子点数
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211111101458.png)
