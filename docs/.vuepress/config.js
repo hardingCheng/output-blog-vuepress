@@ -84,7 +84,7 @@ module.exports = {
                         text: 'js',
                         items: [
                             {text: 'JavaScript', link: '/interview/js'},
-                            {text: '大厂面经总结', link: '/interview/interviewq'},
+                            {text: '大厂面经总结', link: '/interview/interview-collection'},
                         ]
                     },
                     {
