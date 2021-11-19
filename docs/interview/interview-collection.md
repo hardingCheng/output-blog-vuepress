@@ -2509,7 +2509,6 @@ Promise 也不建议在这里面进行，因为 Promise 的回调属性 Event lo
 - css雪碧图
 
 ## JS
-### 设计模式？？？？？？？？
 ### WebComponent？？？？？？？？
 ### js能表示的最大整数，小数在计算机内部的存储过程？？？？？？
 ### JS如何实现多线程
@@ -6725,7 +6724,7 @@ if (!bool.valueOf()) {
 - 观察者模式 (响应式数据原理)
 - 装饰模式: (@装饰器的用法)
 - 策略模式 策略模式指对象有某个行为,但是在不同的场景中,该行为有不同的实现方案-比如选项的合并策略
-
+### 设计模式？？？？？？？？
 
 ## TS
 ### Typescript 有什么好处？？？？？？？？？
@@ -6764,8 +6763,126 @@ Node.js 是一个开源与跨平台的 JavaScript 运行时环境。在浏览器
     - 操作数据库、为前端和移动端提供基于json的API。
 ## HTTP
 
-### 两个页面之间的通信如何做？？？？？？
+### 两个页面之间的通信如何做？
+#### postMessage
+window.postMessage()方法可以安全地实现Window对象之间的跨域通信。例如，在一个页面和它生成的弹出窗口之间，或者是页面和嵌入其中的iframe之间。
+
+通常情况下，不同页面上的脚本允许彼此访问，当且仅当它们源自的页面共享相同的协议，端口号和主机（也称为“同源策略”）。window.postMessage()提供了一个受控的机制来安全地规避这个限制（如果使用得当的话）。
+
+一般来说，一个窗口可以获得对另一个窗口的引用(例如，通过targetWindow=window.opener)，然后使用targetWindow.postMessage()在其上派发MessageEvent。接收窗口随后可根据需要自行处理此事件。传递给window.postMessage()的参数通过事件对象暴露给接收窗口
+```js
+// postMessage程序
+var receiver = document.getElementById('receiver').contentWindow;//origin窗口
+var btn = document.getElementById('send');//发送消息
+btn.addEventListener('click', function (e) {
+    e.preventDefault();
+    var val = document.getElementById('text').value;
+    receiver.postMessage("Hello "+val+"！", "http://res.42du.cn");//将信息发送到http://res.42du.cn窗口
+}); 
+
+
+
+// 参数和语法
+targetWindow.postMessage(message, targetOrigin, [transfer]);
+//message:发送的信息
+//targetOrigin:argetOrigin就是指定目标窗口的来源，必须与消息发送目标相一致，可以是字符串“*”或URI。 *表示任何目标窗口都可接收，为安全起见，请一定要明确提定接收方的URI。
+//transfer是可选参数
+
+
+
+// 接收端
+window.addEventListener("message", receiveMessage, false);
+function receiveMessage(event){
+  if (event.origin !== "http://www.42du.cn")
+    return;
+}
+//event对象有三个属性，分别是origin，data和source。event.data表示接收到的消息；event.origin表示postMessage的发送来源，包括协议，域名和端口；event.source表示发送消息的窗口对象的引用; 我们可以用这个引用来建立两个不同来源的窗口之间的双向通信。 
+```
+```js
+// 发送端
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>42度空间-window.postMessage()跨域消息传递</title>
+</head>
+<body>
+<div>
+    <input id="text" type="text" value="42度空间" />
+    <button id="send" >发送消息</button>
+</div>
+<iframe id="receiver" src="http://res.42du.cn/static/html/receiver.html" width="500" height="60">
+    <p>你的浏览器不支持IFrame。</p>
+</iframe>
+<script>
+    window.onload = function() {
+        var receiver = document.getElementById('receiver').contentWindow;
+        var btn = document.getElementById('send');
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            var val = document.getElementById('text').value;
+            receiver.postMessage("Hello "+val+"！", "http://res.42du.cn");
+        });
+    }
+</script>
+</body>
+</html>
+
+
+
+// 接收程序
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>42度空间-从www.42du.cn接收消息</title>
+</head>
+<body>
+<div id="message">
+    Hello World!
+</div>
+<script>
+    window.onload = function() {
+        var messageEle = document.getElementById('message');
+        window.addEventListener('message', function (e) {
+            alert(e.origin);
+            if (e.origin !== "http://www.42du.cn") {
+                return;
+            }
+            messageEle.innerHTML = "从"+ e.origin +"收到消息： " + e.data;
+        });
+    }
+</script>
+</body>
+</html>
+```
+#### webSocket
+所有的WebSocket都监听同一个服务器地址，利用send发送消息，利用onmessage获取消息的变化，不仅能窗口，还能跨浏览器，兼容性最佳，只是需要消耗点服务器资源。
+```js
+var ws = new WebSocket("ws://localhost:3000/")
+ws.onopen = function (event) {
+  // 或者把此方法注册到其他事件中，即可与其他服务器通信
+  ws.send({now : Date.now()}); // 通过服务器中转消息
+};
+ws.onmessage = function (event) {
+  // 消费消息
+  console.log(event.data);
+}
+```
+#### localstorage
+一个窗口更新localStorage，另一个窗口监听window对象的”storage”事件，来实现通信。(localStorage需要同源窗口才能共享，即协议，域名，端口一致)
+```js
+// 本窗口的设值代码
+localStorage.setItem('aaa', (Math.random()*10).toString())
+
+// 其他窗口监听storage事件
+window.addEventListener("storage", function (e) {
+  console.log(e)
+  console.log(e.newValue)
+})
+```
 ### Service Worker?????????????
+### Webworker Service Worker区别??????
 ### JWT
 #### 什么是 JWT
 
@@ -7710,7 +7827,7 @@ RTP本身没有提供按时发送机制或其他服务质量（QoS）保证，�
 - 发起人：
   - AJAX 客户端发起
   - WebSocket 服务器端和客户端相互推送
-### websocket如何建立连接，手写websocket建立过程？？？？？？？？？？
+### WebSocket如何建立连接，手写WebSocket建立过程？？？？？？？？？？
 ### 跨域的方案
 #### 同源是什么？
 如果两个URL的协议`protocol`、主机名`host`和端口号`port`都相同的话，则这两个URL是同源。
@@ -7719,7 +7836,6 @@ RTP本身没有提供按时发送机制或其他服务质量（QoS）保证，�
 - WebSocket（不受同源策略的限制）
 - CORS（支持跨域通信，也支持同源通信）
 #### 跨域是什么？
-
 **当协议、域名与端口号中任意一个不相同时，都算作不同域，不同域之间相互请求资源的表现(非同源策略请求)，称作”跨域“**。
 - 造成跨域的几种常见表现
   - 服务器分开部署（Web服务器 + 数据请求服务器）
@@ -8848,6 +8964,7 @@ const routes: Array<RouteConfig> = [
 
 - IP（Internet Protocol）独立IP数，是指1天内多少个独立的IP浏览了页面，即统计不同的IP浏览用户数量。同一IP不管访问了几个页面，独立IP数均为1；不同的IP浏览页面，计数会加1。 IP是基于用户广域网IP地址来区分不同的访问者的，所以，多个用户（多个局域网IP）在同一个路由器（同一个广域网IP）内上网，可能被记录为一个独立IP访问者。如果用户不断更换IP，则有可能被多次统计。
 ## Vue
+### PWA????????????
 ### SSR
 #### 什么是SSR
 SSR是Server Side Render简称，叫服务端渲染
@@ -9024,6 +9141,118 @@ Vue.directive('my-directive', {
 ```
 ### Vue手写渲染函数？？？？？？？全栈然叔的课程是有的，介绍的很详细
 ### Vue 组件修饰符？？？？？？？
+### Vue 该如何实现组件缓存？
+Vue中有个动态组件的概念，它能够帮助开发者更好的实现组件之间的切换，但是动态组件在切换的过程中，组件的实例都是重新创建的，而在面对需求频繁的变化，要频繁的切换组件时，我们就需要保留组件的状态来节约性能。
+
+
+为了解决组件频繁切换造成性能浪费问题，需要使用到 Vue 中内置组件<keep-alive>
+使用<keep-alive></keep-alive> 包裹动态组件时，会缓存不活动的组件实例,主要用于保留组件状态或避免重新渲染
+
+### 什么是异步组件？
+将应用分割成小一些的代码块，并且只在需要的时候才从服务器加载一个模块。为了简化，Vue 允许你以一个工厂函数的方式定义你的组件，这个工厂函数会异步解析你的组件定义。Vue 只有在这个组件需要被渲染的时候才会触发该工厂函数，且会把结果缓存起来供未来重渲染。
+
+简单来说是一个概念，一个可以让组件异步加载的方式；它一般会用于性能优化，比如减小首屏加载时间、加载资源大小。
+#### Vue2.x的异步组件？
+```js
+// 就是异步组件是通过将组件定义为返回 Promise 的函数来创建的
+const Student = () => import('pages/student/list')
+const StudentDetail = () => import('pages/student/detail')
+
+
+
+// src/router/routes.js
+const routes = [
+  {
+    path: '/',
+    name: '首页',
+    component: Home,
+  },
+  {
+    path: '/student',
+    name: '学生管理',
+    component: () => import('pages/student/list');
+  },
+  {
+    path: '/student-detail/:id',
+    name: '学生详情',
+    component: StudentDetail,
+  },
+  /// ...
+]
+```
+#### Vue3.0的异步组件？
+在 Vue3.x 中可使用 defineAsyncComponent。在 Vue 3 中，由于函数式组件被定义为纯函数，因此异步组件需要通过将其包裹在新的  defineAsyncComponent 。
+```js
+import { defineAsyncComponent } from 'vue'
+import ErrorComponent from './components/ErrorComponent.vue'
+import LoadingComponent from './components/LoadingComponent.vue'
+
+/// 不带选项的异步组件
+const asyncModalStudent = defineAsyncComponent(() => import('pages/student/list'))
+
+/// 带选项的异步组件
+const asyncModalStudentDetailWithOptions = defineAsyncComponent({
+  loader: () => import('pages/student/detail'),
+  delay: 200,
+  timeout: 3000,
+  errorComponent: ErrorComponent,
+  loadingComponent: LoadingComponent,
+})
+```
+### 动态引入组件有什么好处？
+动态组件：是Vue中一个特殊的Html元素：<component>，它拥有一个特殊的 is 属性，属性值可以是 已注册组件的名称 或 一个组件的选项对象，它是用于不同组件之间进行动态切换的。
+
+Vue中有个动态组件的概念，它能够帮助开发者更好的实现组件之间的切换，但是动态组件在切换的过程中，组件的实例都是重新创建的，而在面对需求频繁的变化，要频繁的切换组件时，我们就需要保留组件的状态来节约性能。
+
+
+为了解决组件频繁切换造成性能浪费问题，需要使用到 Vue 中内置组件<keep-alive>
+使用<keep-alive></keep-alive> 包裹动态组件时，会缓存不活动的组件实例,主要用于保留组件状态或避免重新渲染
+```js
+// 组件的切换方式
+// 方式一: 使用 v-if和v-else
+// 变量flag为true时显示comp-a组件 ,相反则显示comp-b组件
+<comp-a v-if="flag"></comp-a>
+
+<comp-b v-else></comp-b>
+
+
+
+
+// 方式二:使用内置组件:<component></component>
+// 点击切换登录,注册,退出组件
+   <template>
+     <div>
+        <a href="#" @click.prevent="comName = 'login'">登录</a>
+        <a href="#" @click.prevent="comName = 'register'">注册</a>
+        <a href="#" @click.prevent="comName = 'logOut'">退出</a>
+        
+        //  <component></component> 来展示对应名称的组件,相当于一个占位符
+        //    :is 属性指定 组件名称
+
+      <component :is="comName"></component>
+      </div>
+    </template>
+    
+    
+    
+    
+
+// 方式三 : vue-router
+// 路由规则:
+  {
+    path: '/login',
+    name: 'login',
+    component: () => import('../views/login.vue')
+  },
+  {
+    path: '/register',
+    name: 'register',
+    component: () => import('../views/register.vue')
+  },
+  
+  // 需要展示组件的位置:
+   <router-view />
+```
 ### Vue组件间传值的方法有哪些?
 1. props、$emit()
 ```js
@@ -10797,6 +11026,7 @@ Webpack 的运行流程是一个串行的过程：
 - 完成模块编译：在经过第4步使用 Loader 翻译完所有模块后，得到了每个模块被翻译后的最终内容以及它们之间的依赖关系
 - 输出资源：根据入口和模块的依赖关系，组装成一个个包含多个模块的chunk，然后将chunk转换成一个单独的文件加入输出列表，这是可以修改输出内容的最后机会
 - 输出完成：在确定好输出内容后，根据配置确定输出的路径和文件名，把文件内容写入到文件系统
+### webpack打包的生命周期??????????????
 ### Webpack特点
 - 代码分割
   - Webpack 有两种组织模块依赖的方式，同步和异步。异步依赖作为分割点，形成一个新的块。在优化了依赖树后，每一个异步区块都作为一个文件被打包。
@@ -10808,15 +11038,6 @@ Webpack 的运行流程是一个串行的过程：
   - Webpack 还有一个功能丰富的插件系统。大多数内容功能都是基于这个插件系统运行的，还可以开发和使用开源的 Webpack 插件，来满足各式各样的需求。
 - 支持热模块替换(HMR)
 - 在开发应用时使用 Webpack，开发库时使用 Rollup。
-### Webpack的loader和plugins的区别
-  
-Loader 本质就是一个函数，在该函数中对接收到的内容进行转换，返回转换后的结果。 因为 Webpack 只认识 JavaScript，所以 Loader 就成了翻译官，对其他类型的资源进行转译的预处理工作。
-
-Plugin 就是插件，基于事件流框架 Tapable，插件可以扩展 Webpack 的功能，在 Webpack 运行的生命周期中会广播出许多事件，Plugin 可以监听这些事件，在合适的时机通过 Webpack 提供的 API 改变输出结果。
-
-Loader 在 module.rules 中配置，作为模块的解析规则，类型为数组。每一项都是一个 Object，内部包含了 test(类型文件)、loader、options (参数)等属性。
-
-Plugin 在 plugins 中单独配置，类型为数组，每一项是一个 Plugin 的实例，参数都通过构造函数传入。
 ### 有哪些常见的Loader？你用过哪些Loader？
 
 - raw-loader：加载文件原始内容（utf-8）
@@ -10841,9 +11062,9 @@ Plugin 在 plugins 中单独配置，类型为数组，每一项是一个 Plugin
 - vue-loader：加载 Vue.js 单文件组件
 - i18n-loader: 国际化
 - cache-loader: 可以在一些性能开销较大的 Loader 之前添加，目的是将结果缓存到磁盘里
-
+### plugin?????????????????
+### plugin 的执行顺序???????????
 ### 有哪些常见的Plugin？你用过哪些Plugin？
-
 - define-plugin：定义环境变量 (Webpack4 之后指定 mode 会自动配置)
 - ignore-plugin：忽略部分文件
 - html-webpack-plugin：简化 HTML 文件创建 (依赖于 html-loader)
@@ -10857,9 +11078,10 @@ Plugin 在 plugins 中单独配置，类型为数组，每一项是一个 Plugin
 - ModuleConcatenationPlugin: 开启 Scope Hoisting
 - speed-measure-webpack-plugin: 可以看到每个 Loader 和 Plugin 执行耗时 (整个打包耗时、每个 Plugin 和 Loader 耗时)
 - webpack-bundle-analyzer: 可视化 Webpack 输出文件的体积 (业务组件、依赖第三方模块)
-
+### loader?????????????????
+### loader 的执行顺序
+默认情况下是：从右往左，从下往上。
 ### 是否写过Loader？简单描述一下编写loader的思路？
-
 Loader 支持链式调用，所以开发上需要严格遵循“单一职责”，每个 Loader 只负责自己需要负责的事情。
 
 - Loader 运行在 Node.js 中，我们可以调用任意 Node.js 自带的 API 或者安装第三方模块进行调用
@@ -10881,9 +11103,16 @@ webpack在运行的生命周期中会广播出许多事件，Plugin 可以监听
   - watch-run 当依赖的文件发生变化时会触发
 
 - 异步的事件需要在插件处理完任务时调用回调函数通知 Webpack 进入下一个流程，不然会卡住
-### webpack Plugin 和 Loader 的区别
-- Loader
-  - 用于对模块源码的转换，loader 描述了 webpack 如何处理非 javascript 模块，并且在 bundle 中引入这些依赖。loader 可以将文件从不同的语言（如 TypeScript）转换为 JavaScript，或者将内联图像转换为 data URL。比如说：CSS-Loader，Style-Loader 等。
+### Webpack的loader和plugins的区别
+  
+Loader 本质就是一个函数，在该函数中对接收到的内容进行转换，返回转换后的结果。 因为 Webpack 只认识 JavaScript，所以 Loader 就成了翻译官，对其他类型的资源进行转译的预处理工作。
+
+Plugin 就是插件，基于事件流框架 Tapable，插件可以扩展 Webpack 的功能，在 Webpack 运行的生命周期中会广播出许多事件，Plugin 可以监听这些事件，在合适的时机通过 Webpack 提供的 API 改变输出结果。
+
+Loader 在 module.rules 中配置，作为模块的解析规则，类型为数组。每一项都是一个 Object，内部包含了 test(类型文件)、loader、options (参数)等属性。
+
+Plugin 在 plugins 中单独配置，类型为数组，每一项是一个 Plugin 的实例，参数都通过构造函数传入。
+
 ### source map是什么？生产环境怎么用？
 source map 是将编译、打包、压缩后的代码映射回源代码的过程。打包压缩后的代码不具备良好的可读性，想要调试源码就需要 soucre map。map文件只要不打开开发者工具，浏览器是不会加载的。
 
@@ -11378,6 +11607,8 @@ Vite(读音类似于[weɪt]，法语，快的意思) 是一个由原生 ES Modul
 - 即时热模块更换（热更新）
 - 真正的按需编译
   Vite 要求项目完全由 ES Module 模块组成，common.js 模块不能直接在 Vite 上使用。因此不能直接在生产环境使用。在打包上依旧还是使用 rollup 等传统打包工具。因此 Vite 目前更像是一个类似于 webpack-dev-server 的开发工具.
+### Vite为什么这么快??????????????
+### ES Module是什么?????????cjs amd cmd umd
 ### Vite 的基本实现原理
 Vite 的基本实现原理，就是启动一个 koa 服务器拦截浏览器请求ES Module的请求。通过 path 找到目录下对应的文件做一定的处理最终以 ES Modules 格式返回给客户端
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211008174614.png)
@@ -16024,12 +16255,474 @@ function sleep(s){
 
 ```
 ### 手写相关函数2
-## Git
-### CI/CD？？？？？？？？？
-### git命令？？？？？？？？
-### 一个业务场景：a，b，c，d，要删除c的提交，git怎么操作（git revert）？？？？？？？
-## 色子点数
+## Git/规范
+### CI/CD？
+CI/CD 是一种通过在应用开发阶段引入自动化来频繁向客户交付应用的方法。
 
+CI/CD 的核心概念是持续集成、持续交付和持续部署。它是作为一个面向开发和运营团队的解决方案，主要针对在集成新代码时所引发的问题（也称为：“集成地狱”）。
+
+CI/CD 可让持续自动化和持续监控贯穿于应用的整个生命周期（从集成和测试阶段，到交付和部署）。
+
+这里提供一些常用的 CI/CD 工具：Jenkins、GitHub Actions、GitLab CI、Travis CI
+#### CI 全名是 Continuous Integration —— 持续集成；
+协同开发是目前主流的开发方式，也就是多位开发人员可以同时处理同一个应用的不同模块或者功能。将所有开发分支代码集成在一起，最终可能会花费很多时间和进行很多重复劳动，费事费力。因为代码冲突是难以避免的。持续集成（CI）可以帮助开发者更加方便地将代码更改合并到主分支。一旦开发人员将改动的代码合并到主分支，系统就会通过自动构建应用，并运行不同级别的自动化测试（通常是单元测试和集成测试）来验证这些更改，确保这些更改没有对应用造成破坏。如果自动化测试发现新代码和现有代码之间存在冲突，CI 可以更加轻松地快速修复这些错误。
+
+
+CI 持续集成 描述了存储库变更过程。
+- 我们可以协同工作，最后的更改都会应用到 master（main） 分支上；但这样一个简单的模型也隐藏着一些问题：
+    - 如何知道 master 分支的代码部署成功了？
+        - 每次推送更改时，Git 服务器都会向 CI 服务器发送一个通知；
+        - CI 服务器克隆存储库，检出分支，并与主分支合并；
+        - 然后启动构建脚本；
+        - 如果返回 Code 为 0，则表示构建成功。否则，被视为失败；
+        - CI 服务器将带有构建结果的请求发送到 Git 服务器；
+        - 如果构建成功，则允许合并请求。否则，合并被阻止；
+        - 这个过程保证合并到主分支的代码不会破坏构建！
+        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211119085910.png)
+    - 如何验证单元测试的覆盖率？
+        - 在任何时候，master 分支的测试覆盖率都不应低于 50%；我们可以借助 Jacoco plugin 插件来实现这一检测；
+        - 借助 SonarCloud ，可以实现只检查新增代码的测试覆盖率！
+        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211119090351.png)
+    - 如何判断团队成员是否按统一的代码规范来编码？
+        - 可以借助 Checkstyle 插件！比如代码中有一个未使用的 import ，则直接返回构建失败；当然，这个可以根据项目需求来个性配置；
+    - 这些问题也可以手动验证，但就是麻烦、低效、易出错；不如交给自动化的 CI ，它就是来干这个的！
+#### CD 全名是 Continuous Delivery —— 持续交付；
+CD 持续交付 描述了项目新版本自动部署的过程。
+CD 持续交付（Continuous Delivery）:
+CI 在完成了构建、单元测试和集成测试这些自动化流程后，持续交付可以自动把已验证的代码发布到企业自己的存储库。
+持续交付旨在建立一个可随时将开发环境的功能部署到生产环境的代码库。在持续交付过程中，每个步骤都涉及到了测试自动化和代码发布自动化。在流程结束时，运维团队可以快速、轻松地将应用部署到生产环境中。
+
+CD 持续部署（Continuous Deployment）:
+对于一个完整、成熟的 CI/CD 管道来说，最后的阶段是持续部署。它是作为持续交付的延伸，持续部署可以自动将应用发布到生产环境。实际上，持续部署意味着开发人员对应用的改动，在编写完成后的几分钟内就能及时生效（前提是它通过了自动化测试）。这更加便于运营团队持续接收和整合用户反馈。总而言之，所有这些 CI/CD 的关联步骤，都极大地降低了应用的部署风险。不过，由于还需要编写自动化测试以适应 CI/CD 管道中的各种测试和发布阶段，因此前期工作量还是很大的。
+
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211119090459.png)
+之前的 CI 服务器演变成了现在的 CI/CD 服务器，你可以将 CI 作业委派给 GitLab CI，将 CD 作业委派给 Jenkins。
+- CD
+    - 请求合并时部署；
+    - 定时器部署；
+    - Pull Request 合到特定分支时进行部署；
+    - 还可组合以上选项；
+#### CI 和 CD 有什么区别？
+- CI/CD 中的“CI”始终指持续集成
+    - 它属于开发人员的自动化流程。成功的 CI 意味着应用代码的新更改会定期构建、测试并合并到共享存储库中。该解决方案可以解决在一次开发中有太多应用分支，从而导致相互冲突的问题。
+- CI/CD 中的“CD”指的是持续交付和/或持续部署，
+    - 这些相关概念有时会交叉使用。两者都事关管道后续阶段的自动化，但它们有时也会单独使用，用于说明自动化程度。
+    - 持续交付（第一种CD）通常是指开发人员对应用的更改会自动进行错误测试并上传到存储库（如 GitHub 或容器注册表），然后由运维团队将其部署到实时生产环境中。这旨在解决开发和运维团队之间可见性及沟通较差的问题。因此，持续交付的目的就是确保尽可能减少部署新代码时所需的工作量。
+    - 持续部署（另一种“CD”）指的是自动将开发人员的更改从存储库发布到生产环境，以供客户使用。它主要为了解决因手动流程降低应用交付速度，从而使运维团队超负荷的问题。持续部署以持续交付的优势为根基，实现了管道后续阶段的自动化。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211119092205.png)
+### Git
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211119094900.png)
+### Git命令1
+
+- 初始化本地仓库
+    - git init 将当前目录初始化为 git 的本地仓库
+- 查看是否有文件被追踪(只能追踪到暂存区和工作目录中的文件)
+    - git status 红色没有追踪,绿色被追踪,他只能看暂存区和工作目录里面的文件,commit 之后到未修改\添加任何文件之前,没有区别,将不会打印任何东西
+- 暂存区操作
+    - 添加到暂存区
+        - git add . 将所有文件提交到暂存区
+        - git add <文件名字> 将指定文件提交到暂存区
+    - 从暂存区移除文件
+        - git rm --cached <文件名字> 从暂存区移除文件
+        - git restore --staged <文件名字> 从暂存区移除文件(只能移除暂存区的文件)
+        - git reset head <文件名字> 取消上一次的操作(commit 也能用 reset head 取消) 注意:git 所有的操作都是修改操作,所以也可以直接删除工作区文件 然后git add . 提交到暂存区,也能删除
+- 本地仓库操作
+    - 提交到本地仓库
+        - git commit -m "初始化项目" 这里写本次提交的日志,(如:git commit -m "初始化项目") 一定要写日志,否则会报错.
+        - git commit 如果只写了 git commit 会进入编辑模式,按 i 进入编辑状态,输入日志后按 esc 退出编辑模式 在输入 :wq 保存并提交
+        - git commit -am "初始化项目" am 是git add. 和git commit -m "初始化项目" 的缩写, 代表将文件添加到暂存区并提交, 省去写 git add .命令
+    - 查看提交日志
+        - git log 查看所有日志的详细信息(id, 日期,作者,日志)
+        - git log --pretty=oneline 查看简略日志(id,日志)
+    - 对比文本地仓库文件和暂存区文件的不同 git diff head -- <文件名称> 查看本地库和工作区的文件的不同 
+    ```md
+    代码说明:
+    |参数|说明|
+    |:-:|:-:|
+    |--|变动之前的文件|
+    |++|变动之后的文件|
+    |-1,2|变动之前的文件,从第一行开始,连续两行|
+    |+1,4|变动之前的文件,从第一行开始,连续三行|
+    ```
+    - 查看本地仓库文件
+        - git ls-files 查看本地仓库中的文件,没有被添加到仓库中的将不会显示
+- 版本回退
+    - git reset --hard head^ 退回上一个版本,head 后面的^ 有多少个代表多少个版本,如git reset --hard head^^^^代表回退四个版本
+    - git reset --hard head~2 想要回退多少个版本就在~ 后面写多少,如git reset --hard head~200 代表回退 200 个版本
+    - git reset --hard <id> 回退到指定版本,id 是通过git log 或者git reflog 查询的,保证 id 不唯一即可,一般 8 位左右,如git reset --hard 69feb20ed1
+    - git reflog 查看所有的日志 包括退回的日志,git log 回退之后就无法显示最新的版本
+- 远程仓库操作
+    - 建立远程仓库连接
+        - git remote rm origin 删除远程仓库连接(针对已经连接过仓库),
+        - git remote add origin <仓库地址> 如git remote add origin https://github.com/QIXIUQX/teset.git
+        - git remote -v 查看连接的远程仓库
+    - 推送到远程仓库
+        - git push origin main 推送到远程仓库的 main 分支
+- 分支操作
+    - 本地分支操作
+        - git branch <本地分支名称> 创建一个分支 如git branch dev
+        - git checkout -b <本地分支名称> 创建一个分支并且直接切换到该分支 如git checkout -b feature_search 将会创建分支 feature_search 并且切到 feature_search 分支
+        - git branch 查看当前所有分支,*代表当前所在分支
+        - git branch -d <本地分支名称> 删除本地分支,如git branch -d dev
+        - git checkout <本地分支名称> 切换到某个分支,如 git checkout dev 切换到 dev 分支
+        - git branch -m <本地分支名称> [本地分支名称] 修改分支名字,如 git branch -m test dev将名称为 test 的分支重命名为 dev git branch -m demo 将当前分支名字重命名为 demo
+        - git merge dev 将 dev 分支合并到 master(输入命令时在 master 分支) 分支合并只能是主干合并分支, 不能是分支合并主干
+    - 远程分支操作
+        - git branch -a 查看当前所有分支(本地分支和远程分支),*代表当前所在分支
+        - git push origin <本地分支名称> 将分支推送到远程仓库 如 git push origin dev
+        - git push origin :<远程分支名称> 将删除远程分支,不会影响本地分支 如 git push origin :dev
+        - git checkout -b <本地分支名称> origin/<远程分支名称> 将远程分支拉取到本地并且创建分支 如 git checkout -b dev origin/dev
+        - git fetch 获取远程仓库最新的分支状态,(一般用于拉取远程分支到本地之前)
+    - 拉取远程最新内容到本地
+        - git pull origin <远程分支名称>拉取远程最新内容到本地 如git pull origin master 拉取远程分支最新内容到本地(ps:每次推送到远程时候优先拉取一次,有冲突直接处理,然后在 push 到远程仓库)
+- 标签操作
+    - 本地标签操作
+        - git tag 查询所有本地标签
+        - git tag -d <本地标签名称> 删除本地指定标签
+        - git tag <本地标签名称> 创建一个标签 如git tag v1.0 注意标签是给最后一次提交成功的记录打的
+        - git tag <本地标签名称> <id> 指定某一个版本打标签 如git tag v0.5 8acf0ab39 给 id 为 8acf0ab39 的提交记录打标签
+        - git tag <本地标签名称> -m "标签说明" <id> 指定某一个版本打标签并加说明 如git tag 初始化项目 -m "在给id3580d4180打标签" 3580d4180 给 id 为 3580d4180 的提交记录打标签并且标签的说明是:在给 id3580d4180 打标签" 3580d4180,这时候 push 到远程仓库点 tag 就可以看
+    - 远程标签操作
+        - git push origin <本地标签名称> 推送本地标签到远程仓库 如 git push origin v1.0 将本地仓库 v1.0 推送到远程仓库, 此时远程仓库就能看到 tag
+        - git push origin --tag 本地所有没有推送到远程的标签将会全部推送到远程
+        - git push origin :refs/tags/<远程标签名称> 删除指定远程仓库中的标签 如 git push origin :refs/tags/v1.0
+### Git命令2
+#### git config
+配置 Git 的相关参数。
+```md
+# 查看配置信息
+# --local：仓库级，--global：全局级，--system：系统级
+$ git config <--local | --global | --system> -l
+
+# 查看当前生效的配置信息
+$ git config -l
+
+# 编辑配置文件
+# --local：仓库级，--global：全局级，--system：系统级
+$ git config <--local | --global | --system> -e
+
+# 添加配置项
+# --local：仓库级，--global：全局级，--system：系统级
+$ git config <--local | --global | --system> --add <name> <value>
+
+# 获取配置项
+$ git config <--local | --global | --system> --get <name>
+
+# 删除配置项
+$ git config <--local | --global | --system> --unset <name>
+
+# 配置提交记录中的用户信息
+$ git config --global user.name <用户名>
+$ git config --global user.email <邮箱地址>
+
+# 更改Git缓存区的大小
+# 如果提交的内容较大，默认缓存较小，提交会失败
+# 缓存大小单位：B，例如：524288000（500MB）
+$ git config --global http.postBuffer <缓存大小>
+
+# 调用 git status/git diff 命令时以高亮或彩色方式显示改动状态
+$ git config --global color.ui true
+
+# 配置可以缓存密码，默认缓存时间15分钟
+$ git config --global credential.helper cache
+
+# 配置密码的缓存时间
+# 缓存时间单位：秒
+$ git config --global credential.helper 'cache --timeout=<缓存时间>'
+
+# 配置长期存储密码
+$ git config --global credential.helper store
+
+```
+#### git clone
+从远程仓库克隆一个版本库到本地。
+```md
+# 默认在当前目录下创建和版本库名相同的文件夹并下载版本到该文件夹下
+$ git clone <远程仓库的网址>
+
+# 指定本地仓库的目录
+$ git clone <远程仓库的网址> <本地目录>
+
+# -b 指定要克隆的分支，默认是master分支
+$ git clone <远程仓库的网址> -b <分支名称> <本地目录>
+
+```
+#### git init
+初始化项目所在目录，初始化后会在当前目录下出现一个名为 .git 的目录。
+```md
+# 初始化本地仓库，在当前目录下生成 .git 文件夹
+$ git init
+```
+#### git status
+查看本地仓库的状态。
+```md
+# 查看本地仓库的状态
+$ git status
+
+# 以简短模式查看本地仓库的状态
+# 会显示两列，第一列是文件的状态，第二列是对应的文件
+# 文件状态：A 新增，M 修改，D 删除，?? 未添加到Git中
+$ git status -s
+```
+#### git remote
+操作远程库。
+```md
+# 列出已经存在的远程仓库
+$ git remote
+
+# 列出远程仓库的详细信息，在别名后面列出URL地址
+$ git remote -v
+$ git remote --verbose
+
+# 添加远程仓库
+$ git remote add <远程仓库的别名> <远程仓库的URL地址>
+
+# 修改远程仓库的别名
+$ git remote rename <原远程仓库的别名> <新的别名>
+
+# 删除指定名称的远程仓库
+$ git remote remove <远程仓库的别名>
+
+# 修改远程仓库的 URL 地址
+$ git remote set-url <远程仓库的别名> <新的远程仓库URL地址>
+
+```
+#### git branch
+操作 Git 的分支命令。
+```md
+# 列出本地的所有分支，当前所在分支以 "*" 标出
+$ git branch
+
+# 列出本地的所有分支并显示最后一次提交，当前所在分支以 "*" 标出
+$ git branch -v
+
+# 创建新分支，新的分支基于上一次提交建立
+$ git branch <分支名>
+
+# 修改分支名称
+# 如果不指定原分支名称则为当前所在分支
+$ git branch -m [<原分支名称>] <新的分支名称>
+# 强制修改分支名称
+$ git branch -M [<原分支名称>] <新的分支名称>
+
+# 删除指定的本地分支
+$ git branch -d <分支名称>
+
+# 强制删除指定的本地分支
+$ git branch -D <分支名称>
+
+```
+#### git checkout
+检出命令，用于创建、切换分支等。
+```md
+# 切换到已存在的指定分支
+$ git checkout <分支名称>
+
+# 创建并切换到指定的分支，保留所有的提交记录
+# 等同于 "git branch" 和 "git checkout" 两个命令合并
+$ git checkout -b <分支名称>
+
+# 创建并切换到指定的分支，删除所有的提交记录
+$ git checkout --orphan <分支名称>
+
+# 替换掉本地的改动，新增的文件和已经添加到暂存区的内容不受影响
+$ git checkout <文件路径>
+
+```
+#### git cherry-pick
+把已经提交的记录合并到当前分支。
+```md
+# 把已经提交的记录合并到当前分支
+$ git cherry-pick <commit ID>
+```
+#### git add
+把要提交的文件的信息添加到暂存区中。当使用 git commit 时，将依据暂存区中的内容来进行文件的提交。
+```md
+# 把指定的文件添加到暂存区中
+$ git add <文件路径>
+
+# 添加所有修改、已删除的文件到暂存区中
+$ git add -u [<文件路径>]
+$ git add --update [<文件路径>]
+
+# 添加所有修改、已删除、新增的文件到暂存区中，省略 <文件路径> 即为当前目录
+$ git add -A [<文件路径>]
+$ git add --all [<文件路径>]
+
+# 查看所有修改、已删除但没有提交的文件，进入一个子命令系统
+$ git add -i [<文件路径>]
+$ git add --interactive [<文件路径>]
+
+```
+#### git commit
+将暂存区中的文件提交到本地仓库中。
+```md
+# 把暂存区中的文件提交到本地仓库，调用文本编辑器输入该次提交的描述信息
+$ git commit
+
+# 把暂存区中的文件提交到本地仓库中并添加描述信息
+$ git commit -m "<提交的描述信息>"
+
+# 把所有修改、已删除的文件提交到本地仓库中
+# 不包括未被版本库跟踪的文件，等同于先调用了 "git add -u"
+$ git commit -a -m "<提交的描述信息>"
+
+# 修改上次提交的描述信息
+$ git commit --amend
+
+```
+#### git fetch
+从远程仓库获取最新的版本到本地的 tmp 分支上。
+```md
+# 将远程仓库所有分支的最新版本全部取回到本地
+$ git fetch <远程仓库的别名>
+
+# 将远程仓库指定分支的最新版本取回到本地
+$ git fetch <远程主机名> <分支名>
+
+```
+#### git merge
+合并分支。
+```md
+# 把指定的分支合并到当前所在的分支下
+$ git merge <分支名称>
+
+```
+#### git diff
+比较版本之间的差异。
+```md
+# 比较当前文件和暂存区中文件的差异，显示没有暂存起来的更改
+$ git diff
+
+# 比较暂存区中的文件和上次提交时的差异
+$ git diff --cached
+$ git diff --staged
+
+# 比较当前文件和上次提交时的差异
+$ git diff HEAD
+
+# 查看从指定的版本之后改动的内容
+$ git diff <commit ID>
+
+# 比较两个分支之间的差异
+$ git diff <分支名称> <分支名称>
+
+# 查看两个分支分开后各自的改动内容
+$ git diff <分支名称>...<分支名称>
+
+```
+#### git pull
+从远程仓库获取最新版本并合并到本地。
+首先会执行 git fetch，然后执行 git merge，把获取的分支的 HEAD 合并到当前分支。
+```md
+# 从远程仓库获取最新版本。
+$ git pull
+
+```
+#### git push
+把本地仓库的提交推送到远程仓库。
+```md
+# 把本地仓库的分支推送到远程仓库的指定分支
+$ git push <远程仓库的别名> <本地分支名>:<远程分支名>
+
+# 删除指定的远程仓库的分支
+$ git push <远程仓库的别名> :<远程分支名>
+$ git push <远程仓库的别名> --delete <远程分支名>
+
+```
+#### git log
+显示提交的记录。
+```md
+# 打印所有的提交记录
+$ git log
+
+# 打印从第一次提交到指定的提交的记录
+$ git log <commit ID>
+
+# 打印指定数量的最新提交的记录
+$ git log -<指定的数量>
+
+```
+#### git reset
+还原提交记录。
+```md
+# 重置暂存区，但文件不受影响
+# 相当于将用 "git add" 命令更新到暂存区的内容撤出暂存区，可以指定文件
+# 没有指定 commit ID 则默认为当前 HEAD
+$ git reset [<文件路径>]
+$ git reset --mixed [<文件路径>]
+
+# 将 HEAD 的指向改变，撤销到指定的提交记录，文件未修改
+$ git reset <commit ID>
+$ git reset --mixed <commit ID>
+
+# 将 HEAD 的指向改变，撤销到指定的提交记录，文件未修改
+# 相当于调用 "git reset --mixed" 命令后又做了一次 "git add"
+$ git reset --soft <commit ID>
+
+# 将 HEAD 的指向改变，撤销到指定的提交记录，文件也修改了
+$ git reset --hard <commit ID>
+```
+#### git revert
+生成一个新的提交来撤销某次提交，此次提交之前的所有提交都会被保留。
+```md
+# 生成一个新的提交来撤销某次提交
+$ git revert <commit ID>
+
+```
+#### git tag
+操作标签的命令。
+```md
+# 打印所有的标签
+$ git tag
+
+# 添加轻量标签，指向提交对象的引用，可以指定之前的提交记录
+$ git tag <标签名称> [<commit ID>]
+
+# 添加带有描述信息的附注标签，可以指定之前的提交记录
+$ git tag -a <标签名称> -m <标签描述信息> [<commit ID>]
+
+# 切换到指定的标签
+$ git checkout <标签名称>
+
+# 查看标签的信息
+$ git show <标签名称>
+
+# 删除指定的标签
+$ git tag -d <标签名称>
+
+# 将指定的标签提交到远程仓库
+$ git push <远程仓库的别名> <标签名称>
+
+# 将本地所有的标签全部提交到远程仓库
+$ git push <远程仓库的别名> –tags
+
+```
+#### git mv
+重命名文件或者文件夹。
+```md
+# 重命名指定的文件或者文件夹
+$ git mv <源文件/文件夹> <目标文件/文件夹>
+
+```
+#### git rm
+删除文件或者文件夹。
+```md
+# 移除跟踪指定的文件，并从本地仓库的文件夹中删除
+$ git rm <文件路径>
+
+# 移除跟踪指定的文件夹，并从本地仓库的文件夹中删除
+$ git rm -r <文件夹路径>
+
+# 移除跟踪指定的文件，在本地仓库的文件夹中保留该文件
+$ git rm --cached
+
+```
+### 一个业务场景：a，b，c，d，要删除c的提交，git怎么操作（git revert）？？？？？？？
+### 如何确保你的代码规范？？？？？？
+## 色子点数
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211111101458.png)
 
 ```html
