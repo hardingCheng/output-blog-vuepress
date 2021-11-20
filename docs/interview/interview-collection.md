@@ -147,8 +147,22 @@ web后端：就是用户看不见摸不着的数据库交互处理的业务逻�
   ```
 
 ## CSS
-### min-width、max-width、width的包含(优先级关系)关系？？？？？？？？？？
-### 哪些CSS属性是不被IE兼容的？？？？？？？？？？
+### div拖拽？？？？？？？
+### 线性渐变？？？？？？？？
+### CSS3有哪些新特性？？？？？？？
+### CSS3动画性能比较好？？？？？？？
+### min-width、max-width、width的包含(优先级关系)关系?
+min-width和max-width分别限制了元素的最小宽度和最大宽度，当浏览器缩小导致元素宽度小于min-width时，元素的width就会被min-width的值取代.
+
+如果min-width和max-width的权重比width要大，即时在width后面加了!important也是如此。如果min-width的值比max-width大，那么元素的最终宽度会取min-width的值。
+### 哪些CSS属性是不被IE兼容的?
+- border-radius
+- background-size
+- @font-face
+- transform
+- transition
+- animation
+### CSS兼容性质的处理？？？？？？？？？？？？？
 ### 实现瀑布流的方法？
 #### 什么是瀑布流布局
 瀑布流又称瀑布流式布局，是一种比较流行的页面布局方式，专业的英文名称为[Masonry Layouts]。与传统的分页显示不同，视觉表现为参差不齐的多栏布局。
@@ -2510,7 +2524,17 @@ Promise 也不建议在这里面进行，因为 Promise 的回调属性 Event lo
 
 ## JS
 ### WebComponent？？？？？？？？
-### js能表示的最大整数，小数在计算机内部的存储过程？？？？？？
+### 如何开启严格模式，严格模式下的特点？？？？？？？
+### 遍历对象属性的方法，哪些遍历自身属性，哪些遍历原型属性？？？？？？？？
+### JS放在head和放在body中的区别
+在HTML body部分中的JavaScripts会在页面加载的时候被执行。
+
+在HTML head部分中的JavaScripts会在被调用的时候才执行。
+### js能表示的最大整数，小数在计算机内部的存储过程？
+#### javascript能表示的最大的整数是多大？？？？？？？
+Math.pow(2,53)   9007199254740992
+Math.pow(2, 53) === Math.pow(2, 53) + 1;    // true
+#### js小数在计算机内部的存储过程？？？？？？？？
 ### JS如何实现多线程
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211115222810.png)
 JS为我们提供了一个Worker的类，它的作用就是为了解决这种阻塞的现象。当我们使用这个类的时候，它就会向浏览器申请一个新的线程。这个线程就用来单独执行一个js文件。
@@ -4168,7 +4192,7 @@ changeName();
 
 ### 内存泄漏
 该释放的内存垃圾没有被释放，依然霸占着原有的内存不松手，造成系统内存的浪费，导致性能恶化，系统崩溃等严重后果，这就是所谓的内存泄漏。
-
+### 哪些可能造成内存泄漏？？？？？？
 ### 创建对象有几种方法
 ```js
 // 第一种：字面量
@@ -4715,7 +4739,60 @@ var deepClone = function (target, map = new WeakMap()) {
   - indexOf() 查找数组是否存在某个元素，返回下标
   - lastIndexOf() 查找指定元素在数组中的最后一个位置
   - ES7 includes() 查找数组是否包含某个元素 返回布尔
-### 数组的方法？？？？？？？？？？？
+### JS操作数组的方法？
+- concat()
+    - concat() 方法用于连接两个或多个数组。该方法不会改变现有的数组，仅会返回被连接数组的一个副本。
+- join()
+    - join() 方法用于把数组中的所有元素放入一个字符串。元素是通过指定的分隔符进行分隔的，默认使用','号分割，不改变原数组。
+- push()
+    - push() 方法可向数组的末尾添加一个或多个元素，并返回新的长度。末尾添加，返回的是长度，会改变原数组。
+- shift()
+    - shift() 方法用于把数组的第一个元素从其中删除，并返回第一个元素的值。返回第一个元素，改变原数组。
+- unshift()
+    - unshift() 方法可向数组的开头添加一个或更多元素，并返回新的长度。返回新长度，改变原数组。
+- slice()
+    - slice() 方法返回一个新的数组，包含从 start 到 end （不包括该元素）的 arrayObject 中的元素。返回选定的元素，该方法不会修 改原数组。
+- splice()
+    - splice() 方法可删除从 index 处开始的零个或多个元素，并且用参数列表中声明的一个或多个值来替换那些被删除的元素。如果从 arrayObject 中删除了元素，则返回的是含有被删除的元素的数组。splice() 方法会直接对数组进行修改。
+- substring() 和 substr()
+    - 相同点：如果只是写一个参数，两者的作用都一样：都是是截取字符串从当前下标以后直到字符串最后的字符串片段。
+    - 不同点：第二个参数
+substr（startIndex,lenth）： 第二个参数是截取字符串的长度（从起始点截取某个长度的字符串）；
+substring（startIndex, endIndex）： 第二个参数是截取字符串最终的下标 （截取2个位置之间的字符串,‘含头不含尾'）。
+- sort 排序
+    - 按照 Unicode code 位置排序，默认升序
+- reverse()
+    - reverse() 方法用于颠倒数组中元素的顺序。返回的是颠倒后的数组，会改变原数组。
+- indexOf 和 lastIndexOf
+    - indexOf 和 lastIndexOf 都接受两个参数：查找的值、查找起始位置 不存在，返回 -1 ；存在，返回位置。indexOf 是从前往后查找， lastIndexOf 是从后往前查找。
+- every
+    - every 对数组的每一项都运行给定的函数，每一项都返回 ture,则返回 true
+- some
+    - some 对数组的每一项都运行给定的函数，任意一项都返回 ture,则返回 true
+- filter
+    - filter 对数组的每一项都运行给定的函数，返回 结果为 ture 的项组成的数组
+- map
+    - 对数组的每一项都运行给定的函数，返回每次函数调用的结果组成一个新数组
+- forEach 数组遍历
+
+
+ES6新增新操作数组的方法
+- find()：
+    -  传入一个回调函数，找到数组中符合当前搜索规则的第一个元素，返回它，并且终止搜索。
+- findIndex()：
+    - 传入一个回调函数，找到数组中符合当前搜索规则的第一个元素，返回它的下标，终止搜索。
+- fill()：
+    - 选择数组的某个下标，从该位置开始复制数组元素，默认从0开始复制。也可以指定要复制的元素范围。
+- from
+    - 将类似数组的对象（array-like object）和可遍历（iterable）的对象转为真正的数组
+- of
+    - 用于将一组值，转换为数组。这个方法的主要目的，是弥补数组构造函数 Array() 的不足。因为参数个数的不同，会导致 Array() 的行为有差异。
+- entries() 返回迭代器：返回键值对
+- values() 返回迭代器：返回键值对的value
+- keys() 返回迭代器：返回键值对的key
+- includes
+    - 判断数组中是否存在该元素，参数：查找的值、起始位置，可以替换 ES5 时代的 indexOf 判断方式。indexOf 判断元素是否为 NaN，会判断错误。
+### 如何让数组置空？？？？？？？
 ### ES6往后了解哪些新特性?？？？？？？？？
 ### ES6
   https://juejin.cn/post/6844903959283367950
@@ -6725,7 +6802,120 @@ if (!bool.valueOf()) {
 - 装饰模式: (@装饰器的用法)
 - 策略模式 策略模式指对象有某个行为,但是在不同的场景中,该行为有不同的实现方案-比如选项的合并策略
 ### 设计模式？？？？？？？？
+#### 设计模式原则
+- S – Single Responsibility Principle 单一职责原则
+    - 一个程序只做好一件事
+    - 如果功能过于复杂就拆分开，每个部分保持独立
+- O – OpenClosed Principle 开放/封闭原则
+    - 对扩展开放，对修改封闭
+    - 增加需求时，扩展新代码，而非修改已有代码
+- L – Liskov Substitution Principle 里氏替换原则
+    - 子类能覆盖父类
+    - 父类能出现的地方子类就能出现
+- I – Interface Segregation Principle 接口隔离原则
+    - 保持接口的单一独立
+    - 类似单一职责原则，这里更关注接口
+- D – Dependency Inversion Principle 依赖倒转原则
+    - 面向接口编程，依赖于抽象而不依赖于具体
+    - 使用方只关注接口而不关注具体类的实现
+#### 设计模式分类
+- 创建型
+    - 单例模式
+    - 原型模式
+    - 工厂模式
+    - 抽象工厂模式
+    - 建造者模式
+- 结构型
+    - 适配器模式
+    - 装饰器模式
+    - 代理模式
+    - 外观模式
+    - 桥接模式
+    - 组合模式
+    - 享元模式
+- 行为型
+    - 观察者模式
+    - 迭代器模式
+    - 策略模式
+    - 模板方法模式
+    - 职责链模式
+    - 命令模式
+    - 备忘录模式
+    - 状态模式
+    - 访问者模式
+    - 中介者模式
+    - 解释器模式
+#### 工厂模式
+工厂模式定义一个用于创建对象的接口，这个接口由子类决定实例化哪一个类。该模式使一个类的实例化延迟到了子类。而子类可以重写接口方法以便创建的时候指定自己的对象类型。
+```js
+class Product {
+    constructor(name) {
+        this.name = name
+    }
+    init() {
+        console.log('init')
+    }
+    fun() {
+        console.log('fun')
+    }
+}
 
+class Factory {
+    create(name) {
+        return new Product(name)
+    }
+}
+
+// use
+let factory = new Factory()
+let p = factory.create('p1')
+p.init()
+p.fun()
+```
+- 适用场景
+    - 如果你不想让某个子系统与较大的那个对象之间形成强耦合，而是想运行时从许多子系统中进行挑选的话，那么工厂模式是一个理想的选择
+    - 将new操作简单封装，遇到new的时候就应该考虑是否用工厂模式；
+    - 需要依赖具体环境创建不同实例，这些实例都有相同的行为,这时候我们可以使用工厂模式，简化实现的过程，同时也可以减少每种对象所需的代码量，有利于消除对象间的耦合，提供更大的灵活性
+- 优点
+    - 创建对象的过程可能很复杂，但我们只需要关心创建结果。
+    - 构造函数和创建者分离, 符合“开闭原则”
+    - 一个调用者想创建一个对象，只要知道其名称就可以了。
+    - 扩展性高，如果想增加一个产品，只要扩展一个工厂类就可以。
+- 缺点
+    - 添加新产品时，需要编写新的具体产品类,一定程度上增加了系统的复杂度
+    - 考虑到系统的可扩展性，需要引入抽象层，在客户端代码中均使用抽象层进行定义，增加了系统的抽象性和理解难度
+- 什么时候不用
+    - 当被应用到错误的问题类型上时,这一模式会给应用程序引入大量不必要的复杂性.除非为创建对象提供一个接口是我们编写的库或者框架的一个设计上目标,否则我会建议使用明确的构造器,以避免不必要的开销。
+    - 由于对象的创建过程被高效的抽象在一个接口后面的事实,这也会给依赖于这个过程可能会有多复杂的单元测试带来问题。
+- 例子
+    - 曾经我们熟悉的JQuery的$()就是一个工厂函数，它根据传入参数的不同创建元素或者去寻找上下文中的元素，创建成相应的jQuery对象
+    ```js
+    class jQuery {
+    constructor(selector) {
+        super(selector)
+    }
+    add() {
+        
+    }
+      // 此处省略若干API
+    }
+    
+    window.$ = function(selector) {
+        return new jQuery(selector)
+    }
+    ```
+    - vue 的异步组件
+        - 在大型应用中，我们可能需要将应用分割成小一些的代码块，并且只在需要的时候才从服务器加载一个模块。为了简化，Vue 允许你以一个工厂函数的方式定义你的组件，这个工厂函数会异步解析你的组件定义。Vue 只有在这个组件需要被渲染的时候才会触发该工厂函数，且会把结果缓存起来供未来重渲染。
+        ```js
+        Vue.component('async-example', function (resolve, reject) {
+          setTimeout(function () {
+            // 向 `resolve` 回调传递组件定义
+            resolve({
+              template: '<div>I am async!</div>'
+            })
+          }, 1000)
+        })
+        ```
 ## TS
 ### Typescript 有什么好处？？？？？？？？？
 ### Typescript 有什么不好的地方吗？？？？？？？？？
@@ -6881,8 +7071,489 @@ window.addEventListener("storage", function (e) {
   console.log(e.newValue)
 })
 ```
-### Service Worker?????????????
-### Webworker Service Worker区别??????
+### Service Worker?
+#### 是什么
+一个服务器与浏览器之间的中间人角色，如果网站中注册了service worker那么它可以拦截当前网站所有的请求，进行判断（需要编写相应的判断程序），如果需要向服务器发起请求的就转给服务器，如果可以直接使用缓存的就直接返回缓存不再转给服务器。从而大大提高浏览体验。
+
+Service Worker旨在通过代码精确控制缓存文件和HTTP请求，是已经被废弃掉的AppCache技术的替代方案。javaScript 是单线程的，随着web业务的复杂化，开发者逐渐在js中做了许多耗费资源的运算过程，这使得单线程的弊端更加凹显。web worker正是基于此被创造出来，它是脱离在主线程之外的，我们可以将复杂耗费时间的事情交给web worker来做。但是web worker作为一个独立的线程，他的功能应当不仅于此。sw便是在web worker的基础上增加了离线缓存的能力。当然在 Service Worker 之前也有在 HTML5 上做离线缓存的 API 叫 AppCache, 但是 AppCache 存在很多缺点
+
+sw是由事件驱动的,具有生命周期，可以拦截处理页面的所有网络请求(fetch)，可以访问cache和indexDB，支持推送，并且可以让开发者自己控制管理缓存的内容以及版本，为离线弱网环境下的 web 的运行提供了可能，让 web 在体验上更加贴近 native。换句话说他可以把你应用里的所有静态动态资源根据不同策略缓存起来，在你下次打开时不再需要去服务器请求，这样一来就减少了网络耗时，使得web应用可以秒开，并且在离线环境下也变得可用。做到这一切你只需要增加一个sw文件，不会对原有的代码产生任何侵入，是不是很perfect？
+
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211120195536.png)
+- Service Worker的生命周期
+    - 当一个servicework被注册成功后，它将开始它的生命周期，我们对servicework的操作一般都是在其生命周期里面进行的。servicework的生命周期分为这么几个状态 安装中, 安装后, 激活中, 激活后, 废弃。
+        - 安装( installing )：这个状态发生在 Service Worker 注册之后，表示开始安装，这个状态会触发 install 事件，一般会在install事件的回调里面进行静态资源的离线缓存， 如果这些静态资源缓存失败了，那 Service Worker 安装就会失败，生命周期终止。
+        - 安装后( installed )：当成功捕获缓存到的资源时，servicework会变为这个状态，当此时没有其他的servicework线程在工作时，会立即进入激活状态，如果此时有正在工作的servicework工作线程，则会等待其他的 Service Worker 线程被关闭后才会被激活。可以使用 self.skipWaiting() 方法强制正在等待的servicework工作线程进入激活状态。
+        - 激活( activating )：在这个状态下会触发activate事件，在activate 事件的回调中去清理旧版缓存。
+        - 激活后( activated )：在这个状态下，servicework会取得对整个页面的控制
+        - 废弃状态 ( redundant )：这个状态表示一个 Service Worker 的生命周期结束。新版本的 Service Worker 替换了旧版本的 Service Worker会出现这个状态
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211120195913.png)
+- Service Worker 文件只在首次注册的时候执行了一次。
+- 安装、激活流程也只是在首次执行 Service Worker 文件的时候进行了一次。
+- 首次注册成功的 Service Worker 不能拦截当前页面的请求。
+- 非首次注册的 Service Worker 可以控制当前的页面并能拦截请求
+- Service Worker 首次注册或者有新版本触发更新的时候，才会重新创建一个 worker 工作线程并解析执行 Service Worker 文件，在这之后并进入 Service Worker 的安装和激活生命周期
+#### 更新Service Worker
+- 更新一个servicework，最直接的办法就是修改servicework.js这个文件，当刷新浏览器时，浏览器尝试重新下载servicework.js脚本文件，然后会与之前的版本比对，一旦发现文件内容不一致，就会进入更新流程。
+    - 新的 servicework 被启动安装并触发 install事件。
+    - 安装成功后，新版 servicework 进入等待状态，此时页面的控制权还在老版 servicework手中。
+    - 当servicework控制的所有终端都关闭之后，或者手动self.skipWaiting()，旧的 servicework 才能被终止，此时新的servicework被激活，触发activate 事件。
+    - 用户再次访问页面，或刷新页面，新的 service work 启动控制页面。
+#### （Service Worker的特点）细碎的描述
+- 基于web Worker（一个独立于JavaScript主线程的独立线程，在里面执行需要消耗大量资源的操作不会阻塞主线程）
+- 本质上充当服务器与浏览器之间的代理服务器（可以拦截全站的请求，并作出相应的动作->由开发者指定的动作
+- 在web worker的基础上增加了离线缓存的能力
+- 创建有效的离线体验（将一些不常更新的内容缓存在浏览器，提高访问体验）
+- 由事件驱动的，具有生命周期
+- 可以访问catche和indexDB
+- 支持推送
+- 并且可以让开发者自己控制管理缓存的内容以及版本
+#### 注意事项
+- service worker运行在worker上下文-----不可以访问DOM
+- 完全异步，同步API（如XHR和localStorage）不能再service work中使用
+- 处于安全考虑，service worker只能为https承载
+- 在Firefox浏览器的用户隐私模式，service work不可用
+- 其生命周期与页面无关（关联页面未关闭时，它也可以退出，没有关联页面，它也可以启动）
+- Service Worker做缓存还是挺有用的，相比较Cache-Control之类的Headers来做缓存控制而言，拥有更细粒度的控制过程，并且可以做相应的错误和降级处理。但是依然需要注意缓存带来的时效性问题，否则得不偿失。
+#### Service Worker 的简单实践
+1. **注册**。 serviceWorker对象存在于navigator对象下，可以再主线程中调用navigator.serviceWorker.register()方法来注册servicework,register 方法接受两个参数,第一个参数表示servicework.js相对于origin的路径，第二个参数是 Serivce Worker 的配置项，可选填，其中比较重要的是 scope 属性，用来指定你想让 service worker 控制的内容的目录。 默认值为servicework.js所在的目录。这个属性所表示的路径不能在 service worker 文件的路径之上，默认是 Serivce Worker 文件所在的目录。 成功注册或返回一个promise。
+```js
+// 页面的入口文件
+
+if (navigator.serviceWorker) {
+  window.addEventListener('load', () => {
+    console.log('开始注册ServiceWorker')
+    navigator.serviceWorker
+      .register('./serviceworker.js')
+      .then((reg) => {
+        if (reg.installing) {
+          console.log('Service worker installing')
+        } else if (reg.waiting) {
+          console.log('Service worker installed')
+        } else if (reg.active) {
+          console.log('Service worker active')
+        }
+        console.log('ServiceWorker register success: ', reg)
+      })
+      .catch((err) => {
+        console.log('ServiceWorker register failed: ', err)
+      })
+  })
+}
+```
+2. 安装
+```js
+self.addEventListener('install', (event) => {
+  console.log('install事件')
+  self.skipWaiting() //用来强制更新的servicework跳过等待时间
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(function (cache) {
+      return cache.addAll(urlsToCache)
+    })
+  )
+})
+```
+首先 self.skipWaiting() 执行，告知浏览器直接跳过等待阶段，淘汰过期的Service Worker脚本，直接开始尝试激活新的Service Worker。然后使用 caches.open 打开一个Cache，打开后，通过cache.addAll尝试缓存我们预先声明的文件。 CacheStorage 全局的cache Api 并非只有在sw中才能用 浏览器控制台直接用也是可以的，所以是挂在window下的
+
+event.waitUntil() 只能在 Service Worker 的 install 或者 activate 事件中使用；看起来像是一个 callback，用来延长事件的作用时间,但是，即便你不使用它，程序也可能正常运行。如果你传递了一个 Promise 给它，那么只有当该 Promise resolved 时，Service Worker 才会完成 install；如果 Promise rejected 掉，那么整个 Service Worker 便会被废弃掉。因此，cache.addAll 里面，只要有一个资源获取失败，整个 Service Worker 便会失效。
+
+在 install 事件回调被调用时，它把即将被激活的 worker 线程状态延迟为 installing 状态，直到传递的 Promise 被成功地 resolve。这主要用于确保：Service Worker 工作线程在所有依赖的核心 cache 被缓存之前都不会被激活。
+
+在 activate 事件回调被调用时，它把即将被激活的 worker 线程状态延迟为 activating 状态，直到传递的 Promise 被成功地 resolve。这主要用于确保：任何功能事件不会被分派到 ServiceWorkerGlobalScope 对象，直到它删除过期的缓存条目。
+
+当 waitUntil()运行时，如果 Promise 是 rejected 那么installing 或者 activating 的状态会被设置为 redundant。
+3. 激活
+```js
+self.addEventListener('activate', (event) => {
+  console.log('activate事件')
+  var cacheWhitelist = [CACHE_NAME]
+  self.clients.claim() // 保证 激活之后能够马上作用于所有的终端
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (cacheWhitelist.indexOf(cacheName) === -1) {
+            return caches.delete(cacheName)
+          }
+        })
+      )
+    })
+  )
+})
+```
+在激活servicework时需要删除之前的缓存，可将需要的缓存放在有个白名单中，然后通过caches.keys()拿到所有缓存，将不再白名单中的缓存删掉。
+4. 拦截网络请求
+```js
+  self.addEventListener('fetch', (event) => {
+    event.respondWith(
+      caches.match(event.request).then((response) => {
+        if (response) 
+          return response;
+        }
+        return fetch(event.request);
+      })
+    );
+  });
+```
+通过监听servicework的 fetch 事件来拦截网络请求，调用 event 上的 respondWith() 方法来劫持当前servicework控制域下的 HTTP 请求，该方法会直接返回一个Promise 结果 ，这个结果就会是http请求的响应。上面代码中就一个简单的逻辑，先劫持http请求，然后看看缓存中是否有这个请求的资源，如果有则直接返回，如果没有就去请求服务器上的资源。 event.respondWith 方法只能在 Service Worker 的 fetch 事件中使用。
+
+Cache Stroage 只能缓存静态资源，所以它只能缓存用户的 GET 请求；Cache Stroage 中的缓存不会过期，但是浏览器对它的大小是有限制的，所以需要我们定期进行清理。
+对应post 请求我们也可以通过 fetch方法拦截到，来进行一些自定义的返回。
+5. service worker 与主线程之间的通信
+- 主线程
+```js
+  // 传递
+  navigator.serviceWorker.controller && navigator.serviceWorker.controller.postMessage("this message is from page");
+
+  // 接收
+  navigator.serviceWorker.addEventListener('message', function (e) {
+    console.log('service worker传递的信息',e.data); 
+  });
+```
+- service worker
+```js
+self.addEventListener('message', (event)=>{
+  console.log('页面传递过来的数据',event.data)  // 收到主线程传递的信息
+  event.source.postMessage('this message is from sw.js to page');  // 向主线程传递信息
+})
+```
+- service worker 卸载
+```js
+  navigator.serviceWorker.getRegistrations().then(function (registrations) {
+    for (let registration of registrations) {
+      //安装在网页的service worker不止一个，找到我们的那个并删除
+      console.log(registration)
+      if (registration && registration.scope === 'http://localhost:8080/') {
+        registration.unregister()
+      }
+    }
+  })
+```
+- serviceworker 和 http缓存
+    - 在缓存文件更新方面
+        - 如果是http缓存，一刷新页面就可以拿到最新的资源
+        - 如果是sw缓存， 一刷新页面，会返回当前缓存中的资源（不是最新），然后请求sw.js文件发现更新后重新进入sw生命周期，重新去更新缓存，当你再次刷新时才能拿到最新资源。所以在缓存资源更新时，sw会延迟一次刷新才能获取最新资源
+    - 在缓存控制方面：
+        - http一般是由服务器端控制的，而sw则是可以前端自己控制，可以更好地控制缓存。
+        - 协商缓存返回状态码304， 强缓存返回的是200， 在这点上server worker和强缓存比较类似的返回也是200， 会对请求进行拦截，不会真是的发出请求。
+### WebWorker
+#### 概述
+JavaScript 语言采用的是单线程模型，也就是说，所有任务只能在一个线程上完成，一次只能做一件事。前面的任务没做完，后面的任务只能等着。随着电脑计算能力的增强，尤其是多核 CPU 的出现，单线程带来很大的不便，无法充分发挥计算机的计算能力。
+
+​ Web Worker 的作用，就是为 JavaScript 创造多线程环境，允许主线程创建 Worker 线程，将一些任务分配给后者运行。在主线程运行的同时，Worker 线程在后台运行，两者互不干扰。等到 Worker 线程完成计算任务，再把结果返回给主线程。这样的好处是，一些计算密集型或高延迟的任务，被 Worker 线程负担了，主线程（通常负责 UI 交互）就会很流畅，不会被阻塞或拖慢。
+
+Worker 线程一旦新建成功，就会始终运行，不会被主线程上的活动（比如用户点击按钮、提交表单）打断。这样有利于随时响应主线程的通信。但是，这也造成了 Worker 比较耗费资源，不应该过度使用，而且一旦使用完毕，就应该关闭。
+
+Web Worker 有以下几个使用注意点。
+- 同源限制
+    - 分配给 Worker 线程运行的脚本文件，必须与主线程的脚本文件同源。
+- DOM 限制
+    - Worker 线程所在的全局对象，与主线程不一样，无法读取主线程所在网页的 DOM 对象，也无法使用document、window、parent这些对象。但是，Worker 线程可以navigator对象和location对象。
+- 通信联系
+    - Worker 线程和主线程不在同一个上下文环境，它们不能直接通信，必须通过消息完成。
+- 脚本限制
+    - Worker 线程不能执行alert()方法和confirm()方法，但可以使用 XMLHttpRequest 对象发出 AJAX 请求。
+- 文件限制
+    - Worker 线程无法读取本地文件，即不能打开本机的文件系统（file://），它所加载的脚本，必须来自网络。
+#### 基本用法
+1. 主线程
+主线程采用new命令，调用Worker()构造函数，新建一个 Worker 线程。
+```js
+var worker = new Worker('work.js');
+```
+Worker()构造函数的参数是一个脚本文件，该文件就是 Worker 线程所要执行的任务。由于 Worker 不能读取本地文件，所以这个脚本必须来自网络。如果下载没有成功（比如404错误），Worker 就会默默地失败。
+然后，主线程调用worker.postMessage()方法，向 Worker 发消息。
+```js
+worker.postMessage('Hello World');
+worker.postMessage({method: 'echo', args: ['Work']});
+```
+worker.postMessage()方法的参数，就是主线程传给 Worker 的数据。它可以是各种数据类型，包括二进制数据。
+接着，主线程通过worker.onmessage指定监听函数，接收子线程发回来的消息。
+```js
+worker.onmessage = function (event) {
+  console.log('Received message ' + event.data);
+  doSomething();
+}
+
+function doSomething() {
+  // 执行任务
+  worker.postMessage('Work done!');
+}
+```
+上面代码中，事件对象的data属性可以获取 Worker 发来的数据。
+Worker 完成任务以后，主线程就可以把它关掉。
+```js
+worker.terminate();
+```
+2.  Worker 线程
+Worker 线程内部需要有一个监听函数，监听message事件。
+```js
+self.addEventListener('message', function (e) {
+  self.postMessage('You said: ' + e.data);
+}, false);
+```
+上面代码中，self代表子线程自身，即子线程的全局对象。因此，等同于下面两种写法。
+```js
+// 写法一
+this.addEventListener('message', function (e) {
+  this.postMessage('You said: ' + e.data);
+}, false);
+
+// 写法二
+addEventListener('message', function (e) {
+  postMessage('You said: ' + e.data);
+}, false);
+```
+除了使用self.addEventListener()指定监听函数，也可以使用self.onmessage指定。监听函数的参数是一个事件对象，它的data属性包含主线程发来的数据。self.postMessage()方法用来向主线程发送消息。
+根据主线程发来的数据，Worker 线程可以调用不同的方法，下面是一个例子。
+```js
+self.addEventListener('message', function (e) {
+  var data = e.data;
+  switch (data.cmd) {
+    case 'start':
+      self.postMessage('WORKER STARTED: ' + data.msg);
+      break;
+    case 'stop':
+      self.postMessage('WORKER STOPPED: ' + data.msg);
+      self.close(); // Terminates the worker.
+      break;
+    default:
+      self.postMessage('Unknown command: ' + data.msg);
+  };
+}, false);
+```
+3. Worker 加载脚本
+Worker 内部如果要加载其他脚本，有一个专门的方法importScripts()。
+```js
+ importScripts('script1.js');
+```
+该方法可以同时加载多个脚本。
+```js
+importScripts('script1.js', 'script2.js');
+```
+4. 错误处理
+主线程可以监听 Worker 是否发生错误。如果发生错误，Worker 会触发主线程的error事件。
+```js
+worker.onerror(function (event) {
+  console.log([
+    'ERROR: Line ', e.lineno, ' in ', e.filename, ': ', e.message
+  ].join(''));
+});
+
+// 或者
+worker.addEventListener('error', function (event) {
+  // ...
+});
+```
+Worker 内部也可以监听error事件。
+5. 关闭 Worker
+使用完毕，为了节省系统资源，必须关闭 Worker。
+```js
+// 主线程
+worker.terminate();
+
+// Worker 线程
+self.close();
+```
+#### 数据通信
+前面说过，主线程与 Worker 之间的通信内容，可以是文本，也可以是对象。需要注意的是，这种通信是拷贝关系，即是传值而不是传址，Worker 对通信内容的修改，不会影响到主线程。事实上，浏览器内部的运行机制是，先将通信内容串行化，然后把串行化后的字符串发给 Worker，后者再将它还原。
+
+主线程与 Worker 之间也可以交换二进制数据，比如 File、Blob、ArrayBuffer 等类型，也可以在线程之间发送。下面是一个例子。
+
+```js
+// 主线程
+var uInt8Array = new Uint8Array(new ArrayBuffer(10));
+for (var i = 0; i < uInt8Array.length; ++i) {
+  uInt8Array[i] = i * 2; // [0, 2, 4, 6, 8,...]
+}
+worker.postMessage(uInt8Array);
+
+// Worker 线程
+self.onmessage = function (e) {
+  var uInt8Array = e.data;
+  postMessage('Inside worker.js: uInt8Array.toString() = ' + uInt8Array.toString());
+  postMessage('Inside worker.js: uInt8Array.byteLength = ' + uInt8Array.byteLength);
+};
+```
+但是，拷贝方式发送二进制数据，会造成性能问题。比如，主线程向 Worker 发送一个 500MB 文件，默认情况下浏览器会生成一个原文件的拷贝。为了解决这个问题，JavaScript 允许主线程把二进制数据直接转移给子线程，但是一旦转移，主线程就无法再使用这些二进制数据了，这是为了防止出现多个线程同时修改数据的麻烦局面。这种转移数据的方法，叫做Transferable Objects。这使得主线程可以快速把数据交给 Worker，对于影像处理、声音处理、3D 运算等就非常方便了，不会产生性能负担。
+
+如果要直接转移数据的控制权，就要使用下面的写法。
+```js
+// Transferable Objects 格式
+worker.postMessage(arrayBuffer, [arrayBuffer]);
+
+// 例子
+var ab = new ArrayBuffer(1);
+worker.postMessage(ab, [ab]);
+```
+#### 同页面的 Web Worker
+通常情况下，Worker 载入的是一个单独的 JavaScript 脚本文件，但是也可以载入与主线程在同一个网页的代码。
+```html
+<!DOCTYPE html>
+  <body>
+    <script id="worker" type="app/worker">
+      addEventListener('message', function () {
+        postMessage('some message');
+      }, false);
+    </script>
+  </body>
+</html>
+```
+上面是一段嵌入网页的脚本，注意必须指定<script>标签的type属性是一个浏览器不认识的值，上例是app/worker。
+然后，读取这一段嵌入页面的脚本，用 Worker 来处理。
+```js
+var blob = new Blob([document.querySelector('#worker').textContent]);
+var url = window.URL.createObjectURL(blob);
+var worker = new Worker(url);
+
+worker.onmessage = function (e) {
+  // e.data === 'some message'
+};
+```
+上面代码中，先将嵌入网页的脚本代码，转成一个二进制对象，然后为这个二进制对象生成 URL，再让 Worker 加载这个 URL。这样就做到了，主线程和 Worker 的代码都在同一个网页上面。
+#### 实例：Worker 线程完成轮询
+有时，浏览器需要轮询服务器状态，以便第一时间得知状态改变。这个工作可以放在 Worker 里面。
+```js
+function createWorker(f) {
+  var blob = new Blob(['(' + f.toString() +')()']);
+  var url = window.URL.createObjectURL(blob);
+  var worker = new Worker(url);
+  return worker;
+}
+
+var pollingWorker = createWorker(function (e) {
+  var cache;
+
+  function compare(new, old) { ... };
+
+  setInterval(function () {
+    fetch('/my-api-endpoint').then(function (res) {
+      var data = res.json();
+
+      if (!compare(data, cache)) {
+        cache = data;
+        self.postMessage(data);
+      }
+    })
+  }, 1000)
+});
+
+pollingWorker.onmessage = function () {
+  // render data
+}
+
+pollingWorker.postMessage('init');
+// 上面代码中，Worker 每秒钟轮询一次数据，然后跟缓存做比较。如果不一致，就说明服务端有了新的变化，因此就要通知主线程。
+```
+#### 实例： Worker 新建 Worker
+Worker 线程内部还能再新建 Worker 线程（目前只有 Firefox 浏览器支持）。下面的例子是将一个计算密集的任务，分配到10个 Worker。
+
+主线程代码如下。
+```js
+var worker = new Worker('worker.js');
+worker.onmessage = function (event) {
+  document.getElementById('result').textContent = event.data;
+};
+```
+Worker 线程代码如下。
+```js
+// worker.js
+
+// settings
+var num_workers = 10;
+var items_per_worker = 1000000;
+
+// start the workers
+var result = 0;
+var pending_workers = num_workers;
+for (var i = 0; i < num_workers; i += 1) {
+  var worker = new Worker('core.js');
+  worker.postMessage(i * items_per_worker);
+  worker.postMessage((i + 1) * items_per_worker);
+  worker.onmessage = storeResult;
+}
+
+// handle the results
+function storeResult(event) {
+  result += event.data;
+  pending_workers -= 1;
+  if (pending_workers <= 0)
+    postMessage(result); // finished!
+}
+```
+上面代码中，Worker 线程内部新建了10个 Worker 线程，并且依次向这10个 Worker 发送消息，告知了计算的起点和终点。计算任务脚本的代码如下。
+```js
+// core.js
+var start;
+onmessage = getStart;
+function getStart(event) {
+  start = event.data;
+  onmessage = getEnd;
+}
+
+var end;
+function getEnd(event) {
+  end = event.data;
+  onmessage = null;
+  work();
+}
+
+function work() {
+  var result = 0;
+  for (var i = start; i < end; i += 1) {
+    // perform some complex calculation here
+    result += 1;
+  }
+  postMessage(result);
+  close();
+}
+```
+#### API
+1. 主线程
+浏览器原生提供Worker()构造函数，用来供主线程生成 Worker 线程。
+```js
+var myWorker = new Worker(jsUrl, options);
+```
+Worker()构造函数，可以接受两个参数。第一个参数是脚本的网址（必须遵守同源政策），该参数是必需的，且只能加载 JS 脚本，否则会报错。第二个参数是配置对象，该对象可选。它的一个作用就是指定 Worker 的名称，用来区分多个 Worker 线程。
+```js
+// 主线程
+var myWorker = new Worker('worker.js', { name : 'myWorker' });
+
+// Worker 线程
+self.name // myWorker
+```
+Worker()构造函数返回一个 Worker 线程对象，用来供主线程操作 Worker。Worker 线程对象的属性和方法如下。
+```md
+Worker.onerror：指定 error 事件的监听函数。
+Worker.onmessage：指定 message 事件的监听函数，发送过来的数据在Event.data属性中。
+Worker.onmessageerror：指定 messageerror 事件的监听函数。发送的数据无法序列化成字符串时，会触发这个事件。
+Worker.postMessage()：向 Worker 线程发送消息。
+Worker.terminate()：立即终止 Worker 线程。
+```
+2. Worker 线程
+Web Worker 有自己的全局对象，不是主线程的window，而是一个专门为 Worker 定制的全局对象。因此定义在window上面的对象和方法不是全部都可以使用。
+Worker 线程有一些自己的全局属性和方法。
+```md
+self.name： Worker 的名字。该属性只读，由构造函数指定。
+self.onmessage：指定message事件的监听函数。
+self.onmessageerror：指定 messageerror 事件的监听函数。发送的数据无法序列化成字符串时，会触发这个事件。
+self.close()：关闭 Worker 线程。
+self.postMessage()：向产生这个 Worker 线程发送消息。
+self.importScripts()：加载 JS 脚本。
+```
+### WebWorker 和 Service Worker区别?
+- Web Worker
+    - Worker 和 主线程互不干扰，通常用于替主线程分担计算密集型任务，防止主线程中JS执行时阻塞UI。
+    - Worker本身也会耗费资源，因此一旦使用完毕，就应该分别使用terminate和close方法关闭。
+    - worker线程无法读取本地文件，因此其脚本文件也必须为网络资源，且必须与主线程脚本文件同源
+    - worker无法读取/操作dom对象，没有alert()和confirm()方法，也无法获取document、window、parent，但是可以获取navigator和location。
+- service worker
+    - 基于web worker(因此拥有web worker的各种特性)，充当服务器与浏览器之间的代理服务器（可以拦截请求，并作出开发者指定的动作），拥有离线缓存能力
+    - 它设计为完全异步，同步API（如XHR和localStorage）不能在service worker中使用
+    - 出于安全考量，Service Worker 只能使用在 https 或本地的 localhost 环境下
+    - 不同于Web Worker，Service Worker 是一个进程而不是线程，其生命周期与页面无关（关联页面未关闭时，它也可以退出，没有关联页面时，它也可以启动），且可以被多个页面公用
 ### JWT
 #### 什么是 JWT
 
@@ -7710,7 +8381,6 @@ ping命令是使用的网络层协议ICMP
 ### 域名访问和ip访问区别
 1. ip访问对应某一台确定的服务器；
 2. 域名访问相当于在ip访问的基础上，做了一个反向代理的中间功能。例如：百度，很多人会同时使用，如果使用的是同一台服务器的话，服务器估计会扛不住，如果访问的是域名，中间的反向代理，可以将用户反向代理到不同的服务器上，减轻服务器压力。
-### 怎么进行域名和 IP 的换绑 ？？？？？？？？？
 ### TCP三次握手和四次挥手
 - 为什么要进行三次握手：为了确认对方的发送和接收能力。
   - 第一次握手：建立连接时，客户端发送syn包（syn=j）到服务器，并进入SYN_SENT状态，等待服务器确认；SYN：同步序列编号（Synchronize Sequence Numbers）。
@@ -8964,7 +9634,46 @@ const routes: Array<RouteConfig> = [
 
 - IP（Internet Protocol）独立IP数，是指1天内多少个独立的IP浏览了页面，即统计不同的IP浏览用户数量。同一IP不管访问了几个页面，独立IP数均为1；不同的IP浏览页面，计数会加1。 IP是基于用户广域网IP地址来区分不同的访问者的，所以，多个用户（多个局域网IP）在同一个路由器（同一个广域网IP）内上网，可能被记录为一个独立IP访问者。如果用户不断更换IP，则有可能被多次统计。
 ## Vue
-### PWA????????????
+### 如何封装组件？？？？
+### 如何设计组件？？？？
+### 如何设计组件库？？？？
+### PWA?？？？？？？？？？？？？
+渐进式网络应用（PWA）是谷歌在2015年底提出的概念。基本上算是web应用程序，但在外观和感觉上与原生app类似。支持PWA的网站可以提供脱机工作、推送通知和设备硬件访问等功能。
+
+- 主要的优点
+    - 可被浏览器主动发现
+    - 易安装，手机上可以把应用图标发往手机桌面，电脑上可以安装在浏览器中
+    - 独立于网络，可以离线访问，主动推送消息，资源预缓存以及离线优先
+    - 渐进式，向下兼容
+    - 响应式，多端适配
+- 主要的缺点
+    - 浏览器兼容性差，目前该特性只有新版本谷歌浏览器、火狐浏览器、Edge 浏览器支持
+- 解决的问题
+    - 如何正确缓存网站资源并使其在离线时可用的问题
+    - 主要利用了浏览器提供的 Service Worker的能力，Service Worker 运行在一个与页面 JavaScript 主线程独立的线程上，可以控制网络请求、消息推送和执行指定的任务。利用控制网络请求的能力，可以实现页面离线访问。
+- 配置三要素
+    - 可靠的Https网络协议
+    - service-worker.js
+    - manifest.json
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211120203105.png)
+#### PWA有那些优点？
+- 更小更快: 渐进式的web应用程序比原生应用程序小得多。他们甚至不需要安装。这是他们没有浪费磁盘空间和加载速度非常快。
+- 响应式界面: PWA支持的网页能够自动适应各种屏幕大小。它可以是手机、平板、台式机或笔记本。
+- 无需更新: 大多数移动应用程序需要每周定期更新。与普通网站一样，每当用户交互发生且不需要应用程序或游戏商店批准时，PWA总是加载最新更新版本。
+- 高性价比：原生移动应用需要分别为Android和iOS设备开发，开发成本非常高。另一方面，PWAs有着相同的功能，但只是先前价格的一小部分，开发成本低。
+- SEO优势：搜索引擎可以发现PWAs，并且加载速度非常快。就像其他网站一样，它们的链接也可以共享。提供良好的用户体验和结果，在SEO排名提高。
+- 脱机功能：由于service worker API的支持，可以在脱机或低internet连接中访问PWAs。
+- 安全性：PWAs通过HTTPS连接传递，并在每次交互中保护用户数据。
+- 推送通知：通过推送通知的支持，PWAs轻松地与用户进行交互，提供非常棒的用户体验。
+- 绕过应用商店：原生app如果需要任何新的更新,需要应用商店几天的审批，且有被拒绝或禁止的可能性,对于这方面来说，PWAs有它独特的优势，不需要App Store支持。更新版本可以直接从web服务器加载，无需App Store批准。
+- 零安装：在浏览过程中，PWA会在手机和平板电脑上有自己的图标，就像移动应用程序一样，但不需要经过冗长的安装过程。
+####  PWA有什么缺点？
+- 对系统功能的访问权限较低：目前PWA对本机系统功能的访问权限比原生app有限。而且，所有的浏览器都不支持它的全部功能，但可能在不久的将来，它将成为新的开发标准。
+- 多数Android，少数iOS：目前更多的支持来自Android。iOS系统只提供了部分。
+- 没有审查标准：PWAs不需要任何适用于应用商店中本机应用的审查，这可能会加快进程，但缺乏从应用程序商店中获取推广效益。
+
+
+
 ### SSR
 #### 什么是SSR
 SSR是Server Side Render简称，叫服务端渲染
@@ -9016,6 +9725,8 @@ SPA是怎么实现的呢？为什么不需要重新加载页面就能达到页�
     - 初次加载时耗时多
     - 页面复杂度提高很多
 ### 认为 node.js，vue，react 各种出现的原因和各自优缺点是啥？？？？？？？
+### 为什么vue是渐进式框架？？？？？？？
+### slot是干嘛的？？？？？？
 ### Vue框架有哪些有点和缺点?
 优点：渐进式，组件化，轻量级，虚拟dom，响应式，单页面路由，数据与视图分开。
 缺点：单页面不利于seo，不支持IE8以下，首屏加载时间长。
@@ -9030,6 +9741,7 @@ SPA是怎么实现的呢？为什么不需要重新加载页面就能达到页�
     - 2.数据变化，React手动(setState)，Vue自动(初始化已响应式处理，Object.defineProperty，Proxy)
     - 3.React单向绑定，Vue双向绑定
     - 4.React的Redux，Vue的Vuex
+### jQuery和Vue的区别？？？？？？
 ### v-model原理？
 #### v-model原理
 v-model实际上时语法糖，下面就是语法糖的构造过程。
@@ -11026,7 +11738,21 @@ Webpack 的运行流程是一个串行的过程：
 - 完成模块编译：在经过第4步使用 Loader 翻译完所有模块后，得到了每个模块被翻译后的最终内容以及它们之间的依赖关系
 - 输出资源：根据入口和模块的依赖关系，组装成一个个包含多个模块的chunk，然后将chunk转换成一个单独的文件加入输出列表，这是可以修改输出内容的最后机会
 - 输出完成：在确定好输出内容后，根据配置确定输出的路径和文件名，把文件内容写入到文件系统
-### webpack打包的生命周期??????????????
+### webpack打包的生命周期?
+首先，我们需要读到入口文件里的内容（也就是index.js的内容）
+
+其次，分析入口文件，递归的去读取模块所依赖的文件内容，生成依赖图
+
+最后，根据依赖图，生成浏览器能够运行的最终代码
+
+
+- 初始化参数 从配置文件和 Shell 语句中读取与合并参数，得出最终的参数
+- 开始编译 用上一步得到的参数初始化 Compiler 对象，加载所有配置的插件，执行对象的 run 方法开始执行编译
+- 确定入口 根据配置中的 entry 找出所有的入口文件
+- 编译模块 从入口文件出发，调用所有配置的 Loader 对模块进行编译，再找出该模块被编译后的最终内容以及它们之间的依赖关系
+- 完成模块编译 在经过第4步使用 Loader 翻译完所有模块后，得到了每个模块被翻译后的最终内容以及它们之间的依赖关系
+- 输出资源 根据入口和模块之间的依赖关系，组装成一个个包含多个模块的 Chunk，再把每个 Chunk 转换成一个单独的文件加入到输出列表，这步是可以修改输出内容的最后机会
+- 输出完成 在确定好输出内容后，根据配置确定输出的路径和文件名，把文件内容写入到文件系统
 ### Webpack特点
 - 代码分割
   - Webpack 有两种组织模块依赖的方式，同步和异步。异步依赖作为分割点，形成一个新的块。在优化了依赖树后，每一个异步区块都作为一个文件被打包。
@@ -11038,6 +11764,45 @@ Webpack 的运行流程是一个串行的过程：
   - Webpack 还有一个功能丰富的插件系统。大多数内容功能都是基于这个插件系统运行的，还可以开发和使用开源的 Webpack 插件，来满足各式各样的需求。
 - 支持热模块替换(HMR)
 - 在开发应用时使用 Webpack，开发库时使用 Rollup。
+### plugin?
+plugin完成的是loader不能完成的功能。plugin也是为了扩展webpack的功能，但是 plugin 是作用于webpack本身上的。而且plugin不仅只局限在打包，资源的加载上，它的功能要更加丰富。从打包优化和压缩，到重新定义环境变量，功能强大到可以用来处理各种各样的任务。webpack提供了很多开箱即用的插件：CommonChunkPlugin主要用于提取第三方库和公共模块，避免首屏加载的bundle文件，或者按需加载的bundle文件体积过大，导致加载时间过长，是一把优化的利器。而在多页面应用中，更是能够为每个页面间的应用程序共享代码创建bundle。插件可以携带参数，所以在plugins属性传入new实例。
+
+plugins在整个编译周期都起作用。
+### plugin 的执行顺序???????????
+### 有哪些常见的Plugin？你用过哪些Plugin？
+- define-plugin：定义环境变量 (Webpack4 之后指定 mode 会自动配置)
+- ignore-plugin：忽略部分文件
+- html-webpack-plugin：简化 HTML 文件创建 (依赖于 html-loader)
+- web-webpack-plugin：可方便地为单页应用输出 HTML，比 html-webpack-plugin 好用
+- uglifyjs-webpack-plugin：不支持 ES6 压缩 (Webpack4 以前)
+- terser-webpack-plugin: 支持压缩 ES6 (Webpack4)
+- webpack-parallel-uglify-plugin: 多进程执行代码压缩，提升构建速度
+- mini-css-extract-plugin: 分离样式文件，CSS 提取为独立文件，支持按需加载 (替代extract-text-webpack-plugin)
+- serviceworker-webpack-plugin：为网页应用增加离线缓存功能
+- clean-webpack-plugin: 目录清理
+- ModuleConcatenationPlugin: 开启 Scope Hoisting
+- speed-measure-webpack-plugin: 可以看到每个 Loader 和 Plugin 执行耗时 (整个打包耗时、每个 Plugin 和 Loader 耗时)
+- webpack-bundle-analyzer: 可视化 Webpack 输出文件的体积 (业务组件、依赖第三方模块)
+### 是否写过Plugin？简单描述一下编写Plugin的思路？
+webpack在运行的生命周期中会广播出许多事件，Plugin 可以监听这些事件，在特定的阶段钩入想要添加的自定义功能。Webpack 的 Tapable 事件流机制保证了插件的有序性，使得整个系统扩展性良好。
+- compiler 暴露了和 Webpack 整个生命周期相关的钩子
+- compilation 暴露了与模块和依赖有关的粒度更小的事件钩子
+- 插件需要在其原型上绑定apply方法，才能访问 compiler 实例
+- 传给每个插件的 compiler 和 compilation对象都是同一个引用，若在一个插件中修改了它们身上的属性，会影响后面的插件
+- 找出合适的事件点去完成想要的功能
+  - emit 事件发生时，可以读取到最终输出的资源、代码块、模块及其依赖，并进行修改(emit 事件是修改 Webpack 输出资源的最后时机)
+  - watch-run 当依赖的文件发生变化时会触发
+
+- 异步的事件需要在插件处理完任务时调用回调函数通知 Webpack 进入下一个流程，不然会卡住
+### 手写一个plugins？？？？？？
+### loader?
+loader从字面的意思理解，是 加载 的意思。
+由于webpack 本身只能打包commonjs规范的js文件，所以，针对css，图片等格式的文件没法打包，就需要引入第三方的模块进行打包。loader虽然是扩展了 webpack ，但是它只专注于转化文件（transform）这一个领域，完成压缩，打包，语言翻译。loader是运行在NodeJS中。仅仅只是为了打包。
+
+
+ loader运行在打包文件之前（loader为在模块加载时的预处理文件）
+### loader 的执行顺序
+默认情况下是：从右往左，从下往上。
 ### 有哪些常见的Loader？你用过哪些Loader？
 
 - raw-loader：加载文件原始内容（utf-8）
@@ -11062,25 +11827,6 @@ Webpack 的运行流程是一个串行的过程：
 - vue-loader：加载 Vue.js 单文件组件
 - i18n-loader: 国际化
 - cache-loader: 可以在一些性能开销较大的 Loader 之前添加，目的是将结果缓存到磁盘里
-### plugin?????????????????
-### plugin 的执行顺序???????????
-### 有哪些常见的Plugin？你用过哪些Plugin？
-- define-plugin：定义环境变量 (Webpack4 之后指定 mode 会自动配置)
-- ignore-plugin：忽略部分文件
-- html-webpack-plugin：简化 HTML 文件创建 (依赖于 html-loader)
-- web-webpack-plugin：可方便地为单页应用输出 HTML，比 html-webpack-plugin 好用
-- uglifyjs-webpack-plugin：不支持 ES6 压缩 (Webpack4 以前)
-- terser-webpack-plugin: 支持压缩 ES6 (Webpack4)
-- webpack-parallel-uglify-plugin: 多进程执行代码压缩，提升构建速度
-- mini-css-extract-plugin: 分离样式文件，CSS 提取为独立文件，支持按需加载 (替代extract-text-webpack-plugin)
-- serviceworker-webpack-plugin：为网页应用增加离线缓存功能
-- clean-webpack-plugin: 目录清理
-- ModuleConcatenationPlugin: 开启 Scope Hoisting
-- speed-measure-webpack-plugin: 可以看到每个 Loader 和 Plugin 执行耗时 (整个打包耗时、每个 Plugin 和 Loader 耗时)
-- webpack-bundle-analyzer: 可视化 Webpack 输出文件的体积 (业务组件、依赖第三方模块)
-### loader?????????????????
-### loader 的执行顺序
-默认情况下是：从右往左，从下往上。
 ### 是否写过Loader？简单描述一下编写loader的思路？
 Loader 支持链式调用，所以开发上需要严格遵循“单一职责”，每个 Loader 只负责自己需要负责的事情。
 
@@ -11092,17 +11838,7 @@ Loader 支持链式调用，所以开发上需要严格遵循“单一职责”�
 - 加载本地 Loader 方法
   - Npm link
   - ResolveLoader
-### 是否写过Plugin？简单描述一下编写Plugin的思路？
-webpack在运行的生命周期中会广播出许多事件，Plugin 可以监听这些事件，在特定的阶段钩入想要添加的自定义功能。Webpack 的 Tapable 事件流机制保证了插件的有序性，使得整个系统扩展性良好。
-- compiler 暴露了和 Webpack 整个生命周期相关的钩子
-- compilation 暴露了与模块和依赖有关的粒度更小的事件钩子
-- 插件需要在其原型上绑定apply方法，才能访问 compiler 实例
-- 传给每个插件的 compiler 和 compilation对象都是同一个引用，若在一个插件中修改了它们身上的属性，会影响后面的插件
-- 找出合适的事件点去完成想要的功能
-  - emit 事件发生时，可以读取到最终输出的资源、代码块、模块及其依赖，并进行修改(emit 事件是修改 Webpack 输出资源的最后时机)
-  - watch-run 当依赖的文件发生变化时会触发
-
-- 异步的事件需要在插件处理完任务时调用回调函数通知 Webpack 进入下一个流程，不然会卡住
+### 手写一个loader？？？？？？？？？
 ### Webpack的loader和plugins的区别
   
 Loader 本质就是一个函数，在该函数中对接收到的内容进行转换，返回转换后的结果。 因为 Webpack 只认识 JavaScript，所以 Loader 就成了翻译官，对其他类型的资源进行转译的预处理工作。
@@ -11607,7 +12343,15 @@ Vite(读音类似于[weɪt]，法语，快的意思) 是一个由原生 ES Modul
 - 即时热模块更换（热更新）
 - 真正的按需编译
   Vite 要求项目完全由 ES Module 模块组成，common.js 模块不能直接在 Vite 上使用。因此不能直接在生产环境使用。在打包上依旧还是使用 rollup 等传统打包工具。因此 Vite 目前更像是一个类似于 webpack-dev-server 的开发工具.
-### Vite为什么这么快??????????????
+### Vite为什么这么快?
+Webpacp先打包构建再启动开发服务器。
+Vite 巧妙地利用了浏览器对 ESM 的支持，先启动开发服务器,首次启动时会执行依赖预构建，当代码执行到模块加载时再请求对应模块的文件。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211120205244.png)
+
+- 利用原生的 ESM，不用自己实现一套兼容各种模块标准的模块化方案，开发服务器启动后用到什么资源请求什么资源，天然的按需加载。
+- 利用 esbuild 把耗时的构建过程变成更轻量的依赖预构建，构建速度几十上百倍的提升
+- 预构建依赖时会缓存文件，浏览器请求过的依赖也会设置强缓存，其它资源开发服务器也会根据是否变动协商缓存。
 ### ES Module是什么?????????cjs amd cmd umd
 ### Vite 的基本实现原理
 Vite 的基本实现原理，就是启动一个 koa 服务器拦截浏览器请求ES Module的请求。通过 path 找到目录下对应的文件做一定的处理最终以 ES Modules 格式返回给客户端
@@ -17112,3 +17856,4 @@ body{
 ## 其他
 ### 最近关注的技术，细说一个你比较了解的
 ### 平时会在哪里学习技术，看哪些资料
+### 前端有哪 几个方向？？？
