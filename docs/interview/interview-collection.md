@@ -148,9 +148,392 @@ web后端：就是用户看不见摸不着的数据库交互处理的业务逻�
 
 ## CSS
 ### div拖拽？？？？？？？
-### 线性渐变？？？？？？？？
-### CSS3有哪些新特性？？？？？？？
-### CSS3动画性能比较好？？？？？？？
+### 线性渐变?
+线性渐变`linear-gradient()` 第一个参数: 可不写, 默认值为`to bottom `(即180%), 用来指定渐变的方向, 可是是具体的角度值, 也可以直接指定方位`to left`/ `to right`/` to top`/ `to bottom`。
+
+为实现渐变, 还需要至少定义两个颜色结点, 每个颜色节点可由两个参数组成, [颜色值 位置值, 颜色值 位置值, ...], 其中颜色值为必填项, 位置值可为长度, 也可以是百分比, 非必填项。
+
+如: `linear-gradient(red 30%, blue 80%);` 表示: 容器顶部30%的区域被填充为红色实色, 容器中间50%的高度区域被填充为从红色到蓝色的渐变色, 容器底部20%区域被填充为蓝色实色。
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>线性渐变实验一</title>
+    <style>
+        div{
+            margin:50px 20px;
+            width:180px;
+            height:100px;
+            float:left;
+            text-align: center;
+            line-height:100px;
+            color:white;
+        }
+        .gradient_1{
+            background:linear-gradient(red, blue);
+        }
+        .gradient_2{
+            background:linear-gradient(to top,red, blue);
+        }
+        .gradient_3{
+            background:linear-gradient(to right,red, blue);
+        }
+        .gradient_4{
+            background:linear-gradient(to left,red, blue);
+            /* 只写一个right表示起始位置是右边，也就是从右到左 */
+            /* background: -webkit-linear-gradient(right, red, blue); */
+            /* background: -moz-linear-gradient(right, red, blue); */
+            /* background: -o-linear-gradient(right, red, blue); */
+        }
+        .gradient_5{
+            background:linear-gradient(to right bottom,red, blue);
+        }
+        .gradient_6{
+            background:linear-gradient(to left top,red, blue);
+        }
+    </style>
+</head>
+<body>
+    <div class="gradient_1">
+        从上到下
+    </div>  
+    <div class="gradient_2">
+        从下到上
+    </div> 
+    <div class="gradient_3">
+        从左到右
+    </div> 
+    <div class="gradient_4">
+        从右到左
+    </div> 
+    <div class="gradient_5">
+        从左上角到右下角
+    </div> 
+    <div class="gradient_6">
+        从右下角到左上角
+    </div>    
+</body>
+</html>
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211121222414.png)
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>线性渐变实验二</title>
+    <style>
+        div{
+            margin:50px 20px;
+            width:200px;
+            height:100px;
+            float:left;
+            text-align: center;
+            line-height:100px;
+            color:white;
+        }
+        .gradient_1{
+            background:linear-gradient(0deg,red, blue);
+        }
+        .gradient_2{
+            background:linear-gradient(45deg,red, blue);
+        }
+        .gradient_3{
+            background:linear-gradient(90deg,red, blue);
+        }
+        .gradient_4{
+            background:linear-gradient(135deg,red, blue);
+        }
+        .gradient_5{
+            background:linear-gradient(180deg,red, blue);
+        }
+        .gradient_6{
+            background:linear-gradient(225deg,red, blue);
+        }
+        .gradient_7{
+            background:linear-gradient(270deg,red, blue);
+        }
+        .gradient_8{
+            background:linear-gradient(315deg,red, blue);
+        }
+        .gradient_9{
+            background:linear-gradient(360deg,red, blue);
+        }
+    </style>
+</head>
+<body>
+    <div class="gradient_1">
+         0edeg
+    </div>  
+    <div class="gradient_2">
+        45deg
+    </div> 
+    <div class="gradient_3">
+        90deg
+    </div> 
+    <div class="gradient_4">
+        135deg
+    </div> 
+    <div class="gradient_5">
+        180deg
+    </div> 
+    <div class="gradient_6">
+        225deg
+    </div>  
+    <div class="gradient_7">
+         270deg
+    </div> 
+    <div class="gradient_8">
+        315deg
+    </div> 
+    <div class="gradient_9">
+        360deg
+    </div>  
+</body>
+</html>
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211121222443.png)
+已经实现了简单的条纹效果, 接下来实现简单的条纹背景, 这里需要借助 background-size 来控制每一块条纹背景的大小, 并且background-repeat 应该设置为repeat。
+```html
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>线性渐变实验三</title>
+    <style>
+        div{
+            margin:50px 20px;
+            width:180px;
+            height:180px;
+            float:left;
+            text-align: center;
+            line-height:180px;
+            color:white;
+        }
+        .gradient_1{
+            background:linear-gradient(red 20%, blue 80%);
+            /* 渐变填充区域为容器中间40%的高度区域, 其他区域填充的颜色为实色。 */
+        }
+        .gradient_2{
+            background:linear-gradient(red 50%, blue 50%);
+        }
+        .gradient_3{
+            background:linear-gradient(red 33%, blue 33%,blue 66%,green 66%);
+        }
+        .gradient_4{
+            background:linear-gradient(red 40%, blue 0);
+            /* CSS图像(第三版)规范: 如果某个色标的位置值比整个列表中在它之前的色标的位置值都要小, 则该色标的位置值会被设置为它前面所有色标位置值的最大值。 */
+        }
+        .gradient_5{
+            background: linear-gradient(red 50%, blue 0);
+            background-size: 100% 40px;
+        }
+        .gradient_6{
+            background: linear-gradient(45deg,red 50%, blue 0);
+        }
+        .gradient_7{
+            background: linear-gradient(45deg,red 50%, blue 0);
+            background-size: 50px 50px;
+        }
+        .gradient_8{
+            background: linear-gradient(45deg,red 25%, blue 0, blue 50%, red 0,red 75%,blue 0);
+        }
+        .gradient_9{
+            background: linear-gradient(45deg,red 25%, blue 0, blue 50%, red 0,red 75%,blue 0);
+            background-size: 50px 50px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="gradient_1">
+        有渐变颜色
+    </div>  
+    <div class="gradient_2">
+        颜色分明
+    </div> 
+    <div class="gradient_3">
+        三种颜色
+    </div>
+    <div class="gradient_4">
+        占比不一样
+    </div>  
+    <div class="gradient_5">
+        条纹1
+    </div>
+    <div class="gradient_6">
+        条纹2
+    </div>
+    <div class="gradient_7">
+        条纹3
+    </div>
+    <div class="gradient_8">
+        条纹4
+    </div> 
+    <div class="gradient_9">
+        条纹5
+    </div>
+         
+   
+</body>
+</html>
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211121222644.png)
+边框缺角。
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>线性渐变实验三</title>
+    <style>
+        div{
+            margin:50px 20px;
+            width:180px;
+            height:180px;
+            float:left;
+            text-align: center;
+            line-height:180px;
+            color:white;
+        }
+        .gradient_1{
+            background: linear-gradient(-125deg, #fff 15px, #58a 0);
+        }
+        .gradient_2{
+            background: linear-gradient(125deg, #fff 15px, #58a 0), 
+                        linear-gradient(-125deg, #fff 15px, #58a 0);
+            background-size: 50% 100%;
+            background-position: left, right;
+            background-repeat: no-repeat;
+        }
+        .gradient_3{
+            background: linear-gradient(125deg, #fff 15px, #58a 0), 
+                        linear-gradient(-125deg, #fff 15px, #58a 0),
+                        linear-gradient(45deg, #58a 15px, #58a 0), 
+                        linear-gradient(-45deg, #fff 15px, #58a 0);
+            background-size: 50% 50%;
+            background-position: top left, top right, bottom left, bottom right;
+            background-repeat: no-repeat;
+        }
+
+        .gradient_4{
+            background: linear-gradient(125deg, #fff 15px, #58a 0), 
+                        linear-gradient(-125deg, #fff 15px, #58a 0),
+                        linear-gradient(45deg, #fff 15px, #58a 0), 
+                        linear-gradient(-45deg, #fff 15px, #58a 0);
+            background-size: 50% 50%;
+            background-position: top left, top right, bottom left, bottom right;
+            background-repeat: no-repeat;
+        }
+    </style>
+</head>
+<body>
+    <div class="gradient_1">
+        缺一个角
+    </div>  
+    <div class="gradient_2">
+        缺两个角
+    </div> 
+    <div class="gradient_3">
+        缺三个角
+    </div>
+    <div class="gradient_4">
+        缺四个角
+    </div>  
+
+         
+   
+</body>
+</html>
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211121222735.png)
+
+### CSS3有哪些新特性？
+-  新特性
+    -  新增各种CSS选择器 （: not(.input)：所有 class 不是“input”的节点）
+    -  圆角 （border-radius:8px）
+    -  多列布局 （column）
+    -  阴影和反射 （Shadow\Reflect）
+    -  文字特效 （text-shadow）
+    -  线性渐变 （gradient）
+    -  旋转，缩放,定位,倾斜 （transform）
+    -  动画 （Animation）
+    -  多背景，背景裁剪
+    -  颜色
+        -  rgba()函数
+        -  hsl()及hsla()函数
+        -  opacity属性，用于设置透明度
+    - 弹性布局 flex
+    - 盒子模型: box-sizing
+
+- 新增伪类 - 伪元素
+    - p:first-of-type 选择属于其父元素的首个 元素的每个 元素。
+    - p:last-of-type 选择属于其父元素的最后 元素的每个 元素。
+    - p:only-of-type 选择属于其父元素唯一的 元素的每个元素。
+    - p:only-child 选择属于其父元素的唯一子元素的每个 元素。
+    - p:nth-child(2) 选择属于其父元素的第二个子元素的每个 元素。
+    - :enabled 已启用的表单元素。
+    - :disabled 已禁用的表单元素。
+    - :checked 单选框或复选框被选中。
+    - ::before 在元素之前添加内容。
+    - ::after 在元素之后添加内容,也可以用来做清除浮动。
+    - ::first-line 添加一行特殊样式到首行。
+    - ::first-letter 添加一个特殊的样式到文本的首字母。
+    - 伪类语法一个：，它是为了弥补css常规类选择器的不足
+    - 伪元素语法两个：，它是凭空创建的一个虚拟容器生成的元素
+### CSS3动画性能比较好？
+#### JS动画
+JS 动画是逐帧动画，在时间帧上绘制内容，一帧一帧的，所以他的可再造性很高，几乎可以完成任何你想要的动画形式。但是由于逐帧动画的内容不一样，会增加制作的负担，占用比较大的资源空间。
+
+- 缺点：
+    - (1)JavaScript在浏览器的主线程中运行，而主线程中还有其它需要运行的JavaScript脚本、样式计算、布局、绘制任务等,对其干扰导致线程可能出现阻塞，从而造成丢帧的情况。
+    - (2)代码的复杂度高于CSS动画
+- 优点：
+    - (1)JavaScript动画控制能力很强, 可以在动画播放过程中对动画进行控制：开始、暂停、回放、终止、取消都是可以做到的。
+    - (2)动画效果比css3动画丰富,有些动画效果，比如曲线运动,冲击闪烁,视差滚动效果，只有JavaScript动画才能完成
+    - (3)CSS3有兼容性问题，而JS大多时候没有兼容性问题
+#### CSS动画
+CSS3 动画也被称为补间动画，原因是只需要添加关键帧的位置，其他的未定义的帧会被自动生成。
+
+因为我们只设置了几个关键帧的位置，所以在进行动画控制的时候比较困难，不能再半路暂停动画，或者在动画过程中添加一些其他操作，都不大容易。
+
+- 缺点：
+    - (1)运行过程控制较弱,无法附加事件绑定回调函数。CSS动画只能暂停,不能在动画中寻找一个特定的时间点，不能在半路反转动画，不能变换时间尺度，不能在特定的位置添加回调函数或是绑定回放事件,无进度报告。
+    - (2)代码冗长。想用 CSS 实现稍微复杂一点动画,最后CSS代码都会变得非常笨重。
+- 优点：
+    - (1)浏览器可以对动画进行优化。
+    - (2)代码相对简单,性能调优方向固定
+    - (3)对于帧速表现不好的低版本浏览器，CSS3可以做到自然降级，而JS则需要撰写额外代码
+#### CSS动画流畅的原因
+从实现动画的复杂度来看，CSS 动画大多数都是补间动画，而 JS 动画是逐帧动画。当然这里我们不谈论实现的效果
+
+渲染线程分为main thread(主线程)和compositor thread(合成器线程)。
+
+如果CSS动画只是改变transform和opacity，这时整个CSS动画得以在compositor thread完成（而JS动画则会在main thread执行，然后触发compositor进行下一步操作）。
+
+在JS执行一些昂贵的任务时，main thread繁忙，CSS动画由于使用了compositor thread可以保持流畅。
+
+#### CSS动画比JS流畅的前提
+- JS在执行一些昂贵的任务
+- 同时CSS动画不触发layout或paint，在CSS动画或JS动画触发了paint或layout时，需要main thread进行Layer树的重计算，这时CSS动画或JS动画都会阻塞后续操作。
+-  只有如下属性的修改才符合“仅触发Composite，不触发layout或paint”：
+    -  backface-visibility
+    -  opacity
+    -  transfrom
+    -  perspective-origin
+    -  perspective
+- 所以只有用上了3D加速或修改opacity时，css3动画的优势才会体现出来。
 ### min-width、max-width、width的包含(优先级关系)关系?
 min-width和max-width分别限制了元素的最小宽度和最大宽度，当浏览器缩小导致元素宽度小于min-width时，元素的width就会被min-width的值取代.
 
@@ -162,7 +545,7 @@ min-width和max-width分别限制了元素的最小宽度和最大宽度，当�
 - transform
 - transition
 - animation
-### CSS兼容性质的处理？？？？？？？？？？？？？
+### CSS兼容性质的处理？？？？？？？？？
 ### 实现瀑布流的方法？
 #### 什么是瀑布流布局
 瀑布流又称瀑布流式布局，是一种比较流行的页面布局方式，专业的英文名称为[Masonry Layouts]。与传统的分页显示不同，视觉表现为参差不齐的多栏布局。
@@ -2524,8 +2907,115 @@ Promise 也不建议在这里面进行，因为 Promise 的回调属性 Event lo
 
 ## JS
 ### WebComponent？？？？？？？？
-### 如何开启严格模式，严格模式下的特点？？？？？？？
-### 遍历对象属性的方法，哪些遍历自身属性，哪些遍历原型属性？？？？？？？？
+### 如何开启严格模式，严格模式下的特点？
+改善错误检查功能并且标识可能不会延续到未来JavaScript版本的脚本。ES5严格模式是限制性更强的JavaScript变体，它与常规JavaScript的语义不同，其分析更为严格。
+
+全局
+```js
+'use strict';
+
+function doSomething(a, b = a) {
+  // code
+}
+```
+es模块
+现代浏览器支持ES模块，但有一些警告。 要使用模块，需要在 script 标签上添加属性 type， 对应值 为 module。
+
+局部
+```js
+
+function doSomething(a, b) {
+  'use strict';
+  // code
+}
+```
+
+
+- 严格模式的限制
+    - 变量必须声明后再使用
+    - 函数的参数不能有同名属性，否则报错
+    - 不能使用with语句
+    - 不能对只读属性赋值，否则报错
+    - 不能使用前缀 0 表示八进制数，否则报错
+    - 不能删除不可删除的属性，否则报错
+    - 不能删除变量delete prop，会报错，只能删除属性delete global[prop]
+    - eval不会在它的外层作用域引入变量
+    - eval和arguments不能被重新赋值
+    - arguments不会自动反映函数参数的变化
+    - 不能使用arguments.callee
+    - 不能使用arguments.caller
+    - 禁止this指向全局对象
+    - 不能使用fn.caller和fn.arguments获取函数调用的堆栈
+    - 增加了保留字（比如protected、static和interface）
+### 遍历对象属性的方法，哪些遍历自身属性，哪些遍历原型属性？
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211121225033.png)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211121225525.png)
+#### Object.keys(), Object.values(), Object.entries()
+Object.keys(), Object.values(), Object.entries()系列 可遍历对象自身可枚举属性(不含以Symbol类型为key的属性，以下简称symbol属性), 适合搭配forEach, for of等数组遍历方法使用。
+
+可遍历自身属性，不可遍历原型链上属性，不可遍历非枚举属性，不可遍历symbol属性。
+```js
+let obj = Object.create({ inheritProp: 1 }, { noneEnumbleProp: { value: 2 }});
+obj.selfProp = 3;
+const symbol = Symbol('prop');
+obj[symbol] = 4;
+Object.keys(obj); // ["selfProp"]
+```
+#### Object.getOwnPropertyNames() 
+Object.getOwnPropertyNames() 可遍历自身属性，不包括symbol属性 用法和Object.keys()一样，区别是比Object.keys()多遍历了自身非枚举属性。
+
+可遍历自身属性（枚举+非枚举），不可遍历原型链上属性，不可遍历symbol属性。
+```js
+let obj = Object.create({ inheritProp: 1 }, { noneEnumbleProp: { value: 2 }});
+obj.selfProp = 3;
+const symbol = Symbol('prop');
+obj[symbol] = 4;
+Object.getOwnPropertyNames(obj); // ["noneEnumbleProp", "selfProp"]
+```
+#### for in 
+for in 可遍历原型链和自身的可枚举属性，不包括symbol属性，不可遍历非枚举属性。
+
+不可遍历symbol属性，不可遍历非枚举属性。
+```js
+let obj = Object.create({ inheritProp: 1 }, { noneEnumbleProp: { value: 2 }});
+obj.selfProp = 3;
+const symbol = Symbol('prop');
+obj[symbol] = 4;
+for (let prop in obj) {
+    console.log(prop);
+}
+// selfProp
+// inheritProp
+```
+
+将 for-in 语句配合 obj.hasOwnProperty(prop) 方法一起使用，就能得到跟 Object.keys/values/entries 方法一样的效果——即返回对象自身的可枚举字符串属性。
+
+```js
+for (let prop in obj) {
+  if (obj.hasOwnProperty(prop)) {
+    console.log({ key: prop, value: obj[prop], pair: [prop, obj[prop]] })
+  }
+}
+// {key: "str", value: "This is a String property", pair: ["str", "This is a String property"] }
+```
+#### Object.getOwnPropertySymbols()
+可遍历自身symbol属性（枚举+非枚举）。
+```js
+let obj = Object.create({ inheritProp: 1 }, { noneEnumbleProp: { value: 2 }});
+obj.selfProp = 3;
+const symbol1 = Symbol('prop1');
+const symbol2 = Symbol('prop2');
+obj[symbol1] = 4;
+Object.defineProperty(obj, symbol2, { value:5 });
+Object.getOwnPropertySymbols(obj); // [Symbol(prop1), Symbol(prop2)]
+```
+#### Reflect.ownKeys(obj)
+Reflect.ownKeys(obj) 可以看做是 Object.getOwnPropertyNames(obj) + Object.getOwnPropertySymbols(obj)，即获得 obj 自身的所有属性集合。
+
+
+```js
+Reflect.ownKeys(obj) // ["str", "unenum", Symbol(), Symbol(unenum)]
+```
 ### JS放在head和放在body中的区别
 在HTML body部分中的JavaScripts会在页面加载的时候被执行。
 
@@ -4191,8 +4681,48 @@ changeName();
 在函数执行完毕之后，函数的声明周期结束，那么现在，从 Window对象 出发， obj1 和 obj2 都会被垃圾收集器标记为不可抵达，这样子的情况下，互相引用的情况也会迎刃而解。
 
 ### 内存泄漏
-该释放的内存垃圾没有被释放，依然霸占着原有的内存不松手，造成系统内存的浪费，导致性能恶化，系统崩溃等严重后果，这就是所谓的内存泄漏。
-### 哪些可能造成内存泄漏？？？？？？
+该释放的内存垃圾没有被释放，依然霸占着原有的内存不松手，造成系统内存的浪费，导致性能恶化，系统崩溃等严重后果，这就是所谓的内存泄漏。那当不再用到的对象内存，没有及时被回收时，我们叫它 内存泄漏（Memory leak）。
+### 哪些可能造成内存泄漏？
+#### 不正当的闭包
+```js
+function fn1(){
+  let test = new Array(1000).fill('isboyjc')
+  return function(){
+    console.log('hahaha')
+  }
+}
+let fn1Child = fn1()
+fn1Child()
+```
+```js
+function fn2(){
+  let test = new Array(1000).fill('isboyjc')
+  return function(){
+    console.log(test)
+    return test
+  }
+}
+// 显然它也是闭包，并且因为 return 的函数中存在函数 fn2 中的 test 变量引用，所以 test 并不会被回收，也就造成了内存泄漏。
+let fn2Child = fn2()
+fn2Child()
+
+
+
+
+
+
+function fn2(){
+  let test = new Array(1000).fill('isboyjc')
+  return function(){
+    console.log(test)
+    return test
+  }
+}
+let fn2Child = fn2()
+fn2Child()
+// 其实在函数调用后，把外部的引用关系置空就好了。说不正当的使用闭包可能会造成内存泄漏。
+fn2Child = null
+```
 ### 创建对象有几种方法
 ```js
 // 第一种：字面量
@@ -4792,7 +5322,34 @@ ES6新增新操作数组的方法
 - keys() 返回迭代器：返回键值对的key
 - includes
     - 判断数组中是否存在该元素，参数：查找的值、起始位置，可以替换 ES5 时代的 indexOf 判断方式。indexOf 判断元素是否为 NaN，会判断错误。
-### 如何让数组置空？？？？？？？
+### 如何让数组置空？
+1. 方法1
+直接置空，重新初始化。这种方式性能是最好的，因为直接声明了一个新数组，相当于变量初始化，并没有去修改原数组。
+```js
+arr = [1, 2, 3]
+arr = []
+```
+2. 方法2
+使用 length 属性，别忘了在 JS 里，数组的 length 属性不仅可读，还是可写的。这句代码将数组的长度设置为 0，返回 0，此时在控制台再次打印 arr, 会输出 []
+```js
+arr = [1, 2, 3]
+arr.length = 0
+```
+3. 方法3
+使用 splice 属性。数组的 splice 方法用处多多，这里输入两个参数，第一个参数 0 表示从数组索引 0 处开始操作，第二个参数表示待删除的元素个数，这里输入数组的长度，也就是把整个数组的元素都删除了。splice 方法返回被删除的元素，所以这句代码执行后会返回 [1, 2, 3] ，此时再打印 arr,  输出空数组 []
+```js
+arr = [1, 2, 3]
+arr.splice(0, arr.length)
+```
+4. 方法4
+使用循环 + pop / shift 方法。通过循环数组中的元素，使用数组内置的 shift/pop 方法来删除数组元素，这两个方法都是直接修改了原数组。通过对比前面的方法，就可以大致猜到这种方式性能肯定是最差的。
+```js
+arr = [1, 2, 3]
+while (arr.length) {
+	arr.pop()
+	// 类似的，arr.shift()
+}
+```
 ### ES6往后了解哪些新特性?？？？？？？？？
 ### ES6
   https://juejin.cn/post/6844903959283367950
