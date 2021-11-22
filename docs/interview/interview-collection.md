@@ -4723,6 +4723,217 @@ fn2Child()
 // 其实在函数调用后，把外部的引用关系置空就好了。说不正当的使用闭包可能会造成内存泄漏。
 fn2Child = null
 ```
+#### 隐式全局变量
+我们知道 JavaScript 的垃圾回收是自动执行的，垃圾回收器每隔一段时间就会找出那些不再使用的数据，并释放其所占用的内存空间。
+
+再来看全局变量和局部变量，函数中的局部变量在函数执行结束后这些变量已经不再被需要，所以垃圾回收器会识别并释放它们。但是对于全局变量，垃圾回收器很难判断这些变量什么时候才不被需要，所以全局变量通常不会被回收，我们使用全局变量是 OK 的，但同时我们要避免一些额外的全局变量产生。
+```js
+function fn(){
+  // 没有声明从而制造了隐式全局变量test1
+  test1 = new Array(1000).fill('isboyjc1')
+  
+  // 函数内部this指向window，制造了隐式全局变量test2
+  this.test2 = new Array(1000).fill('isboyjc2')
+}
+// 调用函数 fn ，因为 没有声明 和 函数中this 的问题造成了两个额外的隐式全局变量，这两个变量不会被回收，这种情况我们要尽可能的避免，在开发中我们可以使用严格模式或者通过 lint 检查来避免这些情况的发生，从而降低内存成本。
+fn()
+```
+除此之外，我们在程序中也会不可避免的使用全局变量，这些全局变量除非被取消或者重新分配之外也是无法回收的，这也就需要我们额外的关注，也就是说当我们在使用全局变量存储数据时，要确保使用后将其置空或者重新分配，当然也很简单，在使用完将其置为 null 即可，特别是在使用全局变量做持续存储大量数据的缓存时，我们一定要记得设置存储上限并及时清理，不然的话数据量越来越大，内存压力也会随之增高。
+
+```js
+var test = new Array(10000)
+
+// do something
+
+test = null
+```
+#### 游离DOM引用
+考虑到性能或代码简洁方面，我们代码中进行 DOM 时会使用变量缓存 DOM 节点的引用，但移除节点的时候，我们应该同步释放缓存的引用，否则游离的子树无法释放。
+
+```html
+<div id="root">
+  <ul id="ul">
+    <li></li>
+    <li></li>
+    <li id="li3"></li>
+    <li></li>
+  </ul>
+</div>
+<script>
+  let root = document.querySelector('#root')
+  let ul = document.querySelector('#ul')
+  let li3 = document.querySelector('#li3')
+  
+  // 由于ul变量存在，整个ul及其子元素都不能GC
+  root.removeChild(ul)
+  
+  // 虽置空了ul变量，但由于li3变量引用ul的子节点，所以ul元素依然不能被GC
+  ul = null
+  
+  // 已无变量引用，此时可以GC
+  li3 = null
+</script>
+```
+当我们使用变量缓存 DOM 节点引用后删除了节点，如果不将缓存引用的变量置空，依然进行不了 GC，也就会出现内存泄漏。
+
+假如我们将父节点置空，但是被删除的父节点其子节点引用也缓存在变量里，那么就会导致整个父 DOM 节点树下整个游离节点树均无法清理，还是会出现内存泄漏，解决办法就是将引用子节点的变量也置空
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211122081820.png)
+#### 遗忘的定时器
+经常会用到计时器，也就是 setTimeout 和 setInterval。
+```js
+// 获取数据
+let someResource = getData()
+setInterval(() => {
+  const node = document.getElementById('Node')
+	if(node) {
+    node.innerHTML = JSON.stringify(someResource))
+	}
+}, 1000)
+// 在 setInterval 没有结束前，回调函数里的变量以及回调函数本身都无法被回收。
+```
+什么才叫结束呢？也就是调用了 clearInterval。如果没有被 clear 掉的话，就会造成内存泄漏。不仅如此，如果回调函数没有被回收，那么回调函数内依赖的变量也没法被回收。所以在上例中，someResource 就没法被回收。
+
+同样，setTiemout 也会有同样的问题，所以，当不需要 interval 或者 timeout 时，最好调用 clearInterval 或者 clearTimeout来清除，另外，浏览器中的 requestAnimationFrame 也存在这个问题，我们需要在不需要的时候用 cancelAnimationFrame API 来取消使用。
+#### 遗忘的事件监听器
+当事件监听器在组件内挂载相关的事件处理函数，而在组件销毁时不主动将其清除时，其中引用的变量或者函数都被认为是需要的而不会进行回收，如果内部引用的变量存储了大量数据，可能会引起页面占用内存过高，这样就造成意外的内存泄漏。
+
+```vue
+<template>
+  <div></div>
+</template>
+
+<script>
+export default {
+  created() {
+    window.addEventListener("resize", this.doSomething)
+  },
+  beforeDestroy(){
+    window.removeEventListener("resize", this.doSomething)
+  },
+  methods: {
+    doSomething() {
+      // do something
+    }
+  }
+}
+</script>
+```
+#### 遗忘的监听者模式
+监听者模式想必我们都知道，不管是 Vue 、 React 亦或是其他，对于目前的前端开发框架来说，监听者模式实现一些消息通信都是非常常见的，比如 EventBus. . .
+
+当我们实现了监听者模式并在组件内挂载相关的事件处理函数，而在组件销毁时不主动将其清除时，其中引用的变量或者函数都被认为是需要的而不会进行回收，如果内部引用的变量存储了大量数据，可能会引起页面占用内存过高，这样也会造成意外的内存泄漏。
+```vue
+<template>
+  <div></div>
+</template>
+
+<script>
+export default {
+  created() {
+    eventBus.on("test", this.doSomething)
+  },
+  beforeDestroy(){
+    eventBus.off("test", this.doSomething)
+  },
+  methods: {
+    doSomething() {
+      // do something
+    }
+  }
+}
+</script>
+```
+#### 遗忘的Map、Set对象
+当使用 Map 或 Set 存储对象时，同 Object 一致都是强引用，如果不将其主动清除引用，其同样会造成内存不自动进行回收。
+
+如果使用 Map ，对于键为对象的情况，可以采用 WeakMap，WeakMap 对象同样用来保存键值对，对于键是弱引用（注：WeakMap 只对于键是弱引用），且必须为一个对象，而值可以是任意的对象或者原始值，由于是对于对象的弱引用，不会干扰 Js 的垃圾回收。
+
+如果需要使用 Set 引用对象，可以采用 WeakSet，WeakSet 对象允许存储对象弱引用的唯一值，WeakSet 对象中的值同样不会重复，且只能保存对象的弱引用，同样由于是对于对象的弱引用，不会干扰 Js 的垃圾回收。
+
+这里可能需要简单介绍下，谈弱引用，我们先来说强引用，之前我们说 JS 的垃圾回收机制是如果我们持有对一个对象的引用，那么这个对象就不会被垃圾回收，这里的引用，指的就是 强引用 ，而弱引用就是一个对象若只被弱引用所引用，则被认为是不可访问（或弱可访问）的，因此可能在任何时刻被回收。
+
+```js
+// obj是一个强引用，对象存于内存，可用
+let obj = {id: 1}
+// 重写obj引用
+obj = null 
+// 对象从内存移除，回收 {id: 1} 对象
+
+
+
+
+let obj = {id: 1}
+let user = {info: obj}
+let set = new Set([obj])
+let map = new Map([[obj, 'hahaha']])
+// 重写obj
+// 此例我们重写 obj 以后，{id: 1} 依然会存在于内存中，因为 user 对象以及后面的 set/map 都强引用了它，Set/Map、对象、数组对象等都是强引用，所以我们仍然可以获取到 {id: 1} ，我们想要清除那就只能重写所有引用将其置空了。
+obj = null 
+console.log(user.info) // {id: 1}
+console.log(set)
+console.log(map)
+
+
+
+let obj = {id: 1}
+let weakSet = new WeakSet([obj])
+let weakMap = new WeakMap([[obj, 'hahaha']])
+// 重写obj引用
+obj = null
+// {id: 1} 将在下一次 GC 中从内存中删除
+// 使用了 WeakMap 以及 WeakSet 即为弱引用，将 obj 引用置为 null 后，对象 {id: 1} 将在下一次 GC 中被清理出内存。
+```
+#### 未清理的Console输出
+写代码的过程中，肯定避免不了一些输出，在一些小团队中可能项目上线也不清理这些 console，殊不知这些 console 也是隐患，同时也是容易被忽略的，我们之所以在控制台能看到数据输出，是因为浏览器保存了我们输出对象的信息数据引用，也正是因此未清理的 console 如果输出了对象也会造成内存泄漏。
+
+所以，开发环境下我们可以使用控制台输出来便于我们调试，但是在生产环境下，一定要及时清理掉输出。
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>test</title>
+</head>
+
+<body>
+  <button id="click">click</button>
+
+  <script>
+    !function () {
+      function Test() {
+        this.init()
+      }
+      Test.prototype.init = function () {
+        this.a = new Array(10000).fill('isboyjc')
+        console.log(this)
+      }
+
+      document.querySelector('#click').onclick = function () {
+        new Test();
+      }
+    }()
+  </script>
+</body>
+
+</html>
+```
+#### 网络回调
+某些场景中，在某个页面发起网络请求，并注册一个回调，且回调函数内持有该页面某些内容，那么，当该页面销毁时，应该注销网络的回调，否则，因为网络持有页面部分内容，也会导致页面部分内容无法被回收。
+#### 内存泄漏排查、定位与修复
+析内存泄漏的原因，还是需要借助开发者工具的 Memory 功能，这个功能可以抓取内存快照，也可以抓取一段时间内，内存分配的情况，还可以抓取一段时间内触发内存分配的各函数情况
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211122092223.png)
+利用这些工具，我们可以分析出，某个时刻是由于哪个函数操作导致了内存分配，分析出大量重复且没有被回收的对象是什么。
+这样一来，有嫌疑的函数也知道了，有嫌疑的对象也知道了，再去代码中分析下，这个函数里的这个对象到底是不是就是内存泄漏的元凶，搞定。
+#### 内存三大件
+内存泄漏 我们说很久了，对象已经不再使用但没有被回收，内存没有被释放，即内存泄漏，那想要避免就避免让无用数据还存在引用关系，也就是多注意我们上面说的常见的几种内存泄漏的情况。
+
+内存膨胀 即在短时间内内存占用极速上升到达一个峰值，想要避免需要使用技术手段减少对内存的占用。
+
+频繁 GC 同这个名字，就是 GC 执行的特别频繁，一般出现在频繁使用大的临时变量导致新生代空间被装满的速度极快，而每次新生代装满时就会触发 GC，频繁 GC 同样会导致页面卡顿，想要避免的话就不要搞太多的临时变量，因为临时变量不用了就会被回收，这和我们内存泄漏中说避免使用全局变量冲突，其实，只要把握好其中的度，不太过分就 OK。
+
 ### 创建对象有几种方法
 ```js
 // 第一种：字面量
@@ -7473,6 +7684,137 @@ p.fun()
           }, 1000)
         })
         ```
+#### 单例模式
+一个类只有一个实例，并提供一个访问它的全局访问点。
+```js
+ class LoginForm {
+    constructor() {
+        this.state = 'hide'
+    }
+    show() {
+        if (this.state === 'show') {
+            alert('已经显示')
+            return
+        }
+        this.state = 'show'
+        console.log('登录框显示成功')
+    }
+    hide() {
+        if (this.state === 'hide') {
+            alert('已经隐藏')
+            return
+        }
+        this.state = 'hide'
+        console.log('登录框隐藏成功')
+    }
+ }
+ LoginForm.getInstance = (function () {
+     let instance
+     return function () {
+        if (!instance) {
+            instance = new LoginForm()
+        }
+        return instance
+     }
+ })()
+
+let obj1 = LoginForm.getInstance()
+obj1.show()
+
+let obj2 = LoginForm.getInstance()
+obj2.hide()
+
+console.log(obj1 === obj2)
+```
+- 优点
+    - 划分命名空间，减少全局变量
+    - 增强模块性，把自己的代码组织在一个全局变量名下，放在单一位置，便于维护
+    - 且只会实例化一次。简化了代码的调试和维护
+- 缺点
+    - 由于单例模式提供的是一种单点访问，所以它有可能导致模块间的强耦合 从而不利于单元测试。无法单独测试一个调用了来自单例的方法的类，而只能把它与那个单例作为一个单元一起测试。
+- 场景例子
+    - 定义命名空间和实现分支型方法
+    - 登录框
+    - vuex 和 redux中的store
+#### 适配器模式
+将一个类的接口转化为另外一个接口，以满足用户需求，使类之间接口不兼容问题通过适配器得以解决。
+```js
+class Plug {
+  getName() {
+    return 'iphone充电头';
+  }
+}
+
+class Target {
+  constructor() {
+    this.plug = new Plug();
+  }
+  getName() {
+    return this.plug.getName() + ' 适配器Type-c充电头';
+  }
+}
+
+let target = new Target();
+target.getName(); // iphone充电头 适配器转Type-c充电头
+```
+- 优点
+    - 可以让任何两个没有关联的类一起运行。
+    - 提高了类的复用。
+    - 适配对象，适配库，适配数据
+- 缺点
+    - 额外对象的创建，非直接调用，存在一定的开销（且不像代理模式在某些功能点上可实现性能优化)
+    - 如果没必要使用适配器模式的话，可以考虑重构，如果使用的话，尽量把文档完善
+- 场景
+    - 整合第三方SDK
+    - 封装旧接口
+```js
+// 自己封装的ajax， 使用方式如下
+ajax({
+    url: '/getData',
+    type: 'Post',
+    dataType: 'json',
+    data: {
+        test: 111
+    }
+}).done(function() {})
+// 因为历史原因，代码中全都是：
+// $.ajax({....})
+
+// 做一层适配器
+var $ = {
+    ajax: function (options) {
+        return ajax(options)
+    }
+}
+```
+```vue
+// 原有data 中的数据不满足当前的要求，通过计算属性的规则来适配成我们需要的格式，对原有数据并没有改变，只改变了原有数据的表现形式
+<template>
+    <div id="example">
+        <p>Original message: "{{ message }}"</p>  <!-- Hello -->
+        <p>Computed reversed message: "{{ reversedMessage }}"</p>  <!-- olleH -->
+    </div>
+</template>
+<script type='text/javascript'>
+    export default {
+        name: 'demo',
+        data() {
+            return {
+                message: 'Hello'
+            }
+        },
+        computed: {
+            reversedMessage: function() {
+                return this.message.split('').reverse().join('')
+            }
+        }
+    }
+</script>
+```
+
+- 不同点
+    - 适配器模式： 提供一个不同的接口（如不同版本的插头）
+    - 代理模式： 提供一模一样的接口
 ## TS
 ### Typescript 有什么好处？？？？？？？？？
 ### Typescript 有什么不好的地方吗？？？？？？？？？
