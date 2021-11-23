@@ -147,7 +147,69 @@ web后端：就是用户看不见摸不着的数据库交互处理的业务逻�
   ```
 
 ## CSS
-### div拖拽？？？？？？？
+### DIV拖拽？
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211122221738.png)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211122221809.png)
+```js
+    drag () {
+      // 拖拽功能(主要是触发三个事件：onmousedown\onmousemove\onmouseup)
+      var drag = document.getElementById('drag')
+
+      // 点击某物体时，用drag对象即可，move和up是全局区域，也就是整个文档通用，应该使用document对象而不是drag对象(否则，采用drag对象时物体只能往右方或下方移动)
+      drag.onmousedown = function (e) {
+        var e = e || window.event // 兼容ie浏览器
+        var diffX = e.clientX - drag.offsetLeft // 鼠标点击物体那一刻相对于物体左侧边框的距离=点击时的位置相对于浏览器最左边的距离-物体左边框相对于浏览器最左边的距离
+        var diffY = e.clientY - drag.offsetTop
+
+        /* 低版本ie bug:物体被拖出浏览器可是窗口外部时，还会出现滚动条，
+                解决方法是采用ie浏览器独有的2个方法setCapture()\releaseCapture(),这两个方法，
+                可以让鼠标滑动到浏览器外部也可以捕获到事件，而我们的bug就是当鼠标移出浏览器的时候，
+                限制超过的功能就失效了。用这个方法，即可解决这个问题。注：这两个方法用于onmousedown和onmouseup中 */
+        if (typeof drag.setCapture !== 'undefined') {
+          drag.setCapture()
+        }
+
+        document.onmousemove = function (e) {
+          var e = e || window.event // 兼容ie浏览器
+          var left = e.clientX - diffX
+          var top = e.clientY - diffY
+
+          // 控制拖拽物体的范围只能在浏览器视窗内，不允许出现滚动条
+          if (left < 0) {
+            left = 0
+          } else if (left > window.innerWidth - drag.offsetWidth) {
+            left = window.innerWidth - drag.offsetWidth
+          }
+          if (top < 0) {
+            top = 0
+          } else if (top > window.innerHeight - drag.offsetHeight) {
+            top = window.innerHeight - drag.offsetHeight
+          }
+
+          // 移动时重新得到物体的距离，解决拖动时出现晃动的现象
+          drag.style.left = left + 'px'
+          drag.style.top = top + 'px'
+        }
+        document.onmouseup = function (e) { // 当鼠标弹起来的时候不再移动
+          console.log('this', this)
+          this.onmousemove = null
+          this.onmouseup = null // 预防鼠标弹起来后还会循环（即预防鼠标放上去的时候还会移动）
+
+          // 修复低版本ie bug
+          if (typeof drag.releaseCapture !== 'undefined') {
+            drag.releaseCapture()
+          }
+        }
+      }
+    }
+```
+- 我们要确定怎样实现偏移效果，这里无非就两种：
+    - 一种是利用绝对定位，拖拽时调整top和left值，但是这种方案依赖父组件的定位方式
+    - 另一种是利用transform，拖拽时调整元素的偏移向量，这种方案不依赖父组件的定位方式
+- 确定怎么计算偏移向量，这里我们监听mouse事件来实现：
+    - 监听元素的mousedown事件，记录元素初始偏移位置；
+    - 监听文档的mousemove事件，根据鼠标位移向量修改元素的偏移位置；
+    - 监听文档的mouseup事件，重置数据。
 ### 线性渐变?
 线性渐变`linear-gradient()` 第一个参数: 可不写, 默认值为`to bottom `(即180%), 用来指定渐变的方向, 可是是具体的角度值, 也可以直接指定方位`to left`/ `to right`/` to top`/ `to bottom`。
 
@@ -2906,7 +2968,38 @@ Promise 也不建议在这里面进行，因为 Promise 的回调属性 Event lo
 - css雪碧图
 
 ## JS
-### WebComponent？？？？？？？？
+### WebComponent？
+#### 什么是 Web Component?
+web component是官方定义的自定义组件实现方式，它可以让开发者不依赖任何第三方框架（如Vue，React）来实现自定义页面组件；达到组件复用效果。
+
+Web Components旨在解决这些问题 — 它由四项主要技术组成，它们可以一起使用来创建封装功能的定制元素，可以在你喜欢的任何地方重用，不必担心代码冲突。
+
+- Custom elements（自定义元素）：一组JavaScript API，允许您定义custom elements及其行为，然后可以在您的用户界面中按照需要使用它们。
+- Shadow DOM（影子DOM）：一组JavaScript API，用于将封装的“影子”DOM树附加到元素（与主文档DOM分开呈现）并控制其关联的功能。通过这种方式，您可以保持元素的功能私有，这样它们就可以被脚本化和样式化，而不用担心与文档的其他部分发生冲突。
+- HTML templates（HTML模板）：<template> 和 <slot> 元素使您可以编写不在呈现页面中显示的标记模板。然后它们可以作为自定义元素结构的基础被多次重用。
+- HTML Imports（HTML导入）：一旦定义了自定义组件，最简单的重用它的方法就是使其定义细节保存在一个单独的文件中，然后使用导入机制将其导入到想要实际使用它的页面中。HTML 导入就是这样一种机制，尽管存在争议 — Mozilla 根本不同意这种方法，并打算在将来实现更合适的。
+
+#### 定义和使用web component三部曲
+1. 继承HTMLElement实现自定义类
+```js
+class MyButton extends HTMLElement {
+    constructor() {
+        super();
+    }
+}
+```
+2. 定义组件模板
+```html
+<template>
+</template>
+```
+3. 注册自定义元素
+```js
+window.customElements.define(name, ComponentClass)
+```
+
+
+
 ### 如何开启严格模式，严格模式下的特点？
 改善错误检查功能并且标识可能不会延续到未来JavaScript版本的脚本。ES5严格模式是限制性更强的JavaScript变体，它与常规JavaScript的语义不同，其分析更为严格。
 
@@ -9398,6 +9491,7 @@ RTP本身没有提供按时发送机制或其他服务质量（QoS）保证，�
   - WebSocket 服务器端和客户端相互推送
 ### WebSocket如何建立连接，手写WebSocket建立过程？？？？？？？？？？
 ### 跨域的方案
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211122224158.png)
 #### 同源是什么？
 如果两个URL的协议`protocol`、主机名`host`和端口号`port`都相同的话，则这两个URL是同源。
 #### 前后端通讯的方式
@@ -9717,8 +9811,27 @@ CORS（cross-origin resource sharing），跨源资源共享（一般俗称『�
     - Access-Control-Allow-Credentials（可选） – 和简单请求当中作用相同。
     - Access-Control-Max-Age（可选） – 以秒为单位的缓存时间。预请求的的发送并非免费午餐，允许时应当尽可能缓存。
   - 一旦预回应如期而至，所请求的权限也都已满足，则实际请求开始发送
-#### 使用Access-Control-Allow-Origin为什么可以解决跨域问题?？？？？？？？
-#### 使用access-control-allow-origin解决跨域问题的流程是怎样的?？？？？？？
+#### 使用Access-Control-Allow-Origin为什么可以解决跨域问题?
+浏览器在发送跨域请求并且包含自定义 header 字段时，浏览器会先向服务器发送 OPTIONS 预检请求（preflight request），探测该请求服务是否允许自定义跨域字段。如果允许，则继续执行 POST、GET请求，否则返回提示错误。
+
+此时浏览器会向服务器发送预检请求，询问是否支持跨域的自定义 header 字段。设置的 Access-Control-Request-Headers 服务器需要适当的作出应答。
+
+服务器需要对 OPTIONS 请求作出应答，通过设置 header 包含 Access-Control-Request-Headers，并且包含 OPTIONS 请求中的 Access-Control-Request-Headers 对值。
+#### 使用Access-Control-Allow-Origin解决跨域问题的流程是怎样的?
+浏览器会自动进行 CORS 通信，实现 CORS 通信的关键是后端。只要后端实现了 CORS，就实现了跨域。
+
+服务端设置 Access-Control-Allow-Origin 就可以开启 CORS。 该属性表示哪些域名可以访问资源，如果设置通配符则表示所有网站都可以访问资源。
+
+虽然设置 CORS 和前端没什么关系，但是通过这种方式解决跨域问题的话，会在发送请求时出现两种情况，分别为简单请求和复杂请求。
+
+
+
+
+复杂请求的CORS请求，会在正式通信之前，增加一次HTTP查询请求，称为"预检"请求,该请求是 option 方法的，通过该请求来知道服务端是否允许跨域请求。
+
+此时浏览器会向服务器发送预检请求，询问是否支持跨域的自定义 header 字段。设置的 Access-Control-Request-Headers 服务器需要适当的作出应答。
+
+服务器需要对 OPTIONS 请求作出应答，通过设置 header 包含 Access-Control-Request-Headers，并且包含 OPTIONS 请求中的 Access-Control-Request-Headers 对值。
 ### 什么叫同源？浏览器为什么要设置同源？同源策略都可以阻挡哪些恶意代码？
 - 什么叫同源
     - 两个页面地址中的协议，域名，端口号一致，则表示同源
@@ -10624,8 +10737,89 @@ SPA是怎么实现的呢？为什么不需要重新加载页面就能达到页�
     - 初次加载时耗时多
     - 页面复杂度提高很多
 ### 认为 node.js，vue，react 各种出现的原因和各自优缺点是啥？？？？？？？
-### 为什么vue是渐进式框架？？？？？？？
-### slot是干嘛的？？？？？？
+### 为什么vue是渐进式框架？
+渐进式代表的含义是：主张最少,没有多做职责之外的事。
+
+渐进式框架给予了开发同学很多灵活性，可以根据不同业务的复杂度选择不同复杂度的Vue框架进行开发，如图所示。也就是说，咱们既可以直接引入Vue.js来做声明式渲染，也可以集成生态圈里的各自插件完成大型应用的开发。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211123074920.png)
+
+
+每个框架都不可避免会有自己的一些特点，从而会对使用者有一定的要求，这些要求就是主张，主张有强有弱，它的强势程度会影响在业务开发中的使用方式。
+
+比如说，Angular，它两个版本都是强主张的，如果你用它，必须接受以下东西：
+- 必须使用它的模块机制- 必须使用它的依赖注入
+- 必须使用它的特殊形式定义组件（这一点每个视图框架都有，难以避免）
+所以Angular是带有比较强的排它性的，如果你的应用不是从头开始，而是要不断考虑是否跟其他东西集成，这些主张会带来一些困扰。
+
+比如React，它也有一定程度的主张，它的主张主要是函数式编程的理念，比如说，你需要知道什么是副作用，什么是纯函数，如何隔离副作用。它的侵入性看似没有Angular那么强，主要因为它是软性侵入。
+
+Vue可能有些方面是不如React，不如Angular，但它是渐进的，没有强主张，你可以在原有大系统的上面，把一两个组件改用它实现，当jQuery用；也可以整个用它全家桶开发，当Angular用；还可以用它的视图，搭配你自己设计的整个下层用。你可以在底层数据逻辑的地方设计模式的那套理念，也可以函数式，都可以，它只是个轻量视图而已，只做了自己该做的事，没有做不该做的事，仅此而已。
+
+
+1.开发的时候需要什么就加什么。我们可以通过添加组件系统、客户端路由、大规模状态管理来构建一个完整的框架。更重要的是，这些功能相互独立你可以在核心功能的基础上任意选用其他的部件，不一定要全部整合在一起。可以看到，所说的“渐进式”。
+2.没有多做职责之外的事，侵入性看似没有Angular那么强，比如说，Angular，它两个版本都是强主张的，如果你用它，必须接受以下东西：必须使用它的模块机制- 必须使用它的依赖注入等
+### slot是干嘛的？
+slot的意思是插槽，Vue使用slot的作用是做内容分发。所谓的内容分发其实就是将父组件的内容放到子组件指定的位置叫做内容分发。所谓的内容分发其实就是将父组件的内容放到子组件指定的位置叫做内容分发。
+
+我们可以理解slot为要占出当前的位置，方便我们插入内容。
+
+- slot的用法可以分为三类
+    - 默认插槽
+        - 插槽用<slot>标签来确定渲染的位置，里面放如果父组件没传内容时的后备内容
+    - 具名插槽
+        - 具名插槽用name属性来表示插槽的名字，不传为默认插槽
+    - 作用域插槽
+        - 作用域插槽在作用域上绑定属性来将子组件的信息传给父组件使用，这些属性会被挂在父组件slot-scope接受的对象上。
+```html
+// Child.vue
+<template>
+  <div>
+    <main>
+    <!-- 默认插槽 -->
+        <slot>
+          <!-- slot内为后备内容 -->
+          <h3>没传内容</h3>
+        </slot>
+    </main>
+
+    <!-- 具名插槽 -->
+    <header>
+        <slot name="header">
+          <h3>没传header插槽</h3>
+        </slot>
+    </header>
+
+    <!-- 作用域插槽 -->
+    <footer>
+        <slot name="footer" testProps="子组件的值">
+          <h3>没传footer插槽</h3>
+        </slot>
+    <footer>
+  </div>
+</template>
+
+<style scoped>
+div{
+ border: 1px solid #000;  
+}
+</style>
+
+
+
+// Parent.vue
+<child>
+  <!-- 默认插槽 -->
+  <div>默认插槽</div>  
+  <!-- 具名插槽 -->
+  <div slot="header">具名插槽header</div>
+  <!-- 作用域插槽 -->
+  <div slot="footer" slot-scope="slotProps">
+    {{slotProps.testProps}}
+  </div>
+</child>
+```
+
 ### Vue框架有哪些有点和缺点?
 优点：渐进式，组件化，轻量级，虚拟dom，响应式，单页面路由，数据与视图分开。
 缺点：单页面不利于seo，不支持IE8以下，首屏加载时间长。
@@ -10640,7 +10834,15 @@ SPA是怎么实现的呢？为什么不需要重新加载页面就能达到页�
     - 2.数据变化，React手动(setState)，Vue自动(初始化已响应式处理，Object.defineProperty，Proxy)
     - 3.React单向绑定，Vue双向绑定
     - 4.React的Redux，Vue的Vuex
-### jQuery和Vue的区别？？？？？？
+### jQuery和Vue的区别？
+jQuery：这个曾经是最流行的Web前端JS库，即使是现在依然有很多人在使用，可是现在无论是国内还是国外它的使用率正在渐渐的被其他JS框架所代替，随着浏览器厂商对HTML5规范统一遵循以及ECMA6在浏览器端的支持实现，相信 jQuery 的使用率会越来越低。
+
+Vue：是一个近两年兴起的前端JS库，它是一个精简的MVVM。从技术角度讲，Vue.js 专注于 MVVM 模型的 ViewModel 层。它通过双向数据绑定把 View 层和 Model 层连接了起来，通过对数据的操作就可以完成对页面视图的渲染。当然还有很多其他的MVVM框架如Angular、React都是大同小异，本质上都是基于MVVM的理念。 然而 Vue 以他独特的优势——简单、快速、组合、紧凑、强大而迅速崛起。
+
+- jQuery 和 Vue 的对比分析：
+    - jQuery 是使用选择器（$）选取DOM对象，对其进行赋值、取值、事件绑定等操作，其实和原生的HTML的区别只在于可以更方便的选取和操作DOM对象，而数据和界面通常是混在一起的。比如需要获取<label>标签的内容：$("lable").val(); ，它还是依赖DOM元素的值。
+    - Vue 则是通过 Vue 对象将数据和 View 完全分离开来了。对数据进行操作不再需要引用相应的DOM对象，可以说数据和 View 是分离的，它们通过 Vue 对象这个 VM 实现相互的绑定。这就是传说中的MVVM模式了。
+    - Vue 侧重数据绑定，jQuery侧重样式操作、动画效果等
 ### v-model原理？
 #### v-model原理
 v-model实际上时语法糖，下面就是语法糖的构造过程。
@@ -13251,7 +13453,6 @@ Vite 巧妙地利用了浏览器对 ESM 的支持，先启动开发服务器,首
 - 利用原生的 ESM，不用自己实现一套兼容各种模块标准的模块化方案，开发服务器启动后用到什么资源请求什么资源，天然的按需加载。
 - 利用 esbuild 把耗时的构建过程变成更轻量的依赖预构建，构建速度几十上百倍的提升
 - 预构建依赖时会缓存文件，浏览器请求过的依赖也会设置强缓存，其它资源开发服务器也会根据是否变动协商缓存。
-### ES Module是什么?????????cjs amd cmd umd
 ### Vite 的基本实现原理
 Vite 的基本实现原理，就是启动一个 koa 服务器拦截浏览器请求ES Module的请求。通过 path 找到目录下对应的文件做一定的处理最终以 ES Modules 格式返回给客户端
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211008174614.png)
@@ -13265,6 +13466,193 @@ Vite 的热加载原理，其实就是在客户端与服务端建立了一个 we
 Webpack 之所以慢，是因为 Webpack 会将许多资源构成一个或者多个 bundle 。当我们修改模块中的一个子模块b.js，整个bundle.js 都需要重新打包，随着项目规模的扩大，重新打包(热更新)的时间越来越长。
 
 跳过打包的过程，当需要某个模块时再通过请求去获取。Vite 一个由原生 ES Module（esbuild 是一个全新的js打包工具，支持如babel, 压缩等的功能）驱动的 Web 开发构建工具，完全做到按需加载。
+### Javascript 中的 CJS, AMD, UMD 和 ESM是什么？
+Javascript 添加模块化。其中就有 CJS、AMD、UMD 和 ESM。
+#### CJS(CommonJS)
+Node.js 无疑对前端的发展具有极大的促进作用，其中 CommonJS 模块化规范更是颠覆了人们对于模块化的认知：
+Node.js应用由模块（采用的 CommonJS 模块规范）组成。即一个文件就是一个模块，拥有自己独立的作用域，变量和方法都是存在独立作用域内。
+
+Node.js 中的 CommonJS 规范在浏览器端实现依靠的就是 module.exports和 require方法。
+CommonJS 规范规定，每个模块内部，module变量代表当前模块。这个变量是一个对象，它的 exports属性（即 module.exports）是对外的接口。
+加载某个模块，其实是加载该模块的 module.exports属性。使用 require方法加载模块。
+
+CJS 是 CommonJS 的缩写。经常我们这么使用：
+```JS
+// importing 
+const doSomething = require('./doSomething.js'); 
+
+// exporting
+module.exports = function doSomething(n) {
+  // do something
+}
+```
+- 所有代码都运行在模块作用域内，不会污染全局作用域；
+- 模块加载的顺序，按照其在代码中引入的顺序；
+- 模块可以多次加载，但是只会在第一次加载时运行一次，然后运行结果会被缓存，之后不论加载几次，都会直接读取缓存。清除缓存后方可再次运行；
+- module.exports属性输出的是值的拷贝，一旦输出操作完成，模块内发生的任何变化不会影响到已输出的值；
+- 注意 module.exports和 exports的用法以及区别；
+#### AMD
+AMD 规范，全称为：Asynchronous Module Definition。这还要从 Node.js 自身说起，Node.js 运行于服务器端，文件都存在本地磁盘中，不需要去发起网络请求异步加载，所以 CommonJS 规范加载模块是同步的，对于 Node.js 来说自然没有问题，但是应用到浏览器环境中就显然不太合适了。 AMD 规范就是解决这一问题的。
+
+AMD 不同于 CommonJS 规范，是异步的，可以说是专为浏览器环境定制的。AMD 规范中定义了如何创建模块、如何输出、如何导入依赖。
+更加友好的是，require.js 库为我们准备好了一切，我们只需要通过define方法，定义为模块；再通过require方法，加载模块。
+因为是异步的，模块的加载不影响它后面语句的运行。所有依赖这个模块的语句，都定义在一个回调函数中，等到加载完成之后，这个回调函数才会运行。
+AMD 代表异步模块定义。下面是一个示例代码
+```js
+define(['dep1', 'dep2'], function (dep1, dep2) {
+    //Define the module value by returning a value.
+    return function () {};
+});
+
+
+
+// "simplified CommonJS wrapping" https://requirejs.org/docs/whyamd.html
+define(function (require) {
+    var dep1 = require('dep1'),
+        dep2 = require('dep2');
+    return function () {};
+});
+```
+- AMD 是异步(asynchronously)导入模块的(因此得名)
+- 一开始被提议的时候，AMD 是为前端而做的(而 CJS 是后端)
+- AMD 的语法不如 CJS 直观。AMD 和 CJS 完全相反
+#### CMD
+CMD 规范全称为：Common Module Definition，综合了 CommonJS 和 AMD 规范的特点，推崇 as lazy as possible。
+
+CMD 规范和 CMD 规范不同之处：
+- AMD 需要异步加载模块，而 CMD 可以同步可以异步；
+- CMD 推崇依赖就近，AMD 推崇依赖前置。
+#### UMD
+UMD 叫做通用模块定义规范（Universal Module Definition）。
+它可以通过运行编译时让同一个代码模块在使用 CommonJs、CMD 甚至是 AMD 的项目中运行。
+这样就使得 JavaScript 包运行在浏览器端、服务区端甚至是 APP 端都只需要遵守同一个写法就行了。
+
+UMD 代表通用模块定义（Universal Module Definition）。
+```js
+(function (root, factory) {
+    if (typeof define === "function" && define.amd) {
+        define(["jquery", "underscore"], factory);
+    } else if (typeof exports === "object") {
+        module.exports = factory(require("jquery"), require("underscore"));
+    } else {
+        root.Requester = factory(root.$, root._);
+    }
+}(this, function ($, _) {
+    // this is where I defined my module implementation
+
+    var Requester = { // ... };
+
+    return Requester;
+}));
+```
+在定义模块得时候会检测当前得环境，将不同的模块定义方式转换为同一种写法。
+- 在前端和后端都适用（“通用”因此得名）
+- 与 CJS 或 AMD 不同，UMD 更像是一种配置多个模块系统的模式。
+- 当使用 Rollup/Webpack 之类的打包器时，UMD 通常用作备用模块
+#### ESM
+ES 模块化最大的两个特点是：
+- ES 模块化规范中模块输出的是值的引用
+    - 由于 ES 模块化规范中导出的值是引用，所以不论何时修改模块中的变量，在外部都会有体现。
+    - 因为 CommonJS 规范下，输出的值只是拷贝，通过 updateData方法改变了模块内的 data的值，但是data和 myData并没有任何关联，只是一份拷贝，所以模块内的变量值修改，也就不会影响到修改之前就已经拷贝过来的 myData啦。
+- 静态化，编译时就确定模块之间的关系，每个模块的输入和输出变量也是确定的
+    - ES 模块化设计成静态的目的何在？ 首要目的就是为了实现 tree shaking 提升运行性能（下面会简单说 tree shaking）。 ES 模块化的静态特性也带来了局限：
+        - import依赖必须在文件顶部；
+        - export导出的变量类型严格限制；
+        - 依赖不可以动态确定。
+- ES 的 export和 export default要用谁？ ES 模块化导出有 export和 export default两种。这里我们建议减少使用 export default导出！ 
+    - 其一 export default导出整体对象，不利于 tree shaking；
+    - 其二 export default导出的结果可以随意命名，不利于代码管理；
+
+ESM 代表 ES 模块。这是 Javascript 提出的实现一个标准模块系统的方案。我相信你们很多人都看到过这个:
+```js
+import React from 'react';
+
+
+
+import {foo, bar} from './myLib';
+...
+export default function() {
+  // your Function
+};
+export const function1() {...};
+export const function2() {...};
+```
+- 在很多现代浏览器可以使用
+- 它兼具两方面的优点：具有 CJS 的简单语法和 AMD 的异步
+- 得益于 ES6 的静态模块结构，可以进行 Tree Shaking
+- ESM 允许像 Rollup 这样的打包器，删除不必要的代码，减少代码包可以获得更快的加载
+#### ES6 Module和Commonjs区别
+1. 使用
+```js
+// ESM使用
+// ESM是ESModule，是ECMAScript自己的模块体系，于ES6引入
+// 导出：export命令
+export const obj = {name: 'E1e'}；
+// 默认导出 export default命令
+export default {name: 'E1e'};
+// 引入接口：import命令
+// 引入普通导出
+import { obj } from './test.js';
+// 引入默认导出
+import obj from './test.js';
+
+
+
+// CJS使用
+// CJSCommonJS，主要用于服务器端
+// 导出
+const obj = {a: 1};
+module.exports = obj;
+// 引入
+const obj = require('./test.js');
+```
+2. ESM输出的是值的引用，而CJS输出的是值的拷贝；
+```js
+// a.mjs(Node环境中进行测试，必须修改后缀名为mjs，这是Node的强制规定)
+export let age = 18;
+export function addAge() {
+  age++;
+}
+// b.mjs
+import { age, addAge } from "./a.mjs";
+addAge();
+console.log(age); // 19
+
+
+
+// a.js(Node环境中进行测试，必须修改后缀名为mjs，这是Node的强制规定)
+let age = 18;
+module.exports = {
+  age,
+  addAge: function () {
+    age++;
+  },
+};
+// b.js
+const { age, addAge } = require("./a.js");
+addAge();
+console.log(age); // 18
+```
+3. CJS的输出是运行时加载，而ESM是编译时输出接口；
+因为CJS输出的是一个对象，该对象需要在脚本运行完成后才生成，而ESM的输出是静态的，在编译时就能生成。
+
+4. CJS是同步加载，ESM是异步加载；
+由于CJS是用于服务器端的模块体系，需要加载的模块都在本地，所以采用同步加载也不会出问题，但是ESM用于浏览器端时，可能涉及到一些异步请求，所以需要采用异步加载。
+
+
+
+
+
+- CommonJs
+    - CommonJs可以动态加载语句，代码发生在运行时
+    - CommonJs混合导出，还是一种语法，只不过不用声明前面对象而已，当我导出引用对象时之前的导出就被覆盖了
+        - 如果使用exports导出单个值之后，就不能在导出一个对象值，这只会修改exports的对象改变，然而修改无效，最终导出还是name，和sex，因为最终的导出是由module.exports决定的。
+    - CommonJs导出值是拷贝，可以修改导出的值，这在代码出错时，不好排查引起变量污染
+- Es Module
+    - Es Module是静态的，不可以动态加载语句，只能声明在该文件的最顶部，代码发生在编译时
+    - Es Module混合导s出，单个导出，默认导出，完全互不影响
+    - Es Module导出是引用值之前都存在映射关系，并且值都是可读的，不能修改
+
 ### ES6 Module和Commonjs区别
 #### commonjs 使用与原理
 在使用  规范下，有几个显著的特点。
