@@ -147,6 +147,7 @@ web后端：就是用户看不见摸不着的数据库交互处理的业务逻�
   ```
 
 ## CSS
+### 如果给你一个div，让你实现多层边框????????
 ### DIV拖拽？
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211122221738.png)
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211122221809.png)
@@ -2968,6 +2969,7 @@ Promise 也不建议在这里面进行，因为 Promise 的回调属性 Event lo
 - css雪碧图
 
 ## JS
+### js中的sort是如何选择排序算法的？？？？？
 ### WebComponent？
 #### 什么是 Web Component?
 web component是官方定义的自定义组件实现方式，它可以让开发者不依赖任何第三方框架（如Vue，React）来实现自定义页面组件；达到组件复用效果。
@@ -7908,6 +7910,43 @@ var $ = {
 - 不同点
     - 适配器模式： 提供一个不同的接口（如不同版本的插头）
     - 代理模式： 提供一模一样的接口
+#### 装饰者模式
+- 动态地给某个对象添加一些额外的职责，，是一种实现继承的替代方案
+- 在不改变原对象的基础上，通过对其进行包装扩展，使原有对象可以满足用户的更复杂需求，而不会影响从这个类中派生的其他对象
+```js
+class Cellphone {
+    create() {
+        console.log('生成一个手机')
+    }
+}
+class Decorator {
+    constructor(cellphone) {
+        this.cellphone = cellphone
+    }
+    create() {
+        this.cellphone.create()
+        this.createShell(cellphone)
+    }
+    createShell() {
+        console.log('生成手机壳')
+    }
+}
+// 测试代码
+let cellphone = new Cellphone()
+cellphone.create()
+
+console.log('------------')
+let dec = new Decorator(cellphone)
+dec.create(
+```
+- 场景例子
+    - 比如现在有4 种型号的自行车，我们为每种自行车都定义了一个单独的类。现在要给每种自行车都装上前灯、尾 灯和铃铛这3 种配件。如果使用继承的方式来给 每种自行车创建子类，则需要 4×3 = 12 个子类。 但是如果把前灯、尾灯、铃铛这些对象动态组 合到自行车上面，则只需要额外增加3 个类
+- 优点
+    - 装饰类和被装饰类都只关心自身的核心业务，实现了解耦。
+    - 方便动态的扩展功能，且提供了比继承更多的灵活性。
+- 缺点
+    - 多层装饰比较复杂。
+    - 常常会引入许多小对象，看起来比较相似，实际功能大相径庭，从而使得我们的应用程序架构变得复杂起来
 ## TS
 ### Typescript 有什么好处？？？？？？？？？
 ### Typescript 有什么不好的地方吗？？？？？？？？？
@@ -8651,6 +8690,13 @@ HTTP客户端一般对同一个服务器的并发连接个数都是有限制的�
   - sessionStorage 存在内存中，数据在当前浏览器窗口关闭后自动删除
     ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211015134146.png)
 ### Cookie、Session、webStorage、localStorage、sessionStorage
+#### Cookie有没有默认过期时间?
+Cookie分为2类：会话Cookie和 持久Cookie。
+
+会话Cookie是一种临时Cookie，它记录用户访问长点是的设置和偏好。用户退出浏览器时，会话Cookie就被删除了。
+持久Cookie的生存时间更长一些，他们存储在硬盘上，浏览器退出，计算机重启时，他们仍然存在。通常用持久Cookie维护某个用户会周期性访问的站点的配置文件或登录名。
+
+会话Cookie和持久Cookie之间的唯一区别就是他们的过期时间。没有指定Expires(过期时间)时，默认为会话Cookie。
 #### Cookie
 - HTTP 是无状态的协议（对于事务处理没有记忆能力，每次客户端和服务端会话完成时，服务端不会保存任何会话信息）：每个请求都是完全独立的，服务端无法确认当前访问者的身份信息，无法分辨上一次的请求发送者和这一次的发送者是不是同一个人。所以服务器与浏览器为了进行会话跟踪（知道是谁在访问我），就必须主动的去维护一个状态，这个状态用于告知服务端前后两个请求是否来自同一浏览器。而这个状态需要通过 cookie 或者 session 去实现。
 
@@ -9892,6 +9938,29 @@ if (top.location.hostname !== self.location.hostname) {
 - 钓鱼网站
 - XSS
 - CSRF
+### 防范xss应该过滤哪些标签呢?
+最普遍的做法就是转义输入输出的内容，对于引号、尖括号、斜杠进行转义。
+```js
+function escape(str) {
+  str = str.replace(/&/g, '&amp;')
+  str = str.replace(/</g, '&lt;')
+  str = str.replace(/>/g, '&gt;')
+  str = str.replace(/"/g, '&quto;')
+  str = str.replace(/'/g, '&#39;')
+  str = str.replace(/`/g, '&#96;')
+  str = str.replace(/\//g, '&#x2F;')
+  return str
+}
+```
+
+但是对于显示富文本来说，显然不能通过上面的办法来转义所有字符，因为这样会把需要的格式也过滤掉。对于这种情况，通常采用白名单过滤的办法，当然也可以通过黑名单过滤，但是考虑到需要过滤的标签和标签属性实在太多，更加推荐使用白名单的方式。
+```js
+const xss = require('xss')
+let html = xss('<h1 id="title">XSS Demo</h1><script>alert("xss");</script>')
+// -> <h1>XSS Demo</h1>&lt;script&gt;alert("xss");&lt;/script&gt;
+console.log(html)
+```
+
 ### XSS 攻击和 CSRF 攻击各自的原理是什么？两者又有什么区别？以及如何防范？
 1、XSS 攻击
 - 概念
@@ -9903,6 +9972,14 @@ if (top.location.hostname !== self.location.hostname) {
       - 过滤；移除用户输入和事件相关的属性。(过滤 script、style、iframe 等节点)
       - 校正；使用 DOM Parse 转换，校正不配对的 DOM 标签。
       - HttpOnly
+      - CSP
+          - CSP 的实质就是白名单策略，预先设定好哪些资源能被加载执行而哪些不能，为了防止跨域脚本攻击而制定。
+          - 一种是通过 HTTP 头信息的 Content-Security-Policy 的字段。
+              - `Content-Security-Policy: script-src 'self'; font-src 'none'; style-src test.com; img-src * data:`
+          - 另一种是通过网页的标签。
+              - `<meta http-equiv="Content-Security-Policy" content="script-src 'self'; object-src 'none'; style-src cdn.example.org third-party.org; child-src https:">`
+          - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211123222515.png)
+          
     - 分类
       - 反射型(非持久)：点击链接，执行脚本
       - 存储型(持久)：恶意输入保存数据库，其他用户访问，执行脚本
@@ -9920,6 +9997,7 @@ if (top.location.hostname !== self.location.hostname) {
 - 两者区别
   - CSRF：需要用户先登录网站 A，获取 cookie。XSS：不需要登录。
   - CSRF：是利用网站 A 本身的漏洞，去请求网站 A 的 api。XSS：是向网站 A 注入 JS 代码，然后执行 JS 里的代码，篡改网站 A 的内容。
+### XSS和CSRF???????
 ### DOS、 DDOS攻击原理和防范？
 - DOS
     - 最基本的DoS攻击就是利用合理的客户端请求来占用过多的服务器资源，从而使合法用户无法得到服务器的响应。
@@ -10446,6 +10524,7 @@ TCP提供一种可靠的传输，这个过程涉及到三次握手，四次挥�
   - 隐藏在屏幕外，或在页面滚动时，尽量停止动画；
   - 尽量缓存DOM查找，查找器尽量简洁；
   - 涉及多域名的网站，可以开启域名预解析
+### 如何测的首屏优化时间?????????
 ### 提高首屏展示效率
 - Vue-Router路由懒加载（利用Webpack的代码切割）
 - 使用CDN加速，将通用的库从vendor进行抽离
@@ -10685,7 +10764,7 @@ const routes: Array<RouteConfig> = [
 - 没有审查标准：PWAs不需要任何适用于应用商店中本机应用的审查，这可能会加快进程，但缺乏从应用程序商店中获取推广效益。
 
 
-
+### node适合做服务端渲染吗???????
 ### SSR
 #### 什么是SSR
 SSR是Server Side Render简称，叫服务端渲染
@@ -18750,6 +18829,56 @@ $ git rm -r <文件夹路径>
 # 移除跟踪指定的文件，在本地仓库的文件夹中保留该文件
 $ git rm --cached
 
+```
+### git操作 git revert 和 git reset区别？
+时常会因为代码及文件的修改提交，导致各种各样的冲突，还有产品需求的频繁变更，致使我们不得不做出回退版本，撤回提交这样的决定，那么此时，reset和revert命令，就派上了用场！
+
+reset，revert都有撤销、回退的意思，但却各有千秋，区别还是很大的，所以该使用哪种命令一定要结合实际情况来决定。
+
+#### git reset
+reset，使用方法：`git reset --hard commit` ，commit是提交后产生的SHA1，执行该命令后，代码会完全回退到本次提交时的状态，工作暂存区以及本次提交后面的提交内容将会被完全清除，包括提交记录！
+
+```md
+# 8cbf16c0821d20fe42c361f4e3d75a0493dc5fc2后面的提交都消除了
+git reset --hard 8cbf16c0821d20fe42c361f4e3d75a0493dc5fc2  
+```
+HEAD已经指向了t1，但你刷新后台时，发现并没有什么变化，这是因为我们还需要执行一下push，但这里需要注意的是，因为本地代码回到了旧版本，但远程仓库是新版本和本地不一致，所以你在用git push时会报错，这里我们需要使用强制提交，git push -f
+
+- 优点：
+    - 彻底回退到指定版本，干净清爽；
+    - 提交时间线清晰，没有冗杂；
+- 缺点：
+    - 记录彻底清除，无法再次恢复；
+#### git revert
+revert执行后会产生新的commit记录，是通过一次新的commit来恢复到之前旧的commit，但revert会保留恢复的该次提交后面的其它提交内容，假如后面的提交与要恢复的提交更改了同一地方，此时用revert就会产生冲突!
+
+```md
+git revert 8cbf16c0821d20fe42c361f4e3d75a0493dc5fc2
+```
+revert是撤销/撤回/反提交的意思，我们不能按reset的思路理解，我们执行git revert t1，这么做其实结果是要撤销t1的提交，注意，仅仅是撤销t1的提交，把t1的修改恢复到t1之前也就是初始的状态，而不会影响t2，t3的提交。但如果t2，t3中修改了t1修改的同一地方，那么就会产生冲突，因为revert意图撤销t1的修改，但发现t2和t3把t1的修改再次修改了，此时，revert意图变得不清晰，因为它无法确定到底是应用你最新的修改，
+
+#### 总结
+- reset是彻底回退到指定的commit版本，该commit后的所有commit都将被清除，包括提交历史记录；
+- revert仅仅是撤销指定commit的修改，并不影响后续的commit，但所撤销的commit被后续的commit修改了同一地方则会产生冲突；
+- reset执行后不会产生记录，revert执行后会产生记录；
+- reset执行后无法再次恢复，revert执行后因为不会清除记录，并且会产生新纪录，所以文件不会丢失，你可以多次执行revert恢复到某次改变之前的状态；
+- reset执行后HEAD会后移，而revert的HEAD则一直是向前的；
+### 合并多个commit
+使用 git rebase合并commit。
+#### 待合并的commit没有提交到远程
+```md
+git rebase -i
+在弹出的文件里面第一行保持不动，
+后面的pick改为s
+然后保存文件
+git push 即可
+```
+#### 待合并的commit已经提交到远程
+```md
+ git reset commit_id
+ git add .
+ git commit -am "Here's the bug fix that closes #28"
+ git push --force
 ```
 ### 一个业务场景：a，b，c，d，要删除c的提交，git怎么操作（git revert）？？？？？？？
 ### 如何确保你的代码规范？？？？？？
