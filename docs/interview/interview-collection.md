@@ -7947,6 +7947,50 @@ dec.create(
 - 缺点
     - 多层装饰比较复杂。
     - 常常会引入许多小对象，看起来比较相似，实际功能大相径庭，从而使得我们的应用程序架构变得复杂起来
+#### 代理模式
+是为一个对象提供一个代用品或占位符，以便控制对它的访问。
+```js
+// 假设当A 在心情好的时候收到花，小明表白成功的几率有60%，而当A 在心情差的时候收到花，小明表白的成功率无限趋近于0。小明跟A 刚刚认识两天，还无法辨别A 什么时候心情好。如果不合时宜地把花送给A，花被直接扔掉的可能性很大，这束花可是小明吃了7 天泡面换来的。但是A 的朋友B 却很了解A，所以小明只管把花交给B，B 会监听A 的心情变化，然后选择A 心情好的时候把花转交给A
+
+let Flower = function() {}
+let xiaoming = {
+  sendFlower: function(target) {
+    let flower = new Flower()
+    target.receiveFlower(flower)
+  }
+}
+let B = {
+  receiveFlower: function(flower) {
+    A.listenGoodMood(function() {
+      A.receiveFlower(flower)
+    })
+  }
+}
+let A = {
+  receiveFlower: function(flower) {
+    console.log('收到花'+ flower)
+  },
+  listenGoodMood: function(fn) {
+    setTimeout(function() {
+      fn()
+    }, 1000)
+  }
+}
+xiaoming.sendFlower(B)
+```
+
+- 场景
+    - HTML元 素事件代理
+    - ES6 的 proxy 阮一峰Proxy
+- 优点
+    - 代理模式能将代理对象与被调用对象分离，降低了系统的耦合度。代理模式在客户端和目标对象之间起到一个中介作用，这样可以起到保护目标对象的作用
+    - 代理对象可以扩展目标对象的功能；通过修改代理对象就可以了，符合开闭原则；
+- 缺点
+    - 处理请求速度可能有差别，非直接访问存在开销
+- 不同点
+    - 装饰者模式实现上和代理模式类似
+    - 装饰者模式： 扩展功能，原有功能不变且可直接使用
+    - 代理模式： 显示原有功能，但是经过限制之后的
 ## TS
 ### Typescript 有什么好处？？？？？？？？？
 ### Typescript 有什么不好的地方吗？？？？？？？？？
@@ -10725,8 +10769,125 @@ const routes: Array<RouteConfig> = [
 
 - IP（Internet Protocol）独立IP数，是指1天内多少个独立的IP浏览了页面，即统计不同的IP浏览用户数量。同一IP不管访问了几个页面，独立IP数均为1；不同的IP浏览页面，计数会加1。 IP是基于用户广域网IP地址来区分不同的访问者的，所以，多个用户（多个局域网IP）在同一个路由器（同一个广域网IP）内上网，可能被记录为一个独立IP访问者。如果用户不断更换IP，则有可能被多次统计。
 ## Vue
-### 如何封装组件？？？？
-### 如何设计组件？？？？
+### 如何封装组件？如何设计组件?
+#### 组件化和模块化
+模块化:是从代码逻辑的角度进行划分的;方便代码分层开发，保证每个功能模块的职能单一。
+
+组件化:是从UI界面的角度进行划分的前端的组件化方便组件的重用。
+#### 组件分类
+对功能、ui样式的封装，一个功能或者一个ui样式就是一个组件，导航栏，banner，页脚等等这些功能、样式都是组件。 
+
+有些人对react的组件分为函数式组件、无状态组件和有状态组件、展示型组件和容器型组件等。
+
+有些人vue对组件分为全局组件、局部组件、函数式（无状态）组件、普通（有状态）组件、动态组件、普通（非动态）组件、异步组件、普通（非异步）组件、递归组件、普通（非递归）组件。
+
+1. 按组件注册方式分类：vue将组件分为全局组件和局部组件
+2. 按组件有无自己的状态分类：可以分为函数式（无状态）组件和普通（无状态）组件
+3. 按组件是否动态分类：可以分为动态组件和普通（非动态）组件 动态组件:通过component 标签加is属性（属性值为引入的组件名称）引入的组件
+4. 按组件是否异步分类：可以分为异步组件和普通（非异步）组件
+异步组件:按需加载组件，在需要组件的时候再去加载组件（这样可以让首屏部分代码块优先加载，加快首屏渲染速度，像目前我们项目中使用的路由懒加载，以及局部这种方式引入的组件() => import('./my-async-component')等都是异步组件）
+5. 按组件是否循环引用分类：可以分为递归组件和普通（非递归）组件
+
+在一般我们的开发中，组件又分为ui展示类组件（着重ui样式的展示，比如我们常用的element-ui之类的）、功能组件（不注重样式，只对功能进行封装）、业务组件等。
+#### 为什么要拆分组件
+1. 提高开发效率
+在组件化开发之前，我们每个页面都是单独的，如果在开发一个页面的时候遇到了曾今开发过类似的部分，只能复制粘贴到当前页面，然后进行一些改动，有时参数、变量之类的丢失，页面或许还会报错，还要花费大量的时候去排查问题，组件化之后，类似的部分我们只需要引入组件即可，无需重复开发，一定程度上也减少了代码量，极大提高项目的编译速度
+2. 方便重复使用
+一个组件可在多个地方使用
+3. 简化调试步骤
+一个页面出现问题时，可以优先定位到某个模块，然后直接定位到某个组件，无需看完整个页面的所有代码然后排查问题。
+4. 提升整个项目的可维护性
+页面都由组件组成，模块与模块之间的耦合度降低，删除修改某个模块的功能时仅需直接修改组件。
+5. 便于协同开发
+每个组件都把对应的业务功能收敛在一个工程里，彼此互不打扰。 在多人团队里，每个人只负责自己的业务模块，对业务功能的增删改查，都只限定在自己的这个业务模块里，不会影响其他人的业务。
+#### 如何拆分组件
+1. 保证单一职责。
+一个组件“只做好一件事”，只做好最基本的事，留出可组合的口子。尽量把更多功能外包出去。
+2. 开放封闭原则。
+对扩展开放，对修改封闭。有新的业务需求时，首先考虑如何扩展，单个组件只实现最单纯的功能，更多通过扩展实现，而不是修改组件。
+3. 单个组件文件最好不超过200或400kb
+追求短小精悍，有利于调试，缩小排错范围。
+4. 避免函数有太多的参数。入口处检查参数的有效性，出口处检查返回的正确性
+避免别人使用组件时传参有误，造成很多无法预料的报错。
+5. 松耦合，封装的组件不要依赖太多其他的组件
+当所有问题都是通过堆砌一堆开源代码解決时，一是会存在冗余，二是很难调试，当其中一个模块有问题时可能会导致整个组件无法使用，复杂的依赖关系，也会发生版本冲突之类的事情。如果要依赖组件或库，要依赖稳定的也就是不经常変的。
+6. 无副作用：不依赖、不修改外部变量，内部操作不影响其它组件
+在保证输入/输出不变的情况，可以安全的被替换。
+7. 提炼精华，一些无关紧要的东西，比如数据获取，数据整理或事件处理逻辑，理想情况下应该将其移入外部 js 或者放在父组件中去进行处理，组件内只负责ui展示或者功能的实现。
+8. 合理组件化
+ a.是否有足够的页面结构/逻辑来保证它？如果它只是几行代码，那么最终可能会创建更多的代码来分隔它。
+ b.代码重复（或可能重复）? 如果某些东西只使用一次，并且服务于一个不太可能在其他地方使用的特定用例，那么将它嵌入其中可能会更好。
+ c.性能是否会受到影响？更改 state/props 会导致组件重新渲染，当发生这种情况时，你需要的是 只是重新去渲染经过 diff 之后得到的相关元素节点。在较大的、关联很紧密的组件中，你可能会发现状态更改会导致在不需要它的许多地方重新呈现，这时应用的性能就可能会开始受到影响。
+#### 封装vue组件
+在编写组件时，最好考虑好以后是否要进行复用。一次性组件间有紧密的耦合没关系，但是可复用组件应当定义一个清晰的公开接口，同时也不要对其使用的外层数据作出任何假设。在开发过程中，结合 Vue 组件化的特性，开发通用组件是很基础且重要的工作。通用组件必须具备==高性能、低耦合==的特性。
+
+Vue 组件的 API 来自三部分——prop、事件和插槽：
+- Prop 允许外部环境传递数据给组件；
+- 事件允许从组件内触发外部环境的副作用；
+- 插槽允许外部环境将额外的内容组合在组件中。
+
+
+1. props(数据从父组件传入)
+```js
+// 通常的props
+props:['data','type','state']
+
+
+// 应用场景比较复杂，对 props 传递的参数应该添加一些验证规则
+props:{
+    data:{
+        type: Array,
+        required: true
+    },
+    type: [String, Number],
+    state: {
+        type: Boolean,
+        default: false
+    }
+}
+// 对于通过 props 传入的参数，不建议对其进行操作，因为会同时修改父组件里面的数据
+```
+2. 在父组件处理事件
+在通用组件中，通常会需要有各种事件， 比如复选框的 change 事件，或者组件中某个按钮的 click 事件。这些事件的处理方法应当尽量放到父组件中，通用组件本身只作为一个中转。
+```js
+//子组件中的方法
+hanleSubmit (data) {
+    this.$emit('submit', data);
+}
+
+
+//在父组件中处理
+<child-form @sumit='parentSubmit'></child-form>
+
+// 这样既降低了耦合性，也保证了通用组件中的数据不被污染
+// 不过，并不是所有的事件都放到父组件处理
+// 比如组件内部的一些交互行为，或者处理的数据只在组件内部传递，这时候就不需要用 $emit 了
+```
+3. 使用插槽slot实现内容分发
+一个通用组件，往往不能够完美的适应所有应用场景。所以在封装组件的时候，只需要完成组件 80% 的功能，剩下的 20% 让父组件通过 solt 解决比如一个弹框组件，弹框下班的操作按钮，有可能是‘取消’，‘确定’，可能是‘重置’，‘提交’....按钮的事件操作也不一样，这种场景就适合用内容分发了。
+```js
+// 子组件
+<div class='modal'>
+    <h3>标题</h3>
+    <div class='con'>
+        .......
+    </div>
+    <div class='act-group'>
+        <slot name='buttonGroup'></slot>
+    </div>
+</div>
+
+ // 父组件  
+<modal>
+    <div slot='buttonGroup'>
+        <button>取消</button>
+        <button>确定</button>
+    </div>
+</modal>
+```
+#### 组件封装细则????????????????
+
+
 ### 如何设计组件库？？？？
 ### PWA?？？？？？？？？？？？？
 渐进式网络应用（PWA）是谷歌在2015年底提出的概念。基本上算是web应用程序，但在外观和感觉上与原生app类似。支持PWA的网站可以提供脱机工作、推送通知和设备硬件访问等功能。
@@ -10764,7 +10925,14 @@ const routes: Array<RouteConfig> = [
 - 没有审查标准：PWAs不需要任何适用于应用商店中本机应用的审查，这可能会加快进程，但缺乏从应用程序商店中获取推广效益。
 
 
-### node适合做服务端渲染吗???????
+### node适合做服务端渲染
+前端提的 服务端渲染（SSR）更多的是指 同构渲染，即一份代码可以在前端渲染也可以在后端渲染：
+
+- 用户首次访问 A 页面的时候，是服务端渲染并返回（SEO 和首屏速度）
+- 然后用户在该页面的其他操作如切到 B 页面，是直接前端渲染的（无需刷新整个页面） 。
+- 如果用户现在强制刷新 B 页面，此时又是服务端直接渲染。
+
+该能力是依托于 React、Vue 等模板引擎来支持的，这一点是传统的 Java 服务端渲染做不到的。
 ### SSR
 #### 什么是SSR
 SSR是Server Side Render简称，叫服务端渲染
@@ -12948,7 +13116,50 @@ Webpack 的运行流程是一个串行的过程：
 plugin完成的是loader不能完成的功能。plugin也是为了扩展webpack的功能，但是 plugin 是作用于webpack本身上的。而且plugin不仅只局限在打包，资源的加载上，它的功能要更加丰富。从打包优化和压缩，到重新定义环境变量，功能强大到可以用来处理各种各样的任务。webpack提供了很多开箱即用的插件：CommonChunkPlugin主要用于提取第三方库和公共模块，避免首屏加载的bundle文件，或者按需加载的bundle文件体积过大，导致加载时间过长，是一把优化的利器。而在多页面应用中，更是能够为每个页面间的应用程序共享代码创建bundle。插件可以携带参数，所以在plugins属性传入new实例。
 
 plugins在整个编译周期都起作用。
-### plugin 的执行顺序???????????
+
+
+
+插件是 webpack 的 支柱 功能。webpack 自身也是构建于你在 webpack 配置中用到的相同的插件系统之上。在webpack运行的生命周期中会广播出许多事件，plugin可以监听这些事件，在合适的时机通过webpack提供的API改变输出结果。
+### plugin 的执行顺序?
+webpack本质上是一种事件流的机制，它的工作流程就是将各个插件串联起来，而实现这一切的核心就是Tapable。
+
+Webpack 的 Tapable 事件流机制保证了插件的有序性，将各个插件串联起来， Webpack 在运行过程中会广播事件，插件只需要监听它所关心的事件，就能加入到这条webapck机制中，去改变webapck的运作，使得整个系统扩展性良好。
+
+Tapable也是一个小型的 library，是Webpack的一个核心工具。类似于node中的events库，核心原理就是一个订阅发布模式。作用是提供类似的插件接口。
+
+webpack中最核心的负责编译的Compiler和负责创建bundles的Compilation都是Tapable的实例，可以直接在 Compiler 和 Compilation 对象上广播和监听事件
+
+```js
+/**
+* 广播事件
+* event-name 为事件名称，注意不要和现有的事件重名
+*/
+compiler.apply('event-name',params);
+compilation.apply('event-name',params);
+/**
+* 监听事件
+*/
+compiler.plugin('event-name',function(params){});
+compilation.plugin('event-name', function(params){})
+```
+Tapable类暴露了tap、tapAsync和tapPromise方法，可以根据钩子的同步/异步方式来选择一个函数注入逻辑。
+
+```js
+// Tabable用法
+
+const {
+ SyncHook,
+ SyncBailHook,
+ SyncWaterfallHook,
+ SyncLoopHook,
+ AsyncParallelHook,
+ AsyncParallelBailHook,
+ AsyncSeriesHook,
+ AsyncSeriesBailHook,
+ AsyncSeriesWaterfallHook
+ } = require("tapable");
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211126092932.png)
 ### 有哪些常见的Plugin？你用过哪些Plugin？
 - define-plugin：定义环境变量 (Webpack4 之后指定 mode 会自动配置)
 - ignore-plugin：忽略部分文件
@@ -12974,13 +13185,189 @@ webpack在运行的生命周期中会广播出许多事件，Plugin 可以监听
   - watch-run 当依赖的文件发生变化时会触发
 
 - 异步的事件需要在插件处理完任务时调用回调函数通知 Webpack 进入下一个流程，不然会卡住
-### 手写一个plugins？？？？？？
+### 手写一个plugins？
+```js
+/**
+ * 在 Webpack 运行的生命周期中会广播出许多事件，Plugin 可以监听这些事件，在合适的时机通过Webpack提供的API改变输出结果。
+ */
+// plugin的本质是类；我们在定义plugin时，其实是在定义一个类；定义好plugin后就可以在webpack配置中使用这个插件
+// plugins/MyPlugin.js
+class MyPlugin {
+    constructor(options) {
+        console.log("Plugin被创建了");
+        console.log(options);
+        this.options = options;
+    }
+    apply(compiler) {}
+}
+//webpack.config.js
+module.exports = {
+    plugins: [
+        // 通过实例化插件传入参数
+        new MyPlugin({
+            title: 'MyPlugin'
+        })
+    ],
+}
+// 在构建插件时就能通过options获取配置信息，对插件做一些初始化的工作。在构造函数中我们发现多了一个apply函数，它会在webpack运行时被调用，并且注入compiler对象
+/**
+ * webpack启动，执行new myPlugin(options)，初始化插件并获取实例
+ * 初始化complier对象，调用myPlugin.apply(complier)给插件传入complier对象
+ * 插件实例获取complier，通过complier监听webpack广播的事件，通过complier对象操作webpack
+ * 
+ * 
+ * 这里又有一个compilation对象，它和上面提到的compiler对象都是Plugin和webpack之间的桥梁
+ * compiler对象包含了 Webpack 环境所有的的配置信息。这个对象在启动 webpack 时被一次性建立，并配置好所有可操作的设置，包括 options，loader 和 plugin。当在 webpack 环境中应用一个插件时，插件将收到此 compiler 对象的引用。可以使用它来访问 webpack 的主环境。
+ * compilation对象包含了当前的模块资源、编译生成资源、变化的文件等。当运行webpack 开发环境中间件时，每当检测到一个文件变化，就会创建一个新的 compilation，从而生成一组新的编译资源。compilation 对象也提供了很多关键时机的回调，以供插件做自定义处理时选择使用。
+ * 
+ * 
+ * compiler和compilation的区别在于：
+ * compiler代表了整个webpack从启动到关闭的生命周期，而compilation只是代表了一次新的编译过程
+ * compiler和compilation暴露出许多钩子，我们可以根据实际需求的场景进行自定义处理
+ */
+
+
+// plugins/MyPlugin.js
+class MyPlugin {
+    constructor(options) {
+        console.log("Plugin被创建了");
+        this.options = options;
+    }
+    apply(compiler) {
+        // 不推荐使用，plugin函数被废弃了
+        //  compiler.plugin("compile", (compilation) => {
+        //    console.log("compile");
+        // });
+        // apply函数中注入的compiler对象进行注册事件,注册完成的钩子
+        // compiler不仅有同步的钩子，通过tap函数来注册
+        compiler.hooks.done.tap("MyPlugin", (compilation) => {
+            console.log("compilation done");
+        });
+        // 还有异步的钩子，通过tapAsync和tapPromise来注册
+        compiler.hooks.run.tapAsync("MyPlugin", (compilation, callback) => {
+            setTimeout(() => {
+                console.log("compilation run");
+                callback()
+            }, 1000)
+        });
+        compiler.hooks.emit.tapPromise("MyPlugin", (compilation) => {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    console.log("compilation emit");
+                    resolve();
+                }, 1000)
+            });
+        });
+
+    }
+}
+//webpack.config.js
+module.exports = {
+    plugins: [
+        // 通过实例化插件传入参数
+        new MyPlugin({
+            title: 'MyPlugin'
+        })
+    ],
+}
+
+
+
+// 手写FileListPlugin
+class FileListPlugin {
+    apply(compiler) {
+        compiler.hooks.emit.tapAsync('FileListPlugin', (compilation, callback) => {
+            var filelist = 'In this build:\n\n';
+            // 遍历所有编译过的资源文件，
+            // 对于每个文件名称，都添加一行内容。
+            for (var filename in compilation.assets) {
+                filelist += '- ' + filename + '\n';
+            }
+            // 将这个列表作为一个新的文件资源，插入到 webpack 构建中：
+            compilation.assets['filelist.md'] = {
+                source: function () {
+                    return filelist;
+                },
+                size: function () {
+                    return filelist.length;
+                }
+            };
+            callback();
+        })
+    }
+}
+module.exports = FileListPlugin
+// 我们这里用到了assets对象，它是所有构建文件的一个输出对象，打印出来大概长这样：
+{
+    'main.bundle.js': {
+        source: [Function: source],
+        size: [Function: size]
+    },
+    'index.html': {
+        source: [Function: source],
+        size: [Function: size]
+    }
+}
+// 我们手动加入一个filelist.md文件的输出；打包后我们在dist文件夹中会发现多了这个文件：
+In this build:
+
+- main.bundle.js
+- index.html
+
+
+
+
+
+
+class DelConsole {
+    constructor(options) {
+        this.deleteConsole = options.deleteConsole;
+    }
+    apply(compiler) {
+        let that = this;
+        compiler.hooks.emit.tap('DelConsole',compilation=>{
+            // 探索每个块（构建后的输出）
+            compilation.chunks.forEach(function(chunk) {
+              // 探索块生成的每个资源文件名
+              chunk.files.forEach(function(filename) {
+                var source = compilation.assets[filename].source();
+                // 删除console语句
+                if(that.deleteConsole){
+                    source = source.replace(/console\.(log|dir|info)\(.*?\);?/g, '');
+                }
+                // 返回
+                compilation.assets[filename]={
+                    source() {
+                        return source;
+                    },
+                    size() {
+                        return source.length;
+                    }
+                }
+              });
+            });
+        });
+    }
+}
+module.exports = DelConsole;
+
+```
 ### loader?
 loader从字面的意思理解，是 加载 的意思。
 由于webpack 本身只能打包commonjs规范的js文件，所以，针对css，图片等格式的文件没法打包，就需要引入第三方的模块进行打包。loader虽然是扩展了 webpack ，但是它只专注于转化文件（transform）这一个领域，完成压缩，打包，语言翻译。loader是运行在NodeJS中。仅仅只是为了打包。
+loader运行在打包文件之前（loader为在模块加载时的预处理文件）
 
 
- loader运行在打包文件之前（loader为在模块加载时的预处理文件）
+
+- loader 支持链式调用。链中的每个 loader 会将转换应用在已处理过的资源上。一组链式的
+- loader 将按照相反的顺序执行。链中的第一个 loader 将其结果（也就是应用过转换后的资源）传递给下一个 loader，依此类推。最后，链中的最后一个 loader，返回 webpack 所期望的 JavaScript。
+- loader 可以是同步的，也可以是异步的。
+- loader 运行在 Node.js 中，并且能够执行任何操作。
+- loader 可以通过 options 对象配置（仍然支持使用 query 参数来设置选项，但是这种方式已被废弃）。
+- 除了常见的通过 package.json 的 main 来将一个 npm 模块导出为 loader，还可以在 module.rules 中使用 loader 字段直接引用一个模块。
+- 除了常见的通过 package.json 的 main 来将一个 npm 模块导出为 loader，还可以在 module.rules 中使用 loader 字段直接引用一个模块。
+- loader 能够产生额外的任意文件。
+- 可以通过 loader 的预处理函数，为 JavaScript 生态系统提供更多能力。用户现在可以更加灵活地引入细粒度逻辑，例如：压缩、打包、语言翻译和 更多其他特性。
 ### loader 的执行顺序
 默认情况下是：从右往左，从下往上。
 ### 有哪些常见的Loader？你用过哪些Loader？
@@ -13018,9 +13405,215 @@ Loader 支持链式调用，所以开发上需要严格遵循“单一职责”�
 - 加载本地 Loader 方法
   - Npm link
   - ResolveLoader
-### 手写一个loader？？？？？？？？？
+### 手写一个loader？
+```js
+/**
+ * 单一原则: 每个Loader只做一件事，简单易用，便于维护；
+ * 链式调用: Webpack 会按顺序链式调用每个Loader；
+ * 统一原则: 遵循Webpack制定的设计规则和结构，输入与输出均为字符串，各个Loader完全独立，即插即用；
+ * 无状态原则：在转换不同模块时，不应该在loader中保留状态；
+ */
+
+// 同步loader
+// loader默认导出一个函数，接受匹配到的文件资源字符串和SourceMap，我们可以修改文件内容字符串后再返回给下一个loader进行处理
+// 导出的loader函数不能使用箭头函数，很多loader内部的属性和方法都需要通过this进行调用，比如this.cacheable()来进行缓存、this.sourceMap判断是否需要生成sourceMap等。
+module.exports = function (source, map) {
+    return source
+}
+
+// style-loader
+// 这里的source就可以看做是处理后的css文件字符串，我们把它通过style标签的形式插入到head中；同时我们也发现最后返回的是一个JS代码的字符串，webpack最后会将返回的字符串打包进模块中。
+function loader(source, map) {
+    let style = `
+      let style = document.createElement('style');
+      style.innerHTML = ${JSON.stringify(source)};
+      document.head.appendChild(style)
+    `;
+    return style;
+}
+module.exports = loader;
+
+// 异步loader
+// 我们在处理source时，有时候会进行异步操作，一种方法是通过async/await，阻塞操作执行；另一种方法可以通过loader本身提供的回调函数callback。
+// callback({
+//     //当无法转换原内容时，给 Webpack 返回一个 Error
+//     error: Error | Null,
+//     //转换后的内容
+//     content: String | Buffer,
+//     //转换后的内容得出原内容的Source Map（可选）
+//     sourceMap?: SourceMap,
+//     //原内容生成 AST语法树（可选）
+//     abstractSyntaxTree?: AST 
+// })
+// Source Map生成很耗时，通常在开发环境下才会生成Source Map，其它环境下不用生成。Webpack为loader提供了this.sourceMap这个属性来告诉loader当前构建环境用户是否需要生成Source Map。
+//loader/less-loader
+const less = require("less");
+
+function loader(source) {
+    const callback = this.async();
+    less.render(source, function (err, res) {
+        let {
+            css,
+            map
+        } = res;
+        callback(null, css, map);
+    });
+}
+module.exports = loader;
+
+// 加载本地loader
+// loader文件准备好了之后，我们需要将它们加载到webpack配置中去；在基础篇中，我们加载第三方的loader只需要安装后在loader属性中写loader名称即可，现在加载本地loader需要把loader的路径配置上。
+module.exports = {
+    module: {
+        rules: [{
+            test: /\.less/,
+            use: [{
+                    loader: './loader/style-loader.js',
+                },
+                {
+                    loader: path.resolve(__dirname, "loader", "less-loader"),
+                },
+            ],
+        }]
+    }
+}
+// 们可以在loader中配置本地loader的相对路径或者绝对路径，但是这样写起来比较繁琐，我们可以利用webpack提供的resolveLoader属性，来告诉webpack应该去哪里解析本地loader。
+module.exports = {
+    module: {
+        rules: [{
+            test: /\.less/,
+            use: [{
+                    loader: 'style-loader',
+                },
+                {
+                    loader: 'less-loader',
+                },
+            ],
+        }]
+    },
+    resolveLoader: {
+        // 这样webpack会先去loader文件夹下找loader，没有找到才去node_modules；因此我们写的loader尽量不要和第三方loader重名，否则会导致第三方loader被覆盖加载。
+        modules: [path.resolve(__dirname, 'loader'), 'node_modules']
+    }
+}
+
+// 处理参数
+// 我们在配置loader时，经常会给loader传递参数进行配置，一般是通过options属性来传递的，也有像url-loader通过字符串来传参：
+{
+    test: /\.(jpg|png|gif|bmp|jpeg)$/,
+    use: 'url-loader?limt=1024&name=[hash:8].[ext]'
+}
+// webpack也提供了query属性来获取传参；但是query属性很不稳定，如果像上面的通过字符串来传参，query就返回字符串格式，通过options方式就会返回对象格式，这样不利于我们处理。因此我们借助一个官方的包loader-utils帮助处理，它还提供了很多有用的工具。
+const {
+    getOptions,
+    parseQuery,
+    stringifyRequest,
+} = require("loader-utils");
+
+module.exports = function (source, map) {
+    //获取options参数
+    const options = getOptions(this);
+    //解析字符串为对象
+    parseQuery("?param1=foo")
+    //将绝对路由转换成相对路径
+    //以便能在require或者import中使用以避免绝对路径
+    stringifyRequest(this, "test/lib/index.js")
+}
+// 　获取到参数后，我们还需要对获取到的options参数进行完整性校验，避免有些参数漏传，如果一个个判断校验比较繁琐，这就用到另一个官方包schema-utils：
+const {
+    getOptions
+} = require("loader-utils");
+const {
+    validate
+} = require("schema-utils");
+const schema = require("./schema.json");
+module.exports = function (source, map) {
+    const options = getOptions(this);
+    const configuration = {
+        name: "Loader Name"
+    };
+    validate(schema, options, configuration);
+    //省略其他代码
+}
+
+// less-loader源码分析
+import less from 'less';
+import {
+    getOptions
+} from 'loader-utils';
+import {
+    validate
+} from 'schema-utils';
+import schema from './options.json';
+async function lessLoader(source) {
+    const options = getOptions(this);
+    //校验参数
+    validate(schema, options, {
+        name: 'Less Loader',
+        baseDataPath: 'options',
+    });
+    const callback = this.async();
+    //对options进一步处理，生成less渲染的参数
+    const lessOptions = getLessOptions(this, options);
+    //是否使用sourceMap，默认取options中的参数
+    const useSourceMap =
+        typeof options.sourceMap === 'boolean' ?
+        options.sourceMap : this.sourceMap;
+    //如果使用sourceMap，就在渲染参数加入
+    if (useSourceMap) {
+        lessOptions.sourceMap = {
+            outputSourceFiles: true,
+        };
+    }
+    let data = source;
+    let result;
+    try {
+        result = await less.render(data, lessOptions);
+    } catch (error) {}
+    const {
+        css,
+        imports
+    } = result;
+    //有sourceMap就进行处理
+    let map =
+        typeof result.map === 'string' ?
+        JSON.parse(result.map) : result.map;
+
+    callback(null, css, map);
+}
+export default lessLoader;
+
+
+// 缓存加速
+// 　在有些情况下，loader处理需要大量的计算非常耗性能（比如babel-loader），如果每次构建都重新执行相同的转换操作每次构建都会非常慢。
+// 因此webpack默认会将loader的处理结果标记为可缓存，也就是说在需要被处理的文件或者其依赖的文件没有发生变化时，它的输出结果必然是相同的；如果不想让webpack缓存该loader，可以禁用缓存：
+module.exports = function (source) {
+    // 强制不缓存
+    this.cacheable(false);
+    return source;
+};
+
+
+
+
+
+
+
+
+
+var loaderUtils = require('loader-utils');
+
+module.exports = function(source) {
+    var options = loaderUtils.getOptions(this) || {};
+    // 删除console语句
+    if(options.deleteConsole) {
+        source = source.replace(/console\.(log|dir|info)\(.*?\);?/g, '');
+    }
+    return source;
+};
+
+```
 ### Webpack的loader和plugins的区别
-  
 Loader 本质就是一个函数，在该函数中对接收到的内容进行转换，返回转换后的结果。 因为 Webpack 只认识 JavaScript，所以 Loader 就成了翻译官，对其他类型的资源进行转译的预处理工作。
 
 Plugin 就是插件，基于事件流框架 Tapable，插件可以扩展 Webpack 的功能，在 Webpack 运行的生命周期中会广播出许多事件，Plugin 可以监听这些事件，在合适的时机通过 Webpack 提供的 API 改变输出结果。
@@ -13029,6 +13622,22 @@ Loader 在 module.rules 中配置，作为模块的解析规则，类型为数�
 
 Plugin 在 plugins 中单独配置，类型为数组，每一项是一个 Plugin 的实例，参数都通过构造函数传入。
 
+
+
+对于loader，它就是一个转换器，将A文件进行编译形成B文件，这里操作的是文件，比如将A.scss或A.less转变为B.css，单纯的文件转换过程；
+对于plugin，它就是一个扩展器，它丰富了wepack本身，针对是webpack打包的整个过程，它并不直接操作文件，而是基于事件机制工作，会监听webpack打包过程中的某些节点，例如：
+```md
+run：开始编译
+make：从entry开始递归分析依赖并对依赖进行build
+build-moodule：使用loader加载文件并build模块
+normal-module-loader：对loader加载的文件用acorn编译，生成抽象语法树AST
+program：开始对AST进行遍历，当遇到require时触发call
+require:事件
+seal：所有依赖build完成，开始对chunk进行优化（抽取公共模块、加hash等）
+optimize-chunk-assets：压缩代码
+emit：把各个chunk输出到结果文件
+```
+通过对节点的监听，从而找到合适的节点对文件做适当的处理。
 ### source map是什么？生产环境怎么用？
 source map 是将编译、打包、压缩后的代码映射回源代码的过程。打包压缩后的代码不具备良好的可读性，想要调试源码就需要 soucre map。map文件只要不打开开发者工具，浏览器是不会加载的。
 
