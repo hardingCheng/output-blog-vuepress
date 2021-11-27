@@ -60,7 +60,7 @@ dom.getBoundingClientRect().width/height //计算一个元素的绝对位置
 1. float的值不是none。
 2. position的值不是static或者relative。绝对定位元素（元素的 `position` 为 `absolute` 或 `fixed`）
 3. display的值是inline-block、table-cell、flex、table-caption或者inline-flex。
-4. overflow的值不是visible。
+4. overflow的值不是visible。(hidden、scroll、auto、inherit)
 
 > #### BFC解决了什么问题
 

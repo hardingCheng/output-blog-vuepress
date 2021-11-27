@@ -69,3 +69,21 @@
     - 有利于SEO，搜索引擎根据标签来确定上下文和各个关键字的权重。
     - 方便其他设备解析，如盲人阅读器根据语义渲染网页
     - 有利于开发和维护，语义化更具可读性，代码更好维护，与CSS3关系更和谐。
+
+
+
+# CSS
+## 面试问题
+### .position有几种，分别描述？
+- static（静态定位）
+    - 对象遵循标准文档流中，top, right, bottom, left 等属性失效。
+- relative（相对定位）
+    - 对象遵循标准文档流中，依赖top, right, bottom, left 等属性相对于该对象在标准文档流中的位置进行偏移，同时可通过z-index定义层叠关系。
+- absolute（绝对定位）
+    - 对象脱离标准文档流，使用top, right, bottom, left 等属性进行绝对定位（相对于static定位以外的第一个父元素进行绝对定位） 同时可通过z-index定义层叠关系。
+- fixed（固定定位）
+    - 对象脱离标准文档流，使用top, right, bottom, left 等属性进行绝对定位（相对于浏览器窗口进行绝对定位）同时可通过z-index定义层叠关系。
+- sticky（粘性定位元素）
+    - 可以说是相对定位relative和固定定位fixed的结合
+    - 在目标区域以内，它的行为就像 position:relative;在滑动过程中，某个元素距离其父元素的距离达到sticky粘性定位的要求时(比如top：100px)；position:sticky这时的效果相当于fixed定位，固定到适当位置。
+### BFC

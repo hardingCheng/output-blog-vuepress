@@ -3350,7 +3350,7 @@ const inorderTraversal = (root) => {
     while(node || stack.length) {
     // 遍历左子树
       while(node) {
-       stack.push(node)
+        stack.push(node)
         node = node.left
       }
       

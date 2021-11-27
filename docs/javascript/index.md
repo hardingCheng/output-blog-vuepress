@@ -406,7 +406,6 @@ var deepClone = function (target) {
     let cloneTarget = Array.isArray(target) ? [] : {};
     for (const key in target) {
       if (target.hasOwnProperty(key)) {
-            // 递归调用！！！
            cloneTarget[key] = deepClone(target[key]);
        }
     }
@@ -627,9 +626,487 @@ function deepClone(obj, cache = new WeakMap()) {
   return res
 }
 
+
+
+
+// 其他高级版本2
+// 深拷贝：对对象内部进行深拷贝，支持 Array、Date、RegExp、DOM
+const deepCopy = (sourceObj) => {
+  // 如果不是对象则退出（可停止递归）
+  if(typeof sourceObj !== 'object') return;
+  
+  // 深拷贝初始值：对象/数组
+  let newObj = (sourceObj instanceof Array) ? [] : {};
+
+  // 使用 for-in 循环对象属性（包括原型链上的属性）
+  for (let key in sourceObj) { 
+    // 只访问对象自身属性
+    if (sourceObj.hasOwnProperty(key)) {
+      // 当前属性还未存在于新对象中时
+      if(!(key in newObj)){
+        if (sourceObj[key] instanceof Date) {
+          // 判断日期类型
+          newObj[key] = new Date(sourceObj[key].getTime());
+        } else if (sourceObj[key] instanceof RegExp) {
+          // 判断正则类型
+          newObj[key] = new RegExp(sourceObj[key]);
+        } else if ((typeof sourceObj[key] === 'object') && sourceObj[key].nodeType === 1 ) {
+          // 判断 DOM 元素节点
+          let domEle = document.getElementsByTagName(sourceObj[key].nodeName)[0];
+          newObj[key] = domEle.cloneNode(true);
+        } else {
+          // 当元素属于对象（排除 Date、RegExp、DOM）类型时递归拷贝
+          newObj[key] = (typeof sourceObj[key] === 'object') ? deepCopy(sourceObj[key]) : sourceObj[key];
+        }
+      }
+    }
+  }
+  return newObj;
+}
+// deepCopy 函数测试效果
+const objA = {
+  name: 'jack',
+  birthday: new Date(),
+  pattern: /jack/g,
+  body: document.body,
+  others: [123,'coding', new Date(), /abc/gim,]
+};
+const objB = deepCopy(objA);
+console.log(objA === objB); // false
+console.log(objA.others === objB.others); // false
+console.log(objA, objB); // 对象内容一样
 ```
 
 ### 手写相关函数
+#### 手写-如何找到数组中第一个没出现的最小正整数
+```js
+给你一个未排序的整数数组 nums ，请你找出其中没有出现的最小的正整数。
+请你实现时间复杂度为 O(n) 并且只使用常数级别额外空间的解决方案。
+
+示例 1：
+
+输入：nums = [1,2,0]
+输出：3
+
+示例 2：
+
+输入：nums = [3,4,-1,1]
+输出：2
+
+示例 3：
+
+输入：nums = [7,8,9,11,12]
+输出：1
+```
+- 第一版 O(n^2) 的方法
+```js
+const firstMissingPositive = (nums) => {
+  let i = 0;
+  let res = 1;
+  while (i < nums.length) {
+    if (nums[i] == res) {
+      res++;
+      i = 0;
+    } else {
+      i++;
+    }
+  }
+  return res;
+};
+```
+- 第二版 时间空间均为 O(n)
+```js
+const firstMissingPositive = (nums) => {
+  const set = new Set();
+  for (let i = 0; i < nums.length; i++) {
+    set.add(nums[i]);
+  }
+  for (let i = 1; i <= nums.length + 1; i++) {
+    if (!set.has(i)) {
+      return i;
+    }
+  }
+};
+```
+- 最终版 时间复杂度为 O(n) 并且只使用常数级别空间
+```js
+const firstMissingPositive = (nums) => {
+  for (let i = 0; i < nums.length; i++) {
+    while (
+      nums[i] >= 1 &&
+      nums[i] <= nums.length && // 对1~nums.length范围内的元素进行安排
+      nums[nums[i] - 1] !== nums[i] // 已经出现在理想位置的，就不用交换
+    ) {
+      const temp = nums[nums[i] - 1]; // 交换
+      nums[nums[i] - 1] = nums[i];
+      nums[i] = temp;
+    }
+  }
+  // 现在期待的是 [1,2,3,...]，如果遍历到不是放着该放的元素
+  for (let i = 0; i < nums.length; i++) {
+    if (nums[i] != i + 1) {
+      return i + 1;
+    }
+  }
+  return nums.length + 1; // 发现元素 1~nums.length 占满了数组，一个没缺
+};
+```
+#### 手写-怎么在制定数据源里面生成一个长度为 n 的不重复随机数组
+- 第一版 时间复杂度为 O(n^2)
+```js
+function getTenNum(testArray, n) {
+  let result = [];
+  for (let i = 0; i < n; ++i) {
+    const random = Math.floor(Math.random() * testArray.length);
+    const cur = testArray[random];
+    if (result.includes(cur)) {
+      i--;
+      break;
+    }
+    result.push(cur);
+  }
+  return result;
+}
+const testArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+const resArr = getTenNum(testArray, 10);
+```
+- 第二版 标记法 / 自定义属性法 时间复杂度为 O(n)
+```js
+function getTenNum(testArray, n) {
+  let hash = {};
+  let result = [];
+  let ranNum = n;
+  while (ranNum > 0) {
+    const ran = Math.floor(Math.random() * testArray.length);
+    if (!hash[ran]) {
+      hash[ran] = true;
+      result.push(ran);
+      ranNum--;
+    }
+  }
+  return result;
+}
+const testArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+const resArr = getTenNum(testArray, 10);
+```
+- 第三版 交换法 时间复杂度为 O(n)
+```js
+function getTenNum(testArray, n) {
+  const cloneArr = [...testArray];
+  let result = [];
+  for (let i = 0; i < n; i++) {
+    debugger;
+    const ran = Math.floor(Math.random() * (cloneArr.length - i));
+    result.push(cloneArr[ran]);
+    cloneArr[ran] = cloneArr[cloneArr.length - i - 1];
+  }
+  return result;
+}
+const testArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+const resArr = getTenNum(testArray, 14);
+```
+#### 手写-字符串最长的不重复子串
+```js
+const lengthOfLongestSubstring = function (s) {
+  if (s.length === 0) {
+    return 0;
+  }
+
+  let left = 0;
+  let right = 1;
+  let max = 0;
+  while (right <= s.length) {
+    let lr = s.slice(left, right);
+    const index = lr.indexOf(s[right]);
+
+    if (index > -1) {
+      left = index + left + 1;
+    } else {
+      lr = s.slice(left, right + 1);
+      max = Math.max(max, lr.length);
+    }
+    right++;
+  }
+  return max;
+};
+```
+#### 手写-查找数组公共前缀
+```js
+const longestCommonPrefix = function (strs) {
+  const str = strs[0];
+  let index = 0;
+  while (index < str.length) {
+    const strCur = str.slice(0, index + 1);
+    for (let i = 0; i < strs.length; i++) {
+      if (!strs[i] || !strs[i].startsWith(strCur)) {
+        return str.slice(0, index);
+      }
+    }
+    index++;
+  }
+  return str;
+};
+```
+#### 手写-判断括号字符串是否有效
+```js
+const isValid = function (s) {
+  if (s.length % 2 === 1) {
+    return false;
+  }
+  const regObj = {
+    "{": "}",
+    "(": ")",
+    "[": "]",
+  };
+  let stack = [];
+  for (let i = 0; i < s.length; i++) {
+    if (s[i] === "{" || s[i] === "(" || s[i] === "[") {
+      stack.push(s[i]);
+    } else {
+      const cur = stack.pop();
+      if (s[i] !== regObj[cur]) {
+        return false;
+      }
+    }
+  }
+
+  if (stack.length) {
+    return false;
+  }
+
+  return true;
+};
+```
+#### 手写-实现一个对象的 flatten 方法
+```js
+const obj = {
+ a: {
+        b: 1,
+        c: 2,
+        d: {e: 5}
+    },
+ b: [1, 3, {a: 2, b: 3}],
+ c: 3
+}
+
+flatten(obj) 结果返回如下
+// {
+//  'a.b': 1,
+//  'a.c': 2,
+//  'a.d.e': 5,
+//  'b[0]': 1,
+//  'b[1]': 3,
+//  'b[2].a': 2,
+//  'b[2].b': 3
+//   c: 3
+// }
+
+
+
+
+function isObject(val) {
+  return typeof val === "object" && val !== null;
+}
+
+function flatten(obj) {
+  if (!isObject(obj)) {
+    return;
+  }
+  let res = {};
+  const dfs = (cur, prefix) => {
+    if (isObject(cur)) {
+      if (Array.isArray(cur)) {
+        cur.forEach((item, index) => {
+          dfs(item, `${prefix}[${index}]`);
+        });
+      } else {
+        for (let k in cur) {
+          dfs(cur[k], `${prefix}${prefix ? "." : ""}${k}`);
+        }
+      }
+    } else {
+      res[prefix] = cur;
+    }
+  };
+  dfs(obj, "");
+
+  return res;
+}
+flatten();
+```
+#### 手写-将虚拟 Dom 转化为真实 Dom（类似的递归题-必考）
+```js
+// 真正的渲染函数
+function _render(vnode) {
+  // 如果是数字类型转化为字符串
+  if (typeof vnode === "number") {
+    vnode = String(vnode);
+  }
+  // 字符串类型直接就是文本节点
+  if (typeof vnode === "string") {
+    return document.createTextNode(vnode);
+  }
+  // 普通DOM
+  const dom = document.createElement(vnode.tag);
+  if (vnode.attrs) {
+    // 遍历属性
+    Object.keys(vnode.attrs).forEach((key) => {
+      const value = vnode.attrs[key];
+      dom.setAttribute(key, value);
+    });
+  }
+  // 子数组进行递归操作 这一步是关键
+  vnode.children.forEach((child) => dom.appendChild(_render(child)));
+  return dom;
+}
+```
+#### 手写-防抖节流
+```js
+// 防抖
+function debounce(fn, delay = 300) {
+  //默认300毫秒
+  let timer;
+  return function () {
+    const args = arguments;
+    if (timer) {
+      clearTimeout(timer);
+    }
+    timer = setTimeout(() => {
+      fn.apply(this, args); // 改变this指向为调用debounce所指的对象
+    }, delay);
+  };
+}
+
+window.addEventListener(
+  "scroll",
+  debounce(() => {
+    console.log(111);
+  }, 1000)
+);
+
+// 节流
+// 设置一个标志
+function throttle(fn, delay) {
+  let flag = true;
+  return () => {
+    if (!flag) return;
+    flag = false;
+    timer = setTimeout(() => {
+      fn();
+      flag = true;
+    }, delay);
+  };
+}
+
+window.addEventListener(
+  "scroll",
+  throttle(() => {
+    console.log(111);
+  }, 1000)
+);
+```
+#### 手写-发布订阅模式
+```js
+class EventEmitter {
+  constructor() {
+    this.events = {};
+  }
+  // 实现订阅
+  on(type, callBack) {
+    if (!this.events[type]) {
+      this.events[type] = [callBack];
+    } else {
+      this.events[type].push(callBack);
+    }
+  }
+  // 删除订阅
+  off(type, callBack) {
+    if (!this.events[type]) return;
+    this.events[type] = this.events[type].filter((item) => {
+      return item !== callBack;
+    });
+  }
+  // 只执行一次订阅事件
+  once(type, callBack) {
+    function fn() {
+      callBack();
+      this.off(type, fn);
+    }
+    this.on(type, fn);
+  }
+  // 触发事件
+  emit(type, ...rest) {
+    this.events[type] &&
+      this.events[type].forEach((fn) => fn.apply(this, rest));
+  }
+}
+// 使用如下
+// const event = new EventEmitter();
+
+// const handle = (...rest) => {
+//   console.log(rest);
+// };
+
+// event.on("click", handle);
+
+// event.emit("click", 1, 2, 3, 4);
+
+// event.off("click", handle);
+
+// event.emit("click", 1, 2);
+
+// event.once("dbClick", () => {
+//   console.log(123456);
+// });
+// event.emit("dbClick");
+// event.emit("dbClick");
+```
+#### 手写 promise.all 和 race
+```js
+  //静态方法
+  static all(promiseArr) {
+    let result = [];
+    //声明一个计数器 每一个promise返回就加一
+    let count = 0;
+    return new Mypromise((resolve, reject) => {
+      for (let i = 0; i < promiseArr.length; i++) {
+      //这里用 Promise.resolve包装一下 防止不是Promise类型传进来
+        Promise.resolve(promiseArr[i]).then(
+          (res) => {
+            //这里不能直接push数组  因为要控制顺序一一对应(感谢评论区指正)
+            result[i] = res;
+            count++;
+            //只有全部的promise执行成功之后才resolve出去
+            if (count === promiseArr.length) {
+              resolve(result);
+            }
+          },
+          (err) => {
+            reject(err);
+          }
+        );
+      }
+    });
+  }
+  //静态方法
+  static race(promiseArr) {
+    return new Mypromise((resolve, reject) => {
+      for (let i = 0; i < promiseArr.length; i++) {
+        Promise.resolve(promiseArr[i]).then(
+          (res) => {
+            //promise数组只要有任何一个promise 状态变更  就可以返回
+            resolve(res);
+          },
+          (err) => {
+            reject(err);
+          }
+        );
+      }
+    });
+  }
+}
+```
+
 #### 手写Promise
 ```js
 /**
@@ -1586,6 +2063,20 @@ function throttle(handler, wait) {
         }
     }
 }
+
+function throttle(fn, gapTime) {
+  let timer = null
+  return function(){
+    var _self = this,_args = argument;
+    if(timer){
+      return 
+    }
+    timer = setTimeout(() => {
+      fn.apply(_self,_args)
+      timer = null
+    })
+  }
+}
 ```
 #### JS函数防抖和函数节流
 
@@ -1609,6 +2100,7 @@ function throttle(handler, wait) {
 - 对于输入框连续输入进行AJAX验证时，用函数防抖能有效减少请求次数。搜索框输入查询（监听输入框输入内容，设定每隔一段时间访问接口。
 - 判断`scroll`是否滑到底部，`滚动事件`+`函数防抖`
 - 浏览器窗口缩放时，resize事件。
+- 手机号，邮箱验证输入检测
 
 总的来说，适合多次事件**一次响应**的情况
 
