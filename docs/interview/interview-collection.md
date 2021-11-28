@@ -8032,6 +8032,8 @@ let myEvent = {
 
 
 ## Node
+### node是如何处理高并发的？????????
+### node中require模块的加载机制？?????????
 ### Node是什么
 Node.js 是一个开源与跨平台的 JavaScript 运行时环境。在浏览器外运行 V8 JavaScript 引擎（Google Chrome 的内核），利用事件驱动、非阻塞和异步输入输出模型等技术提高性能。我们可以理解为：Node.js 就是一个服务器端的、非阻塞式I/O的、事件驱动的JavaScript运行环境。
 
@@ -8766,6 +8768,7 @@ HTTP客户端一般对同一个服务器的并发连接个数都是有限制的�
   - sessionStorage 存在内存中，数据在当前浏览器窗口关闭后自动删除
     ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211015134146.png)
 ### Cookie、Session、webStorage、localStorage、sessionStorage
+#### cookie的httponly与samesite字段？？？？？？？？？？
 #### Cookie有没有默认过期时间?
 Cookie分为2类：会话Cookie和 持久Cookie。
 
@@ -9298,7 +9301,7 @@ Content-Type: text/html; charset=iso-8859-1
 
 {"name": "qiu", "age": 25}
 ```
-
+#### POST传输的格式？？？？？？？？？
 #### POST和GET的区别：
 POST和GET的区别：
     - **GET在浏览器回退时是无害的，而POST会再次提交请求；**
@@ -10488,9 +10491,109 @@ http缓存机制主要在http响应头中设定，响应头中相关字段为Exp
 - 当构建完成渲染树后，我们确定了哪些节点是可见的以及它们的计算样式，但是我们尚未计算它们在视口内的确切位置和大小。 这个确定的阶段就是布局阶段，也称重排。
 - 布局流程的输出是一个盒模型，它会精确的捕获每一个元素在视口内的确切位置和尺寸。 所有的相对测量值都转换为屏幕上的绝对像素。
 - 现在我们知道了哪些节点可见，它们的计算样式和几何信息。我们终于可以将这些信息传递给最后一个阶段： 将渲染树中的每个节点转换成屏幕上的实际像素。这一步通常被称为"绘制" 或 "栅格化"
-#### 绘制（回流和重绘）？？？？？？？？？？、
-https://juejin.cn/post/7022245003254562852
+#### 绘制（回流和重绘）
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211127214817.png)
+
 这个过程涉及两个比较重要的概念回流和重绘，DOM结点都是以盒模型形式存在，需要浏览器去计算位置和宽度等，这个过程就是回流。等到页面的宽高，大小，颜色等属性确定下来后，浏览器开始绘制内容，这个过程叫做重绘。浏览器刚打开页面一定要经过这两个过程的，但是这个过程非常非常非常消耗性能，所以我们应该尽量减少页面的回流和重绘。
+
+**回流必将引起重绘，重绘不一定会引起回流。**
+
+- 回流 (Reflow)
+    - 当Render Tree中部分或全部元素的元素内容变化（文字数量或图片大小等等）尺寸、结构、或某些属性发生改变时，浏览器重新渲染部分或全部文档的过程称为回流。
+    - 会导致回流的操作：
+        - 页面首次渲染
+        - 浏览器窗口大小发生改变
+        - 元素尺寸或位置发生改变
+        - 元素内容变化（文字数量或图片大小等等）
+        - 元素内容变化（文字数量或图片大小等等）
+        - 添加或者删除可见的DOM元素
+        - 激活CSS伪类（例如：:hover）
+        - 查询某些属性或调用某些方法
+    - 一些常用且会导致回流的属性和方法：
+        - `clientWidth、clientHeight、clientTop、clientLeft`
+        - `offsetWidth、offsetHeight、offsetTop、offsetLeft`
+        - `scrollWidth、scrollHeight、scrollTop、scrollLeft`
+        - `scrollIntoView()、scrollIntoViewIfNeeded()`
+        - `getComputedStyle()`
+        - `getBoundingClientRect()`
+        - `scrollTo()`
+        - 如果要使用它们，最好将值缓存起来
+- 重绘 (Repaint)
+    - 当页面中元素样式的改变并不影响它在文档流中的位置时（例如：color、background-color、visibility等），浏览器会将新样式赋予给元素并重新绘制它，这个过程称为重绘。
+    - 重绘是一个元素外观改变触发的浏览器行为，例如改变 visibility、outline、background-color 等属性，这些属性只是影响元素的外观，不会影响几何属性的时候，会导致重绘。
+    - 何时重绘？
+        - 修改元素的背景颜色
+        - 修改背景图片
+        - visibility
+        - outline
+    
+
+
+- 性能影响
+    - 回流比重绘的代价要更高。
+    - 有时即使仅仅回流一个单一的元素，它的父元素以及任何跟随它的元素也会产生回流。
+    - 现代浏览器会对频繁的回流或重绘操作进行优化：
+        - 当你获取布局信息的操作的时候，会强制队列刷新，
+        - 浏览器会维护一个队列，把所有引起回流和重绘的操作放入队列中，如果队列中的任务数量或者时间间隔达到一个阈值的，浏览器就会将队列清空，进行一次批处理，这样可以把多次回流和重绘变成一次。
+
+- 如何优化回流和重绘
+    - 最小化回流和重绘
+        - 声明图像的大小
+        - 合并样式属性，批量更新
+    - 避免频繁操作 DOM
+        - 使元素脱离文档流 （使用 document fragment）
+        - 对其进行多次修改
+        - 将元素带回到文档中。
+    - 对样式频繁发生的变化的元素使用绝对定位，使其脱离文档流
+    - css3硬件加速（GPU加速）
+        - 触发GPU加速的组件和 csss属性：
+            - `<video>和<canvas>`
+            - `opacity、3D 转换（transform）、will-change、filters`
+            - 过多元素使用css3硬件加速，会导致内存占用较大，会有性能问题
+    - 将引起重绘的行为缓存起来，避免频繁改动
+        - 不要把DOM结点的属性值放在一个循环里当成循环里的变量
+        - 可以使用防抖、节流
+        - 尽量不要使用table布局。
+        - 如果需要创建多个DOM节点，可以使用DocumentFragment创建完后一次性的加入document；
+        - 为动画的HTML元件使用position: fixed/absolute，那么修改他们的css是不会reflow
+            - 元素脱离了文档流，它的变化不会影响到其他元素
+    - 避免逐条改变样式，使用类名去合并样式
+        - 不要一条一条的修改DOM的样式，可以先定义好css的class，然后修改DOM的className。
+    - 将 DOM “离线”
+        - 我们上文所说的回流和重绘，都是在“该元素位于页面上”的前提下会发生的。一旦我们给元素设置 display: none，将其从页面上“拿掉”，那么我们的后续操作，将无法触发回流与重绘——这个将元素“拿掉”的操作，就叫做 DOM 离线化。
+        - 当我们只需要进行很少的 DOM 操作时，DOM 离线化的优越性确实不太明显。一旦操作频繁起来，这“拿掉”和“放回”的开销都将会是非常值得的。
+    - 减少强制同步布局
+        - 避免频繁读取会引发回流/重绘的属性，如果确实需要多次使用，就用一个变量缓存起来。
+        - 比如下属性或方法时，浏览器会立刻清空队列
+            - 读写 offset 家族、scroll 家族和 client 家族属性，以及 getComputedStyle() 方法和 getBoundingClientRect() 方法
+    - 开启GPU加速
+        - 样式中有类似像 ps 中图层的概念，每一层中的 Layout 和 Paint 互不影响。开启 GPU 加速元素会被单独提升到一层。
+        - WebKit 内核的浏览器中，CSS3 的 transform、opacity、filter 这些属性就可以实现合成的效果，浏览器会将渲染层提升为合成层
+    - 如何开启硬件加速呢？
+        - css 的 will-change 属性
+        - 不支持 will-change 的可以使用 translateZ(0)
+        - 硬件加速不是万金油，单独创建合成层是有代价的，每创建一个合成层，就要为其分配内存，内存大小取决于复合层的数量
+        - 复合层的大小 层的管理也更为复杂，在一些低端和终端移动端设备中更为明显，滥用 GPU 加速会引起页面卡顿甚至闪退。
+    - 使用 requestIdleCallback
+        - window.requestIdleCallback() 方法将在浏览器的空闲时段内调用的函数排队。这使开发者能够在主事件循环上执行后台和低优先级工作，而不会影响延迟关键事件，如动画和输入响应。函数一般会按先进先调用的顺序执行，然而，如果回调函数指定了执行超时时间  timeout，则有可能为了在超时前执行函数而打乱执行顺序。
+        - 在 requestIdleCallback 的回调中构建 Document Fragment，然后在下一帧的 requestAnimationFrame 回调进行真实的 DOM 变动。
+
+
+
+
+- 如何避免
+    - CSS
+        - 避免使用table布局。
+        - 尽可能在DOM树的最末端改变class。
+        - 避免设置多层内联样式。
+        - 将动画效果应用到position属性为absolute或fixed的元素上。
+        - 避免使用CSS表达式（例如：calc()）。
+    - JavaScript
+        - 避免频繁操作样式，最好一次性重写style属性，或者将样式列表定义为class并一次性更改class属性。
+        - 避免频繁操作DOM，创建一个documentFragment，在它上面应用所有DOM操作，最后再把它添加到文档中。
+        - 也可以先为元素设置display: none，操作结束后再把它显示出来。因为在display属性为none的元素上进行的DOM操作不会引发回流和重绘。
+        - 避免频繁读取会引发回流/重绘的属性，如果确实需要多次使用，就用一个变量缓存起来。
+        - 对具有复杂动画的元素使用绝对定位，使它脱离文档流，否则会引起父元素及后续元素频繁回流。
 #### 总结渲染过程
 执行渲染树构建，布局和绘制所需时间将取决于文档大小，应用的样式，以及运行文档的设备：文档越大，浏览器就需要完成的工作越多，样式越复杂，绘制的时间就越长。
 
@@ -12614,6 +12717,7 @@ vue一般是单项数据流，当我们的应用遇到多个组件共享状态�
 
 vuex 是专门为 vue 提供的全局状态管理系统，用于多个组件中数据共享、数据缓存等。（无法持久化、内部核心原理是通过创造一个全局实例 new Vue）
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211015154102.png)
+### Vuex数据流向？？？？？？？？？？
 
 ### Vuex是怎么实现的？
 
@@ -15706,7 +15810,7 @@ function queryToObj(url) {
     return paramsObj;
 }
 ```
-
+#### 手写isNaN()？？？？？？？？？？？
 #### 手写深度比较（isEqual）
 
 ```js
@@ -16793,6 +16897,257 @@ Person.prototype.getName = function() {
 let p2 = myNew(Person, "lisi");
 // your name is lisi
 p2.getName();
+```
+
+#### 手写数组去重
+- 利用ES6 Set去重（ES6中最常用）
+- 利用for嵌套for，然后splice去重（ES5中最常用）
+- 利用indexOf去重
+- 利用sort()
+- 利用对象的属性不能相同的特点进行去重（这种数组去重的方法有问题，不建议用，有待改进）
+- 利用includes
+- 利用hasOwnProperty
+- 利用filter
+- 利用递归去重
+- 利用Map数据结构去重
+- 利用reduce+includes
+- [...new Set(arr)]
+```js
+// 利用ES6 Set去重（ES6中最常用）
+function unique (arr) {
+  return Array.from(new Set(arr))
+}
+var arr = [1,1,'true','true',true,true,15,15,false,false, undefined,undefined, null,null, NaN, NaN,'NaN', 0, 0, 'a', 'a',{},{}];
+console.log(unique(arr))
+//[1, "true", true, 15, false, undefined, null, NaN, "NaN", 0, "a", {}, {}]
+
+
+
+
+
+// 利用for嵌套for，然后splice去重（ES5中最常用）
+// 双层循环，外层循环元素，内层循环时比较值。值相同时，则删去这个值。
+function unique(arr){            
+        for(var i=0; i<arr.length; i++){
+            for(var j=i+1; j<arr.length; j++){
+                if(arr[i]==arr[j]){         //第一个等同于第二个，splice方法删除第二个
+                    arr.splice(j,1);
+                    j--;
+                }
+            }
+        }
+return arr;
+}
+var arr = [1,1,'true','true',true,true,15,15,false,false, undefined,undefined, null,null, NaN, NaN,'NaN', 0, 0, 'a', 'a',{},{}];
+console.log(unique(arr))
+//[1, "true", 15, false, undefined, NaN, NaN, "NaN", "a", {…}, {…}]     //NaN和{}没有去重，两个null直接消失了
+
+
+
+
+
+
+
+// 利用indexOf去重
+// 新建一个空的结果数组，for 循环原数组，判断结果数组是否存在当前元素，如果有相同的值则跳过，不相同则push进数组。
+function unique(arr) {
+    if (!Array.isArray(arr)) {
+        console.log('type error!')
+        return
+    }
+    var array = [];
+    for (var i = 0; i < arr.length; i++) {
+        if (array .indexOf(arr[i]) === -1) {
+            array .push(arr[i])
+        }
+    }
+    return array;
+}
+var arr = [1,1,'true','true',true,true,15,15,false,false, undefined,undefined, null,null, NaN, NaN,'NaN', 0, 0, 'a', 'a',{},{}];
+console.log(unique(arr))
+// [1, "true", true, 15, false, undefined, null, NaN, NaN, "NaN", 0, "a", {…}, {…}]  //NaN、{}没有去重
+
+
+
+
+
+
+// 利用sort()
+// 利用sort()排序方法，然后根据排序后的结果进行遍历及相邻元素比对。
+function unique(arr) {
+    if (!Array.isArray(arr)) {
+        console.log('type error!')
+        return;
+    }
+    arr = arr.sort()
+    var arrry= [arr[0]];
+    for (var i = 1; i < arr.length; i++) {
+        if (arr[i] !== arr[i-1]) {
+            arrry.push(arr[i]);
+        }
+    }
+    return arrry;
+}
+     var arr = [1,1,'true','true',true,true,15,15,false,false, undefined,undefined, null,null, NaN, NaN,'NaN', 0, 0, 'a', 'a',{},{}];
+        console.log(unique(arr))
+// [0, 1, 15, "NaN", NaN, NaN, {…}, {…}, "a", false, null, true, "true", undefined]      //NaN、{}没有去重
+
+
+
+
+
+
+
+
+// 利用对象的属性不能相同的特点进行去重（这种数组去重的方法有问题，不建议用，有待改进）
+function unique(arr) {
+    if (!Array.isArray(arr)) {
+        console.log('type error!')
+        return
+    }
+    var arrry= [];
+     var  obj = {};
+    for (var i = 0; i < arr.length; i++) {
+        if (!obj[arr[i]]) {
+            arrry.push(arr[i])
+            obj[arr[i]] = 1
+        } else {
+            obj[arr[i]]++
+        }
+    }
+    return arrry;
+}
+    var arr = [1,1,'true','true',true,true,15,15,false,false, undefined,undefined, null,null, NaN, NaN,'NaN', 0, 0, 'a', 'a',{},{}];
+        console.log(unique(arr))
+//[1, "true", 15, false, undefined, null, NaN, 0, "a", {…}]    //两个true直接去掉了，NaN和{}去重
+
+
+
+
+// 利用includes
+function unique(arr) {
+    if (!Array.isArray(arr)) {
+        console.log('type error!')
+        return
+    }
+    var array =[];
+    for(var i = 0; i < arr.length; i++) {
+            if( !array.includes( arr[i]) ) {//includes 检测数组是否有某个值
+                    array.push(arr[i]);
+              }
+    }
+    return array
+}
+var arr = [1,1,'true','true',true,true,15,15,false,false, undefined,undefined, null,null, NaN, NaN,'NaN', 0, 0, 'a', 'a',{},{}];
+    console.log(unique(arr))
+    //[1, "true", true, 15, false, undefined, null, NaN, "NaN", 0, "a", {…}, {…}]     //{}没有去重
+    
+
+
+
+
+
+
+// 利用hasOwnProperty
+// 利用hasOwnProperty 判断是否存在对象属性
+function unique(arr) {
+    var obj = {};
+    return arr.filter(function(item, index, arr){
+        return obj.hasOwnProperty(typeof item + item) ? false : (obj[typeof item + item] = true)
+    })
+}
+    var arr = [1,1,'true','true',true,true,15,15,false,false, undefined,undefined, null,null, NaN, NaN,'NaN', 0, 0, 'a', 'a',{},{}];
+        console.log(unique(arr))
+//[1, "true", true, 15, false, undefined, null, NaN, "NaN", 0, "a", {…}]   //所有的都去重了
+
+
+
+
+
+
+// 利用filter
+function unique(arr) {
+  return arr.filter(function(item, index, arr) {
+    //当前元素，在原始数组中的第一个索引==当前索引值，否则返回当前元素
+    return arr.indexOf(item, 0) === index;
+  });
+}
+    var arr = [1,1,'true','true',true,true,15,15,false,false, undefined,undefined, null,null, NaN, NaN,'NaN', 0, 0, 'a', 'a',{},{}];
+        console.log(unique(arr))
+//[1, "true", true, 15, false, undefined, null, "NaN", 0, "a", {…}, {…}]
+
+
+
+
+
+// 利用递归去重
+function unique(arr) {
+        var array= arr;
+        var len = array.length;
+
+    array.sort(function(a,b){   //排序后更加方便去重
+        return a - b;
+    })
+
+    function loop(index){
+        if(index >= 1){
+            if(array[index] === array[index-1]){
+                array.splice(index,1);
+            }
+            loop(index - 1);    //递归loop，然后数组去重
+        }
+    }
+    loop(len-1);
+    return array;
+}
+ var arr = [1,1,'true','true',true,true,15,15,false,false, undefined,undefined, null,null, NaN, NaN,'NaN', 0, 0, 'a', 'a',{},{}];
+console.log(unique(arr))
+//[1, "a", "true", true, 15, false, 1, {…}, null, NaN, NaN, "NaN", 0, "a", {…}, undefined]
+
+
+
+
+
+// 利用Map数据结构去重
+// 创建一个空Map数据结构，遍历需要去重的数组，把数组的每一个元素作为key存到Map中。由于Map中不会出现相同的key值，所以最终得到的就是去重后的结果。
+function arrayNonRepeatfy(arr) {
+  let map = new Map();
+  let array = new Array();  // 数组用于返回结果
+  for (let i = 0; i < arr.length; i++) {
+    if(map .has(arr[i])) {  // 如果有该key值
+      map .set(arr[i], true); 
+    } else { 
+      map .set(arr[i], false);   // 如果没有该key值
+      array .push(arr[i]);
+    }
+  } 
+  return array ;
+}
+ var arr = [1,1,'true','true',true,true,15,15,false,false, undefined,undefined, null,null, NaN, NaN,'NaN', 0, 0, 'a', 'a',{},{}];
+    console.log(unique(arr))
+//[1, "a", "true", true, 15, false, 1, {…}, null, NaN, NaN, "NaN", 0, "a", {…}, undefined]
+
+
+
+
+
+
+// 利用reduce+includes
+function unique(arr){
+    return arr.reduce((prev,cur) => prev.includes(cur) ? prev : [...prev,cur],[]);
+}
+var arr = [1,1,'true','true',true,true,15,15,false,false, undefined,undefined, null,null, NaN, NaN,'NaN', 0, 0, 'a', 'a',{},{}];
+console.log(unique(arr));
+// [1, "true", true, 15, false, undefined, null, NaN, "NaN", 0, "a", {…}, {…}]
+
+
+
+
+
+
+// [...new Set(arr)]
+[...new Set(arr)] 
+//代码就是这么少----（其实，严格来说并不算是一种，相对于第一种方法来说只是简化了代码）
 ```
 
 #### 手写forEach方法
