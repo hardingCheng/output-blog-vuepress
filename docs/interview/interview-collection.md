@@ -147,6 +147,7 @@ web后端：就是用户看不见摸不着的数据库交互处理的业务逻�
   ```
 
 ## CSS
+### float在什么时候不生效？？？？？？
 ### 如果给你一个div，让你实现多层边框????????
 ### DIV拖拽？
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211122221738.png)
@@ -5526,7 +5527,7 @@ var deepClone = function (target, map = new WeakMap()) {
   }
 };
 ```
-
+### reduce的奇淫技巧？？？？？？？？？？？
 ### 类数组对象转换为数组的方法
 - ES6语法 Array.from(arr)
   ```js
@@ -8023,6 +8024,65 @@ let myEvent = {
     - 提高了安全性
 - 缺点
     - 不符合开闭原则，如果要改东西很麻烦，继承重写都不合适。
+#### 观察者模式
+定义了一种一对多的关系，让多个观察者对象同时监听某一个主题对象，这个主题对象的状态发生变化时就会通知所有的观察者对象，使它们能够自动更新自己，当一个对象的改变需要同时改变其它对象，并且它不知道具体有多少对象需要改变的时候，就应该考虑使用观察者模式。
+
+- 发布 & 订阅
+- 一对多
+```js
+// 主题 保存状态，状态变化之后触发所有观察者对象
+class Subject {
+  constructor() {
+    this.state = 0
+    this.observers = []
+  }
+  getState() {
+    return this.state
+  }
+  setState(state) {
+    this.state = state
+    this.notifyAllObservers()
+  }
+  notifyAllObservers() {
+    this.observers.forEach(observer => {
+      observer.update()
+    })
+  }
+  attach(observer) {
+    this.observers.push(observer)
+  }
+}
+
+// 观察者
+class Observer {
+  constructor(name, subject) {
+    this.name = name
+    this.subject = subject
+    this.subject.attach(this)
+  }
+  update() {
+    console.log(`${this.name} update, state: ${this.subject.getState()}`)
+  }
+}
+
+// 测试
+let s = new Subject()
+let o1 = new Observer('o1', s)
+let o2 = new Observer('02', s)
+
+s.setState(12)
+```
+- 场景
+    - DOM事件
+    - vue 响应式
+
+- 优点
+    - 支持简单的广播通信，自动通知所有已经订阅过的对象
+    - 目标对象与观察者之间的抽象耦合关系能单独扩展以及重用
+    - 增加了灵活性
+    - 观察者模式所做的工作就是在解耦，让耦合的双方都依赖于抽象，而不是依赖于具体。从而使得各自的变化都不会影响到另一边的变化。
+- 缺点
+    - 过度使用会导致对象与对象之间的联系弱化，会导致程序难以跟踪维护和理解
 ## TS
 ### Typescript 有什么好处？？？？？？？？？
 ### Typescript 有什么不好的地方吗？？？？？？？？？
@@ -8032,8 +8092,268 @@ let myEvent = {
 
 
 ## Node
-### node是如何处理高并发的？????????
-### node中require模块的加载机制？?????????
+### Node解决的问题
+- 解决的问题：解决web端高并发问题，例如i/o密集操作
+- 什么是I/O密集：指的是文件操作、网络操作（频繁埋点->网络操作）、数据库等等
+- 什么是CPU密集：指的是逻辑处理运算、压缩、解压、加密、解密等等
+- 为什么：NodeJS处理并发的能力强，但处理计算和逻辑的能力反而很弱
+### Node工作流程
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211128210201.png)
+- V8引擎解析JavaScript脚本，若解析后的代码，调用了Node API，Node就会将代码交给libuv库处理，这个libuv库是c语言写的，也就是node的事件环的核心。
+- libuv库负责Node API的执行，它将不同的任务分配给不同的工作线程（work threads），通过多线程同步阻塞执行，模拟异步处理机制，成功后将回调函数放入Event Queue。
+- 等到work threads队列中有执行完成的事件，就会通过execute callback回调给Event queue队列，把它放入队列中。
+- 最后通过事件驱动(发布订阅)的方式，取出EVENT QUEUE队列的事件，再通过V8引擎将结果返回给应用
+
+
+- 传统的server 每个请求生成一个线程,nodejs是一个单线程的，使用libuv库保持数万并发
+- libuv:c语言编写的基础库实现主循环
+- NodeJS它的所有I/O、网络通信等比较耗时的任务，都可以交给worker threads执行再回调，所以很快
+- 非阻塞事件驱动 实现异步开发,通过事件驱动的I/O来操作完成平台数据密集型实时应用
+
+我们所看到的node.js单线程只是一个js主线程，本质上的异步操作还是由线程池完成的，node将所有的阻塞操作都交给了内部的线程池去实现，本身只负责不断的往返调度，并没有进行真正的I/O操作，从而实现异步非阻塞I/O，这便是node单线程和事件驱动的精髓之处。
+
+### Node是如何处理高并发的？
+- Node.js
+    - Node.js是建立在Google V8 JavaScript引擎之上的网络服务器框架，允许开发者能够用客户端使用的语言JavaScript在服务器端编码。
+    - JS的执行机制：JS设计是单线程的，通过事件环Event Loop实现异步开发。
+    - Node.js正因为node的Event Loop原理，使NodeJS处理并发的能力强。
+- nodejs处理高并发的原理机制
+    - 每个Node.js进程只有一个主线程在执行程序代码，形成一个执行栈（execution context stack)。
+    - 主线程之外，还维护了一个"事件队列"（Event queue）。当用户的网络请求或者其它的异步操作到来时，node都会把它放到Event Queue之中，此时并不会立即执行它，代码也不会被阻塞，继续往下走，直到主线程代码执行完毕。
+    - 主线程代码执行完毕完成后，然后通过Event Loop，也就是事件循环机制，开始到Event Queue的开头取出第一个事件，从线程池中分配一个线程去执行这个事件，接下来继续取出第二个事件，再从线程池中分配一个线程去执行，然后第三个，第四个。主线程不断的检查事件队列中是否有未执行的事件，直到事件队列中所有事件都执行完了，此后每当有新的事件加入到事件队列中，都会通知主线程按顺序取出交EventLoop处理。当有事件执行完毕后，会通知主线程，主线程执行回调，线程归还给线程池。
+    - 主线程不断重复上面的第三步。
+- 我们所看到的node.js单线程只是一个js主线程，本质上的异步操作还是由线程池完成的，node将所有的阻塞操作都交给了内部的线程池去实现，本身只负责不断的往返调度，并没有进行真正的I/O操作，从而实现异步非阻塞I/O，这便是node单线程和事件驱动的精髓之处了。
+- nodejs高并发大流量的设计实现,控制并发的三种方法 eventproxy、async.mapLimit、async.queue
+    - eventproxy是使用类似递归的方式，让每次最大同时请求数量控制在设定的值
+    - async.queue，是使用async库 一个流程控制器
+    - async.mapLimit，原理与async.queue相类似 都自带控制最大任务执行数量
+### node中require模块的加载机制？
+#### require和module.exports不是黑魔法
+require和module.exports干的事情并不复杂，我们先假设有一个全局对象{}，初始情况下是空的，当你require某个文件时，就将这个文件拿出来执行，如果这个文件里面存在module.exports，当运行到这行代码时将module.exports的值加入这个对象，键为对应的文件名，最终这个对象就长这样：
+```json
+{
+  "a.js": "hello world",
+  "b.js": function add(){},
+  "c.js": 2,
+  "d.js": { num: 2 }
+}
+```
+当你再次require某个文件时，如果这个对象里面有对应的值，就直接返回给你，如果没有就重复前面的步骤，执行目标文件，然后将它的module.exports加入这个全局对象，并返回给调用者。这个全局对象其实就是我们经常听说的缓存。**所以require和module.exports并没有什么黑魔法，就只是运行并获取目标文件的值，然后加入缓存，用的时候拿出来用就行。**再看看这个对象，因为d.js是一个引用类型，所以你在任何地方获取了这个引用都可以更改他的值，如果不希望自己模块的值被更改，需要自己写模块时进行处理，比如使用Object.freeze()，Object.defineProperty()之类的方法。
+
+#### 模块类型和加载顺序
+模块类型：
+Node.js的模块有好几种类型，前面我们使用的其实都是文件模块，总结下来，主要有这两种类型：
+- 内置模块：就是Node.js原生提供的功能，比如fs，http等等，这些模块在Node.js进程起来时就加载了。
+- 文件模块：我们前面写的几个模块，还有第三方模块，即node_modules下面的模块都是文件模块。
+
+
+加载顺序：
+加载顺序是指当我们require(X)时，应该按照什么顺序去哪里找X，在官方文档上有详细伪代码，总结下来大概是这么个顺序：
+1. 优先加载内置模块，即使有同名文件，也会优先使用内置模块。
+2. 不是内置模块，先去缓存找。
+3. 缓存没有就去找对应路径的文件。
+4. 不存在对应的文件，就将这个路径作为文件夹加载。
+5. 对应的文件和文件夹都找不到就去node_modules下面找。
+6. 还找不到就报错了。
+
+
+加载文件夹
+前面提到找不到文件就找文件夹，但是不可能将整个文件夹都加载进来，加载文件夹的时候也是有一个加载顺序的：
+1. 先看看这个文件夹下面有没有package.json，如果有就找里面的main字段，main字段有值就加载对应的文件。所以如果大家在看一些第三方库源码时找不到入口就看看他package.json里面的main字段吧，比如jquery的main字段就是这样："main": "dist/jquery.js"。
+2. 如果没有package.json或者package.json里面没有main就找index文件。
+3. 如果这两步都找不到就报错了。
+
+
+支持的文件类型:
+1. .js：.js文件是我们最常用的文件类型，加载的时候会先运行整个JS文件，然后将前面说的module.exports作为require的返回值。
+2. .json：.json文件是一个普通的文本文件，直接用JSON.parse将其转化为对象返回就行。
+3. .node：.node文件是C++编译后的二进制文件，纯前端一般很少接触这个类型。
+#### 手写require
+```md
+require -> _load() -> tryModuleLoad() -> Module.prototype.load -> Module._extensions[extension](this, filename) -> _compile
+```
+**Module类**
+Node.js模块加载的功能全部在Module类里面，整个代码使用面向对象的思想。Module类的构造函数也不复杂，主要是一些值的初始化，为了跟官方Module名字区分开，我们自己的类命名为MyModule：
+```js
+function MyModule(id = '') {
+  this.id = id;       // 这个id其实就是我们require的路径
+  this.path = path.dirname(id);     // path是Node.js内置模块，用它来获取传入参数对应的文件夹路径
+  this.exports = {};        // 导出的东西放这里，初始化为空对象
+  this.filename = null;     // 模块对应的文件名
+  this.loaded = false;      // loaded用来标识当前模块是否已经加载
+}
+```
+**require方法**
+我们一直用的require其实是Module类的一个实例方法，内容很简单，先做一些参数检查，然后调用Module._load方法.
+```js
+MyModule.prototype.require = function (id) {
+  return Module._load(id);
+}
+```
+**MyModule._load**
+MyModule._load是一个静态方法，这才是require方法的真正主体，他干的事情其实是：
+1. 先检查请求的模块在缓存中是否已经存在了，如果存在了直接返回缓存模块的exports。
+2. 如果不在缓存中，就new一个Module实例，用这个实例加载对应的模块，并返回模块的exports。
+我们自己来实现下这两个需求，缓存直接放在Module._cache这个静态变量上，这个变量官方初始化使用的是Object.create(null)，这样可以使创建出来的原型指向null，我们也这样做吧：
+```js
+MyModule._cache = Object.create(null);
+
+MyModule._load = function (request) {    // request是我们传入的路劲参数
+  const filename = MyModule._resolveFilename(request);
+
+  // 先检查缓存，如果缓存存在且已经加载，直接返回缓存
+  const cachedModule = MyModule._cache[filename];
+  if (cachedModule !== undefined) {
+    return cachedModule.exports;
+  }
+
+  // 如果缓存不存在，我们就加载这个模块
+  // 加载前先new一个MyModule实例，然后调用实例方法load来加载
+  // 加载完成直接返回module.exports
+  const module = new MyModule(filename);
+  
+  // load之前就将这个模块缓存下来，这样如果有循环引用就会拿到这个缓存，但是这个缓存里面的exports可能还没有或者不完整
+  MyModule._cache[filename] = module;
+  
+  module.load(filename);
+  
+  return module.exports;
+}
+```
+**MyModule._resolveFilename**
+MyModule._resolveFilename从名字就可以看出来，这个方法是通过用户传入的require参数来解析到真正的文件地址的，源码中这个方法比较复杂，因为按照前面讲的，他要支持多种参数：内置模块，相对路径，绝对路径，文件夹和第三方模块等等，如果是文件夹或者第三方模块还要解析里面的package.json和index.js。我们这里主要讲原理，所以我们就只实现通过相对路径和绝对路径来查找文件，并支持自动添加js和json两种后缀名:
+```js
+MyModule._resolveFilename = function (request) {
+  const filename = path.resolve(request);   // 获取传入参数对应的绝对路径
+  const extname = path.extname(request);    // 获取文件后缀名
+
+  // 如果没有文件后缀名，尝试添加.js和.json
+  if (!extname) {
+    const exts = Object.keys(MyModule._extensions);
+    for (let i = 0; i < exts.length; i++) {
+      const currentPath = `${filename}${exts[i]}`;
+
+      // 如果拼接后的文件存在，返回拼接的路径
+      if (fs.existsSync(currentPath)) {
+        return currentPath;
+      }
+    }
+  }
+
+  return filename;
+}
+```
+**MyModule.prototype.load**
+MyModule.prototype.load是一个实例方法，这个方法就是真正用来加载模块的方法，这其实也是不同类型文件加载的一个入口，不同类型的文件会对应MyModule._extensions里面的一个方法：
+```js
+MyModule.prototype.load = function (filename) {
+  // 获取文件后缀名
+  const extname = path.extname(filename);
+
+  // 调用后缀名对应的处理函数来处理
+  MyModule._extensions[extname](this, filename);
+
+  this.loaded = true;
+}
+// 注意这段代码里面的this指向的是module实例，因为他是一个实例方法。
+```
+**加载js文件: MyModule._extensions['.js']**
+前面我们说过不同文件类型的处理方法都挂载在MyModule._extensions上面的，我们先来实现.js类型文件的加载：
+```js
+MyModule._extensions['.js'] = function (module, filename) {
+  const content = fs.readFileSync(filename, 'utf8');
+  module._compile(content, filename);
+}
+// 可以看到js的加载方法很简单，只是把文件内容读出来，然后调了另外一个实例方法_compile来执行他。
+```
+**编译执行js文件：MyModule.prototype._compile**
+MyModule.prototype._compile是加载JS文件的核心所在，也是我们最常使用的方法，这个方法需要将目标文件拿出来执行一遍，执行之前需要将它整个代码包裹一层，以便注入exports, require, module, __dirname, __filename，这也是我们能在JS文件里面直接使用这几个变量的原因。要实现这种注入也不难，假如我们require的文件是一个简单的Hello World，长这样：
+```js
+module.exports = "hello world";
+
+
+MyModule.wrap = function (script) {
+  return MyModule.wrapper[0] + script + MyModule.wrapper[1];
+};
+
+
+MyModule.prototype._compile = function (content, filename) {
+  const wrapper = Module.wrap(content);    // 获取包装后函数体
+
+  // vm是nodejs的虚拟机沙盒模块，runInThisContext方法可以接受一个字符串并将它转化为一个函数
+  // 返回值就是转化后的函数，所以compiledWrapper是一个函数
+  const compiledWrapper = vm.runInThisContext(wrapper, {
+    filename,
+    lineOffset: 0,
+    displayErrors: true,
+  });
+
+  // 准备exports, require, module, __filename, __dirname这几个参数
+  // exports可以直接用module.exports，即this.exports
+  // require官方源码中还包装了一层，其实最后调用的还是this.require
+  // module不用说，就是this了
+  // __filename直接用传进来的filename参数了
+  // __dirname需要通过filename获取下
+  const dirname = path.dirname(filename);
+
+  compiledWrapper.call(this.exports, this.exports, this.require, this,
+    filename, dirname);
+}
+```
+1. this:compiledWrapper是通过call调用的，第一个参数就是里面的this，这里我们传入的是this.exports，也就是module.exports，也就是说我们js文件里面this是对module.exports的一个引用。
+2. exports: compiledWrapper正式接收的第一个参数是exports，我们传的也是this.exports,所以js文件里面的exports也是对module.exports的一个引用。
+3. require: 这个方法我们传的是this.require，其实就是MyModule.prototype.require，也就是MyModule._load。
+4. module: 我们传入的是this，也就是当前模块的实例。
+5. __filename：文件所在的绝对路径。
+6. __dirname: 文件所在文件夹的绝对路径。
+
+
+**加载json文件: MyModule._extensions['.json']**
+加载json文件就简单多了，只需要将文件读出来解析成json就行了：
+```js
+MyModule._extensions['.json'] = function (module, filename) {
+  const content = fs.readFileSync(filename, 'utf8');
+  module.exports = JSONParse(content);
+}
+```
+
+
+
+
+总结:
+1. require不是黑魔法，整个Node.js的模块加载机制都是JS实现的。
+2. 每个模块里面的exports, require, module, __filename, __dirname五个参数都不是全局变量，而是模块加载的时候注入的。
+3. 为了注入这几个变量，我们需要将用户的代码用一个函数包裹起来，拼一个字符串然后调用沙盒模块vm来实现。
+4. 初始状态下，模块里面的this, exports, module.exports都指向同一个对象，如果你对他们重新赋值，这种连接就断了。
+5. 对module.exports的重新赋值会作为模块的导出内容，但是你对exports的重新赋值并不能改变模块导出内容，只是改变了exports这个变量而已，因为模块始终是module，导出内容是module.exports。
+6. 为了解决循环引用，模块在加载前就会被加入缓存，下次再加载会直接返回缓存，如果这时候模块还没加载完，你可能拿到未完成的exports。
+7. Node.js实现的这套加载机制叫CommonJS。
+### exports和module.exports的区别
+exports和module.exports这两个变量都是通过下面这行代码注入的。
+```js
+compiledWrapper.call(this.exports, this.exports, this.require, this,
+    filename, dirname);
+```
+初始状态下，exports === module.exports === {}，exports是module.exports的一个引用，如果你一直是这样使用的:
+```js
+exports.a = 1;
+module.exports.b = 2;
+
+console.log(exports === module.exports);   // true
+// exports和module.exports都是指向同一个对象{}，你往这个对象上添加属性并没有改变这个对象本身的引用地址，所以exports === module.exports一直成立。
+```
+需要注意的是，你对module.exports的重新赋值会作为模块的导出内容，但是你对exports的重新赋值并不能改变模块导出内容，只是改变了exports这个变量而已，因为模块始终是module，导出内容是module.exports。
+### Node.js对于循环引用是进行了处理的
+MyModule._load源码里面，注意这两行代码的顺序:
+```js
+MyModule._cache[filename] = module;
+
+module.load(filename);
+```
+上述代码中我们是先将缓存设置了，然后再执行的真正的load，顺着这个思路我能来理一下这里的加载流程:
+1. main加载a，a在真正加载前先去缓存中占一个位置
+2. a在正式加载时加载了b
+3. b又去加载了a，这时候缓存中已经有a了，所以直接返回a.exports，即使这时候的exports是不完整的。
 ### Node是什么
 Node.js 是一个开源与跨平台的 JavaScript 运行时环境。在浏览器外运行 V8 JavaScript 引擎（Google Chrome 的内核），利用事件驱动、非阻塞和异步输入输出模型等技术提高性能。我们可以理解为：Node.js 就是一个服务器端的、非阻塞式I/O的、事件驱动的JavaScript运行环境。
 
@@ -8061,7 +8381,11 @@ Node.js 是一个开源与跨平台的 JavaScript 运行时环境。在浏览器
     - 单页面浏览器应用程序。
     - 操作数据库、为前端和移动端提供基于json的API。
 ## HTTP
-
+### Axios
+#### axios的取消请求？？？？？？
+#### 除了axios还了解那些请求方法？？？？？？？
+### Fetch
+#### fetch怎么携带cookie？？？？？
 ### 两个页面之间的通信如何做？
 #### postMessage
 window.postMessage()方法可以安全地实现Window对象之间的跨域通信。例如，在一个页面和它生成的弹出窗口之间，或者是页面和嵌入其中的iframe之间。
@@ -9301,8 +9625,17 @@ Content-Type: text/html; charset=iso-8859-1
 
 {"name": "qiu", "age": 25}
 ```
-#### POST传输的格式？？？？？？？？？
-#### POST和GET的区别：
+#### POST传输的格式？
+- application/x-www-form-urlencoded
+    - 最常见的post提交数据的格式，原生form表单如果不设置 enctype 属性，那默认就会按照 application/x-www-form-urlencoded 格式上传. 正如其名 form-urlencoded ，他会对字段进行转码，提交的数据按照 key1=1&key2=2 这种形式来提交，跟get方式提交参数是一样的，只不过放在了request body里面。
+    - 优点是，实现简单，兼容性好，多数浏览器工具都默认支持。
+    - 缺点是，没法实现复杂的数据，比如文件二进制流，符号会被编码，比如 [ ] 会被转成%5B跟%5D，空格会被转成 %20 等，PS:这种编码方式被称为百分比编号，是URL编码在特定上下文的统一资源定位符的编码机制。
+- multipart/form-data
+    - 这种是一般是用来提交文件、非ASCII码数据或者是二进制流数据，提交excel文件为例，打开控制台能看到如下的表单数据, 每一个字段都有一个分界线，用来分割不同字段。对比 application/x-www-form-urlencoded 会多了很多分界线，用来传普通的数据会比较浪费待带宽或者流量。
+- application/json
+    - 这种格式就是正常的json数据，可以传数组，嵌套对象等，适合传递复杂嵌套的数据，特别适合RESTful风格的接口。各种工具如Chrome开发者工具跟postman等都有很好的支持，会以树形结构展示。提交JS对象需要用JSON.stringify 转化。
+    - 其中原生的表单只支持第一种跟第二种提交方式，enctype 属性还支持 text/pain, 不过日常开发比较少用。
+#### POST和GET的区别？
 POST和GET的区别：
     - **GET在浏览器回退时是无害的，而POST会再次提交请求；**
     - GET产生的URL地址可以被收藏，而POST不可以；
@@ -12717,8 +13050,14 @@ vue一般是单项数据流，当我们的应用遇到多个组件共享状态�
 
 vuex 是专门为 vue 提供的全局状态管理系统，用于多个组件中数据共享、数据缓存等。（无法持久化、内部核心原理是通过创造一个全局实例 new Vue）
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211015154102.png)
-### Vuex数据流向？？？？？？？？？？
-
+### Vuex数据流向？
+1. Components 收集用户反馈触发 Actions,Actions 是负责处理从 Vue Components 接收到的用户行为的模块。
+    1. 调用其他 action 
+    2. 发送异步请求以及提交（commit） mutations
+2. Actions 提交（commit）Mutations，请求修改 State
+3. Mutation 同步修改 State
+4. State 改变后重新渲染（Render）Components
+### 手写Vuex？？？？？？？？？？？？
 ### Vuex是怎么实现的？
 
 install函数：用来注册插件到vue里（说白了就是在vue中执行这个函数，并把vue当作参数传入此函数，使用vue的方法和绑定store到各个组件上）
@@ -15037,6 +15376,92 @@ console.log(str)
     - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108172704.png)
 ## 手写相关函数
 ### 手写相关函数1
+#### 手写Node 的 Promisify？
+```js
+// 使用前
+fs.readFile('./index.js', (err, data) => {
+   if(!err) {
+       console.log(data.toString())
+   }
+   console.log(err)
+})
+// 使用promisify后
+const readFile = promisify(fs.readFile)
+readFile('./index.js')
+   .then(data => {
+       console.log(data.toString())
+   })
+   .catch(err => {
+       console.log('error:', err)
+   })
+
+```
+```js
+// const newFn = promisify(fn)
+// newFn(a) 会执行Promise参数方法
+function promisify(fn) {
+  return function(...args) {
+    // 返回promise的实例
+    return new Promise(function(reslove, reject) {
+      // newFn(a) 时会执行到这里向下执行
+      // 加入参数cb => newFn(a)
+      args.push(function(err, data) {
+        if (err) {
+          reject(err)
+        } else {
+          reslove(data)
+        }
+      })
+      // 这里才是函数真正执行的地方执行newFn(a, cb)
+      fn.apply(null, args)
+    })
+  }
+}
+
+```
+#### 手写reduce实现map？
+```js
+// 将每次遍历的元素，作为传入的函数的参数，并将函数执行的结果放入新的数组中。
+Array.prototype._map = function (callback) {
+  if(typeof callback === 'function') {
+    return this.reduce((prev,item,index,arr) => {
+      prev.push(callback(item, index, arr))
+      return prev
+    }, [])
+  } else {
+    console.log(new Error('callback is not function'))
+  }
+}
+
+let val = [1, 5, 6]._map(item => item+ 1)
+console.log(val);  // [2, 6, 7]
+```
+#### 手写reduce实现filter？
+```js
+// 如果filter函数传入的参数(参数是一个函数)执行后有返回值，即经过了检验，才将遍历的当前元素放入数组中，如果没有返回值，就忽略
+  Array.prototype._filter = function (callback) {
+    if(typeof callback === 'function') {
+      return this.reduce((prev,item,index,arr) => {
+        callback(item, index, arr) ? prev.push(item) : null
+        return prev
+      }, [])
+    } else {
+      console.log(new Error('callback is not function'))
+    }
+  }
+  let val = [1, 5, 6]._filter(item => item > 2)
+  console.log(val);  // [5, 6]
+
+```
+#### reduce最大值/最小值
+```js
+  let arr = [1, 2, 3, 4, 5]
+
+console.log(arr.reduce((prev, cur) => Math.max(prev, cur))); // 5
+
+console.log(arr.reduce((prev, cur) => Math.min(prev, cur))); // 1
+
+```
 #### 生成指定长度的随机字符串
 ```js
 function generateRamStr(len, charSet) {
@@ -15810,7 +16235,13 @@ function queryToObj(url) {
     return paramsObj;
 }
 ```
-#### 手写isNaN()？？？？？？？？？？？
+#### 手写isNaN()？
+```js
+function myIsNaN(param) {
+	var param = Number(param)
+	return param !== param
+}
+```
 #### 手写深度比较（isEqual）
 
 ```js
