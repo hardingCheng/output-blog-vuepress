@@ -147,8 +147,43 @@ web后端：就是用户看不见摸不着的数据库交互处理的业务逻�
   ```
 
 ## CSS
-### float在什么时候不生效？？？？？？
-### 如果给你一个div，让你实现多层边框????????
+### float在什么时候不生效？
+1. display：none
+设置成display：none了之后，float失效这一点自然不用说。因为此时元素已经不在dom树里了，float当然起不了作用。
+
+2. position：absolute、fixed。
+无论是fixed（相对窗口定位）或者absolute（相对最近的position属性不为static的祖先元素）。都会使float失效。
+### 如果给你一个div，让你实现多层边框?
+#### box-shadow实现
+`box-shadow：x-shadow  y-shadow  blur  spread  color  inset;`
+- x-shadow：设置对象的阴影水平偏移值，单位可以是px、em或百分比等，允许负值。
+- y-shadow：设置对象的阴影垂直偏移值，单位可以是px、em或百分比等，允许负值。
+- blur：用于设置边框阴影半径大小。
+- spread：扩展半径，设置阴影的尺寸；这个参数可选，缺省时值为0。
+- color：设置阴影的颜色；
+- inset：这个参数默认不设置。默认情况下为外阴影，inset表示内阴影。
+```css
+div{  
+     box-shadow: 0 0 0 10px red,
+　　　　　　　   0 0 0 16px green,
+　　　　　　　   0 2px 5px 16px rgba(0,0,0,.5);     
+     background: yellowgreen;
+ }
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211129215800.png)
+#### outline实现
+如果我们只需要2层边框，那么使用outline是不错的选择，先设置常规的border边框，再加上outline（描边）。而且outline比上面的box-shadow还有一大优点就是，可以生成虚线等边框。通常outline属性需要和对应的描边偏移outline-offset来实现。
+```css
+div{
+    width: 200px;
+    height: 100px;
+    background: #ffffff;
+    border: 5px solid #53cfa2;
+    outline: #736e21 dashed 1px;
+    outline-offset: -20px;
+}
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211129215847.png)
 ### DIV拖拽？
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211122221738.png)
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211122221809.png)
@@ -5527,7 +5562,274 @@ var deepClone = function (target, map = new WeakMap()) {
   }
 };
 ```
-### reduce的奇淫技巧？？？？？？？？？？？
+### reduce的奇淫技巧？
+reduce方法是一个数组的迭代方法，和map、filter不同，reduce方法可缓存一个变量，迭代时我们可以操作这个变量，然后返回它。
+#### 数组累加
+数组累加是项目经常遇到的，比如计算商品总价等，使用reduce就可以一行代码搞定，而且不用定义外部变量，reduce是完全无副作用的函数。
+```js
+// 累加
+[1, 2, 3, 4, 5, 6, 7, 8].reduce((a, i) => a + i);
+// 输出：36
+
+// 累加，默认一个初始值
+[1, 2, 3, 4, 5, 6, 7, 8].reduce((a, i) => a + i, 5);
+// 输出：41
+
+// 累乘
+[1, 2, 3, 4, 5, 6, 7, 8].reduce((a, i) => a * i);
+// 输出：40320
+```
+#### 找出数组最大值
+在数组每次的迭代中，我们使用Math.max获取最大值并返回，最后我们将得到数组所有项目的最大值。
+```js
+[1, 2, 3, 4, 5, 6, 7, 8].reduce((a, i) => Math.max(a, i));
+```
+#### 处理不规则数组
+通过map和reduce配合使用，返回每个子数组拼接好的结果。
+```js
+let data = [
+  ["红色","128g", "苹果手机"],
+  ["南北","两室一厅","128㎡","洋房住宅"],
+  ["小米","白色","智能运动手表","心率血压血氧","来电信息提醒"], 
+  ["官方发售","2020年秋季","篮球","球鞋","品牌直邮"]
+]
+let dataConcat = data.map(item=>item.reduce((a,i)=>`${a} ${i}`))
+
+// 输出结果：
+["红色 128g 苹果手机"
+"南北 两室一厅 128㎡ 洋房住宅"
+"小米 白色 智能运动手表 心率血压血氧 来电信息提醒"
+"官方发售 2020年秋季 篮球 球鞋 品牌直邮"]
+```
+#### 删除数据重复项
+检查当前迭代项是否存在，如果不存在添加到数组中。
+```js
+let array = [1, 2, 3, 'a', 'b', 'c', 1, 2, 3, 'a', 'b', 'c'];
+array.reduce((noDupes, curVal) => {
+  if (noDupes.indexOf(curVal) === -1) { noDupes.push(curVal) }
+  return noDupes
+}, [])
+// 输出：[1, 2, 3, 'a', 'b', 'c']
+
+
+
+
+function Uniq(arr = []) {
+    return arr.reduce((t, v) => t.includes(v) ? t : [...t, v], []);
+}
+const arr = [2, 1, 0, 3, 2, 1, 2];
+Uniq(arr); // [2, 1, 0, 3]
+```
+#### 验证括号是否合法
+这是一个很巧妙的用法，我在dev.to上看到的用法。如果结果等于0说明，括号数量是合法的。
+```js
+[..."(())()(()())"].reduce((a,i)=> i === '(' ? a+1 : a-1 , 0);
+// 输出：0
+
+// 使用循环方式
+let status=0
+for (let i of [..."(())()(()())"]) {
+  if(i === "(")
+    status = status + 1
+  else if(i === ")")
+    status = status - 1
+  if (status < 0) {
+    break;
+  }
+}
+```
+#### 按属性分组
+按照指定key将数据进行分组，这里我用国家字段分组，在每次迭代过程中检查当前国家是否存在，如果不存在创建一个数组，将数据插入到数组中。并返回数组。
+```js
+let obj = [
+  {name: '张三', job: '数据分析师', country: '中国'},
+  {name: '艾斯', job: '科学家', country: '中国'},
+  {name: '雷尔', job: '科学家', country: '美国'},
+  {name: '鲍勃', job: '软件工程师', country: '印度'},
+]
+
+obj.reduce((group, curP) => {
+  let newkey = curP['country']
+  if(!group[newkey]){
+    group[newkey]=[]
+  }
+  group[newkey].push(curP)
+  return group
+}, [])
+// 输出：
+[ 中国: [{…}, {…}]
+  印度: [{…}]
+  美国: [{…}] ]
+```
+#### 数组扁平化
+这里展示的数组只有一级深度，如果数组是多级可以使用递归来进行处理。
+```js
+[[3, 4, 5], [2, 5, 3], [4, 5, 6]].reduce((singleArr, nextArray) => singleArr.concat(nextArray), [])
+// 输出：[3, 4, 5, 2, 5, 3, 4, 5, 6]
+
+
+// 当然也可以使用ES6的.flat方法替代
+[ [3, 4, 5], 
+	[2, 5, 3], 
+	[4, 5, 6]
+].flat();
+```
+#### 反转字符串
+```js
+[..."hello world"].reduce((a,v) => v+a)
+
+
+
+[..."hello world"].reverse().join('')
+```
+#### 数组成员独立拆解
+```js
+function Unzip(arr = []) {
+    return arr.reduce(
+        (t, v) => (v.forEach((w, i) => t[i].push(w)), t),
+        Array.from({ length: Math.max(...arr.map(v => v.length)) }).map(v => [])
+    );
+}
+
+const arr = [["a", 1, true], ["b", 2, false]];
+Unzip(arr); // [["a", "b"], [1, 2], [true, false]]
+```
+#### 数组成员个数统计
+```js
+function Count(arr = []) {
+    return arr.reduce((t, v) => (t[v] = (t[v] || 0) + 1, t), {});
+}
+
+const arr = [0, 1, 1, 2, 2, 2];
+Count(arr); // { 0: 1, 1: 2, 2: 3 }
+```
+#### 数组成员位置记录
+```js
+function Position(arr = [], val) {
+    return arr.reduce((t, v, i) => (v === val && t.push(i), t), []);
+}
+
+const arr = [2, 1, 5, 4, 2, 1, 6, 6, 7];
+Position(arr, 2); // [0, 4]
+```
+#### 数组成员特性分组
+```js
+function Group(arr = [], key) {
+    return key ? arr.reduce((t, v) => (!t[v[key]] && (t[v[key]] = []), t[v[key]].push(v), t), {}) : {};
+}
+
+
+const arr = [
+    { area: "GZ", name: "YZW", age: 27 },
+    { area: "GZ", name: "TYJ", age: 25 },
+    { area: "SZ", name: "AAA", age: 23 },
+    { area: "FS", name: "BBB", age: 21 },
+    { area: "SZ", name: "CCC", age: 19 }
+]; // 以地区area作为分组依据
+Group(arr, "area"); // { GZ: Array(2), SZ: Array(2), FS: Array(1) }
+```
+#### 数组成员所含关键字统计
+```js
+function Keyword(arr = [], keys = []) {
+    return keys.reduce((t, v) => (arr.some(w => w.includes(v)) && t.push(v), t), []);
+}
+
+const text = [
+    "今天天气真好，我想出去钓鱼",
+    "我一边看电视，一边写作业",
+    "小明喜欢同桌的小红，又喜欢后桌的小君，真TM花心",
+    "最近上班喜欢摸鱼的人实在太多了，代码不好好写，在想入非非"
+];
+const keyword = ["偷懒", "喜欢", "睡觉", "摸鱼", "真好", "一边", "明天"];
+Keyword(text, keyword); // ["喜欢", "摸鱼", "真好", "一边"]
+```
+#### 数字千分化
+```js
+function ThousandNum(num = 0) {
+    const str = (+num).toString().split(".");
+    const int = nums => nums.split("").reverse().reduceRight((t, v, i) => t + (i % 3 ? v : `${v},`), "").replace(/^,|,$/g, "");
+    const dec = nums => nums.split("").reduce((t, v, i) => t + ((i + 1) % 3 ? v : `${v},`), "").replace(/^,|,$/g, "");
+    return str.length > 1 ? `${int(str[0])}.${dec(str[1])}` : int(str[0]);
+}
+
+
+
+ThousandNum(1234); // "1,234"
+ThousandNum(1234.00); // "1,234"
+ThousandNum(0.1234); // "0.123,4"
+ThousandNum(1234.5678); // "1,234.567,8"
+```
+#### 异步累计
+```js
+async function AsyncTotal(arr = []) {
+    return arr.reduce(async(t, v) => {
+        const at = await t;
+        const todo = await Todo(v);
+        at[v] = todo;
+        return at;
+    }, Promise.resolve({}));
+}
+
+const result = await AsyncTotal(); // 需要在async包围下使用
+
+```
+#### 斐波那契数列
+```js
+function Fibonacci(len = 2) {
+    const arr = [...new Array(len).keys()];
+    return arr.reduce((t, v, i) => (i > 1 && t.push(t[i - 1] + t[i - 2]), t), [0, 1]);
+}
+
+Fibonacci(10); // [0, 1, 1, 2, 3, 5, 8, 13, 21, 34]
+
+```
+#### URL参数反序列化
+```js
+function ParseUrlSearch() {
+    return location.search.replace(/(^\?)|(&$)/g, "").split("&").reduce((t, v) => {
+        const [key, val] = v.split("=");
+        t[key] = decodeURIComponent(val);
+        return t;
+    }, {});
+}
+
+// 假设URL为：https://www.baidu.com?age=25&name=TYJ
+ParseUrlSearch(); // { age: "25", name: "TYJ" }
+```
+#### URL参数序列化
+```js
+function StringifyUrlSearch(search = {}) {
+    return Object.entries(search).reduce(
+        (t, v) => `${t}${v[0]}=${encodeURIComponent(v[1])}&`,
+        Object.keys(search).length ? "?" : ""
+    ).replace(/&$/, "");
+}
+
+StringifyUrlSearch({ age: 27, name: "YZW" }); // "?age=27&name=YZW"
+```
+#### 返回对象指定键值
+```js
+function GetKeys(obj = {}, keys = []) {
+    return Object.keys(obj).reduce((t, v) => (keys.includes(v) && (t[v] = obj[v]), t), {});
+}
+
+
+const target = { a: 1, b: 2, c: 3, d: 4 };
+const keyword = ["a", "d"];
+GetKeys(target, keyword); // { a: 1, d: 4 }
+```
+#### 数组转对象
+```js
+const people = [
+    { area: "GZ", name: "YZW", age: 27 },
+    { area: "SZ", name: "TYJ", age: 25 }
+];
+const map = people.reduce((t, v) => {
+    const { name, ...rest } = v;
+    t[name] = rest;
+    return t;
+}, {}); // { YZW: {…}, TYJ: {…} }
+```
 ### 类数组对象转换为数组的方法
 - ES6语法 Array.from(arr)
   ```js
@@ -5553,6 +5855,61 @@ var deepClone = function (target, map = new WeakMap()) {
   //...
   }）
   ```
+#### 代替map和filter
+```js
+const arr = [0, 1, 2, 3];
+
+// 代替map：[0, 2, 4, 6]
+const a = arr.map(v => v * 2);
+const b = arr.reduce((t, v) => [...t, v * 2], []);
+
+// 代替filter：[2, 3]
+const c = arr.filter(v => v > 1);
+const d = arr.reduce((t, v) => v > 1 ? [...t, v] : t, []);
+
+// 代替map和filter：[4, 6]
+const e = arr.map(v => v * 2).filter(v => v > 2);
+const f = arr.reduce((t, v) => v * 2 > 2 ? [...t, v * 2] : t, []);
+```
+#### 代替some和every
+```js
+const scores = [
+    { score: 45, subject: "chinese" },
+    { score: 90, subject: "math" },
+    { score: 60, subject: "english" }
+];
+
+// 代替some：至少一门合格
+const isAtLeastOneQualified = scores.reduce((t, v) => t || v.score >= 60, false); // true
+
+// 代替every：全部合格
+const isAllQualified = scores.reduce((t, v) => t && v.score >= 60, true); // false
+```
+#### 数组分割
+```js
+function Chunk(arr = [], size = 1) {
+    return arr.length ? arr.reduce((t, v) => (t[t.length - 1].length === size ? t.push([v]) : t[t.length - 1].push(v), t), [[]]) : [];
+}
+
+
+const arr = [1, 2, 3, 4, 5];
+Chunk(arr, 2); // [[1, 2], [3, 4], [5]]
+```
+#### 数组填充
+```js
+function Fill(arr = [], val = "", start = 0, end = arr.length) {
+    if (start < 0 || start >= end || end > arr.length) return arr;
+    return [
+        ...arr.slice(0, start),
+        ...arr.slice(start, end).reduce((t, v) => (t.push(val || v), t), []),
+        ...arr.slice(end, arr.length)
+    ];
+}
+
+
+const arr = [0, 1, 2, 3, 4, 5, 6];
+Fill(arr, "aaa", 2, 5); // [0, 1, "aaa", "aaa", "aaa", 5, 6]
+```
 ### 数组的遍历方法（数组的方法），那些方法有什么区别？？？？？？
 ### js数组的方法，哪些会改变原数组
 #### 改变原数组的方法
@@ -8382,10 +8739,246 @@ Node.js 是一个开源与跨平台的 JavaScript 运行时环境。在浏览器
     - 操作数据库、为前端和移动端提供基于json的API。
 ## HTTP
 ### Axios
-#### axios的取消请求？？？？？？
+#### axios的取消请求？
+Axios 是一个基于 Promise 的 HTTP 客户端，同时支持浏览器和 Node.js 环境。它是一个优秀的 HTTP 客户端，被广泛地应用在大量的 Web 项目中。对于浏览器环境来说，Axios 底层是利用 XMLHttpRequest 对象来发起 HTTP 请求。如果要取消请求的话，我们可以通过调用 XMLHttpRequest 对象上的 abort 方法来取消请求：
+```js
+let xhr = new XMLHttpRequest();
+xhr.open("GET", "https://developer.mozilla.org/", true);
+xhr.send();
+setTimeout(() => xhr.abort(), 300);
+```
+而对于 Axios 来说，我们可以通过 Axios 内部提供的 CancelToken 来取消请求：
+```js
+const CancelToken = axios.CancelToken;
+const source = CancelToken.source();
+
+axios.post('/user/12345', {
+  name: 'semlinker'
+}, {
+  cancelToken: source.token
+})
+
+source.cancel('Operation canceled by the user.'); // 取消请求，参数是可选的
+```
+此外，你也可以通过调用 CancelToken 的构造函数来创建 CancelToken，具体如下所示：
+```js
+const CancelToken = axios.CancelToken;
+let cancel;
+
+axios.get('/user/12345', {
+  cancelToken: new CancelToken(function executor(c) {
+    cancel = c;
+  })
+});
+
+cancel(); // 取消请求
+```
+#### CancelToken 的工作原理
+我们是通过调用 CancelToken 构造函数来创建 CancelToken 对象：
+```js
+new axios.CancelToken((cancel) => {
+  if (!pendingRequest.has(requestKey)) {
+    pendingRequest.set(requestKey, cancel);
+  }
+})
+```
+所以接下来，我们来分析 CancelToken 构造函数，该函数被定义在 lib/cancel/CancelToken.js 文件中：
+```js
+// lib/cancel/CancelToken.js
+function CancelToken(executor) {
+  if (typeof executor !== 'function') {
+    throw new TypeError('executor must be a function.');
+  }
+
+  var resolvePromise;
+  this.promise = new Promise(function promiseExecutor(resolve) {
+    resolvePromise = resolve;
+  });
+
+  var token = this;
+  executor(function cancel(message) { // 设置cancel对象
+    if (token.reason) {
+      return; // Cancellation has already been requested
+    }
+    token.reason = new Cancel(message);
+    resolvePromise(token.reason);
+  });
+}
+```
+由以上代码可知，cancel 对象是一个函数，当我们调用该函数后，会创建 Cancel 对象并调用 resolvePromise 方法。该方法执行后，CancelToken 对象上 promise 属性所指向的 promise 对象的状态将变为 resolved。
+```js
+// lib/adapters/xhr.js 
+if (config.cancelToken) {
+  config.cancelToken.promise.then(function onCanceled(cancel) {
+    if (!request) { return; }
+    request.abort(); // 取消请求
+    reject(cancel);
+    request = null;
+  });
+}
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211129222004.png)
+#### axios如何判断重复请求
+当请求方式、请求 URL 地址和请求参数都一样时，我们就可以认为请求是一样的。因此在每次发起请求时，我们就可以根据当前请求的请求方式、请求 URL 地址和请求参数来生成一个唯一的 key，同时为每个请求创建一个专属的 CancelToken，然后把 key 和 cancel 函数以键值对的形式保存到 Map 对象中，使用 Map 的好处是可以快速的判断是否有重复的请求：
+```js
+import qs from 'qs'
+
+const pendingRequest = new Map();
+// GET -> params；POST -> data
+const requestKey = [method, url, qs.stringify(params), qs.stringify(data)].join('&'); 
+const cancelToken = new CancelToken(function executor(cancel) {
+  if(!pendingRequest.has(requestKey)){
+    pendingRequest.set(requestKey, cancel);
+  }
+})
+```
+当出现重复请求的时候，我们就可以使用 cancel 函数来取消前面已经发出的请求，在取消请求之后，我们还需要把取消的请求从 pendingRequest 中移除。现在我们已经知道如何取消请求和如何判断重复请求，下面我们来介绍如何取消重复请求。
+#### axios如何取消重复请求
+因为我们需要对所有的请求都进行处理，所以我们可以考虑使用 Axios 的拦截器机制来实现取消重复请求的功能。Axios 为开发者提供了请求拦截器和响应拦截器，它们的作用如下：
+- 请求拦截器：该类拦截器的作用是在请求发送前统一执行某些操作，比如在请求头中添加 token 字段。
+- 响应拦截器：该类拦截器的作用是在接收到服务器响应后统一执行某些操作，比如发现响应状态码为 401 时，自动跳转到登录页。
+```js
+// generateReqKey：用于根据当前请求的信息，生成请求 Key；
+function generateReqKey(config) {
+  const { method, url, params, data } = config;
+  return [method, url, Qs.stringify(params), Qs.stringify(data)].join("&");
+}
+// addPendingRequest：用于把当前请求信息添加到pendingRequest对象中；
+const pendingRequest = new Map();
+function addPendingRequest(config) {
+  const requestKey = generateReqKey(config);
+  config.cancelToken = config.cancelToken || new axios.CancelToken((cancel) => {
+    if (!pendingRequest.has(requestKey)) {
+       pendingRequest.set(requestKey, cancel);
+    }
+  });
+}
+// removePendingRequest：检查是否存在重复请求，若存在则取消已发的请求。
+function removePendingRequest(config) {
+  const requestKey = generateReqKey(config);
+  if (pendingRequest.has(requestKey)) {
+     const cancelToken = pendingRequest.get(requestKey);
+     cancelToken(requestKey);
+     pendingRequest.delete(requestKey);
+  }
+}
+//  设置请求拦截器
+axios.interceptors.request.use(
+  function (config) {
+    removePendingRequest(config); // 检查是否存在重复请求，若存在则取消已发的请求
+    addPendingRequest(config); // 把当前请求信息添加到pendingRequest对象中
+    return config;
+  },
+  (error) => {
+     return Promise.reject(error);
+  }
+);
+//  设置响应拦截器
+axios.interceptors.response.use(
+  (response) => {
+     removePendingRequest(response.config); // 从pendingRequest对象中移除请求
+     return response;
+   },
+   (error) => {
+      removePendingRequest(error.config || {}); // 从pendingRequest对象中移除请求
+      if (axios.isCancel(error)) {
+        console.log("已取消的重复请求：" + error.message);
+      } else {
+        // 添加异常处理
+      }
+      return Promise.reject(error);
+   }
+);
+
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211129221814.png)
 #### 除了axios还了解那些请求方法？？？？？？？
+#### axios带上cookie
+axios请求默认是不携带cookie的，让了让其带上cookie，需要做一些设置。
+允许携带cookie `axios.defaults.withCredentials=true`
+#### 手写简易版axios
+```js
+ function axios({
+        //注意这里使用结构赋值，可以传默认值
+        url,
+        //默认请求方式为GET
+        method = 'GET',
+        //params用于接受get请求的参数，请求时直接带在url后面
+        params = {},
+        //data用于接受post方法的参数
+        data = {},
+    }) {
+        //返回一个promise对象
+        return new Promise((resolve, reject) => {
+            // 定义一个字符串保存url后面的拼接参数部分
+            let queryString = '';
+            // 得到key组成的数组
+            // Object.keys() 方法会返回一个由一个给定对象的自身可枚举属性组成的数组，
+            Object.keys(params).forEach(key => {
+                    // 这里使用模板字符串简化代码，同时key是一个变量，用[]而不是点语法取出
+                    queryString += `${key}=${params[key]}&`
+                })
+                // 如果queryString非空，也就是说使用get请求传参，我们直接将参数拼接在url后面
+            if (queryString) {
+                // substring() 方法用于提取字符串中介于两个指定下标之间的字符。
+                // 注意最后一个字符是&，因此我们取length-1个字符
+                queryString = queryString.substring(0, queryString.length - 1)
+                    //用？分割并拼接
+                url += '?' + queryString;
+            }
+            // 创建xhr对象
+            const request = new XMLHttpRequest()
+                // 打开连接
+            request.open(method, url, true)
+                // 绑定状态改变的监听（异步，当状态为4时才会继续执行）
+            request.onreadystatechange = function() {
+                if (request.readyState != 4) {
+                    return
+                }
+                // 发送请求 
+                // 如果是get请求，已经在url中携带参数了，直接传null
+                if (method == 'GET') {
+                    request.send(null)
+                        //如果是post请求，将data作为参数发送
+                } else if (method == "POST") {
+                    // 添加请求头
+                    request.setRequestHeader('Content-Type', 'application/json;charset=utf-8')
+                        // JSON格式话data并发送请求
+                    request.send(JSON.stringify(data))
+                }
+                //这时request会返回status和报文
+                // 解构赋值，这里仅返回状态码和报文
+                const {
+                    status,
+                    statusText
+                } = request
+                // 状态码在200到300间代表成功
+                if (status >= 200 && status < 300) {
+                    // 对返回值进行结构赋值
+                    const response = {
+                            //  JSON.stringify 将数组,对象转换成 JSON 字符串，然后使用 JSON.parse 将该字符串重新转换成数组，对象。
+                            data: JSON.parse(request.response),
+                            status,
+                            statusText
+                        }
+                        // 执行回调函数并将response作为参数
+                    resolve(response)
+                } else {
+                    reject(new Error('resquest error status is' + status))
+                }
+
+            }
+
+        })
+    }`
+
+```
 ### Fetch
-#### fetch怎么携带cookie？？？？？
+#### fetch怎么携带cookie？
+fetch 发送请求默认是不发送 cookie 的，不管是同域还是跨域；那么问题就来了，对于那些需要权限验证的请求就可能无法正常获取数据，这时可以配置其 credentials 项，其有3个值：
+- omit: 默认值，忽略 cookie 的发送
+- same-origin: 表示 cookie 只能同域发送，不能跨域发送
+- include: cookie 既可以同域发送，也可以跨域发送
 ### 两个页面之间的通信如何做？
 #### postMessage
 window.postMessage()方法可以安全地实现Window对象之间的跨域通信。例如，在一个页面和它生成的弹出窗口之间，或者是页面和嵌入其中的iframe之间。
@@ -11758,35 +12351,6 @@ $emit('update:属性名',要修改的值)
     - :num.sync: @update:num
     - v-model只能用一次；.sync可以有多个。
 ### Vue设置自定义指令？？？？？？？ 全栈然叔的课程是有的，介绍的很详细
-- Vue指令
-    - Vue的指令以v-开头，作用在HTML元素上，将指令绑定在元素上，给绑定的元素添加一些特殊行为。
-    - `<h1 v-if="yes">Yes</h1>`
-- Vue2.0自定义指令
-    - `Vue.directive(id, definition)`
-    - 传入的两个参数，id是指指令ID，definition是指定义对象。其中，定义对象可以提供一些钩子函数。
-![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211115073324.png)
-```js
-Vue.directive('my-directive', {
-  bind: function(){
-    //做绑定的准备工作
-    //比如添加事件监听器，或是其他只需要执行一次的复杂操作
-  },
-  inserted: function(){
-    //...
-  },
-  update: function(){
-    //根据获得的新值执行对应的更新
-    //对于初始值也会调用一次
-  },
-  componentUpdated: function(){
-    //...
-  },
-  unbind: function(){
-    //做清理操作
-    //比如移除bind时绑定的事件监听器
-  }
-})
-```
 ### Vue手写渲染函数？？？？？？？全栈然叔的课程是有的，介绍的很详细
 ### Vue 组件修饰符？？？？？？？
 ### Vue 该如何实现组件缓存？
@@ -13057,7 +13621,174 @@ vuex 是专门为 vue 提供的全局状态管理系统，用于多个组件中�
 2. Actions 提交（commit）Mutations，请求修改 State
 3. Mutation 同步修改 State
 4. State 改变后重新渲染（Render）Components
-### 手写Vuex？？？？？？？？？？？？
+### 手写Vuex？
+```js
+/* my-vuex/index.js */
+// 保存一个全局的 Vue 之后会用到
+let _Vue = null
+
+// Store 类
+class Store {
+  // 先完成构造方法,构造方法接收一个对象
+  constructor(options) {
+    // 赋初值
+    const state = options.state || {}
+    const mutations = options.mutations || {}
+    const actions = options.actions || {}
+    const getters = options.getters || {}
+    // 1.实现state 把 state 中的数据转为 响应式,直接用 Vue 中的 observable
+    this.state = _Vue.observable(state)
+
+    // 2.实现 getters 这里为什么不知直接 把this.getters 赋值 {} 而是 Object.create(null)
+    // 好处是不用考虑会和原型链上的属性重名问题
+    this.getters = Object.create(null)
+    // 我们要为 getters 添加一个 get 方法，这里就要使用 数据劫持
+    // 先拿到 getters 中每一个 方法
+    Object.keys(getters).forEach((key) => {
+      // 第一个参数是给谁添加 ，第二个是添加的属性名，第三个对象里面可以设置很多参数
+      // 比如 可枚举，可配置，get，set
+      Object.defineProperty(this.getters, key, {
+        // 为 this.getters 每一项都添加 一个 get 方法
+        get: () => {
+          // 还记得吧，getters 中的方法 默认把 state传入进去,改变this指向
+          return getters[key].call(this, this.state)
+        },
+      })
+    })
+
+    // 3.实现 mutations
+    // 先遍历 mutaions 中的对象进行改变 this指向
+    this.mutations = {}
+    Object.keys(mutations).forEach((key) => {
+      this.mutations[key] = (params) => {
+        // 改变this指向 ，默认是要传入 state
+        mutations[key].call(this, this.state, params)
+      }
+    })
+
+    // 4.实现 actions
+    // 和 mutations 一样我们需要重新改变 this 指向
+    this.actions = {}
+    Object.keys(actions).forEach((key) => {
+      this.actions[key] = (params) => {
+        // 改变this指向 ，默认是要传入 store也就是 this
+        actions[key].call(this, this, params)
+      }
+    })
+  }
+
+  // 5.实现commit 方法
+  // 用于 触发mutations中的方法
+  // 第一个参数是事件名 ，第二个是参数
+  commit = (eventName, params) => {
+    this.mutations[eventName](params)
+  }
+
+  // 6.实现 dispatch 方法
+  // 用于 触发actions中的异步方法
+  // 第一个参数是事件名 ，第二个是参数
+  dispatch = (eventName, params) => {
+    this.actions[eventName](params)
+  }
+}
+
+// 因为Vuex 需要 Vue.use() 安装，所以我们必须要有个 install 方法 传入 Vue
+// 第二个参数是一个可选对象
+function install(Vue) {
+  // 保存到全局 _Vue
+  _Vue = Vue
+  // 全局注册混入 这样在所有的组件都能使用 $store
+  _Vue.mixin({
+    // beforeCreate vue初始化阶段
+    // 在 beforeCreate 这个时候把 $store 挂载到 Vue 上
+    beforeCreate() {
+      // 判断 Vue 传递的对象是否有 store 需要挂载
+      // this.$options  是new Vue() 传递的对象
+      if (this.$options.store) {
+        // 把 store 挂载到 Vue 原型上
+        _Vue.prototype.$store = this.$options.store
+      }
+    },
+  })
+}
+
+// mapState
+const mapState = (params) => {
+  // 这里我只写个数组的 起别名的就没弄哈
+  if (!Array.isArray(params))
+    throw new Error('抱歉，当前是丐版的Vuex，只支持数组参数')
+  // 第一步就是要初始 obj ,不然[item] 会报错
+  let obj = {}
+  // 实现逻辑很简单，就是接收传递的的参数
+  // 去this.$store寻找
+  params.forEach((item) => {
+    obj[item] = function() {
+      return this.$store.state[item]
+    }
+  })
+  return obj
+}
+
+// mapMutations
+const mapMutations = (params) => {
+  // 这里我只写个数组的 起别名的就没弄哈
+  if (!Array.isArray(params))
+    throw new Error('抱歉，当前是丐版的Vuex，只支持数组参数')
+  // 第一步就是要初始 obj ,不然[item] 会报错
+  let obj = {}
+  // 实现逻辑很简单，就是接收传递的的参数
+  // 去this.$store寻找
+  params.forEach((item) => {
+    obj[item] = function(params) {
+      return this.$store.commit(item, params)
+    }
+  })
+  return obj
+}
+
+// mapActions
+const mapActions = (params) => {
+  // 这里我只写个数组的 起别名的就没弄哈
+  if (!Array.isArray(params))
+    throw new Error('抱歉，当前是丐版的Vuex，只支持数组参数')
+  // 第一步就是要初始 obj ,不然[item] 会报错
+  let obj = {}
+  // 实现逻辑很简单，就是接收传递的的参数
+  // 去this.$store寻找
+  params.forEach((item) => {
+    obj[item] = function(params) {
+      return this.$store.dispatch(item, params)
+    }
+  })
+  return obj
+}
+
+// mapGetters
+const mapGetters = (params) => {
+  // 这里我只写个数组的 起别名的就没弄哈
+  if (!Array.isArray(params))
+    throw new Error('抱歉，当前是丐版的Vuex，只支持数组参数')
+  // 第一步就是要初始 obj ,不然[item] 会报错
+  let obj = {}
+  // 实现逻辑很简单，就是接收传递的的参数
+  // 去this.$store寻找
+  params.forEach((item) => {
+    obj[item] = function() {
+      return this.$store.getters[item]
+    }
+  })
+  return obj
+}
+// 导出
+export { mapState, mapMutations, mapActions, mapGetters }
+
+// 导出 install 和 store
+export default {
+  install,
+  Store,
+}
+
+```
 ### Vuex是怎么实现的？
 
 install函数：用来注册插件到vue里（说白了就是在vue中执行这个函数，并把vue当作参数传入此函数，使用vue的方法和绑定store到各个组件上）
