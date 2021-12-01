@@ -8738,7 +8738,135 @@ Node.js 是一个开源与跨平台的 JavaScript 运行时环境。在浏览器
     - 单页面浏览器应用程序。
     - 操作数据库、为前端和移动端提供基于json的API。
 ## HTTP
+### 常用的请求方法
+- Ajax
+    - 全称Asynchronous JavaScript and XML（异步的 JavaScript 和 XML）最早出现的发送后端请求技术，隶属于原始js中，核心使用XMLHttpRequest对象，多个请求之间如果有先后关系的话，就会出现回调地狱。
+- jQuery ajax
+    - 是 jQuery 底层 AJAX 实现。简单易用的高层实现见 $.get, $.post 等。$.ajax() 返回其创建的 XMLHttpRequest 对象。大多数情况下你无需直接操作该函数，除非你需要操作不常用的选项，以获得更多的灵活性。
+- axios
+    - axios不是原生JS的，需要进行安装，它不但可以在客户端使用，也可以在nodejs端使用。Axios也可以在请求和响应阶段进行拦截。同样也是基于Promise对象的。特性：从浏览器中创建 XMLHttpRequests、从 node.js 创建 http 请求、支持 Promise API、拦截请求和响应等。
+- fetch
+    - Fetch 提供了对 Request 和 Response （以及其他与网络请求有关的）对象的通用定义。使之今后可以被使用到更多地应用场景中：无论是service workers、Cache API、又或者是其他处理请求和响应的方式，甚至是任何一种需要你自己在程序中生成响应的方式。Fetch号称是AJAX的替代品，是在ES6出现的，使用了ES6中的Promise对象。Fetch是基于promise设计的。Fetch的代码结构比起ajax简单多了，参数有点像jQuery ajax。但是，一定记住fetch不是ajax的进一步封装，而是原生js。Fetch函数就是原生js，没有使用XMLHttpRequest对象。
+### Ajax
+XMLHttpRequest 让发送一个HTTP请求变得非常容易。你只需要简单的创建一个请求对象实例，打开一个URL，然后发送这个请求。当传输完毕后，结果的HTTP状态以及返回的响应内容也可以从请求对象中获取。
+```js
+function reqListener () {
+  console.log(this.responseText);
+}
+
+var oReq = new XMLHttpRequest();
+oReq.onload = reqListener;
+// 通过XMLHttpRequest生成的请求可以有两种方式来获取数据，异步模式或同步模式。请求的类型是由这个XMLHttpRequest对象的open()方法的第三个参数async的值决定的。如果该参数的值为false
+oReq.open("get", "newFile.txt", true);
+oReq.send();
+```
+### Jquery Ajax
+```js
+$.ajax({
+  url: "/api/getWeather",
+  data: {
+    zipcode: 97201
+  },
+  success: function( result ) {
+    $( "#weather-temp" ).html( "<strong>" + result + "</strong> degrees" );
+  }
+});
+```
+传统 Ajax 指的是 XMLHttpRequest（XHR）， 最早出现的发送后端请求技术，隶属于原始js中，核心使用XMLHttpRequest对象，多个请求之间如果有先后关系的话，就会出现回调地狱。Jquery Ajax的出现是对原生XHR的封装，除此以外还增添了对JSONP的支持，Jquery Ajax经过多年的更新维护，真的已经是非常的方便了，但是随着react,vue,angular新一代框架的兴起，以及ES规范的完善，更多API的更新，它逐渐暴露了自己的不足:
+- 本身是针对MVC的编程,不符合现在前端MVVM的浪潮
+- 基于原生的XHR开发，XHR本身的架构不清晰,已经有了fetch的替代方案
+- JQuery整个项目太大，单纯使用ajax却要引入整个JQuery非常的不合理（采取个性化打包的方案又不能享受CDN服务）
+- 不符合关注分离（Separation of Concerns）的原则
+- 配置和调用方式非常混乱，而且基于事件的异步模型不友好
+```js
+var list = {}; 
+$.ajax({
+    //请求方式 POST || GET
+    type : "POST", 
+    //请求的媒体类型
+    contentType: "application/json;charset=UTF-8",
+    //请求地址
+    url : "http://127.0.0.1/xxxx/",
+    //数据，json字符串
+    data : JSON.stringify(list),
+    //请求成功
+    success : function(result) {
+        console.log(result);
+    },
+    //请求失败，包含具体的错误信息
+    error : function(e){
+        console.log(e.status);
+        console.log(e.responseText);
+    }
+});
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211130120441.png)
 ### Axios
+#### 案例
+```js
+// 为给定 ID 的 user 创建请求
+axios.get('/user?ID=12345')
+  .then(function (response) {
+    console.log(response);
+  })
+  .catch(function (error) {
+    console.log(error);
+  });
+
+// 上面的请求也可以这样做
+axios.get('/user', {
+    params: {
+      ID: 12345
+    }
+  })
+  .then(function (response) {
+    console.log(response);
+  })
+  .catch(function (error) {
+    console.log(error);
+  });
+  
+  
+  
+axios.post('/user', {
+    firstName: 'Fred',
+    lastName: 'Flintstone'
+  })
+  .then(function (response) {
+    console.log(response);
+  })
+  .catch(function (error) {
+    console.log(error);
+  });
+
+
+
+// 执行多个并发请求
+function getUserAccount() {
+  return axios.get('/user/12345');
+}
+
+function getUserPermissions() {
+  return axios.get('/user/12345/permissions');
+}
+
+axios.all([getUserAccount(), getUserPermissions()])
+  .then(axios.spread(function (acct, perms) {
+    // 两个请求现在都执行完成
+  }));
+
+```
+#### axios特性
+- 从浏览器中创建 XMLHttpRequests
+- 从 node.js 创建 http 请求
+- 支持 Promise API
+- 拦截请求和响应
+- 转换请求数据和响应数据
+- 取消请求
+- 自动转换 JSON 数据
+- 客户端支持防御 XSRF
+
+axios创建请求时可以用的配置选项。只有 url 是必需的。如果没有指定 method，请求将默认使用 get 方法。
 #### axios的取消请求？
 Axios 是一个基于 Promise 的 HTTP 客户端，同时支持浏览器和 Node.js 环境。它是一个优秀的 HTTP 客户端，被广泛地应用在大量的 Web 项目中。对于浏览器环境来说，Axios 底层是利用 XMLHttpRequest 对象来发起 HTTP 请求。如果要取消请求的话，我们可以通过调用 XMLHttpRequest 对象上的 abort 方法来取消请求：
 ```js
@@ -8892,10 +9020,50 @@ axios.interceptors.response.use(
 
 ```
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211129221814.png)
-#### 除了axios还了解那些请求方法？？？？？？？
 #### axios带上cookie
 axios请求默认是不携带cookie的，让了让其带上cookie，需要做一些设置。
 允许携带cookie `axios.defaults.withCredentials=true`
+#### 带并发数限制的axios请求函数?
+```js
+const axios = require('axios')
+const arr = new Array(100).fill('https://www.baidu.com')
+
+/**
+ * @param {Array<String>} arr 请求地址
+ * @param {Number} n 控制并发数量
+ */
+function ajax (arr, n) {
+  const { length } = arr
+  const result = []
+  let flag = 0 // 控制进度，表示当前位置
+  let sum = 0 // 记录请求完成总数
+
+  return new Promise((resolve, reject) => {
+    // 先连续调用n次，就代表最大并发数量
+    while (flag < n) {
+      next()
+    }
+    function next(){
+      const cur = flag++ // 利用闭包保存当前位置，以便结果能顺序存储
+      if (cur >= length) return
+
+      const url = arr[cur]
+      axios.get(url).then(res => {
+        result[cur] = cur // 保存结果。为了体现顺序，这里保存索引值
+        if (++sum >= length) {
+          resolve(result)
+        } else {
+          next()
+        }
+      }).catch(reject)
+    }
+  })
+}
+
+ajax(arr, 10).then(res => {
+    console.log(res)
+})
+```
 #### 手写简易版axios
 ```js
  function axios({
@@ -8974,11 +9142,160 @@ axios请求默认是不携带cookie的，让了让其带上cookie，需要做一
 
 ```
 ### Fetch
+#### Fetch
+Fetch 提供了对 Request 和 Response （以及其他与网络请求有关的）对象的通用定义。使之今后可以被使用到更多地应用场景中：无论是service workers、Cache API、又或者是其他处理请求和响应的方式，甚至是任何一种需要你自己在程序中生成响应的方式。Fetch号称是AJAX的替代品，是在ES6出现的，使用了ES6中的Promise对象。Fetch是基于promise设计的。Fetch的代码结构比起ajax简单多了，参数有点像jQuery ajax。但是，一定记住fetch不是ajax的进一步封装，而是原生js。Fetch函数就是原生js，没有使用XMLHttpRequest对象。
+#### Fetch详解
+Fetch 提供了对 Request 和 Response （以及其他与网络请求有关的）对象的通用定义。
+Fetch 是一个现代的概念, 等同于 XMLHttpRequest。它提供了许多与XMLHttpRequest相同的功能，但被设计成更具可扩展性和高效性。
+
+Fetch API 提供了一个 JavaScript接口，用于访问和操纵HTTP管道的部分，例如请求和响应。它还提供了一个全局 fetch()方法，该方法提供了一种简单，合理的方式来跨网络异步获取资源。
+
+请注意，fetch规范与jQuery.ajax()主要有两种方式的不同，牢记：
+- 当接收到一个代表错误的 HTTP 状态码时，从 fetch()返回的 Promise 不会被标记为 reject， 即使该 HTTP 响应的状态码是 404 或 500。相反，它会将 Promise 状态标记为 resolve （但是会将 resolve 的返回值的 ok 属性设置为 false ），仅当网络故障时或请求被阻止时，才会标记为 reject。
+- 默认情况下，fetch 不会从服务端发送或接收任何 cookies, 如果站点依赖于用户 session，则会导致未经认证的请求（要发送 cookies，必须设置 credentials 选项）。自从2017年8月25日后，默认的credentials政策变更为same-originFirefox也在61.0b13中改变默认值。
+
+```js
+// 一个基本的 fetch请求设置起来很简单。
+fetch('http://example.com/movies.json')
+  .then(function(response) {
+    return response.json();
+  })
+  .then(function(myJson) {
+    console.log(myJson);
+  });
+
+// 这里我们通过网络获取一个JSON文件并将其打印到控制台。最简单的用法是只提供一个参数用来指明想fetch()到的资源路径，然后返回一个包含响应结果的promise(一个 Response 对象)。
+// 当然它只是一个 HTTP 响应，而不是真的JSON。为了获取JSON的内容，我们需要使用 json()方法（在Bodymixin 中定义，被 Request 和 Response 对象实现）。
+```
+```js
+// fetch() 接受第二个可选参数，一个可以控制不同配置的 init 对象：
+// Example POST method implementation:
+
+postData('http://example.com/answer', {answer: 42})
+  .then(data => console.log(data)) // JSON from `response.json()` call
+  .catch(error => console.error(error))
+
+function postData(url, data) {
+  // Default options are marked with *
+  return fetch(url, {
+    body: JSON.stringify(data), // must match 'Content-Type' header
+    cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+    credentials: 'same-origin', // include, same-origin, *omit
+    headers: {
+      'user-agent': 'Mozilla/4.0 MDN Example',
+      'content-type': 'application/json'
+    },
+    method: 'POST', // *GET, POST, PUT, DELETE, etc.
+    mode: 'cors', // no-cors, cors, *same-origin
+    redirect: 'follow', // manual, *follow, error
+    referrer: 'no-referrer', // *client, no-referrer
+  })
+  .then(response => response.json()) // parses response to JSON
+}
+```
+#### fetch的优点
+- 语法简洁，更加语义化
+- 基于标准 Promise 实现，支持 async/await
+- 同构方便，使用 isomorphic-fetch
+- 更加底层，提供的API丰富（request, response）
+- 脱离了XHR，是ES规范里新的实现方式
+#### fetch的取消请求？
+使用 AbortController 取消 Fetch 请求和事件监听。
+
+在没有 Fetch API 之前，一般通过 XMLHttpRequest 来实现数据更新，当我们发出请求后想临时取消，可以调用 XMLHttpRequest.abort() 方法来终止该请求。
+
+有了 AbortController，同样可以实现取消 Fetch 请求。
+```js
+const controller = new AbortController();
+const signal = controller.signal;
+
+fetch("/", { signal }).catch(err => {
+  console.log(err); // DOMException: The user aborted a request.
+  console.log("aborted:", signal.aborted); // aborted: true
+});
+
+controller.abort();
+```
 #### fetch怎么携带cookie？
 fetch 发送请求默认是不发送 cookie 的，不管是同域还是跨域；那么问题就来了，对于那些需要权限验证的请求就可能无法正常获取数据，这时可以配置其 credentials 项，其有3个值：
 - omit: 默认值，忽略 cookie 的发送
 - same-origin: 表示 cookie 只能同域发送，不能跨域发送
 - include: cookie 既可以同域发送，也可以跨域发送
+#### 带并发数限制的fetch请求函数
+```js
+function handleFetchQueue(urls, max, callback) {
+  const urlCount = urls.length;
+  const requestsQueue = [];
+  const results = [];
+  let i = 0;
+  const handleRequest = (url) => {
+    const req = fetch(url).then(res => {
+      console.log('当前并发： '+requestsQueue);
+      const len = results.push(res);
+      if (len < urlCount && i + 1 < urlCount) {
+        requestsQueue.shift();
+        handleRequest(urls[++i])
+      } else if (len === urlCount) {
+        'function' === typeof callback && callback(results)
+      }
+    }).catch(e => {
+      results.push(e)
+    });
+    if (requestsQueue.push(req) < max) {
+      handleRequest(urls[++i])
+    }
+  };
+  handleRequest(urls[i])
+}
+
+
+const urls = Array.from({length: 10}, (v, k) => k);
+
+const fetch = function (idx) {
+  return new Promise(resolve => {
+    console.log(`start request ${idx}`);
+    const timeout = parseInt(Math.random() * 1e4);
+    setTimeout(() => {
+      console.log(`end request ${idx}`);
+      resolve(idx)
+    }, timeout)
+  })
+};
+
+const max = 4;
+
+const callback = () => {
+  console.log('run callback');
+};
+
+
+handleFetchQueue(urls, max, callback);
+```
+### ajax、fetch、axios的优缺点
+ajax 的优缺点：
+- 属 js 原生，基于XHR进行开发，XHR 结构不清晰。
+- 针对 mvc 编程，由于近来vue和React的兴起，不符合mvvm前端开发流程。
+- 单纯使用 ajax 封装，核心是使用 XMLHttpRequest 对象,使用较多并有先后顺序的话，容易产生回调地狱。
+
+fetch 的优缺点：
+- 属于原生 js，脱离了xhr ,号称可以替代 ajax技术。
+- 基于 Promise 对象设计的，可以解决回调地狱问题。
+- 提供了丰富的 API，使用结构简单。
+- 默认不带cookie，使用时需要设置。
+- 没有办法检测请求的进度，无法取消或超时处理。
+- 返回结果是 Promise 对象，获取结果有多种方法，数据类型有对应的获取方法，封装时需要分别处理，易出错。
+- 浏览器支持性比较差。
+
+
+axios的优缺点：
+- 在浏览器中创建XMLHttpRequest请求，在node.js中创建http请求。
+- 解决回调地狱问题。
+- 自动转化为json数据类型。
+- 支持Promise技术，提供并发请求接口。
+- 可以通过网络请求检测进度。
+- 提供超时处理。
+- 浏览器兼容性良好。
+- 有拦截器，可以对请求和响应统一处理。
 ### 两个页面之间的通信如何做？
 #### postMessage
 window.postMessage()方法可以安全地实现Window对象之间的跨域通信。例如，在一个页面和它生成的弹出窗口之间，或者是页面和嵌入其中的iframe之间。
@@ -12350,7 +12667,194 @@ $emit('update:属性名',要修改的值)
     - v-model： @input + value
     - :num.sync: @update:num
     - v-model只能用一次；.sync可以有多个。
-### Vue设置自定义指令？？？？？？？ 全栈然叔的课程是有的，介绍的很详细
+### Vue设置自定义指令？
+因为vue有了常用的内置指令(v-model、v-bind和v-on等)，但是在项目需求你会有多个地方使用到同一个功能。
+#### Vue2.0的自定义指令
+- 自定义指定的生命周期：
+    - bind：只调用一次，指令第一次绑定到元素时调用。在这里可以进行一次性的初始化设置。
+    - inserted：被绑定元素插入父节点时调用。
+    - update：所在组件的 VNode 更新时调用，但是可能发生在其子 VNode 更新之前。指令的值可能发生了改变，也可能没有。但是你可以通过比较更新前后的值来忽略不必要的模板更新。
+    - componentUpdated：指令所在组件的 VNode 及其子 VNode 全部更新后调用。
+    - unbind：只调用一次，指令与元素解绑时调用。
+总结：bind >> inserted >> update >> componentUpdated >> unbind (小菜鸡的我只用inserted)
+
+- 参数
+    - el：指令所绑定的元素，可以用来直接操作 DOM。
+    - binding：一个对象，包含以下 property：
+        - name：指令名，不包括 v- 前缀。
+        - value：指令的绑定值，例如：v-my-directive="1 + 1" 中，绑定值为 2。
+        - oldValue：指令绑定的前一个值，仅在 update 和 componentUpdated 钩子中可用。无论值是否改变都可用。
+        - expression：字符串形式的指令表达式。例如 v-my-directive="1 + 1" 中，表达式为 "1 + 1"。
+        - arg：传给指令的参数，可选。例如 v-my-directive:foo 中，参数为 "foo"。
+        - modifiers：一个包含修饰符的对象。例如：v-my-directive.foo.bar 中，修饰符对象为 { foo: true, bar: true }。
+    - vnode：Vue 编译生成的虚拟节点。移步 VNode API 来了解更多详情。
+    - oldVnode：上一个虚拟节点，仅在 update 和 componentUpdated 钩子中可用。
+```js
+<template>
+  <div>
+    <input type="text" v-myModel="value" />
+    {{ value }}
+    <input type="checkbox" v-myModel="checked">
+    {{checked}}
+  </div>
+</template>
+
+<script>
+export default {
+  directives: {
+    myModel: {
+      inserted(el, binding, vnode) {
+        if ((typeof binding.value) == 'undefined') {
+          return console.error('v-myModel未赋值')
+        }
+        // 这里是获取input上type属性值
+        const type = vnode.data.attrs.type
+        let event = ''
+        let targetValue = ''
+        // 就是不同的类型有对应的事件和事件下获得的值
+        switch (type) {
+          case 'text':
+            event = 'input'
+            targetValue = 'value'
+            break;
+          case 'textarea':
+            event = 'input'
+            targetValue = 'value'
+            break;
+          case 'checkbox':
+            event = 'change'
+            targetValue = 'checked'
+            break;
+          case 'radio':
+            event = 'change'
+            targetValue = 'checked'
+            break;
+          case 'select':
+            event = 'change'
+            targetValue = 'value'
+            break;
+
+        }
+        // binding.value就是给v-myModel的值,这里为1和false给页面渲染使用
+        el.value = binding.value
+        // 这里的监听就是给组件上的data赋值
+        el.addEventListener(event, (e) => {
+          vnode.context[binding.expression] = e.target[targetValue]
+        })
+      },
+    }
+  },
+  data() {
+    return {
+      value: '1',
+      checked: false
+    }
+  }
+}
+</script>
+```
+
+注册一个全局的指令
+```js
+// 注册一个全局自定义指令 `v-focus`
+Vue.directive('focus', {
+  // 当被绑定的元素插入到 DOM 中时……
+  inserted: function (el) {
+    // 聚焦元素
+    el.focus()
+  }
+})
+```
+注册一个局部的指令
+```js
+directives: {
+  focus: {
+    // 指令的定义
+    inserted: function (el) {
+      el.focus()
+    }
+  }
+}
+```
+#### Vue3.0自定义指令
+- 自定义指令的生命周期：
+    - created - 新的！在元素的 attribute 或事件侦听器应用之前调用。
+    - bind → beforeMount
+    - inserted → mounted
+    - beforeUpdate：新的！这是在元素本身更新之前调用的，很像组件生命周期钩子。
+    - update → 移除！有太多的相似之处要更新，所以这是多余的，请改用 updated。
+    - componentUpdated → updated
+    - beforeUnmount：新的！与组件生命周期钩子类似，它将在卸载元素之前调用。
+    - unbind -> unmounted
+```js
+<template>
+  <div>
+    vue3.x
+    <input type="text" v-myModel:value="value" />
+    {{ value }}
+    <input type="checkbox" v-myModel:checked="checked" />
+    {{ checked }}
+  </div>
+</template>
+
+<script lang='ts'>
+import { ref } from 'vue'
+export default {
+  directives: {
+    myModel: {
+      mounted(el, binding, vnode) {
+        if ((typeof binding.value) == 'undefined') {
+          return console.error('v-myModel未赋值')
+        }
+        // 获得组件的实例对象
+        let vm = binding.instance
+        // 这里是获取input上type属性值
+        const type = vnode.props.type
+        let event = ''
+        let targetValue = ''
+        switch (type) {
+          case 'text':
+            event = 'input'
+            targetValue = 'value'
+            break;
+          case 'textarea':
+            event = 'input'
+            targetValue = 'value'
+            break;
+          case 'checkbox':
+            event = 'change'
+            targetValue = 'checked'
+            break;
+          case 'radio':
+            event = 'change'
+            targetValue = 'checked'
+            break;
+          case 'select':
+            event = 'change'
+            targetValue = 'value'
+            break;
+        }
+        el.value = binding.value
+        // 给元素添加监听的事件
+        el.addEventListener(event, (e) => {
+          // binding.arg 为v-myModel:value的value、v-myModel:checked的checked,为了修改组件实例下面的value和checked。
+          vm[binding.arg] = e.target[targetValue]
+        })
+      }
+    }
+  },
+  setup() {
+    const value = ref('11')
+    const checked = ref(false)
+    return {
+      value,
+      checked
+    }
+  },
+}
+</script>
+```
+vue3.x自定义指令生命周期 created >> beforeMount >> mounted >> beforeUpdate >> updated >> beforeUnmount >> unmounted
 ### Vue手写渲染函数？？？？？？？全栈然叔的课程是有的，介绍的很详细
 ### Vue 组件修饰符？？？？？？？
 ### Vue 该如何实现组件缓存？
