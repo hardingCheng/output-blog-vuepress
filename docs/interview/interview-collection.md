@@ -8440,6 +8440,58 @@ s.setState(12)
     - 观察者模式所做的工作就是在解耦，让耦合的双方都依赖于抽象，而不是依赖于具体。从而使得各自的变化都不会影响到另一边的变化。
 - 缺点
     - 过度使用会导致对象与对象之间的联系弱化，会导致程序难以跟踪维护和理解
+#### 状态模式
+允许一个对象在其内部状态改变的时候改变它的行为，对象看起来似乎修改了它的类
+- 场景
+    - 一个对象的行为取决于它的状态，并且它必须在运行时刻根据状态改变它的行为
+    - 一个操作中含有大量的分支语句，而且这些分支语句依赖于该对象的状态
+- 优点
+    - 定义了状态与行为之间的关系，封装在一个类里，更直观清晰，增改方便
+    - 状态与状态间，行为与行为间彼此独立互不干扰
+    - 用对象代替字符串来记录当前状态，使得状态的切换更加一目了然
+- 缺点
+    - 会在系统中定义许多状态类
+    - 逻辑分散
+```js
+// 状态 （弱光、强光、关灯）
+class State {
+    constructor(state) {
+        this.state = state
+    }
+    handle(context) {
+        console.log(`this is ${this.state} light`)
+        context.setState(this)
+    }
+}
+class Context {
+    constructor() {
+        this.state = null
+    }
+    getState() {
+        return this.state
+    }
+    setState(state) {
+        this.state = state
+    }
+}
+// test 
+let context = new Context()
+let weak = new State('weak')
+let strong = new State('strong')
+let off = new State('off')
+
+// 弱光
+weak.handle(context)
+console.log(context.getState())
+
+// 强光
+strong.handle(context)
+console.log(context.getState())
+
+// 关闭
+off.handle(context)
+console.log(context.getState())
+```
 ## TS
 ### Typescript 有什么好处？？？？？？？？？
 ### Typescript 有什么不好的地方吗？？？？？？？？？
@@ -12969,6 +13021,23 @@ Vue中有个动态组件的概念，它能够帮助开发者更好的实现组�
   // 需要展示组件的位置:
    <router-view />
 ```
+### Vue 初始化页面闪动问题如何解决？
+```html
+//出现该问题是因为在 Vue 代码尚未被解析之前，尚无法控制页面中 DOM 的显示，
+所以会看见模板字符串等代码。
+//解决方案是，在 css 代码中添加 v-cloak 规则，同时在待编译的标签上添加 v-cloak 属性：
+
+<style>
+ [v-cloak] { display: none; }
+</style>
+<div v-cloak>
+ {{ message }}
+</div>
+
+
+//或者组件用 template 包裹起来
+<template></template>
+```
 ### Vue组件间传值的方法有哪些?
 1. props、$emit()
 ```js
@@ -13939,6 +14008,21 @@ export default defineComponent({
         }
         export default Fun
     ``` 
+    
+
+
+```md
+1、性能提升 一句话简介：
+更小巧，更快速；支持摇树优化；支持 Fragments 和跨组件渲 染；支持自定义渲染器。
+
+2、API 变动 一句话介绍：
+除渲染函数 API 和 scoped-slot 语法之外，其余均保持不变 或者将通过另外构建一个兼容包 来兼容 2.x。
+ 模板语法的 99% 将保持不变。除了 scoped slot 语法可能会有一些微调之 外变动最大的部分将是渲染函数
+ (render) 中的虚拟 DOM 的格式。
+
+3、重写虚拟 DOM (Virtual DOM Rewrite)
+随着虚拟 DOM 重写，减少 运行时（runtime）开销。重写将包括更有效的 代码来创建虚拟节点。
+```
 ### Vue3.0双向绑定的实现原理
 
 ### Vue3.0响应式数据原理
@@ -14009,6 +14093,16 @@ vuex 和 vue-router 的插件注册方法 install 判断如果系统存在实例
 5. 装饰模式: (@装饰器的用法)
 
 ## VueRouter
+### VueRouter路由钩子函数
+```md
+路由的钩子函数总结有6个
+
+全局的路由钩子函数：beforeEach、afterEach
+
+单个的路由钩子函数：beforeEnter
+
+组件内的路由钩子函数：beforeRouteEnter、beforeRouteLeave、beforeRouteUpdate
+```
 ### VueRouter的router 和 route的区别?
 - $route对象
     - $route对象表示当前的路由信息，包含了当前 URL 解析得到的信息。包含当前的路径，参数，query对象等。
@@ -14103,6 +14197,16 @@ window.history.replaceState(state, title, targetURL);
       - 查询参数搭配query，刷新页面数据不会丢失
   - 声明式的导航 <router-link>
     - <router-link :to="{ name: 'news', params: { userId: 1111}}">click to news page</router-link>
+
+```md
+有两种:
+query和params
+
+query和params的区别：
+
+params传参只能由name引入路由，如果写成path页面会显示undefined报错。
+query传参的话可以使用path也可以使用name引入路由，不过建议使用path引入路由。
+```
 ### location.href和vue-router的区别
 
 - vue-router使用pushState进行路由更新，静态跳转，页面不会重新加载；location.href会触发浏览器，页面重新加载一次
@@ -14636,6 +14740,10 @@ actions:{
 ```
 ## Vue-Cli
 ### 实现一个vue-cli，整个思路是什么？??????
+### vue-cli 项目中 assets 和 static 文件夹有什么区别？
+者都是用于存放项目中所使用的静态资源文件的文件夹。其区别在于：
+**assets 中的文件在运行 npm run build 的时候会打包**，简单来说就是会被压缩体积，代码格式化之类的。打包之后也会放到 static 中。static 中的文件则不会被打包。
+
 ## Webpack Vite Rollup
 ### package.json说说你知道的配置，browserlist作用是什么？？？？？？
 #### package.json
@@ -16611,6 +16719,30 @@ console.log(str)
     - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108172704.png)
 ## 手写相关函数
 ### 手写相关函数1
+#### 手写JSONP
+```js
+const jsonp = ({ url, params, callbackName }) => {
+  const generateUrl = () => {
+    let dataSrc = '';
+    for (let key in params) {
+      if (Object.prototype.hasOwnProperty.call(params, key)) {
+        dataSrc += `${key}=${params[key]}&`;
+      }
+    }
+    dataSrc += `callback=${callbackName}`;
+    return `${url}?${dataSrc}`;
+  }
+  return new Promise((resolve, reject) => {
+    const scriptEle = document.createElement('script');
+    scriptEle.src = generateUrl();
+    document.body.appendChild(scriptEle);
+    window[callbackName] = data => {
+      resolve(data);
+      document.removeChild(scriptEle);
+    }
+  })
+}
+```
 #### 手写Node 的 Promisify？
 ```js
 // 使用前
@@ -17877,7 +18009,128 @@ class EventEmitter {
 // event.emit("dbClick");
 // event.emit("dbClick");
 ```
+#### event模块(EventEmitter)
+```js
+function EventEmitter() {
+  this.events = new Map();
+}
 
+// 需要实现的一些方法：
+// addListener、removeListener、once、removeAllListeners、emit
+
+// 模拟实现addlistener方法
+const wrapCallback = (fn, once = false) => ({ callback: fn, once });
+EventEmitter.prototype.addListener = function(type, fn, once = false) {
+  const hanlder = this.events.get(type);
+  if (!hanlder) {
+    // 没有type绑定事件
+    this.events.set(type, wrapCallback(fn, once));
+  } else if (hanlder && typeof hanlder.callback === 'function') {
+    // 目前type事件只有一个回调
+    this.events.set(type, [hanlder, wrapCallback(fn, once)]);
+  } else {
+    // 目前type事件数>=2
+    hanlder.push(wrapCallback(fn, once));
+  }
+}
+// 模拟实现removeListener
+EventEmitter.prototype.removeListener = function(type, listener) {
+  const hanlder = this.events.get(type);
+  if (!hanlder) return;
+  if (!Array.isArray(this.events)) {
+    if (hanlder.callback === listener.callback) this.events.delete(type);
+    else return;
+  }
+  for (let i = 0; i < hanlder.length; i++) {
+    const item = hanlder[i];
+    if (item.callback === listener.callback) {
+      hanlder.splice(i, 1);
+      i--;
+      if (hanlder.length === 1) {
+        this.events.set(type, hanlder[0]);
+      }
+    }
+  }
+}
+// 模拟实现once方法
+EventEmitter.prototype.once = function(type, listener) {
+  this.addListener(type, listener, true);
+}
+// 模拟实现emit方法
+EventEmitter.prototype.emit = function(type, ...args) {
+  const hanlder = this.events.get(type);
+  if (!hanlder) return;
+  if (Array.isArray(hanlder)) {
+    hanlder.forEach(item => {
+      item.callback.apply(this, args);
+      if (item.once) {
+        this.removeListener(type, item);
+      }
+    })
+  } else {
+    hanlder.callback.apply(this, args);
+    if (hanlder.once) {
+      this.events.delete(type);
+    }
+  }
+  return true;
+}
+EventEmitter.prototype.removeAllListeners = function(type) {
+  const hanlder = this.events.get(type);
+  if (!hanlder) return;
+  this.events.delete(type);
+}
+```
+#### Promise并行限制(实现有并行限制的Promise调度器)
+```js
+class Scheduler {
+  constructor() {
+    this.queue = [];
+    this.maxCount = 2;
+    this.runCounts = 0;
+  }
+  add(promiseCreator) {
+    this.queue.push(promiseCreator);
+  }
+  taskStart() {
+    for (let i = 0; i < this.maxCount; i++) {
+      this.request();
+    }
+  }
+  request() {
+    if (!this.queue || !this.queue.length || this.runCounts >= this.maxCount) {
+      return;
+    }
+    this.runCounts++;
+
+    this.queue.shift()().then(() => {
+      this.runCounts--;
+      this.request();
+    });
+  }
+}
+   
+const timeout = time => new Promise(resolve => {
+  setTimeout(resolve, time);
+})
+  
+const scheduler = new Scheduler();
+  
+const addTask = (time,order) => {
+  scheduler.add(() => timeout(time).then(()=>console.log(order)))
+}
+  
+  
+addTask(1000, '1');
+addTask(500, '2');
+addTask(300, '3');
+addTask(400, '4');
+scheduler.taskStart()
+// 2
+// 3
+// 1
+// 4
+```
 #### 手写 promise.all 和 race
 
 ```js
@@ -18517,7 +18770,30 @@ Object.defineProperty(Object.prototype, "__proto__", {
     }
 })
 ```
-
+#### 手写forEach
+```js
+Array.prototype.forEach = function(callback, thisArg) {
+  if (this == null) {
+    throw new TypeError('this is null or not defined');
+  }
+  if (typeof callback !== "function") {
+    throw new TypeError(callback + ' is not a function');
+  }
+  // 让O成为回调函数的对象传递（强制转换对象）
+  const O = Object(this);
+  // >>>0 保证len为number，且为正整数
+  const len = O.length >>> 0;
+  let k = 0;
+  while (k < len) {
+  // 检查i是否在O的属性（会检查原型链）
+    if (k in O) {
+     // 回调函数调用传参
+      callback.call(thisArg, O[k], k, O);
+    }
+    k++;
+  }
+}
+```
 #### 手写instanceof
 
 ```js
@@ -18873,6 +19149,12 @@ const selfMap2 = function(fn,context){
 
 ```javascript
 Array.prototype.filter = function (fn){
+ if (this == undefined) {
+    throw new TypeError('this is null or not undefined');
+  }
+  if (typeof callback !== 'function') {
+    throw new TypeError(callback + 'is not a function');
+  }
     const result = [];
     for (let i=0;i<this.length;i++) {
         if (!this.hasOwnProperty(i)) continue; // 处理稀疏数组的情况
@@ -19064,7 +19346,7 @@ const arrayLike=document.querySelectorAll('div')
 [...arrayLike]
 // 2.Array.from
 Array.from(arrayLike)
-// 3.Array.prototype.slice
+// 3.Array.prototype.slice.call()
 Array.prototype.slice.call(arrayLike)
 // 4.Array.apply
 Array.apply(null, arrayLike)
@@ -19081,6 +19363,8 @@ function flattening1(arr,num=1) {
     if (!Array.isArray(arr)) return
     return arr.flat(num)
 }
+
+
 // 利用 reduce() 方法将数组拉平。
 // 利用 reduce 进行迭代，核心的思想是递归实现。
 function flattening2(arr) {
@@ -19089,6 +19373,8 @@ function flattening2(arr) {
         return a.concat(Array.isArray(b)?flattening2(b):b);
     }, [])
 }
+
+
 // 模拟栈实现数组拉平
 // 该方法是模拟栈，在性能上相对最优解。
 function flattening3(arr) {
@@ -19108,7 +19394,30 @@ const result2 = flattening2(arr)
 const result3 = flattening2(arr)
 console.log(result3)
 
-//使用reduce实现数组的flat方法
+
+
+// 利用正则
+const res2 = JSON.stringify(arr).replace(/\[|\]/g, '').split(',');
+
+
+
+// 正则改良版本
+const res3 = JSON.parse('[' + JSON.stringify(arr).replace(/\[|\]/g, '') + ']');
+
+
+
+// 函数递归
+const res5 = [];
+const fn = arr => {
+  for (let i = 0; i < arr.length; i++) {
+    if (Array.isArray(arr[i])) {
+      fn(arr[i]);
+    } else {
+      res5.push(arr[i]);
+    }
+  }
+}
+fn(arr);
 ```
 
 #### 实现一个对象的扁平化方法
@@ -19222,6 +19531,27 @@ const lazyLoad = function(imgs){
     }
     return handler()
 }
+
+
+
+function lazyload() {
+  const imgs = document.getElementsByTagName('img');
+  const len = imgs.length;
+  // 视口的高度
+  const viewHeight = document.documentElement.clientHeight;
+  // 滚动条高度
+  const scrollHeight = document.documentElement.scrollTop || document.body.scrollTop;
+  for (let i = 0; i < len; i++) {
+    const offsetHeight = imgs[i].offsetTop;
+    if (offsetHeight < viewHeight + scrollHeight) {
+      const src = imgs[i].dataset.src;
+      imgs[i].src = src;
+    }
+  }
+}
+
+// 可以使用节流优化一下
+window.addEventListener('scroll', lazyload);
 ```
 
 scroll滚动事件容易造成性能问题。那可以通过 IntersectionObserver 自动观察 img 标签是否进入可视区域。
@@ -19241,7 +19571,74 @@ const lazyLoad = function(imgs){
   imgs.forEach((img) => observer.observe(img))
 }
 ```
+#### 手写滚动加载
+```js
+// 原理就是监听页面滚动事件，分析clientHeight、scrollTop、scrollHeight三者的属性关系。
+window.addEventListener('scroll', function() {
+  const clientHeight = document.documentElement.clientHeight;
+  const scrollTop = document.documentElement.scrollTop;
+  const scrollHeight = document.documentElement.scrollHeight;
+  if (clientHeight + scrollTop >= scrollHeight) {
+    // 检测到滚动至页面底部，进行后续操作
+    // ...
+  }
+}, false);
+```
+#### 渲染几万条数据不卡住页面
+```js
+// 渲染大数据时，合理使用createDocumentFragment和requestAnimationFrame，将操作切分为一小段一小段执行。
+setTimeout(() => {
+  // 插入十万条数据
+  const total = 100000;
+  // 一次插入的数据
+  const once = 20;
+  // 插入数据需要的次数
+  const loopCount = Math.ceil(total / once);
+  let countOfRender = 0;
+  const ul = document.querySelector('ul');
+  // 添加数据的方法
+  function add() {
+    const fragment = document.createDocumentFragment();
+    for(let i = 0; i < once; i++) {
+      const li = document.createElement('li');
+      li.innerText = Math.floor(Math.random() * total);
+      fragment.appendChild(li);
+    }
+    ul.appendChild(fragment);
+    countOfRender += 1;
+    loop();
+  }
+  function loop() {
+    if(countOfRender < loopCount) {
+      window.requestAnimationFrame(add);
+    }
+  }
+  loop();
+}, 0)
 
+```
+#### 打印出当前网页使用了多少种HTML元素
+```js
+const fn = () => {
+  return [...new Set([...document.querySelectorAll('*')].map(el => el.tagName))].length;
+}
+```
+#### 手写Object.is
+```js
+// Object.is解决的主要是这两个问题：
+// +0 === -0  // true
+// NaN === NaN // false
+
+
+const is= (x, y) => {
+  if (x === y) {
+    // +0和-0应该不相等
+    return x !== 0 || y !== 0 || 1/x === 1/y;
+  } else {
+    return x !== x && y !== y;
+  }
+}
+```
 #### 手写Object.create
 
 Object.create()方法创建一个新对象，使用现有的对象来提供新创建的对象的__proto__。
@@ -20125,7 +20522,7 @@ function render(template, data) {
 }
 ```
 
-#### 将虚拟 Dom 转化为真实 Dom
+#### 将VirtualDom转化为真实DOM结构
 
 ```js
 {
@@ -21146,7 +21543,306 @@ function sleep(s){
     }`
 
 ```
-### 手写相关函数2
+## 排序专题
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211201222237.png)
+- n:数据规模
+- k:“桶”的个数
+- In-place: 占用常数内存，不占用额外内存
+- Out-place: 占用额外内存
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211201222409.png)
+### 如何分析一个排序算法
+复杂度分析是整个算法学习的精髓。
+- 时间复杂度: 一个算法执行所耗费的时间。
+- 空间复杂度: 运行完一个程序所需内存的大小。
+- 分析一个排序算法，要从 `执行效率`、`内存消耗`、`稳定性` 三方面入手。
+#### 执行效率
+1. 最好情况、最坏情况、平均情况时间复杂度
+我们在分析排序算法的时间复杂度时，要分别给出最好情况、最坏情况、平均情况下的时间复杂度。 除此之外，你还要说出最好、最坏时间复杂度对应的要排序的原始数据是什么样的。
+2. 时间复杂度的系数、常数 、低阶
+我们知道，时间复杂度反应的是数据规模 n 很大的时候的一个增长趋势，所以它表示的时候会忽略系数、常数、低阶。
+在对同一阶时间复杂度的排序算法性能对比的时候，我们就要把系数、常数、低阶也考虑进来。
+3. 比较次数和交换（或移动）次数
+基于比较的排序算法的执行过程，会涉及两种操作，一种是元素比较大小，另一种是元素交换或移动。所以，如果我们在分析排序算法的执行效率的时候，应该把比较次数和交换（或移动）次数也考虑进去。
+#### 内存消耗
+也就是看空间复杂度。
+还需要知道如下术语：
+- 内排序：所有排序操作都在内存中完成；
+- 外排序：由于数据太大，因此把数据放在磁盘中，而排序通过磁盘和内存的数据传输才能进行；
+- 原地排序：原地排序算法，就是特指空间复杂度是 O(1) 的排序算法。
+#### 稳定性
+- 稳定：如果待排序的序列中存在值相等的元素，经过排序之后，相等元素之间原有的先后顺序不变。 比如： a 原本在 b 前面，而 a = b，排序之后，a 仍然在 b 的前面；
+- 不稳定：如果待排序的序列中存在值相等的元素，经过排序之后，相等元素之间原有的先后顺序改变。 比如：a 原本在 b 的前面，而 a = b，排序之后， a 在 b 的后面；
+### 冒泡排序
+#### 算法描述
+冒泡排序是一种简单的排序算法。它重复地走访过要排序的数列，一次比较两个元素，如果它们的顺序错误就把它们交换过来。走访数列的工作是重复地进行直到没有再需要交换，也就是说该数列已经排序完成。这个算法的名字由来是因为越小的元素会经由交换慢慢“浮”到数列的顶端。
+#### 算法步骤
+具体算法描述如下：
+- <1>.比较相邻的元素。如果第一个比第二个大，就交换它们两个；
+- <2>.对每一对相邻元素作同样的工作，从开始第一对到结尾的最后一对，这样在最后的元素应该会是最大的数；
+- <3>.针对所有的元素重复以上的步骤，除了最后一个；
+- <4>.重复步骤1~3，直到排序完成。
+#### 特点
+- 优点：排序算法的基础，简单实用易于理解。
+- 缺点：比较次数多，效率较低。
+#### 实现
+```js
+// 冒泡排序（未优化）
+const bubbleSort = arr => {
+	console.time('改进前冒泡排序耗时');
+	const length = arr.length;
+	if (length <= 1) return;
+	// i < length - 1 是因为外层只需要 length-1 次就排好了，第 length 次比较是多余的。
+	for (let i = 0; i < length - 1; i++) {
+		// j < length - i - 1 是因为内层的 length-i-1 到 length-1 的位置已经排好了，不需要再比较一次。
+		for (let j = 0; j < length - i - 1; j++) {
+			if (arr[j] > arr[j + 1]) {
+				const temp = arr[j];
+				arr[j] = arr[j + 1];
+				arr[j + 1] = temp;
+			}
+		}
+	}
+	console.log('改进前 arr :', arr);
+	console.timeEnd('改进前冒泡排序耗时');
+};
+
+
+
+
+// 优化：当某次冒泡操作已经没有数据交换时，说明已经达到完全有序，不用再继续执行后续的冒泡操作。
+// 冒泡排序（已优化）
+const bubbleSort2 = arr => {
+	console.time('改进后冒泡排序耗时');
+	const length = arr.length;
+	if (length <= 1) return;
+	// i < length - 1 是因为外层只需要 length-1 次就排好了，第 length 次比较是多余的。
+	for (let i = 0; i < length - 1; i++) {
+		let hasChange = false; // 提前退出冒泡循环的标志位
+		// j < length - i - 1 是因为内层的 length-i-1 到 length-1 的位置已经排好了，不需要再比较一次。
+		for (let j = 0; j < length - i - 1; j++) {
+			if (arr[j] > arr[j + 1]) {
+				const temp = arr[j];
+				arr[j] = arr[j + 1];
+				arr[j + 1] = temp;
+				hasChange = true; // 表示有数据交换
+			}
+		}
+
+		if (!hasChange) break; // 如果 false 说明所有元素已经到位，没有数据交换，提前退出
+	}
+	console.log('改进后 arr :', arr);
+	console.timeEnd('改进后冒泡排序耗时');
+};
+
+
+
+// 测试
+const arr = [7, 8, 4, 5, 6, 3, 2, 1];
+bubbleSort(arr);
+// 改进前 arr : [1, 2, 3, 4, 5, 6, 7, 8]
+// 改进前冒泡排序耗时: 0.43798828125ms
+
+const arr2 = [7, 8, 4, 5, 6, 3, 2, 1];
+bubbleSort2(arr2);
+// 改进后 arr : [1, 2, 3, 4, 5, 6, 7, 8]
+// 改进后冒泡排序耗时: 0.318115234375ms
+
+
+
+// 双向冒泡
+function bubbleSort3(arr3) {
+    var low = 0;
+    var high= arr.length-1; //设置变量的初始值
+    var tmp,j;
+    console.time('2.改进后冒泡排序耗时');
+    while (low < high) {
+        for (j= low; j< high; ++j) //正向冒泡,找到最大者
+            if (arr[j]> arr[j+1]) {
+                tmp = arr[j]; arr[j]=arr[j+1];arr[j+1]=tmp;
+            }
+        --high;                 //修改high值, 前移一位
+        for (j=high; j>low; --j) //反向冒泡,找到最小者
+            if (arr[j]<arr[j-1]) {
+                tmp = arr[j]; arr[j]=arr[j-1];arr[j-1]=tmp;
+            }
+        ++low;                  //修改low值,后移一位
+    }
+    console.timeEnd('2.改进后冒泡排序耗时');
+    return arr3;
+}
+var arr=[3,44,38,5,47,15,36,26,27,2,46,4,19,50,48];
+console.log(bubbleSort3(arr));//[2, 3, 4, 5, 15, 19, 26, 27, 36, 38, 44, 46, 47, 48, 50]
+```
+#### 分析
+冒泡的过程只涉及相邻数据的交换操作，只需要常量级的临时空间，所以它的空间复杂度为 O(1)，是一个`原地`排序算法。
+
+在冒泡排序中，只有交换才可以改变两个元素的前后顺序。 为了保证冒泡排序算法的稳定性，当有相邻的两个元素大小相等的时候，我们不做交换，相同大小的数据在排序前后不会改变顺序。 所以冒泡排序是`稳定`的排序算法。
+
+最佳情况：`T(n) = O(n)`，当数据已经是正序时。 最差情况：`T(n) = O(n^2)`，当数据是反序时。 平均情况：`T(n) = O(n^2)`。
+### 直接插入排序
+#### 算法描述
+一般人打扑克牌，整理牌的时候，都是按牌的大小（从小到大或者从大到小）整理牌的，那每摸一张新牌，就扫描自己的牌，把新牌插入到相应的位置。
+
+插入排序的工作原理：通过构建有序序列，对于未排序数据，在已排序序列中从后向前扫描，找到相应位置并插入。
+#### 算法步骤
+- 从第一个元素开始，该元素可以认为已经被排序；
+- 取出下一个元素，在已经排序的元素序列中从后向前扫描；
+- 如果该元素（已排序）大于新元素，将该元素移到下一位置；
+- 重复步骤 3，直到找到已排序的元素小于或者等于新元素的位置；
+- 将新元素插入到该位置后；
+- 重复步骤 2 ~ 5。
+#### 实现
+```js
+// 插入排序
+const insertionSort = array => {
+	const len = array.length;
+	if (len <= 1) return
+
+	let preIndex, current;
+	for (let i = 1; i < len; i++) {
+		preIndex = i - 1; //待比较元素的下标
+		current = array[i]; //当前元素
+		while (preIndex >= 0 && array[preIndex] > current) {
+			//前置条件之一: 待比较元素比当前元素大
+			array[preIndex + 1] = array[preIndex]; //将待比较元素后移一位
+			preIndex--; //游标前移一位
+		}
+		if (preIndex + 1 != i) {
+			//避免同一个元素赋值给自身
+			array[preIndex + 1] = current; //将当前元素插入预留空位
+			console.log('array :', array);
+		}
+	}
+	return array;
+};
+
+
+
+// 测试
+const array = [5, 4, 3, 2, 1];
+console.log("原始 array :", array);
+insertionSort(array);
+// 原始 array:    [5, 4, 3, 2, 1]
+// array:  		 [4, 5, 3, 2, 1]
+// array:  		 [3, 4, 5, 2, 1]
+// array: 		 [2, 3, 4, 5, 1]
+// array:  		 [1, 2, 3, 4, 5]
+```
+#### 分析
+插入排序算法的运行并不需要额外的存储空间，所以空间复杂度是 O(1)，所以，这是一个`原地`排序算法。
+
+在插入排序中，对于值相同的元素，我们可以选择将后面出现的元素，插入到前面出现元素的后面，这样就可以保持原有的前后顺序不变，所以插入排序是`稳定`的排序算法。
+
+最佳情况：`T(n) = O(n)`，当数据已经是正序时。 最差情况：`T(n) = O(n^2)`，当数据是反序时。 平均情况：`T(n) = O(n^2)`。
+### 拆半插入排序
+插入排序也有一种优化算法，叫做拆半插入。
+#### 算法描述
+折半插入排序是直接插入排序的升级版，鉴于插入排序第一部分为已排好序的数组，我们不必按顺序依次寻找插入点，只需比较它们的中间值与待插入元素的大小即可。
+#### 算法步骤
+- 取 0 ~ i-1 的中间点 ( m = (i-1) >> 1 )，array[i] 与 array[m] 进行比较，若 array[i]  <  array[m]，则说明待插入的元素 array[i]  应该处于数组的 0 ~ m 索引之间；反之，则说明它应该处于数组的 m ~ i-1 索引之间。
+- 重复步骤 1，每次缩小一半的查找范围，直至找到插入的位置。
+- 将数组中插入位置之后的元素全部后移一位。
+- 在指定位置插入第 i 个元素。
+- 注：x >> 1 是位运算中的右移运算，表示右移一位，等同于 x 除以 2 再取整，即 x >> 1 == Math.floor(x/2) 。
+#### 实现
+```js
+// 折半插入排序
+const binaryInsertionSort = array => {
+	const len = array.length;
+	if (len <= 1) return;
+
+	let current, i, j, low, high, m;
+	for (i = 1; i < len; i++) {
+		low = 0;
+		high = i - 1;
+		current = array[i];
+
+		while (low <= high) {
+			//步骤 1 & 2 : 折半查找
+			m = (low + high) >> 1; // 注: x>>1 是位运算中的右移运算, 表示右移一位, 等同于 x 除以 2 再取整, 即 x>>1 == Math.floor(x/2) .
+			if (array[i] >= array[m]) {
+				//值相同时, 切换到高半区，保证稳定性
+				low = m + 1; //插入点在高半区
+			} else {
+				high = m - 1; //插入点在低半区
+			}
+		}
+		for (j = i; j > low; j--) {
+			//步骤 3: 插入位置之后的元素全部后移一位
+			array[j] = array[j - 1];
+			console.log('array2 :', JSON.parse(JSON.stringify(array)));
+		}
+		array[low] = current; //步骤 4: 插入该元素
+	}
+	console.log('array2 :', JSON.parse(JSON.stringify(array)));
+	return array;
+};
+
+
+const array2 = [5, 4, 3, 2, 1];
+console.log('原始 array2:', array2);
+binaryInsertionSort(array2);
+// 原始 array2:  [5, 4, 3, 2, 1]
+// array2 :     [5, 5, 3, 2, 1]
+// array2 :     [4, 5, 5, 2, 1]
+// array2 :     [4, 4, 5, 2, 1]
+// array2 :     [3, 4, 5, 5, 1]
+// array2 :     [3, 4, 4, 5, 1]
+// array2 :     [3, 3, 4, 5, 1]
+// array2 :     [2, 3, 4, 5, 5]
+// array2 :     [2, 3, 4, 4, 5]
+// array2 :     [2, 3, 3, 4, 5]
+// array2 :     [2, 2, 3, 4, 5]
+// array2 :     [1, 2, 3, 4, 5]
+```
+注意：和直接插入排序类似，折半插入排序每次交换的是相邻的且值为不同的元素，它并不会改变值相同的元素之间的顺序，因此它是`稳定`的。
+### 希尔排序
+### 选择排序
+#### 算法描述
+选择排序算法的实现思路有点类似插入排序，也分已排序区间和未排序区间。但是选择排序每次会从未排序区间中找到最小的元素，将其放到已排序区间的末尾。
+#### 算法步骤
+- 首先在未排序序列中找到最小（大）元素，存放到排序序列的起始位置。
+- 再从剩余未排序元素中继续寻找最小（大）元素，然后放到已排序序列的末尾。
+- 重复第二步，直到所有元素均排序完毕。
+#### 实现
+```js
+const selectionSort = array => {
+	const len = array.length;
+	let minIndex, temp;
+	for (let i = 0; i < len - 1; i++) {
+		minIndex = i;
+		for (let j = i + 1; j < len; j++) {
+			if (array[j] < array[minIndex]) {
+				// 寻找最小的数
+				minIndex = j; // 将最小数的索引保存
+			}
+		}
+		temp = array[i];
+		array[i] = array[minIndex];
+		array[minIndex] = temp;
+		console.log('array: ', array);
+	}
+	return array;
+};
+
+
+// 测试
+const array = [5, 4, 3, 2, 1];
+console.log('原始array:', array);
+selectionSort(array);
+// 原始 array:  [5, 4, 3, 2, 1]
+// array:  		 [1, 4, 3, 2, 5]
+// array:  		 [1, 2, 3, 4, 5]
+// array: 		 [1, 2, 3, 4, 5]
+// array:  		 [1, 2, 3, 4, 5]
+```
+#### 分析
+选择排序空间复杂度为` O(1)`，是一种原地`排序`算法。
+
+选择排序每次都要找剩余未排序元素中的最小值，并和前面的元素交换位置，这样破坏了稳定性。所以，选择排序是一种`不稳定`的排序算法。
+
+无论是正序还是逆序，选择排序都会遍历` n^2 / 2 `次来排序，所以，最佳、最差和平均的复杂度是一样的。 最佳情况：`T(n) = O(n^2)`。 最差情况：`T(n) = O(n^2)`。 平均情况`：T(n) = O(n^2)`。
+
 ## Git/规范
 ### CI/CD？
 CI/CD 是一种通过在应用开发阶段引入自动化来频繁向客户交付应用的方法。
