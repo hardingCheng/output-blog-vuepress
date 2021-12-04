@@ -3513,6 +3513,10 @@ console.log(helloMessage.text); // 'Hello World!'
 ### CSS和JS为什么会放在头部或者底部？
 - 因为页面在加载时，浏览器会识别该文档CSS，并行下载，不会停止对当前文档的加载。放在头部可以保证在加载html生成DOM tree的时候，就可以同时对DOM tree进行渲染，可以防止闪跳，白屏或者布局混乱。
 - 外部引入js文件阻塞其他资源下载，也会阻塞该js引入位置以下的页面的内容呈现，而且js可能会改变DOM tree的结构，需要一个稳定的DOM tree，所以要放置在页面的最下面。
+### undefined 与 undeclared 的区别？
+已在作用域中声明但还没有赋值的变量，是 undefined。相反，还没有在作用域中声明过的变量，是 undeclared 的。
+
+对于 undeclared 变量的引用，浏览器会报引用错误，如 ReferenceError: b is not defined 。但是我们可以使用 typeof 的安全防范机制来避免报错，因为对于 undeclared（或者 not defined ）变量，typeof 会返回 "undefined"。
 ### undefined和null有什么区别？
 首先，undefined和null都是假值（falsy），都能作为条件进行判断。这两种不同类型的值，既有着不同的语义和场景，又表现出较为相似的行为。
 #### undefined
@@ -3782,7 +3786,7 @@ new Date instanceof Date; // true
   console.log(auto instanceof Object);
   // expected output: true
 ```
-#### Symbol主要用于什么场景下
+### Symbol主要用于什么场景下
 - 应用场景1：使用Symbol来作为对象属性名(key)
   - 在这之前，我们通常定义或访问对象的属性时都是使用字符串
   - Symbol可同样用于对象属性的定义和访问
@@ -3827,8 +3831,17 @@ import Login from './a.js'
 const login = new Login('admin', '123456') 
 login.checkPassword('123456') // true login.PASSWORD // oh!no! login[PASSWORD] // oh!no! login["PASSWORD"] // oh!no! 
 ```
-### 变量提升(函数提升)
+### 类型转换
+-  JS 中类型转换只有三种情况，分别是：
+    -  转换为布尔值（调用Boolean()方法）
+    -  转换为数字（调用Number()、parseInt()和parseFloat()方法）
+    -  转换为字符串（调用.toString()或者String()方法）
+    -  null和underfined没有.toString方法
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211203201505.png)
+#### 显示转换？？？？？？？
+#### 隐式转换？？？？？？？
 
+### 变量提升(函数提升)
 - 所谓的变量提升（变量提升），是指在JS代码执行中， JavaScript引擎（V8）把变量的声明部分和函数的声明部分提升到代码开头的行为，变量提升后，会给变量设置默认值undefined，给函数赋值函数体。
 
 - 在JS的变量提升中，提升的只是变量的声明，所以对于var a = 1，一般把它拆分成var a 和 a = 1。只提升var a，a = 1不变。
@@ -4101,6 +4114,8 @@ setInterval 是一个宏任务。用多了你就会发现它并不是准确无�
 响应式（Reactive Programming，RP）
 函数响应式（Functional Reactive Programming，FRP）
 ### this的五种情况
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211203202603.png)
+
 `this`是在执行的时候确定的。不执行，你就不知道在哪里。
 
 1. 作为普通函数执行时，`this`指向`window`。
@@ -4203,7 +4218,10 @@ student.arrowDoSth2(); // 'window'
 - 那么 prototype 就是调用 `构造函数` 而创建的那个对象`实例`的`的原型对象`。
 - 使用原型对象的好处是可以让所有对象实例共享它所包含的属性和方法。
 - 最主要的就是节省内存，如果属性和方法定义在原型上，那么所有的实例对象就能共享。
-
+### js 获取原型的方法？
+- p.proto
+- p.constructor.prototype
+- Object.getPrototypeOf(p)
 ### 构造函数、原型和原型链
 - 每一个函数对象都有一个prototype属性，指向函数对象的原型，原型对象上有一个constructor属性指向构造函数本身。
 - 引用类型 constructor 属性值是可以修改的，但是对于基本类型来说是只读的，当然 null 和 undefined 没有 constructor 属性。
@@ -6291,6 +6309,13 @@ addEventListener第一个参数事件类型，第二个类型即绑定的具体�
 事件触发的顺序为先捕获再冒泡，捕获时从dom树最上层开始响应，冒泡时从dom树最底层开始响应；
 阻止冒泡和捕获用e.stopPropagation(),event.cancelBubble; // IE 6 7 8 的停止冒泡; 
 阻止默认事件用e.preventDefaule(),e.returnValue; 是一个属性，适用于 IE 6 7 8;
+
+### 三种事件模型是什么？
+事件 是用户操作网页时发生的交互动作或者网页本身的一些操作，现代浏览器一共有三种事件模型。
+
+- DOM0级模型： ，这种模型不会传播，所以没有事件流的概念，但是现在有的浏览器支持以冒泡的方式实现，它可以在网页中直接定义监听函数，也可以通过 js属性来指定监听函数。这种方式是所有浏览器都兼容的。
+- IE 事件模型： 在该事件模型中，一次事件共有两个过程，事件处理阶段，和事件冒泡阶段。事件处理阶段会首先执行目标元素绑定的监听事件。然后是事件冒泡阶段，冒泡指的是事件从目标元素冒泡到 document，依次检查经过的节点是否绑定了事件监听函数，如果有则执行。这种模型通过 attachEvent 来添加监听函数，可以添加多个监听函数，会按顺序依次执行。
+- DOM2 级事件模型： 在该事件模型中，一次事件共有三个过程，第一个过程是事件捕获阶段。捕获指的是事件从 document 一直向下传播到目标元素，依次检查经过的节点是否绑定了事件监听函数，如果有则执行。后面两个阶段和 IE 事件模型的两个阶段相同。这种事件模型，事件绑定的函数是 addEventListener，其中第三个参数可以指定事件是否在捕获阶段执行。
 
 ### （DOM 事件流）浏览器的事件冒泡及事件捕获？怎么取消事件冒泡？事件代理？
 
@@ -12319,6 +12344,11 @@ const routes: Array<RouteConfig> = [
 
 - IP（Internet Protocol）独立IP数，是指1天内多少个独立的IP浏览了页面，即统计不同的IP浏览用户数量。同一IP不管访问了几个页面，独立IP数均为1；不同的IP浏览页面，计数会加1。 IP是基于用户广域网IP地址来区分不同的访问者的，所以，多个用户（多个局域网IP）在同一个路由器（同一个广域网IP）内上网，可能被记录为一个独立IP访问者。如果用户不断更换IP，则有可能被多次统计。
 ## Vue
+### ajax请求应该放在哪个生命周期
+- mounted 表示整个渲染完成， dom 也加载完成，因此 ajax 请求应该放在 mounted 生命周期中；
+- 本质上 js 是单线程的，并且 ajax 是异步获取数据，是异步加载的一个机制；
+- 如果将其放在 mounted 之前是没有用的，这样做只会让逻辑更加混乱；
+- 原因在于，如果在 mounted 之前放 ajax 请求，那么这个时候 js 还没有渲染完成。且又因为 ajax 请求的数据还是异步的，因此即使是在 mounted 之前也不能加载，也不会有提前加载的效果。
 ### 如何封装组件？如何设计组件?
 #### 组件化和模块化
 模块化:是从代码逻辑的角度进行划分的;方便代码分层开发，保证每个功能模块的职能单一。
@@ -12436,7 +12466,8 @@ hanleSubmit (data) {
 </modal>
 ```
 #### 组件封装细则????????????????
-
+### 描述组件渲染和更新的过程
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211203205536.png)
 
 ### 如何设计组件库？？？？
 ### PWA?？？？？？？？？？？？？
