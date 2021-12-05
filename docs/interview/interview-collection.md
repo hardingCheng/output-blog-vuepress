@@ -3838,8 +3838,168 @@ login.checkPassword('123456') // true login.PASSWORD // oh!no! login[PASSWORD] /
     -  转换为字符串（调用.toString()或者String()方法）
     -  null和underfined没有.toString方法
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211203201505.png)
-#### 显示转换？？？？？？？
-#### 隐式转换？？？？？？？
+#### 显示转换？
+- Number()
+    - 接收一个参数：123，true,false,null,'123'能处理其他均是NaN
+- parseInt()
+    - 两个参数：对象+进制、123，'123','123a'，其他均为NaN;
+- parseFloat()
+    - 一个参数：123，'123.11', '123.1a',其他均为NaN;
+- String()
+    - 接收一个参数：接收任何参数相当于+'';
+- obj.toString()
+    - 接收一个参数：接收任何参数相当于+'';
+- Boolean()
+    - 接收一个参数：''、NaN、null、undefined、0是false,其他均为true;
+#### 隐式转换？
+```js
+[] == ![] // true
+
+[] == 0 // true
+  
+[2] == 2 // true
+
+['0'] == false // true
+
+'0' == false // true
+
+[] == false // true
+
+[null] == 0 // true
+
+null == 0 // false
+
+[null] == false // true
+
+null == false // false
+
+[undefined] == false // true
+
+undefined == false // false
+```
+- ToString，ToNumber，ToBoolean，ToPrimitive
+    - 比如数字、字符串、布尔型、数组、对象之间的相互转换。
+- ToString
+    - 这里所说的ToString可不是对象的toString方法，而是指其他类型的值转换为字符串类型的操作。
+    - 讨论null、undefined、布尔型、数字、数组、普通对象转换为字符串的规则。
+        - null：转为"null"
+        - undefined：转为"undefined"
+        - 布尔类型：true和false分别被转为"true"和"false"
+        - 数字类型：转为数字的字符串形式，如10转为"10"， 1e21转为"1e+21"
+        - 数组：转为字符串是将所有元素按照","连接起来，相当于调用数组的Array.prototype.join()方法，如[1, 2, 3]转为"1,2,3"，空数组[]转为空字符串，数组中的null或undefined，会被当做空字符串处理
+        - 普通对象：转为字符串相当于直接使用Object.prototype.toString()，返回"[object Object]"
+```js
+String(null) // 'null'
+String(undefined) // 'undefined'
+String(true) // 'true'
+String(10) // '10'
+String(1e21) // '1e+21'
+String([1,2,3]) // '1,2,3'
+String([]) // ''
+String([null]) // ''
+String([1, undefined, 3]) // '1,,3'
+String({}) // '[object Objecr]'
+```
+- ToNumber
+    - ToNumber指其他类型转换为数字类型的操作。
+        - null： 转为0
+        - undefined：转为NaN
+        - 字符串：如果是纯数字形式，则转为对应的数字，空字符转为0, 否则一律按转换失败处理，转为NaN
+        - 布尔型：true和false被转为1和0
+        - 数组：数组首先会被转为原始类型，也就是ToPrimitive，然后在根据转换后的原始类型按照上面的规则处理，关于ToPrimitive，会在下文中讲到
+        - 对象：同数组的处理
+```js
+Number(null) // 0
+Number(undefined) // NaN
+Number('10') // 10
+Number('10a') // NaN
+Number('') // 0 
+Number(true) // 1
+Number(false) // 0
+Number([]) // 0
+Number(['1']) // 1
+Number({}) // NaN
+ ```
+- ToBoolean
+    - ToBoolean指其他类型转换为布尔类型的操作。
+    - js中的假值只有false、null、undefined、空字符、0和NaN，其它值转为布尔型都为true。
+```js
+Boolean(null) // false
+Boolean(undefined) // false
+Boolean('') // flase
+Boolean(NaN) // flase
+Boolean(0) // flase
+Boolean([]) // true
+Boolean({}) // true
+Boolean(Infinity) // true
+```
+-  ToPrimitive
+    -  ToPrimitive指对象类型类型（如：对象、数组）转换为原始类型的操作。
+    -  当对象类型需要被转为原始类型时，它会先查找对象的valueOf方法，如果valueOf方法返回原始类型的值，则ToPrimitive的结果就是这个值
+    -  如果valueOf不存在或者valueOf方法返回的不是原始类型的值，就会尝试调用对象的toString方法，也就是会遵循对象的ToString规则，然后使用toString的返回值作为ToPrimitive的结果。
+    -  对于不同类型的对象来说，ToPrimitive的规则有所不同，比如Date对象会先调用toString，具体可以参考ECMA标准
+```js
+Number([]) // 0
+Number(['10']) //10
+
+const obj1 = {
+valueOf () {
+  return 100
+},
+toString () {
+  return 101
+}
+}
+Number(obj1) // 100
+
+const obj2 = {
+toString () {
+  return 102
+}
+}
+Number(obj2) // 102
+
+const obj3 = {
+toString () {
+  return {}
+}
+}
+Number(obj3) // TypeError
+
+// Number([])， 空数组会先调用valueOf，但返回的是数组本身，不是原始类型，所以会继续调用toString，得到空字符串，相当于Number('')，所以转换后的结果为"0" 同理，Number(['10'])相当于Number('10')，得到结果10
+// obj1的valueOf方法返回原始类型100，所以ToPrimitive的结果为100
+// obj2没有valueOf，但存在toString，并且返回一个原始类型，所以Number(obj2)结果为102
+// obj3的toString方法返回的不是一个原始类型，无法ToPrimitive，所以会抛出错误
+```
+- 宽松相等（==）比较时的隐式转换规则
+    - 宽松相等（==）和严格相等（===）的区别在于宽松相等会在比较中进行隐式转换。
+- 布尔类型和其他类型的相等比较
+    - 只要布尔类型参与比较，该布尔类型的值首先会被转换为数字类型
+    - 根据布尔类型的ToNumber规则，true转为1，false转为0
+- 数字类型和字符串类型的相等比较
+    - 当数字类型和字符串类型做相等比较时，字符串类型会被转换为数字类型
+    - 根据字符串的ToNumber规则，如果是纯数字形式的字符串，则转为对应的数字，空字符转为0, 否则一律按转换失败处理，转为NaN
+    - 因为NaN和任何值都不相等，包括它自己。
+- 对象类型和原始类型的相等比较
+    - 当对象类型和原始类型做相等比较时，对象类型会依照ToPrimitive规则转换为原始类型
+    - 对象的ToPrimitive操作会先调用valueOf方法，并且a的valueOf方法返回一个原始类型的值，所以ToPrimitive的操作结果就是valueOf方法的返回值10。
+- null、undefined和其他类型的比较
+    - null和undefined宽松相等的结果为true，这一点大家都知道
+    - ECMAScript规范中规定null和undefined之间互相宽松相等（==），并且也与其自身相等，但和其他所有的值都不宽松相等（==）。
+
+- 常见的隐式类型转换
+    - 转成String类型
+        - 字符串连接符(+)转成字符串`var n = a + 'helloworld';`
+    - 转成Number型
+        - 自增自减运算符 ++/--`var b = a--`
+        - 加减乘除求余算数运算符 +-*/%
+        - 关系运算符 > < >= <= == != === !===
+            - 当关系运算符一边有字符串时，会将其数据类型使用Number转换，再做比较；
+            - 当两边都是字符串时，则都转成Number，注意：此时不是转成对应的数字，而是按照字符串对应的的unicode编码转成数字
+            - 多个字符从左往右进行比较
+    - 转成Boolean型
+        - Boolean转换参考上述ToBoolean(argument)说明, 以下这几种数据经过Boolean转换，会转成false，+0、-0、NaN、undefined、null、""、document.all(); 复杂数据类型经过Boolean转换后都是true，如：[]、{}
+        - 逻辑非运算符！ 逻辑非运算中，会将数据先做Boolean转换，然后取反
 
 ### 变量提升(函数提升)
 - 所谓的变量提升（变量提升），是指在JS代码执行中， JavaScript引擎（V8）把变量的声明部分和函数的声明部分提升到代码开头的行为，变量提升后，会给变量设置默认值undefined，给函数赋值函数体。
@@ -8517,6 +8677,53 @@ console.log(context.getState())
 off.handle(context)
 console.log(context.getState())
 ```
+#### 迭代器模式
+提供一种方法顺序一个聚合对象中各个元素，而又不暴露该对象的内部表示。
+```js
+class Iterator {
+    constructor(conatiner) {
+        this.list = conatiner.list
+        this.index = 0
+    }
+    next() {
+        if (this.hasNext()) {
+            return this.list[this.index++]
+        }
+        return null
+    }
+    hasNext() {
+        if (this.index >= this.list.length) {
+            return false
+        }
+        return true
+    }
+}
+
+class Container {
+    constructor(list) {
+        this.list = list
+    }
+    getIterator() {
+        return new Iterator(this)
+    }
+}
+
+// 测试代码
+let container = new Container([1, 2, 3, 4, 5])
+let iterator = container.getIterator()
+while(iterator.hasNext()) {
+  console.log(iterator.next())
+}
+```
+- 场景例子
+    - Array.prototype.forEach
+    - jQuery中的$.each()
+    - ES6 Iterator
+- 特点
+    - 访问一个聚合对象的内容而无需暴露它的内部表示。
+    - 为遍历不同的集合结构提供一个统一的接口，从而支持同样的算法在不同的集合结构上进行操作
+- 总结
+    - 对于集合内部结果常常变化各异，不想暴露其内部结构的话，但又想让客户代码透明的访问其中的元素，可以使用迭代器模式
 ## TS
 ### Typescript 有什么好处？？？？？？？？？
 ### Typescript 有什么不好的地方吗？？？？？？？？？
