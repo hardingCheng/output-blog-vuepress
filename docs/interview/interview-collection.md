@@ -3674,6 +3674,7 @@ null 的字面意思是：空值 。这个值的语义是，希望表示一个�
 - Number
 - Symbol
 - BigInt
+    - BigInt 是一种内置对象，它提供了一种方法来表示大于 2^53 - 1 的整数。这原本是 Javascript中可以用number 表示的最大数字。 BigInt 可以表示任意大的整数。
 - Object
   - Array
   - RegExp
@@ -11026,11 +11027,14 @@ ping命令是使用的网络层协议ICMP
 1. ip访问对应某一台确定的服务器；
 2. 域名访问相当于在ip访问的基础上，做了一个反向代理的中间功能。例如：百度，很多人会同时使用，如果使用的是同一台服务器的话，服务器估计会扛不住，如果访问的是域名，中间的反向代理，可以将用户反向代理到不同的服务器上，减轻服务器压力。
 ### TCP三次握手和四次挥手
+#### 三次握手
 - 为什么要进行三次握手：为了确认对方的发送和接收能力。
   - 第一次握手：建立连接时，客户端发送syn包（syn=j）到服务器，并进入SYN_SENT状态，等待服务器确认；SYN：同步序列编号（Synchronize Sequence Numbers）。
   - 第二次握手：服务器收到syn包并确认客户的SYN（ack=j+1），同时也发送一个自己的SYN包（syn=k），即SYN+ACK包，此时服务器进入SYN_RECV状态；
   - 第三次握手：客户端收到服务器的SYN+ACK包，向服务器发送确认包ACK(ack=k+1），此包发送完毕，客户端和服务器进入ESTABLISHED（TCP连接成功）状态，完成三次握手。
   - 握手过程中传送的包里不包含数据，三次握手完毕后，客户端与服务器才正式开始传送数据。四次以上都可以，只不过 三次就够了
+#### 三次握手那次最容易被攻击？？？？？？
+#### 四次握手
 - 四次握手：
   - **客户端进程发出连接释放报文**，并且停止发送数据。释放数据报文首部，FIN=1，其序列号为seq=u（等于前面已经传送过来的数据的最后一个字节的序号加1），此时，客户端进入FIN-WAIT-1（终止等待1）状态。 TCP规定，FIN报文段即使不携带数据，也要消耗一个序号。
   - **服务器收到连接释放报文，发出确认报文**，ACK=1，ack=u+1，并且带上自己的序列号seq=v，此时，服务端就进入了CLOSE-WAIT（关闭等待）状态。TCP服务器通知高层的应用进程，客户端向服务器的方向就释放了，这时候处于半关闭状态，即客户端已经没有数据要发送了，但是服务器若发送数据，客户端依然要接受。这个状态还要持续一段时间，也就是整个CLOSE-WAIT状态持续的时间。
@@ -13476,15 +13480,6 @@ Vue是一个典型的MVVM框架，模型（Model）只是普通的javascript对�
   - 待属性变动dep.notice()通知时，能调用自身的update()方法，并触发Compile中绑定的回调
 - Compile（指令解析器）: Compile主要做的事情是解析模板指令，将模板中变量替换成数据，然后初始化渲染页面视图，并将每个指令对应的节点绑定更新函数，添加鉴定数据的订阅者，一旦数据有变动，收到通知，更新试图
 
-### Vue2.x响应式原理
-- 响应式的主要原理是数据劫持和观察者模式
-- vue2.0中，响应式实现的核心就是 ES5的Object.defineProperty(obj, prop, descriptor). 通过Object.defineProperty()劫持data和props各个属性的getter和setter，getter做依赖收集，setter派发更新。整体来说是一个 数据劫持 + 发布-订阅者模式。
-
-vue 初始化时会用Object.defineProperty()给data中每一个属性添加getter和setter，同时创建dep和watcher进行依赖收集与派发更新，最后通过diff算法对比新老vnode差异，通过patch即时更新DOM
-
-具体来说， ① vue初始化阶段(beforeCreate之后create之前)，遍历data/props，调用Object.defineProperty给每个属性加上getter、setter。② 每个组件、每个computed都会实例化一个watcher（当然也包括每个自定义watcher），订阅渲染/计算所用到的所用data/props/computed，一旦数据发生变化，setter被调用，会通知渲染watcher重新计算、更新组件。
-
-![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211007094007.png)
 
 ### Vue2.xcomputed与watch
 通俗来讲，既能用 computed 实现又可以用 watch 监听来实现的功能，推荐用 computed， 重点在于 computed 的缓存功能 computed 计算属性是用来声明式的描述一个值依赖了其它的值，当所依赖的值或者变量 改变时，计算属性也会跟着改变； watch 监听的是已经在 data 中定义的变量，当该变量变化时，会触发 watch 中的方法。
@@ -13493,7 +13488,7 @@ vue 初始化时会用Object.defineProperty()给data中每一个属性添加gett
 - computed 计算属性 属性的结果会被缓存，当computed中的函数所依赖的属性没有发生改变的时候，那么调用当前函数的时候结果会从缓存中读取。除非依赖的响应式属性变化时才会重新计算，主要当做属性来使用 computed中的函数必须用return返回最终的结果 computed更高效，优先使用。data 不改变，computed 不更新。
 - 使用场景 computed：当一个属性受多个属性影响的时候使用，例：购物车商品结算功能 watch：当一条数据影响多条数据的时候使用，例：搜索数据
 
-### Vue2.x组件中的data为什么是一个函数？
+### Vue2.x的data为什么是一个函数？
 一个组件被复用多次的话，也就会创建多个实例。本质上，这些实例用的都是同一个构造函数。 2.如果data是对象的话，对象属于引用类型，会影响到所有的实例。所以为了保证组件不同的实例之间data不冲突，data必须是一个函数。
 
 ### Vue2.x v-for和v-if不建议用在一起
@@ -13531,10 +13526,19 @@ function makeIndexByKey(children) {
 // 生成的映射表
 let map = makeIndexByKey(oldCh);
 ```
+### Vue2.x响应式原理
+- 响应式的主要原理是数据劫持和观察者模式
+- vue2.0中，响应式实现的核心就是 ES5的Object.defineProperty(obj, prop, descriptor). 通过Object.defineProperty()劫持data和props各个属性的getter和setter，getter做依赖收集，setter派发更新。整体来说是一个 数据劫持 + 发布-订阅者模式。
+
+vue 初始化时会用Object.defineProperty()给data中每一个属性添加getter和setter，同时创建dep和watcher进行依赖收集与派发更新，最后通过diff算法对比新老vnode差异，通过patch即时更新DOM
+
+具体来说， ① vue初始化阶段(beforeCreate之后create之前)，遍历data/props，调用Object.defineProperty给每个属性加上getter、setter。② 每个组件、每个computed都会实例化一个watcher（当然也包括每个自定义watcher），订阅渲染/计算所用到的所用data/props/computed，一旦数据发生变化，setter被调用，会通知渲染watcher重新计算、更新组件。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211007094007.png)
 
 ### Vue2.x双向绑定的实现原理
 当一个Vue实例创建时，Vue会遍历data选项的属性，用 Object.defineProperty 将它们转为 getter/setter并且在内部追踪相关依赖，在属性被访问和修改时通知变化。每个组件实例都有相应的 watcher 程序实例，它会在组件渲染的过程中把属性记录为依赖，之后当依赖项的 setter 被调用时，会通知 watcher重新计算，从而致使它关联的组件得以更新。
-### Vue2.xnextTick的实现
+### Vue2.x nextTick的实现
 nextTick是Vue提供的一个全局API,是在下次DOM更新循环结束之后执行延迟回调，在修改数据之后使用$nextTick，则可以在回调中获取更新后的DOM；
 
 在下次 DOM 更新循环结束之后执行延迟回调，在修改数据之后立即使用 nextTick 来获取更新后的 DOM。 nextTick主要使用了宏任务和微任务。 根据执行环境分别尝试采用Promise、MutationObserver、setImmediate，如果以上都不行则采用setTimeout定义了一个异步方法，多次调用nextTick会将方法存入队列中，通过这个异步方法清空当前队列。
@@ -14063,6 +14067,15 @@ export default defineComponent({
     - 数据劫持优化：使用Proxy代替vue2.x中的defineProperty，能够深层监听数组对象的变化。
     - 编译优化：检测出模板中的静态节点、子树甚至数据对象，并在生成的代码中将它们提升到渲染函数之外。这样可以避免在每次渲染时重新创建这些对象，从而大大提高内存使用率并减少垃圾回收的频率。
     - 语法API优化：推出composition API优化逻辑组合和优化逻辑复用。
+### Object.defineProperty的缺点及vue3为什么用proxy？？？？？
+- Object.defineProperty的缺点
+    - Object.defineProperty的第一个缺陷,无法监听数组变化。
+    - Object.defineProperty的第二个缺陷,只能劫持对象的属性,因此我们需要对每个对象的每个属性进行遍历，如果属性值也是对象那么需要深度遍历,显然能劫持一个完整的对象是更好的选择。
+        - 只能通过遍历对象key去进行设置，如果是新增属性，没办法进行响应式设置，除非调用$set方法。
+        - 因为这个原因，导致对象如果有嵌套的对象属性，需要递归遍历，直到所有key设置完毕。 proxy是可以“包裹"对象，对整个对象进行拦截，可以在属性用到时再去进行响应式的设置。以及监听到对象上的任何变动，使得数组的变动也可以被察觉到
+- vue3为什么用proxy
+    - proxy可以直接监听数组的变化
+    - proxy可以监听对象而非属性.它在目标对象之前架设一层“拦截”，外界对该对象的访问，都必须先通过这层拦截，因此提供了一种机制，可以对外界的访问进行过滤和改写。 Proxy直接可以劫持整个对象,并返回一个新对象。
 ### Vue3.0和Vue2.0的差别
 - 响应式原理不同
     - 使用proxy代替defineProperty
@@ -14261,7 +14274,7 @@ export default defineComponent({
 3、重写虚拟 DOM (Virtual DOM Rewrite)
 随着虚拟 DOM 重写，减少 运行时（runtime）开销。重写将包括更有效的 代码来创建虚拟节点。
 ```
-### Vue3.0双向绑定的实现原理
+### Vue3.0双向绑定的实现原理？？？？？？？？？？？
 
 ### Vue3.0响应式数据原理
 Vue3.x改用Proxy替代Object.defineProperty。因为Proxy可以直接监听对象和数组的变化，并且有多达13种拦截方法。并且作为新标准将受到浏览器厂商重点持续的性能优化。
@@ -14287,8 +14300,8 @@ Proxy只会代理对象的第一层。
 Vue3.x借鉴了 ivi算法和 inferno算法
 在创建VNode时就确定其类型，以及在mount/patch的过程中采用位运算来判断一个VNode的类型，在这个基础之上再配合核心的Diff算法
 该算法中还运用了动态规划的思想求解最长递归子序列。
-### Vue3.0的computed的实现原理
-### Vue3.0的Watch的运行原理
+### Vue3.0的computed的实现原理？？？？？？？？
+### Vue3.0的Watch的运行原理？？？？？？？？
 
 ### Vue项目中实现路由按需加载（路由懒加载）的3中方式
 - vue异步组件
@@ -14983,6 +14996,7 @@ actions:{
 **assets 中的文件在运行 npm run build 的时候会打包**，简单来说就是会被压缩体积，代码格式化之类的。打包之后也会放到 static 中。static 中的文件则不会被打包。
 
 ## Webpack Vite Rollup
+### 6.Webpack讲了 基本概念和理解,HMR ,source-map ,oneof ,externals ,babel ,dll,多线程打包,摇树,懒加载,预加载,pwa
 ### package.json说说你知道的配置，browserlist作用是什么？？？？？？
 #### package.json
 从我们接触前端开始，每个项目的根目录下一般都会有一个package.json文件，这个文件定义了当前项目所需要的各种模块，以及项目的配置信息（比如名称、版本、许可证等）。
@@ -15262,6 +15276,7 @@ Webpack 的运行流程是一个串行的过程：
 - 完成模块编译：在经过第4步使用 Loader 翻译完所有模块后，得到了每个模块被翻译后的最终内容以及它们之间的依赖关系
 - 输出资源：根据入口和模块的依赖关系，组装成一个个包含多个模块的chunk，然后将chunk转换成一个单独的文件加入输出列表，这是可以修改输出内容的最后机会
 - 输出完成：在确定好输出内容后，根据配置确定输出的路径和文件名，把文件内容写入到文件系统
+### webpack 打包构建 AST 以后做了什么??????????
 ### webpack打包的生命周期?
 首先，我们需要读到入口文件里的内容（也就是index.js的内容）
 
@@ -16955,6 +16970,12 @@ console.log(str)
     - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108172654.png)
   - V8引擎优化：针对V8引擎特征可做的性能优化  
     - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211108172704.png)
+## 微前端
+### 微前端是什么, 有哪些特点和优势
+### 微前端实现的主要原理
+### 怎么解决样式隔离
+### 如何解决主应用和子应用的隔离, 用 node.js 实现沙箱机制的原理
+### 主应用修改了路由, 子应用如何感知到
 ## 手写相关函数
 ### 手写相关函数1
 #### 手写JSONP
