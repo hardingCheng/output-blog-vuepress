@@ -1,19 +1,14 @@
 {
-  "name": "output-blog",
+  "name": "output-blof-vuepress",
   "version": "1.0.0",
-  "description": "我的vuepress的Blog",
-  "main": "index.js",
+  "author": "reco_luan",
   "scripts": {
-    "docs:dev": "vuepress dev docs",
-    "docs:build": "vuepress build docs",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "vuepress dev . --open --host \"localhost\"",
+    "build": "vuepress build ."
   },
-  "keywords": [
-    "技术、分享、经验。"
-  ],
-  "author": "hardingcheng",
-  "license": "ISC",
   "devDependencies": {
-    "vuepress": "^1.8.2"
-  }
+    "vuepress": "1.8.2",
+    "vuepress-theme-reco": "1.6.10"
+  },
+  "description": "一个前端的学习小白"
 }
