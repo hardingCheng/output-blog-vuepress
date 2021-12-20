@@ -7,8 +7,21 @@
     "build": "vuepress build ."
   },
   "devDependencies": {
+    "@vuepress/plugin-active-header-links": "^1.8.2",
+    "@vuepress/plugin-last-updated": "^1.8.2",
+    "@vuepress/plugin-medium-zoom": "^1.8.2",
+    "@vuepress/plugin-pwa": "^1.8.2",
     "vuepress": "1.8.2",
+    "vuepress-plugin-copyright": "^1.0.2",
+    "vuepress-plugin-reading-progress": "^1.0.10",
+    "vuepress-plugin-ribbon": "^1.0.4",
+    "vuepress-plugin-ribbon-animation": "^1.1.3",
+    "vuepress-plugin-social-share": "^1.1.0",
+    "vuepress-sidebar-atuo": "^1.0.4",
     "vuepress-theme-reco": "1.6.10"
   },
-  "description": "一个前端的学习小白"
+  "description": "一个前端的学习小白",
+  "dependencies": {
+    "moment": "^2.29.1"
+  }
 }
