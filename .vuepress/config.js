@@ -1,4 +1,3 @@
-const { getChildren } = require("vuepress-sidebar-atuo")
 module.exports = {
   "title": "前端学习总结和技巧",
   "description": "一个前端的学习小白",
@@ -39,6 +38,13 @@ module.exports = {
         "content": "hardingcheng"
       }
     ],
+    [
+      "link",
+      {
+        "rel": "stylesheet",
+        "href": "/css/style.css"
+      }
+    ],
   ],
   "theme": "reco",
   "themeConfig": {
@@ -46,6 +52,9 @@ module.exports = {
     valineConfig: {
       appId: 'vLLJkggojtircPXLrCt8zpk4-gzGzoHsz',// your appId
       appKey: 'TY6a9YjO8dWVQjfHssgGOvBe', // your appKey
+      recordIP:true,
+      placeholder: '来都来了，留下点什么在走呗....',
+      visitor: true
     },
     "lastUpdated": "上次更新时间",
     "nav": [
@@ -91,32 +100,19 @@ module.exports = {
       }
     ],
     "sidebar": {
-      "/docs/theme-reco/": [
-        "",
-        "theme",
-        "plugin", 
-        "api"
-      ],
-      // '/views/': [
-      //   {
-      //       title: '基础知识',
-      //       collapsable: true,
-      //       children: getChildren('./docs/views/basis/')
-      //   },
-      //   {
-      //       title: '高级进阶',
-      //       collapsable: true,
-      //       children: getChildren('./docs/views/advanced/')
-      //   },
-      //    '/jottings/':[
-      //   {
-      //       title: '随笔',
-      //       collapsable: true,
-      //       children: getChildren('./docs/jottings/')
-      //   }
-      // ]
+      '/blogs/Interview/HandwrittenCode/': [
+        {
+          title:'手写代码',
+          collapsable: true,
+          children:[
+          '/blogs/Interview/HandwrittenCode',
+          ]
+        },
+      ]
     },
-    "sidebarDepth": 2,
+    "subSidebar": 'auto',
+    "sidebar":"auto",
+    "sidebarDepth": 3,
     "type": "blog",
     "blogConfig": {
       "category": {
@@ -156,7 +152,10 @@ module.exports = {
     "startYear": '2020-2021'
   },
   "markdown": {
-    "lineNumbers": true
+    "lineNumbers": true,
+    "toc": {
+      includeLevel:[1, 2, 3, 4]
+    }
   },
   "plugins": {
     'reading-progress': {
@@ -229,6 +228,7 @@ module.exports = {
         },
         ribbonShow: false, //  点击彩带  true显示  false为不显示
         ribbonAnimationShow: true  // 滑动彩带
-      }
+      },
+      "vuepress-plugin-code-copy": true,
   }
 }
