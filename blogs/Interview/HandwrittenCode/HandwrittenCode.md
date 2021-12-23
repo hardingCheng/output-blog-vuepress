@@ -164,7 +164,7 @@ function sumString(a, b) {
 }
 ```
 
-### 大数相加并进行千分位展示 xxx,xxx,xxx,xxx
+### 大数相加并进行千分位展示
 
 ```js
 // 核心都是通过数组的reduce,一个通过字符串
@@ -349,6 +349,25 @@ function shuffle(arr) {
 
 let arr = [1, 2, 3, 4, 5, 6];
 console.log(shuffle(arr));
+
+
+
+// 我们可以用生成器来做，每次抽取其中一张牌，把抽出的牌通过yield方法进行抽出去，做成一个可迭代对象，最后通过...展开操作符进行展开。
+const cards = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+function * draw(cards){
+    const c = [...cards];
+
+  for(let i = c.length; i > 0; i--) {
+    const pIdx = Math.floor(Math.random() * i);
+    [c[pIdx], c[i - 1]] = [c[i - 1], c[pIdx]];
+    yield c[i - 1];
+  }
+}
+
+const result = draw(cards);
+console.log([...result]);
+
 ```
 
 ### 手写斐波那契数列
@@ -838,6 +857,77 @@ function partial(fn, ...args) {
     return fn(...args, ...arg);
   };
 }
+```
+### 手写 bind、call、apply 函数
+首先`apply`,`call`,`bind`都是强制绑定`this`,而`apply`和`call`都是立即执行，只有`bind`是返回一个函数，所以可以将`apply`和`call`放在一起分析。
+
+1. `apply`,`call`,`bind`都是可以改变`this`的指向
+2. `apply`,`call`会执行调用的函数，`bind`返回一个新函数。
+3. `apply`第二个参数要求是数组，`call`，`bind`则没有限制数据类型，它会把剩余的参数一起传给函数，`bind`还会把新函数调用时传入的参数一起合并，传给新函数。
+4. 他们都是绑定在`Function`的`prototype`上。
+
+```js
+// call
+Function.prototype._call = function(context, ...args) {
+  // 判断是否是个函数
+  if (typeof this !== "function") {
+    throw new Error("not function");
+  }
+  // 不传默认是全局，window
+  var context = context || window;
+  // args不传时默认是空数组，防止下面用spread操作符时报错
+  var args = args ? args : [];
+  // 把this存到context.fn，这里的this是调用的函数
+  context.fn = this;
+  // 执行调用的函数，this指向context，参数用spread操作符扩展
+  const res = context.fn(...args);
+  // 删除，不污染context
+  delete context.fn;
+  // 返回res
+  return res;
+};
+```
+```js
+// bind
+Function.prototype._bind = function(context, ...args) {
+  // 判断是否是个函数
+  if (typeof this !== "function") {
+    throw new Error("not function");
+  }
+  // 不传默认是全局，window
+  var context = context || window;
+  // 把this存到fn，这里的this是调用的函数
+  let fn = this;
+  return function newFn(...fnArgs) {
+    let res;
+    // 要考虑新函数是不是会当作构造函数
+    if (this instanceof newFn) {
+      // 如果是构造函数则调用new 并且合并参数args，fnArgs
+      res = new fn(...args, ...fnArgs);
+    } else {
+      // 当作普通函数调用 也可以用上面定义的_call
+      res = fn.call(context, ...args, ...fnArgs);
+    }
+    return res;
+  };
+};
+```
+```js
+// apply
+Function.prototype._apply = function(context, args) {
+  // 不传默认是全局，window
+  var context = context || window;
+  // args不传时默认是空数组，防止下面用spread操作符时报错
+  var args = args ? args : [];
+  // 把this存到context.fn，这里的this是调用的函数
+  context.fn = this;
+  // 执行调用的函数，this指向context，参数用spread操作符扩展
+  const res = context.fn(...args);
+  // 删除，不污染context
+  delete context.fn;
+  // 返回res
+  return res;
+};
 ```
 ## 手写代码部分 2
 ### 手写 reduce 实现 map
@@ -1894,6 +1984,55 @@ const isValid = function(s) {
 };
 ```
 ## 手写代码部分4
+### 手写jQuery
+```js
+class jQuery {
+  constructor(selector) {
+    const result = document.querySelectorAll(selector);
+    const length = result.length;
+    for (let i = 0; i < length; i++) {
+      this[i] = result[i];
+    }
+    this.length = length;
+    this.selector = selector;
+  }
+  get(index) {
+    return this[index];
+  }
+  each(fn) {
+    for (let i = 0; i < this.length; i++) {
+      const elem = this[i];
+      fn(elem);
+    }
+  }
+  on(type, fn) {
+    return this.each((elem) => {
+      elem.addEventListener(type, fn, false);
+    });
+  }
+  // 扩展很多 DOM API
+}
+
+// 插件
+jQuery.prototype.dialog = function(info) {
+  alert(info);
+};
+
+// “造轮子”
+class myJQuery extends jQuery {
+  constructor(selector) {
+    super(selector);
+  }
+  // 扩展自己的方法
+  addClass(className) {}
+  style(data) {}
+}
+
+// const $p = new jQuery('p')
+// $p.get(1)
+// $p.each((elem) => console.log(elem.nodeName))
+// $p.on('click', () => alert('clicked'))
+```
 ### 手写将虚拟Dom转化为真实Dom（类似的递归题-必考）
 ```js
 // 真正的渲染函数
@@ -1958,7 +2097,7 @@ class EventEmitter {
   }
 }
 ```
-### event 模块(EventEmitter)
+### 事件总线EventEmitter（发布订阅模式）
 ```js
 function EventEmitter() {
   this.events = new Map();
