@@ -478,6 +478,92 @@ module.exports = {
         ]
       }
 ```
+### 自定义Loader
+#### 创建自己的Loader
+- Loader是用于对模块的源代码进行转换（处理），之前我们已经使用过很多Loader，比如css-loader、style-loader、babel-loader等。
+- 如何自定义自己的Loader：
+    - Loader本质上是一个导出为函数的JavaScript模块；
+    - loader-runner库会调用这个函数，然后将上一个loader产生的结果或者资源文件传入进去；
+- 编写一个hy-loader.js模块这个函数会接收三个参数
+    - content：资源文件的内容；
+    - map：sourcemap相关的数据；
+    - meta：一些元数据；
+- loader必须返回  buffer或者string
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211223190909.png)
+#### 在加载某个模块时，引入loader
+传入的路径和context是有关系的。就是webpack中的content的路径配置
+`content:path.resolve(__dirname,'.')`
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211223194959.png)
+#### resolveLoader属性
+- 但是，如果我们依然希望可以直接去加载自己的loader文件夹，有没有更加简洁的办法呢？
+    - 配置resolveLoader属性；
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211223195038.png)
+#### loader的执行顺序
+- 创建多个Loader使用，它的执行顺序是什么呢？
+    - 从后向前、从右向左的
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211223200528.png)
+#### pitch-loader和enforce
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211223201852.png)
+
+平常的Loader是NomalLoader。
+事实上还有另一种Loader，称之为PitchLoader：
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211223200931.png)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211223201057.png)
+
+#### 执行顺序和enforce
+- 其实这也是为什么loader的执行顺序是相反的：
+    - run-loader先优先执行PitchLoader，在执行PitchLoader时进行loaderIndex++；
+    - run-loader之后会执行NormalLoader，在执行NormalLoader时进行loaderIndex--；
+- 能不能改变它们的执行顺序呢？
+    - 我们可以拆分成多个Rule对象，通过enforce来改变它们的顺序；
+- enforce一共有四种方式：
+    - 默认所有的loader都是normal；
+    - 在行内设置的loader是inline（在前面将css加载时讲过，import 'loader1!loader2!./test.js'）；
+    - 也可以通过enforce设置 pre 和 post；
+- 在Pitching和Normal它们的执行顺序分别是：
+    - Pitching：post, inline, normal, pre；
+    - Normal：pre, normal, inline, post；
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211223202139.png)
+#### 同步的Loader
+- 什么是同步的Loader呢？
+    - **函数结束的时候必须给返回东西**
+    - 默认创建的Loader就是同步的Loader；
+    - 这个Loader必须通过 return 或者 this.callback 来返回结果，交给下一个loader来处理；
+    - 通常在有错误的情况下，我们会使用 this.callback；
+- this.callback的用法如下：
+    - 第一个参数必须是 Error 或者 null；
+    - 第二个参数是一个 string或者Buffer；
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211223202620.png)
+#### 异步的Loader
+- 什么是异步的Loader呢？
+    - 有时候我们使用Loader时会进行一些异步的操作；
+    - 我们希望在异步操作完成后，再返回这个loader处理的结果；
+    - 这个时候我们就要使用异步的Loader了；
+    -  loader-runner已经在执行loader时给我们提供了方法，让loader变成一个异步的loader：
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211223202806.png)
+#### 传入和获取参数
+- 在使用loader时，传入参数。
+- 们可以通过一个webpack官方提供的一个解析库 loader-utils，安装对应的库。
+    - `npm install loader-utils -D`
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211223203102.png)
+#### 校验参数
+- 我们可以通过一个webpack官方提供的校验库 schema-utils，安装对应的库：
+    - `npm install schema-utils -D`
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211223203246.png)
+#### mybabel-loader案例分析
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211223203521.png)
+
+#### md-loader案例分析
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211223204206.png)
+
+
 ### asset  module  type
 - 当前使用的webpack版本是webpack5
     - 在webpack5之前，加载这些资源我们需要使用一些loader，比如raw-loader 、url-loader、file-loader；
