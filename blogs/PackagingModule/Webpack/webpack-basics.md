@@ -563,32 +563,6 @@ module.exports = {
 #### md-loader案例分析
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211223204206.png)
 
-
-### asset  module  type
-- 当前使用的webpack版本是webpack5
-    - 在webpack5之前，加载这些资源我们需要使用一些loader，比如raw-loader 、url-loader、file-loader；
-    - 在webpack5之后，我们可以直接使用资源模块类型（asset module type），来替代上面的这些loader；
-- 资源模块类型(asset module type)，通过添加 4 种新的模块类型，来替换所有这些 loader：
-    -  asset/resource 发送一个单独的文件并导出 URL。之前通过使用 file-loader 实现；
-    -  asset/inline 导出一个资源的 data URI。之前通过使用 url-loader 实现；
-    -  asset/source 导出资源的源代码。之前通过使用 raw-loader 实现；
-    -  asset 在导出一个 data URI 和发送一个单独的文件之间自动选择。之前通过使用 url-loader，并且配置资源 体积限制实现；
-```js
-// webpack.config.js
-
-{
-    test: /\.(png|jpe?g|gif|svg)$/,
-    type:'asset/resource'
-}
-```
-- 可以自定义文件的输出路径和文件名
-    - 方式一：修改output，添加assetModuleFilename属性
-    - 方式二：在Rule中，添加一个generator属性，并且设置filename
-![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211008204218.png)
-- url-loader的limit效果
-    - 步骤一：将type修改为asset；
-    - 步骤二：添加一个parser属性，并且制定dataUrl的条件，添加maxSize属性；
-![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211008211107.png)
 ### Plugin
 - Webpack的另一个核心是Plugin
     - Loader是用于特定的模块类型进行转换；
@@ -671,6 +645,218 @@ module.exports = {
 - 首先，我们需要安装mini-css-extract-plugin：`npm install mini-css-extract-plugin -D`
     - 配置rules和plugins：
         - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211104181915.png)
+### 自定义Plugin
+#### Webpack和Tapable
+- webpack有两个非常重要的类：Compiler和Compilation
+    - 他们通过注入插件的方式，来监听webpack的所有生命周期；
+    - 插件的注入离不开各种各样的Hook，而他们的Hook是如何得到的呢？
+    - 其实是创建了Tapable库中的各种Hook的实例；
+- 所以，如果我们想要学习自定义插件，最好先了解一个库：Tapable
+    - Tapable是官方编写和维护的一个库；
+    - Tapable是管理着需要的Hook，这些Hook可以被应用到我们的插件中；
+#### Tapable有哪些Hook呢？
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211224201902.png)
+
+#### Tapable的Hook分类
+- 同步和异步的：
+    - 以sync开头的，是同步的Hook；
+    - 以async开头的，两个事件处理回调，不会等待上一次处理回调结束后再执行下一次回调；
+- 其他的类别
+    - bail：当有返回值时，就不会执行后续的事件触发了；
+    - Loop：当返回值为true，就会反复执行该事件，当返回值为undefined或者不返回内容，就退出事件；
+    - Waterfall：当返回值不为undefined时，会将这次返回的结果作为下次事件的第一个参数；
+    - Parallel：并行，会同时执行次事件处理回调结束，才执行下一次事件处理回调；
+    - Series：串行，会等待上一是异步的Hook；
+```js
+const { SyncHook, SyncBailHook, SyncLoopHook, SyncWaterfallHook } = require("tapable");
+const { AsyncSeriesHook, AsyncParallelHook } = require('tapable');
+
+let counter = 0;
+
+class LearnTapable {
+  constructor() {
+    this.hooks = {
+      // syncHook: new SyncHook(["name", "age"])
+      // bail: 在某一个事件监听的函数中, 如果有返回值, 那么后续的监听的事件就不会执行了
+      // syncHook: new SyncBailHook(["name", "age"])
+      // loop:在某个时间监听的函数中, 如果返回值为true, 那么这个回调函数就会循环执行.(返回undefined, 就停止执行)
+      // syncHook: new SyncLoopHook(["name", "age"])
+      // waterfall: 在某个时间监听的函数中, 如果有返回值, 那么它的返回值会作为下一次事件监听函数的第一个参数
+      syncHook: new SyncWaterfallHook(["name", "age"]),
+
+      // series: 在一个hook中, 监听了多次事件(多个回调函数), 这两个回调函数是串行执行
+      asyncHook: new AsyncSeriesHook(["name", "age"])
+
+      // parallel: 在一个hook中, 监听了多次事件(多个回调函数), 这两个回调函数是并行执行
+      // asyncHook: new AsyncParallelHook(["name", "age"])
+    }
+
+    // this.hooks.syncHook.tap("event1", (name, age) => {
+    //   console.log("event1", name, age);
+    //   return "event1";
+    // });
+
+    // this.hooks.syncHook.tap("event2", (name, age) => {
+    //   console.log("event2", name, age);
+    // });
+
+    // this.hooks.asyncHook.tapAsync("event1", (name, age, callback) => {
+    //   setTimeout(() => {
+    //     console.log("event1", name, age);
+    //     callback();
+    //   }, 2000);
+    // });
+
+    // this.hooks.asyncHook.tapAsync("event2", (name, age, callback) => {
+    //   setTimeout(() => {
+    //     console.log("event2", name, age);
+    //     callback();
+    //   }, 2000);
+    // });
+
+    this.hooks.asyncHook.tapPromise("event1", (name, age) => {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          console.log("event1", name, age);
+          resolve();
+        }, 2000);
+      })
+    });
+
+    this.hooks.asyncHook.tapPromise("event2", (name, age) => {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          console.log("event2", name, age);
+          resolve();
+        }, 2000);
+      })
+    });
+  }
+
+  emit() {
+    // this.hooks.syncHook.call("why", 18);
+
+    // this.hooks.asyncHook.callAsync("kobe", 30, () => {
+    //   console.log("第一次事件执行完成");
+    // });
+
+    this.hooks.asyncHook.promise("james", 33).then(() => {
+      console.log("事件监听完成");
+    });
+  }
+}
+
+const lt = new LearnTapable();
+lt.emit();
+```
+### Hook的使用过程
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211224204845.png)
+#### 自定义Plugin
+- 在之前的学习中，我们已经使用了非常多的Plugin：
+    - CleanWebpackPlugin
+    - HTMLWebpackPlugin
+    - MiniCSSExtractPlugin
+    - CompressionPlugin
+    - ....
+- 这些Plugin是如何被注册到webpack的生命周期中的呢？
+    - 第一：在webpack函数的createCompiler方法中，注册了所有的插件；
+    - 第二：在注册插件时，会调用插件函数或者插件对象的apply方法；
+    - 第三：插件方法会接收compiler对象，我们可以通过compiler对象来注册Hook的事件；
+    - 第四：某些插件也会传入一个compilation的对象，我们也可以监听compilation的Hook事件；
+#### 开发自己的插件
+- 如何开发自己的插件呢？
+    - 目前大部分插件都可以在社区中找到，但是推荐尽量使用在维护，并且经过社区验证的；
+    - 这里我们开发一个自己的简单插件：将静态文件自动上传服务器中；
+- 自定义插件的过程：
+    - 创建AutoUploadWebpackPlugin类；
+    - 编写apply方法：
+        - 通过ssh连接服务器；
+        - 删除服务器原来的文件夹；
+        - 上传文件夹中的内容；
+    - 在webpack的plugins中，使用AutoUploadWebpackPlugin类；
+
+```js
+const { NodeSSH } = require("node-ssh");
+
+class AutoUploadPlugin {
+  constructor(options) {
+    // nodessh
+    this.ssh = new NodeSSH();
+    // 其他的参数
+    this.options = options;
+  }
+
+  apply(compiler) {
+    // 监听某个hook下的某个钩子事件（声明周期）
+    compiler.hooks.afterEmit.tapAsync(
+      "AutoUploadPlugin",
+      async (compilation, callback) => {
+        // 1.获取输出的文件夹
+        const outputPath = compilation.outputOptions.path;
+        // 2.连接服务器(ssh连接)
+        await this.connectServer();
+
+        // 3.删除原来目录中的内容
+        const serverDir = this.options.remotePath;
+        await this.ssh.execCommand(`rm -rf ${serverDir}/*`);
+
+        // 4.上传文件到服务器(ssh连接)
+        await this.uploadFiles(outputPath, serverDir);
+
+        // 5.关闭ssh
+        this.ssh.dispose();
+
+        callback();
+      }
+    );
+  }
+  // 连接ssh
+  async connectServer() {
+    await this.ssh.connect({
+      host: this.options.host,
+      username: this.options.username,
+      password: this.options.password,
+    });
+
+    console.log("连接成功~");
+  }
+  // 上传文件夹
+  async uploadFiles(localPath, remotePath) {
+    const status = await this.ssh.putDirectory(localPath, remotePath, {
+      recursive: true,
+      concurrency: 10,
+    });
+    console.log("传送到服务器: ", status ? "成功" : "失败");
+  }
+}
+
+module.exports = AutoUploadPlugin;
+```
+### asset  module  type
+- 当前使用的webpack版本是webpack5
+    - 在webpack5之前，加载这些资源我们需要使用一些loader，比如raw-loader 、url-loader、file-loader；
+    - 在webpack5之后，我们可以直接使用资源模块类型（asset module type），来替代上面的这些loader；
+- 资源模块类型(asset module type)，通过添加 4 种新的模块类型，来替换所有这些 loader：
+    -  asset/resource 发送一个单独的文件并导出 URL。之前通过使用 file-loader 实现；
+    -  asset/inline 导出一个资源的 data URI。之前通过使用 url-loader 实现；
+    -  asset/source 导出资源的源代码。之前通过使用 raw-loader 实现；
+    -  asset 在导出一个 data URI 和发送一个单独的文件之间自动选择。之前通过使用 url-loader，并且配置资源 体积限制实现；
+```js
+// webpack.config.js
+
+{
+    test: /\.(png|jpe?g|gif|svg)$/,
+    type:'asset/resource'
+}
+```
+- 可以自定义文件的输出路径和文件名
+    - 方式一：修改output，添加assetModuleFilename属性
+    - 方式二：在Rule中，添加一个generator属性，并且设置filename
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211008204218.png)
+- url-loader的limit效果
+    - 步骤一：将type修改为asset；
+    - 步骤二：添加一个parser属性，并且制定dataUrl的条件，添加maxSize属性；
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211008211107.png)
 ### 浏览器兼容性
 **开发中，浏览器的兼容性问题**，我们应该如何去解决和处理？
 这里指的兼容性是**针对不同的浏览器支持的特性**：比如css特性、js语法，之间的兼容性；

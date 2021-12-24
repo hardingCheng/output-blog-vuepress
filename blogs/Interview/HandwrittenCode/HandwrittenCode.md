@@ -736,19 +736,6 @@ function getTenNum(testArray, n) {
 const testArray = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 const resArr = getTenNum(testArray, 14);
 ```
-### 手写new
-```js
-function myNew(Func, ...args) {
-  // 创建一个空的对象
-  let obj = {};
-  // 隐式原型链接到该函数的原型，obj 可以访问到构造函数原型中的属性
-  obj.__proto__ = Func.prototype;
-  // 绑定 this 实现继承，obj 可以访问到构造函数中的属性
-  const ret = Func.call(obj, ...args);
-  // 优先返回构造函数返回的对象
-  return ret instanceof Object ? ret : obj;
-}
-```
 ### 手写简单的闭包
 ```js
 function a() {
@@ -929,6 +916,118 @@ Function.prototype._apply = function(context, args) {
   return res;
 };
 ```
+### 手写jQuery
+```js
+class jQuery {
+  constructor(selector) {
+    const result = document.querySelectorAll(selector);
+    const length = result.length;
+    for (let i = 0; i < length; i++) {
+      this[i] = result[i];
+    }
+    this.length = length;
+    this.selector = selector;
+  }
+  get(index) {
+    return this[index];
+  }
+  each(fn) {
+    for (let i = 0; i < this.length; i++) {
+      const elem = this[i];
+      fn(elem);
+    }
+  }
+  on(type, fn) {
+    return this.each((elem) => {
+      elem.addEventListener(type, fn, false);
+    });
+  }
+  // 扩展很多 DOM API
+}
+
+// 插件
+jQuery.prototype.dialog = function(info) {
+  alert(info);
+};
+
+// “造轮子”
+class myJQuery extends jQuery {
+  constructor(selector) {
+    super(selector);
+  }
+  // 扩展自己的方法
+  addClass(className) {}
+  style(data) {}
+}
+
+// const $p = new jQuery('p')
+// $p.get(1)
+// $p.each((elem) => console.log(elem.nodeName))
+// $p.on('click', () => alert('clicked'))
+```
+### 手写Ajax
+1. 创建`XMLHttpRequest`对象;
+2. 调用`open`方法传入三个参数 请求方式`(GET/POST)、url、同步异步(true/false)`;
+3. 监听`onreadystatechange`事件，当`readystate`等于 4 时返回`responseText`;
+4. 调用 send 方法传递参数。
+
+```js
+// 声明配置项参数
+var opt = {
+  url: "",
+  type: "get",
+  data: {},
+  success: function () {},
+  error: function () {},
+};
+
+function ajax(opt) {
+  // 声明XMLHttpRequest对象 并且做兼容处理
+  var xhr = XMLHttpRequest
+    ? new XMLHttpRequest()
+    : new ActiveXObject("Microsoft.XMLHTTP");
+  var data = opt.data,
+    url = opt.url,
+    type = opt.type.toUpperCase(),
+    dataArr = [];
+  // 拼接参数
+  for (var k in data) {
+    dataArr.push(k + "=" + data[k]);
+  }
+  // get处理方法
+  if (type === "GET") {
+    // 请求地址上直接拼接相关参数
+    url = url + "?" + dataArr.join("&");
+    xhr.open(type, true);
+    xhr.send();
+  }
+  // post处理方法
+  if (type === "POST") {
+    xhr.open(type, url, true);
+    // 需要设置请求头
+    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    // 发送请求并且附带参数
+    xhr.send(dataArr.join("&"));
+  }
+  // 只判断响应时间就可以了
+  xhr.onreadystatechange = function () {
+    if ((xhr.status >= 200 && xhr.status < 300) || xhr.status === 304) {
+      var res;
+      if (opt.success && opt.success instanceof Function) {
+        res = xhr.responseText;
+        if (typeof res === "string") {
+          res = JSON.parse(res);
+          opt.success.call(xhr, res);
+        }
+      }
+    } else {
+      if (opt.error && opt.error instanceof Function) {
+        opt.error.call(xhr, res);
+      }
+    }
+  };
+}
+```
 ## 手写代码部分 2
 ### 手写 reduce 实现 map
 ```js
@@ -970,6 +1069,58 @@ let arr = [1, 2, 3, 4, 5];
 console.log(arr.reduce((prev, cur) => Math.max(prev, cur))); // 5
 console.log(arr.reduce((prev, cur) => Math.min(prev, cur))); // 1
 ```
+### 手写 forEach
+```js
+Array.prototype.myForEach = function (callback, context) {
+  if (this == null) {
+    throw new TypeError("this is null or not defined");
+  }
+  if (typeof callback !== "function") {
+    throw new TypeError(callback + " is not a function");
+  }
+  let arr = Array.prototype.slice.call(this);
+  let len = arr.length;
+  for (var i = 0; i < len; i++) {
+    callback.call(context, arr[i], i, this);
+  }
+};
+```
+### 手写 map 函数
+```js
+// 遍历数组的每一项，并执行回调函数的操作，返回一个对每一项进行操作后的新数组，
+Array.prototype.map = function(callback) {
+  const result = [];
+  for (let i = 0; i < this.length; i++) {
+    if (!this.hasOwnProperty(i)) continue; // 处理稀疏数组的情况
+    // 运行传递过来的函数  是一个匿名函数
+    result.push(callback(this[i], i, this));
+  }
+  return result;
+};
+const arr = [1, 2, 3, , 5];
+const result = arr.map((item) => item * 2);
+console.log(result);
+
+//es5实现map函数
+const selfMap = function(callback, context) {
+  //当前带有length的对象转化为数组
+  let arr = Array.prototype.slice.call(this);
+  let mappedArr = [];
+  for (let i = 0; i < arr.length; i++) {
+    if (!arr.hasOwnProperty(i)) continue;
+    mappedArr.push(callback.call(context, arr[i], i, this));
+  }
+  return mappedArr;
+};
+// 值得一提的是，map 的第二个参数为第一个参数回调中的 this 指向，如果第一个参数为箭头函数，那设置第二个 this 会因为箭头函数的词法绑定而失效
+
+//使用reduce实现数组map方法
+const selfMap2 = function(callback, context) {
+  let arr = Array.prototype.slice.call(this);
+  return arr.reduce((pre, cur, index) => {
+    return [...pre, callback.call(context, cur, index, this)];
+  }, []);
+};
 ### 手写数组随机排序
 ```js
 // 利用数组自带的sort方法
@@ -1022,6 +1173,632 @@ function foo(arr) {
   return cloneArray;
 }
 console.log(foo(arr));
+```
+### 手写 filter 函数
+```js
+Array.prototype.filter = function(callback) {
+  if (this == undefined) {
+    throw new TypeError("this is null or not undefined");
+  }
+  if (typeof callback !== "function") {
+    throw new TypeError(callback + "is not a function");
+  }
+  const result = [];
+  for (let i = 0; i < this.length; i++) {
+    if (!this.hasOwnProperty(i)) continue; // 处理稀疏数组的情况
+    callback(this[i], i, this) && result.push(this[i]);
+  }
+  return result;
+};
+const arr = [1, 2, 3, , 5];
+const result = arr.filter((item) => item > 2);
+console.log(result);
+
+//es5实现
+const seltFilter = function(callback, context) {
+  let arr = Array.prototype.slice.call(this);
+  let filteredArr = [];
+  for (let i = 0; i < arr.length; i++) {
+    if (!this.hasOwnProperty(i)) continue; // 处理稀疏数组的情况
+    callback.call(context, arr[i], i, this) && filteredArr.push(arr[i]);
+  }
+};
+
+//使用reduce实现数组filter方法
+const selfFilter2 = function(callback, context) {
+  return this.reduce((pre, cur, index) => {
+    return callback.call(context, arr[i], i, this) ? [...pre, ...cur] : [...pre];
+  });
+};
+```
+### 手写reduce
+```js
+// 对数组累积执行回调函数，返回最终计算结果
+Array.prototype.reduce = function(callback, initValue) {
+  let result = initValue ? initValue : this[0];
+  for (let i = 0; i < this.length; i++) {
+    if (!this.hasOwnProperty(i)) continue; // 处理稀疏数组的情况
+    result = callback(result, this[i], i, this);
+  }
+  return result;
+};
+const arr = [1, , 2, 3, , 5];
+const result = arr.reduce((a, b) => a * b, 2);
+console.log(result);
+
+//es5
+const findRealELementIndex = function(arr, initiIndex) {
+  let index;
+  for (let i = initIndex || 0; i < arr.length; i++) {
+    if (!arr.hasOwnProperty(i)) continue;
+    index = i;
+    break;
+  }
+  return index;
+};
+const selfReduce = function(callback, initalValue) {
+  let arr = Array.prototype.slice.call(this);
+  let res;
+
+  if (initalValue === undefined) {
+    res = arr[findRealElementIndex(arr)];
+    for (let i = 0; i < arr.lenght - 1; i++) {
+      //reduce遍历时候 需要跳过稀疏元素，遍历到最后一个非稀疏元素
+      if (!arr.hasOwnProperty(i)) continue;
+      let realElementIndex = findRealElementIndex(arr, i + 1);
+      res = callback.call(null, res, arr[realElementIndex], realElementIndex, this);
+    }
+  } else {
+    res = initalValue;
+    for (let i = 0; i < arr.length; i++) {
+      if (!arr.hasOwnProperty(i)) continue;
+      res = callback.call(null, res, arr[i], i, this);
+    }
+  }
+  return res;
+};
+
+//另一种es5的方法
+Array.prototype.myReduce = function(callback, initialValue) {
+  var len = this.length,
+    nextValue,
+    i;
+  if (!initialValue) {
+    // 没有传第二个参数
+    nextValue = this[0];
+    i = 1;
+  } else {
+    // 传了第二个参数
+    nextValue = initialValue;
+    i = 0;
+  }
+  for (; i < len; i++) {
+    nextValue = callback(nextValue, this[i], i, this);
+  }
+  return nextValue;
+};
+```
+### 手写every函数
+
+```javascript
+Array.prototype.every = function(callback) {
+  let bool = true;
+  for (let i = 0; i < this.length; i++) {
+    if (!this.hasOwnProperty(i)) continue; // 处理稀疏数组的情况
+    if (!callback(this[i], i, this)) {
+      bool = false;
+      break;
+    }
+  }
+  return bool;
+};
+const arr = [1, 2, 3, , 5];
+const result = arr.every((item) => item > 3);
+console.log(result);
+```
+### 手写some函数
+```js
+Array.prototype.some = function (callback){
+    let bool = false;
+    for (let i=0;i<this.length;i++) {
+        if (!this.hasOwnProperty(i)) continue; // 处理稀疏数组的情况
+        if (callback(this[i],i,this)){
+            bool = true
+            break
+        }
+    }
+    return bool
+}
+const arr = [1,2,3,,5]
+const result = arr.some(item => item > 3)
+console.log(result)
+
+
+//es5
+const selfSome = function(callback,context){
+  let arr = Array.prototype.slice.call(this)
+  if(!arr.length) return false
+  let flag = false
+  for(let i = 0;i < arr.length;i++){
+    if(!arr.hasOwnProperty(i)) continue
+    let res = callback.call(context,arr[i],i,this)
+    if(res) {
+      flag = true
+      break
+    }
+  }
+  return flag
+}
+
+// 执行 some 方法的数组如果是一个空数组，最终始终会返回 false，而另一个数组的 every 方法中的数组如果是一个空数组，会始终返回 true
+```
+### 手写find方法
+```js
+// 只查找第一个
+Array.prototype.find = function(fn) {
+  let result;
+  for (let i = 0; i < this.length; i++) {
+    if (!this.hasOwnProperty(i)) continue; // 处理稀疏数组的情况
+    if (fn(this[i], i, this)) {
+      result = this[i];
+      break;
+    }
+  }
+  return result;
+};
+const arr = [1, 2, 3, , 5, 4];
+const result = arr.find((item) => item > 3);
+console.log(result);
+```
+### 手写数组去重
+- 利用 ES6 Set 去重（ES6 中最常用）
+- 利用 for 嵌套 for，然后 splice 去重（ES5 中最常用）
+- 利用 indexOf 去重
+- 利用 sort()
+- 利用对象的属性不能相同的特点进行去重（这种数组去重的方法有问题，不建议用，有待改进）
+- 利用 includes
+- 利用 hasOwnProperty
+- 利用 filter
+- 利用递归去重
+- 利用 Map 数据结构去重
+- 利用 reduce+includes
+- [...new Set(arr)]
+
+```js
+// 利用ES6 Set去重（ES6中最常用）
+function unique(arr) {
+  return Array.from(new Set(arr));
+}
+var arr = [
+  1,
+  1,
+  "true",
+  "true",
+  true,
+  true,
+  15,
+  15,
+  false,
+  false,
+  undefined,
+  undefined,
+  null,
+  null,
+  NaN,
+  NaN,
+  "NaN",
+  0,
+  0,
+  "a",
+  "a",
+  {},
+  {},
+];
+console.log(unique(arr));
+//[1, "true", true, 15, false, undefined, null, NaN, "NaN", 0, "a", {}, {}]
+```
+```js
+// 利用for嵌套for，然后splice去重（ES5中最常用）
+// 双层循环，外层循环元素，内层循环时比较值。值相同时，则删去这个值。
+function unique(arr) {
+  for (var i = 0; i < arr.length; i++) {
+    for (var j = i + 1; j < arr.length; j++) {
+      if (arr[i] == arr[j]) {
+        //第一个等同于第二个，splice方法删除第二个
+        arr.splice(j, 1);
+        j--;
+      }
+    }
+  }
+  return arr;
+}
+var arr = [
+  1,
+  1,
+  "true",
+  "true",
+  true,
+  true,
+  15,
+  15,
+  false,
+  false,
+  undefined,
+  undefined,
+  null,
+  null,
+  NaN,
+  NaN,
+  "NaN",
+  0,
+  0,
+  "a",
+  "a",
+  {},
+  {},
+];
+console.log(unique(arr));
+//[1, "true", 15, false, undefined, NaN, NaN, "NaN", "a", {…}, {…}]     //NaN和{}没有去重，两个null直接消失了
+```
+```js
+// 利用indexOf去重
+// 新建一个空的结果数组，for 循环原数组，判断结果数组是否存在当前元素，如果有相同的值则跳过，不相同则push进数组。
+function unique(arr) {
+  if (!Array.isArray(arr)) {
+    console.log("type error!");
+    return;
+  }
+  var array = [];
+  for (var i = 0; i < arr.length; i++) {
+    if (array.indexOf(arr[i]) === -1) {
+      array.push(arr[i]);
+    }
+  }
+  return array;
+}
+var arr = [
+  1,
+  1,
+  "true",
+  "true",
+  true,
+  true,
+  15,
+  15,
+  false,
+  false,
+  undefined,
+  undefined,
+  null,
+  null,
+  NaN,
+  NaN,
+  "NaN",
+  0,
+  0,
+  "a",
+  "a",
+  {},
+  {},
+];
+console.log(unique(arr));
+// [1, "true", true, 15, false, undefined, null, NaN, NaN, "NaN", 0, "a", {…}, {…}]  //NaN、{}没有去重
+```
+```js
+// 利用sort()
+// 利用sort()排序方法，然后根据排序后的结果进行遍历及相邻元素比对。
+function unique(arr) {
+  if (!Array.isArray(arr)) {
+    console.log("type error!");
+    return;
+  }
+  arr = arr.sort();
+  var arrry = [arr[0]];
+  for (var i = 1; i < arr.length; i++) {
+    if (arr[i] !== arr[i - 1]) {
+      arrry.push(arr[i]);
+    }
+  }
+  return arrry;
+}
+var arr = [
+  1,
+  1,
+  "true",
+  "true",
+  true,
+  true,
+  15,
+  15,
+  false,
+  false,
+  undefined,
+  undefined,
+  null,
+  null,
+  NaN,
+  NaN,
+  "NaN",
+  0,
+  0,
+  "a",
+  "a",
+  {},
+  {},
+];
+console.log(unique(arr));
+// [0, 1, 15, "NaN", NaN, NaN, {…}, {…}, "a", false, null, true, "true", undefined]      //NaN、{}没有去重
+```
+```js
+// 利用includes
+function unique(arr) {
+  if (!Array.isArray(arr)) {
+    console.log("type error!");
+    return;
+  }
+  var array = [];
+  for (var i = 0; i < arr.length; i++) {
+    if (!array.includes(arr[i])) {
+      //includes 检测数组是否有某个值
+      array.push(arr[i]);
+    }
+  }
+  return array;
+}
+var arr = [
+  1,
+  1,
+  "true",
+  "true",
+  true,
+  true,
+  15,
+  15,
+  false,
+  false,
+  undefined,
+  undefined,
+  null,
+  null,
+  NaN,
+  NaN,
+  "NaN",
+  0,
+  0,
+  "a",
+  "a",
+  {},
+  {},
+];
+console.log(unique(arr));
+//[1, "true", true, 15, false, undefined, null, NaN, "NaN", 0, "a", {…}, {…}]     //{}没有去重
+```
+```js
+// 利用hasOwnProperty
+// 利用hasOwnProperty 判断是否存在对象属性
+function unique(arr) {
+  var obj = {};
+  return arr.filter(function (item, index, arr) {
+    return obj.hasOwnProperty(typeof item + item)
+      ? false
+      : (obj[typeof item + item] = true);
+  });
+}
+var arr = [
+  1,
+  1,
+  "true",
+  "true",
+  true,
+  true,
+  15,
+  15,
+  false,
+  false,
+  undefined,
+  undefined,
+  null,
+  null,
+  NaN,
+  NaN,
+  "NaN",
+  0,
+  0,
+  "a",
+  "a",
+  {},
+  {},
+];
+console.log(unique(arr));
+```
+```js
+// 利用filter
+function unique(arr) {
+  return arr.filter(function(item, index, arr) {
+    //当前元素，在原始数组中的第一个索引==当前索引值，否则返回当前元素
+    return arr.indexOf(item, 0) === index;
+  });
+}
+var arr = [
+  1,
+  1,
+  "true",
+  "true",
+  true,
+  true,
+  15,
+  15,
+  false,
+  false,
+  undefined,
+  undefined,
+  null,
+  null,
+  NaN,
+  NaN,
+  "NaN",
+  0,
+  0,
+  "a",
+  "a",
+  {},
+  {},
+];
+console.log(unique(arr));
+//[1, "true", true, 15, false, undefined, null, "NaN", 0, "a", {…}, {…}]
+```
+```js
+// 利用递归去重
+function unique(arr) {
+  var array = arr;
+  var len = array.length;
+
+  array.sort(function(a, b) {
+    //排序后更加方便去重
+    return a - b;
+  });
+
+  function loop(index) {
+    if (index >= 1) {
+      if (array[index] === array[index - 1]) {
+        array.splice(index, 1);
+      }
+      loop(index - 1); //递归loop，然后数组去重
+    }
+  }
+  loop(len - 1);
+  return array;
+}
+var arr = [
+  1,
+  1,
+  "true",
+  "true",
+  true,
+  true,
+  15,
+  15,
+  false,
+  false,
+  undefined,
+  undefined,
+  null,
+  null,
+  NaN,
+  NaN,
+  "NaN",
+  0,
+  0,
+  "a",
+  "a",
+  {},
+  {},
+];
+console.log(unique(arr));
+//[1, "a", "true", true, 15, false, 1, {…}, null, NaN, NaN, "NaN", 0, "a", {…}, undefined]
+```
+```js
+// 利用Map数据结构去重
+// 创建一个空Map数据结构，遍历需要去重的数组，把数组的每一个元素作为key存到Map中。由于Map中不会出现相同的key值，所以最终得到的就是去重后的结果。
+function arrayNonRepeatfy(arr) {
+  let map = new Map();
+  let array = new Array(); // 数组用于返回结果
+  for (let i = 0; i < arr.length; i++) {
+    if (map.has(arr[i])) {
+      // 如果有该key值
+      map.set(arr[i], true);
+    } else {
+      map.set(arr[i], false); // 如果没有该key值
+      array.push(arr[i]);
+    }
+  }
+  return array;
+}
+var arr = [
+  1,
+  1,
+  "true",
+  "true",
+  true,
+  true,
+  15,
+  15,
+  false,
+  false,
+  undefined,
+  undefined,
+  null,
+  null,
+  NaN,
+  NaN,
+  "NaN",
+  0,
+  0,
+  "a",
+  "a",
+  {},
+  {},
+];
+console.log(unique(arr));
+//[1, "a", "true", true, 15, false, 1, {…}, null, NaN, NaN, "NaN", 0, "a", {…}, undefined]
+```
+```js
+// 利用reduce+includes
+function unique(arr) {
+  return arr.reduce(
+    (prev, cur) => (prev.includes(cur) ? prev : [...prev, cur]),
+    []
+  );
+}
+var arr = [
+  1,
+  1,
+  "true",
+  "true",
+  true,
+  true,
+  15,
+  15,
+  false,
+  false,
+  undefined,
+  undefined,
+  null,
+  null,
+  NaN,
+  NaN,
+  "NaN",
+  0,
+  0,
+  "a",
+  "a",
+  {},
+  {},
+];
+console.log(unique(arr));
+// [1, "true", true, 15, false, undefined, null, NaN, "NaN", 0, "a", {…}, {…}]
+```
+```js
+// [...new Set(arr)]
+[...new Set(arr)];
+//代码就是这么少----（其实，严格来说并不算是一种，相对于第一种方法来说只是简化了代码）
+```
+### 类数组转化为数组的方法
+```js
+// 类数组拥有 length 属性 可以使用下标来访问元素 但是不能使用数组的方法 如何把类数组转化为数组?
+
+const arrayLike=document.querySelectorAll('div')
+
+// 1.扩展运算符
+[...arrayLike]
+// 2.Array.from
+Array.from(arrayLike)
+// 3.Array.prototype.slice.call()
+Array.prototype.slice.call(arrayLike)
+// 4.Array.apply
+Array.apply(null, arrayLike)
+// 5.Array.prototype.concat
+Array.prototype.concat.apply([], arrayLike)
 ```
 ### 手写 isNaN()
 ```js
@@ -1618,6 +2395,46 @@ Promise.any = function (array) {
 ```
 ### 手写异步并发数限制
 ```js
+/**
+ * @params list {Array} - 要迭代的数组
+ * @params limit {Number} - 并发数量控制数
+ * @params asyncHandle {Function} - 对`list`的每一个项的处理函数，参数为当前处理项，必须 return 一个Promise来确定是否继续进行迭代
+ * @return {Promise} - 返回一个 Promise 值来确认所有数据是否迭代完成
+ */
+let mapLimit = (list, limit, asyncHandle) => {
+  let recursion = (arr) => {
+    return asyncHandle(arr.shift()).then(() => {
+      if (arr.length !== 0) return recursion(arr);
+      // 数组还未迭代完，递归继续进行迭代
+      else return "finish";
+    });
+  };
+
+  let listCopy = [].concat(list);
+  let asyncList = []; // 正在进行的所有并发异步操作
+  while (limit--) {
+    asyncList.push(recursion(listCopy));
+  }
+  // Promise.all 表示所有的进程已经并发完毕
+  return Promise.all(asyncList); // 所有并发异步操作都完成后，本次并发控制迭代完成
+};
+
+var dataLists = [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 100, 123];
+var count = 0;
+mapLimit(dataLists, 3, (curItem) => {
+  return new Promise((resolve) => {
+    count++;
+    setTimeout(() => {
+      console.log(curItem, "当前并发量:", count--);
+      resolve();
+    }, Math.random() * 5000);
+  });
+}).then((response) => {
+  console.log("finish", response);
+});
+```
+
+```js
 class Scheduler {
   constructor() {
     // 任务队列
@@ -1670,6 +2487,88 @@ scheduler.taskStart();
 // 3
 // 1
 // 4
+```
+```js
+//自定义请求函数
+var request = url => {
+    return new Promise(resolve => {
+        setTimeout(() => {
+            resolve(`任务${url}完成`)
+        }, 1000)
+    }).then(res => {
+        console.log('外部逻辑', res);
+    })
+}
+
+//添加任务
+function addTask(url){
+    let task = request(url);
+    pool.push(task); 
+    task.then(res => {
+        //请求结束后将该Promise任务从并发池中移除
+        pool.splice(pool.indexOf(task), 1);
+        console.log(`${url} 结束，当前并发数：${pool.length}`);
+        url = urls.shift();
+        // //每当并发池跑完一个任务，就再塞入一个任务
+        if(url !== undefined){
+            addTask(url);
+        }
+    })
+}
+
+let urls =  ['bytedance.com','tencent.com','alibaba.com','microsoft.com','apple.com','hulu.com','amazon.com'] // 请求地址
+let pool = []//并发池
+let max = 3 //最大并发量
+//先循环把并发池塞满
+while (pool.length < max) {
+    let url = urls.shift();
+    addTask(url)
+}
+```
+```js
+//自定义请求函数
+var request = url => {
+    return new Promise(resolve => {
+        setTimeout(() => {
+            resolve(`任务${url}完成`)
+        }, 1000)
+    }).then(res => {
+        console.log('外部逻辑', res);
+    })
+}
+
+//添加任务
+function addTask(url){
+    let task = request(url);
+    pool.push(task); 
+    task.then(res => {
+        //请求结束后将该Promise任务从并发池中移除
+        pool.splice(pool.indexOf(task), 1);
+        console.log(`${url} 结束，当前并发数：${pool.length}`);
+    })
+}
+//每当并发池跑完一个任务，就再塞入一个任务
+function run(race){
+    race.then(res => {
+        let url = urls.shift();
+        if(url !== undefined){
+            addTask(url);
+            run(Promise.race(pool));
+        }
+    })
+}
+
+let urls =  ['bytedance.com','tencent.com','alibaba.com','microsoft.com','apple.com','hulu.com','amazon.com'] // 请求地址
+let pool = []//并发池
+let max = 3 //最大并发量
+//先循环把并发池塞满
+while (pool.length < max) {
+    let url = urls.shift();
+    addTask(url)
+}
+//利用Promise.race方法来获得并发池中某任务完成的信号
+let race = Promise.race(pool)
+run(race)
 ```
 ### 手写异步串行 | 异步并行
 ```js
@@ -1900,6 +2799,49 @@ class Storage {
 }
 ```
 ## 手写代码部分3
+### 手写`——proto__`
+```js
+Object.defineProperty(Object.prototype, "__proto__", {
+  get: function() {
+    return Object.getPrototypeOf(this);
+  },
+  // ES6中的Object.setPrototypeOf
+  set: function(o) {
+    Object.setPrototypeOf(this, o);
+    return o;
+  },
+});
+```
+### 手写new
+```js
+function myNew(Func, ...args) {
+  // 创建一个空的对象
+  let obj = {};
+  // 隐式原型链接到该函数的原型，obj 可以访问到构造函数原型中的属性
+  obj.__proto__ = Func.prototype;
+  // 绑定 this 实现继承，obj 可以访问到构造函数中的属性
+  const ret = Func.call(obj, ...args);
+  // 优先返回构造函数返回的对象
+  return ret instanceof Object ? ret : obj;
+}
+```
+### 手写 instanceof
+```js
+function _instanceof(A, B) {
+  var O = B.prototype; // 取B的显示原型
+  // Object.getPrototypeOf(A)
+  A = A.__proto__; // 取A的隐式原型
+  while (true) {
+    //Object.prototype.__proto__ === null
+    if (A === null) return false;
+    if (O === A)
+      // 这里重点：当 O 严格等于 A 时，返回 true
+      return true;
+    A = A.__proto__;
+  }
+}
+```
+## 手写代码部分4
 ### 手写字符串最长的不重复子串(最长不含重复字符的子字符串)
 ```js
 const lengthOfLongestSubstring = function (s) {
@@ -1983,7 +2925,7 @@ const isValid = function(s) {
   return true;
 };
 ```
-## 手写代码部分4
+## 手写代码部分5
 ### 手写jQuery
 ```js
 class jQuery {
