@@ -3,7 +3,6 @@ title: Webpack 基础
 date: 2021-12-20
 tags:
   - Webpack
-  - Webpack 基础
 categories:
   - Webpack
 ---
@@ -2444,3 +2443,9 @@ webpack可以帮助我们打包自己的库文件，比如我们需要打包一�
 ### Plugin执行的顺序
 在webpack声明周期任意阶段执行，取决于我们监听了那个hook，在执行了那个hook就开始执行。
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211220212630.png)
+## React脚手架分析
+## Vue脚手架分析
+### Vue脚手架启动
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211225093920.png)
+### Vue脚手架加载配置
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211225094031.png)
