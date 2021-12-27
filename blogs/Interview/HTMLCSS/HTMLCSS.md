@@ -150,3 +150,42 @@ categories:
   -->
 ```
 ## CSS
+### float 在什么时候不生效？
+1. display：none
+设置成 display：none 了之后，float 失效这一点自然不用说。因为此时元素已经不在 dom 树里了，float 当然起不了作用。
+
+2. position：absolute、fixed。
+无论是 fixed（相对窗口定位）或者 absolute（相对最近的 position 属性不为 static 的祖先元素）。都会使 float 失效。
+### 如果给你一个 div，让你实现多层边框?
+#### box-shadow 实现
+`box-shadow：x-shadow y-shadow blur spread color inset;`
+- x-shadow：设置对象的阴影水平偏移值，单位可以是 px、em 或百分比等，允许负值。
+- y-shadow：设置对象的阴影垂直偏移值，单位可以是 px、em 或百分比等，允许负值。
+- blur：用于设置边框阴影半径大小。
+- spread：扩展半径，设置阴影的尺寸；这个参数可选，缺省时值为 0。
+- color：设置阴影的颜色；
+- inset：这个参数默认不设置。默认情况下为外阴影，inset 表示内阴影。
+```css
+div {
+  box-shadow: 0 0 0 10px red, 　　　　　　　 0 0 0 16px green,
+    　　　　　　　 0 2px 5px 16px rgba(0, 0, 0, 0.5);
+  background: yellowgreen;
+}
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211129215800.png)
+#### outline 实现
+如果我们只需要 2 层边框，那么使用 outline 是不错的选择，先设置常规的 border 边框，再加上 outline（描边）。而且 outline 比上面的 box-shadow 还有一大优点就是，可以生成虚线等边框。通常 outline 属性需要和对应的描边偏移 outline-offset 来实现。
+```css
+div {
+  width: 200px;
+  height: 100px;
+  background: #ffffff;
+  border: 5px solid #53cfa2;
+  outline: #736e21 dashed 1px;
+  outline-offset: -20px;
+}
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211129215847.png)
+
+
+

@@ -860,16 +860,18 @@ Function.prototype._call = function(context, ...args) {
   if (typeof this !== "function") {
     throw new Error("not function");
   }
+  // 创造唯一的key值  作为我们构造的context内部方法名
+  let fn = Symbol();
   // 不传默认是全局，window
   var context = context || window;
   // args不传时默认是空数组，防止下面用spread操作符时报错
   var args = args ? args : [];
   // 把this存到context.fn，这里的this是调用的函数
-  context.fn = this;
+  context[fn] = this; 
   // 执行调用的函数，this指向context，参数用spread操作符扩展
-  const res = context.fn(...args);
+  const res = context[fn](...args);
   // 删除，不污染context
-  delete context.fn;
+  delete context[fn];
   // 返回res
   return res;
 };
@@ -883,17 +885,19 @@ Function.prototype._bind = function(context, ...args) {
   }
   // 不传默认是全局，window
   var context = context || window;
+  // 创造唯一的key值  作为我们构造的context内部方法名
+  let fn = Symbol();
   // 把this存到fn，这里的this是调用的函数
-  let fn = this;
+  context[fn] = this;
   return function newFn(...fnArgs) {
     let res;
     // 要考虑新函数是不是会当作构造函数
     if (this instanceof newFn) {
       // 如果是构造函数则调用new 并且合并参数args，fnArgs
-      res = new fn(...args, ...fnArgs);
+      res = new context[fn](...args, ...fnArgs);
     } else {
       // 当作普通函数调用 也可以用上面定义的_call
-      res = fn.call(context, ...args, ...fnArgs);
+      res = context[fn].call(context, ...args, ...fnArgs);
     }
     return res;
   };
@@ -906,12 +910,14 @@ Function.prototype._apply = function(context, args) {
   var context = context || window;
   // args不传时默认是空数组，防止下面用spread操作符时报错
   var args = args ? args : [];
+  // 创造唯一的key值  作为我们构造的context内部方法名
+  let fn = Symbol();
   // 把this存到context.fn，这里的this是调用的函数
-  context.fn = this;
+  context[fn] = this;
   // 执行调用的函数，this指向context，参数用spread操作符扩展
-  const res = context.fn(...args);
+  const res = context[fn](...args);
   // 删除，不污染context
-  delete context.fn;
+  delete context[fn];
   // 返回res
   return res;
 };
@@ -1011,22 +1017,228 @@ function ajax(opt) {
   }
   // 只判断响应时间就可以了
   xhr.onreadystatechange = function () {
-    if ((xhr.status >= 200 && xhr.status < 300) || xhr.status === 304) {
-      var res;
-      if (opt.success && opt.success instanceof Function) {
-        res = xhr.responseText;
-        if (typeof res === "string") {
-          res = JSON.parse(res);
-          opt.success.call(xhr, res);
+    if (xhr.readyState === 4) {
+      if ((xhr.status >= 200 && xhr.status < 300) || xhr.status === 304) {
+        var res;
+        if (opt.success && opt.success instanceof Function) {
+          res = xhr.responseText;
+          if (typeof res === "string") {
+            res = JSON.parse(res);
+            opt.success.call(xhr, res);
+          }
         }
-      }
-    } else {
-      if (opt.error && opt.error instanceof Function) {
-        opt.error.call(xhr, res);
+      } else {
+        if (opt.error && opt.error instanceof Function) {
+          opt.error.call(xhr, res);
+        }
       }
     }
   };
 }
+```
+### 手写预加载
+预加载简单来说就是将所有所需的资源提前请求加载到本地，这样后面在需要用到时就直接从缓存取资源。
+在网页全部加载之前，对一些主要内容进行加载，以提供给用户更好的体验，减少等待的时间。否则，如果一个页面的内容过于庞大，没有使用预加载技术的页面就会长时间的展现为一片空白，直到所有内容加载完毕。
+```js
+let length = imglist.length;
+let images = new Array(); // 定义一个数组容器，用来存储预加载完成的图片
+let loadEl = document.querySelector(".loading");
+function preload() {
+  let count = 0; // 计算器，计算加载了多少图片
+  for (let i = 0; i < length; i++) {
+    images[i] = new Image();
+    images[i].src = `./imgs/${imglist[i].url}`;
+    // 谷歌浏览器高版本支持大部分ES6，所以这里就不用字符串拼接了。
+    images[i].onload = function () {
+      count++;
+      if (count === length) {
+        loadEl.innerHTML = "加载完成";
+      } else {
+        loadEl.innerHTML = "正在加载中";
+      }
+    };
+  }
+}
+preload();
+```
+### 手写图片懒加载&惰性函数
+- 实现图片懒加载其核心的思想就是将 img 的 src 属性先使用一张本地占位符，或者为空。然后真实的图片路径再定义一个 data-set 属性存起来，待达到一定条件的时将 data-img 的属性值赋给 src。
+- 如下是通过 scroll 滚动事件监听来实现的图片懒加载，当图片都加载完毕移除事件监听，并且将移除 html 标签。
+- 一个是图片到各个边距的距离，二个就是判断图片是否在可视区域内。
+```js
+const lazyLoad = function (imgs) {
+  let count = 0;
+  const deleteImgs = [];
+  const handler = () => {
+    imgs.forEach((item, index) => {
+      // getBoundingClientRect用于获取某个元素相对于视窗的位置集合（getBoundingClientRect()//获取元素的大小及位置）
+      const react = item.getBoundingClientRect();
+      // 我们先获取图片到可视区顶部的距离,并判断是否小于可视区的高度：
+      if (react.top < window.innerHeight) {
+        item.src = item.dataset.src;
+        count++;
+        // 保存已经加载的图片的索引
+        deleteImgs.push(index);
+        // 图片全部加载完成后移除事件监听；
+        if (count === deleteImgs.length)
+          document.removeEventListener("scroll", lazyLoad);
+      }
+    });
+    // 排除已经加载的图片,加载完的图片，从 imgList 移除；
+    imgs = imgs.filter((item, index) => !deleteImgs.includes(index));
+  };
+  return handler();
+};
+
+
+// 采用了节流函数
+// 节流函数：只允许一个函数在N秒内执行一次
+window.addEventListener('scroll',throttle(lazyload,500,1000));
+
+
+// 定义一个防抖函数
+function debounce(fn, delay = 500) {
+  let timer = null;
+  return function (...args) {
+    if (timer) clearTimeout(timer);
+    timer = setTimeout(() => {
+      fn.apply(this, args);
+    }, delay);
+  };
+}
+
+// 页面加载完成执行一次lazyload，渲染第一次打开的网页视口内的图片
+window.onload = lazyload;
+// 监听Scroll事件，为了防止频繁调用，使用防抖函数进行优化
+window.addEventListener("scroll", debounce(lazyload, 600));
+// 浏览器窗口大小改变时重新计算
+window.addEventListener("resize", debounce(lazyload, 600));
+```
+### 手写滚动加载
+```js
+// 原理就是监听页面滚动事件，分析clientHeight、scrollTop、scrollHeight三者的属性关系。
+window.addEventListener(
+  "scroll",
+  function() {
+    const clientHeight = document.documentElement.clientHeight;
+    const scrollTop = document.documentElement.scrollTop;
+    const scrollHeight = document.documentElement.scrollHeight;
+    if (clientHeight + scrollTop >= scrollHeight) {
+      // 检测到滚动至页面底部，进行后续操作
+      // ...
+    }
+  },
+  false
+);
+```
+### 渲染几万条数据不卡住页面
+```js
+// 渲染大数据时，合理使用createDocumentFragment和requestAnimationFrame，将操作切分为一小段一小段执行。
+setTimeout(() => {
+  // 插入十万条数据
+  const total = 100000;
+  // 一次插入的数据
+  const once = 20;
+  // 插入数据需要的次数
+  const loopCount = Math.ceil(total / once);
+  let countOfRender = 0;
+  const ul = document.querySelector("ul");
+  // 添加数据的方法
+  function add() {
+    const fragment = document.createDocumentFragment();
+    for (let i = 0; i < once; i++) {
+      const li = document.createElement("li");
+      li.innerText = Math.floor(Math.random() * total);
+      fragment.appendChild(li);
+    }
+    ul.appendChild(fragment);
+    countOfRender += 1;
+    loop();
+  }
+  function loop() {
+    if (countOfRender < loopCount) {
+      window.requestAnimationFrame(add);
+    }
+  }
+  loop();
+}, 0);
+```
+### 打印出当前网页使用了多少种 HTML 元素
+```js
+const fn = () => {
+  return [
+    ...new Set([...document.querySelectorAll("*")].map((el) => el.tagName)),
+  ].length;
+};
+```
+### JavaScript大数相加
+```js
+// 题目描述:实现一个add方法完成两个大数相加
+let a = "9007199254740991";
+let b = "1234567899999999999";
+
+
+function add(a, b) {
+  //取两个数字的最大长度
+  let maxLength = Math.max(a.length, b.length);
+  //用0去补齐长度
+  a = a.padStart(maxLength, 0); //"0009007199254740991"
+  b = b.padStart(maxLength, 0); //"1234567899999999999"
+  //定义加法过程中需要用到的变量
+  let t = 0;
+  let f = 0; //"进位"
+  let sum = "";
+  for (let i = maxLength - 1; i >= 0; i--) {
+    t = parseInt(a[i]) + parseInt(b[i]) + f;
+    f = Math.floor(t / 10);
+    sum = (t % 10) + sum;
+  }
+  if (f !== 0) {
+    sum = "" + f + sum;
+  }
+  return sum;
+}
+```
+### setTimeout 模拟实现 setInterval(带清除定时器的版本)
+```js
+setTimeout(function() {
+    console.log(1);
+    setTimeout(arguments.callee, 1);
+}, 1)
+        
+// 题目描述:setinterval 用来实现循环定时调用 可能会存在一定的问题 能用 settimeout 解决吗
+function mySettimeout(fn, t) {
+  let timer = null;
+  function interval() {
+    fn();
+    timer = setTimeout(interval, t);
+  }
+  interval();
+  return {
+    cancel: () => {
+      clearTimeout(timer);
+    },
+  };
+}
+// let a=mySettimeout(()=>{
+//   console.log(111);
+// },1000)
+// let b=mySettimeout(() => {
+//   console.log(222)
+// }, 1000)
+```
+### setInterval 模拟实现 setTimeout(带清除定时器的版本)
+```js
+// 我们能反过来使用 setinterval 模拟实现 settimeout 吗？
+const mySetTimeout = (fn, time) => {
+  const timer = setInterval(() => {
+    clearInterval(timer);
+    fn();
+  }, time);
+};
+// mySetTimeout(()=>{
+//   console.log(1);
+// },1000)
 ```
 ## 手写代码部分 2
 ### 手写 reduce 实现 map
@@ -1349,6 +1561,61 @@ Array.prototype.find = function(fn) {
 const arr = [1, 2, 3, , 5, 4];
 const result = arr.find((item) => item > 3);
 console.log(result);
+```
+### 手写拉平数组(数组扁平化)
+```js
+// 利用es6语法arr.flat(num)方法将数组拉平
+// 该方法不传参数默认只会拉平一层，如果想拉平多层嵌套的数组，需要传入一个整数，表示要拉平的层级。该返回返回一个新的数组，对原数组没有影响。
+function flattening(arr, num = 1) {
+  if (!Array.isArray(arr)) return;
+  return arr.flat(num,2);
+}
+```
+```js
+// 利用 reduce() 方法将数组拉平。
+// 利用 reduce 进行迭代，核心的思想是递归实现。
+function flattening(arr) {
+  if (!Array.isArray(arr)) return;
+  return arr.reduce((a, b) => {
+    return a.concat(Array.isArray(b) ? flattening(b) : b);
+  }, []);
+}
+```
+```js
+// 模拟栈实现数组拉平
+// 该方法是模拟栈，在性能上相对最优解。
+function flattening(arr) {
+  if (!Array.isArray(arr)) return;
+  const stack = [...arr];
+  const res = [];
+  while (stack.length) {
+    let value = stack.shift();
+    Array.isArray(value) ? stack.push(value) : res.push(value);
+  }
+  return res;
+}
+```
+```js
+// 利用正则
+const res2 = JSON.stringify(arr)
+  .replace(/\[|\]/g, "")
+  .split(",");
+
+// 正则改良版本
+const res3 = JSON.parse("[" + JSON.stringify(arr).replace(/\[|\]/g, "") + "]");
+```
+```js
+// 函数递归
+const res = [];
+const fn = (arr) => {
+  for (let i = 0; i < arr.length; i++) {
+    if (Array.isArray(arr[i])) {
+      fn(arr[i]);
+    } else {
+      res.push(arr[i]);
+    }
+  }
+}
 ```
 ### 手写数组去重
 - 利用 ES6 Set 去重（ES6 中最常用）
@@ -1838,29 +2105,463 @@ function sIndexOf2(str, searchVal, fromIndex = 0) {
   return -1;
 }
 ```
-### 手写字符串模板
+### 手写浅拷贝
+- 如果属性是基本类型，拷贝的就是基本类型的值，如果属性是引用类型，拷贝的就是内存地址 ，所以如果其中一个对象改变了这个地址，就会影响到另一个对象。
+- 浅拷贝后会重新在堆中创建内存，拷贝前后对象的基本数据类型互不影响，但拷贝前后引用类型会共享堆中的内存，引用类型就会互相影响
+- 实际上对于数组来说， 只要不修改原数组， 重新返回一个新数组就可以实现浅拷贝，比如说map、filter、reduce等方法
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210809212740.png)
+
 ```js
-function render(template, data) {
-  const reg = /\{\{(\w+)\}\}/; // 模板字符串正则
-  if (reg.test(template)) {
-    // 判断模板里是否有模板字符串
-    const name = reg.exec(template)[1]; // 查找当前模板里第一个模板字符串的字段，一个一个查找
-    template = template.replace(reg, data[name]); // 将第一个模板字符串渲染
-    return render(template, data); // 递归的渲染并返回渲染后的结构,递归的查找
+//方法 1
+Object.assign(target, ...sources); // 缺陷：没能处理数组，不够通用
+```
+```js
+//方法 2
+var simpleClone = function(target) {
+  if (typeof target === "object") {
+    let cloneTarget = Array.isArray(target) ? [] : {};
+    for (const key in target) {
+      if (obj.hasOwnProperty(key)) {
+        cloneTarget[key] = target[key];
+      }
+    }
+    return cloneTarget;
+  } else {
+    return target;
   }
-  return template; // 如果模板没有模板字符串直接返回
+}
+```
+```js
+//方法 3
+let obj1 = {
+  name: "yang",
+  res: {
+    value: 123,
+  },
+};
+let { ...obj2 } = obj1;
+obj2.res.value = 456;
+console.log(obj2); // {name: "yang", res: {value: 456}}
+console.log(obj1); // {name: "yang", res: {value: 456}}
+obj2.name = "haha";
+console.log(obj2); // {name: "haha", res: {value: 456}}
+console.log(obj1); // {name: "yang", res: {value: 456}}
+```
+```js
+//方法 4
+const arr1 = [
+  "yang",
+  {
+    value: 123,
+  },
+];
+const arr2 = arr1.slice(0);
+arr2[1].value = 456;
+console.log(arr2); // ["yang", {value: 456}]
+console.log(arr1); // ["yang", {value: 456}]
+arr2[0] = "haha";
+console.log(arr2); // ["haha", {value: 456}]
+console.log(arr1); // ["yang", {value: 456}]
+```
+```js
+//方法 5
+const arr1 = [
+  "yang",
+  {
+    value: 123,
+  },
+];
+const arr2 = [].concat(arr1);
+arr2[1].value = 456;
+console.log(arr2); // ["yang", {value: 456}]
+console.log(arr1); // ["yang", {value: 456}]
+arr2[0] = "haha";
+console.log(arr2); // ["haha", {value: 456}]
+console.log(arr1); // ["yang", {value: 456}]
+```
+### 手写深拷贝
+- 将一个对象从内存中完整的拷贝一份出来,从堆内存中开辟一个新的区域存放新对象,且修改新对象不会影响原对象。深拷贝开辟了新的堆内存地址，并且将对象的引用指向了新开辟的内存地址，和前面复制的对象完全独立，自立根生，拷贝地很深，学功夫学到家，自立门户的感觉。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210809212944.png)
+```js
+//方法 1 JSON.parse(JSON.stringify())
+let student = {
+  name: "小明",
+  score: {
+    english: 88,
+    chinese: 77,
+    math: 99,
+  },
+};
+
+let deepStudent = JSON.parse(JSON.stringify(student));
+// JSON.stringify 对于拷贝其他引用类型、拷贝函数、循环引用等情况无法很好处理，只能运用于简单 JSON。
+// 会忽略 undefined、symbol、不能序列化函数、不能解决循环引用的对象、不能正确处理new Date()、不能处理正则、不能处理new Error()
+deepStudent.name = "李雷";
+deepStudent.score.english = 98;
+console.log("deepStudent: ", deepStudent);
+console.log("student: ", student);
+```
+```js
+//方法 2 深拷贝更为通用的做法：递归遍历赋值
+var deepClone = function(target) {
+  if (typeof target === "object") {
+    let cloneTarget = Array.isArray(target) ? [] : {};
+    for (const key in target) {
+      if (target.hasOwnProperty(key)) {
+        cloneTarget[key] = deepClone(target[key]);
+      }
+    }
+    return cloneTarget;
+  } else {
+    return target;
+  }
+};
+
+
+
+// target.target = target;
+// 这个case如果还用以上递归代码的话，会导致死循环、栈内存溢出。
+// 附加考虑循环引用
+var deepClone = function(target, map = new Map()) {
+  if (typeof target === "object") {
+    let cloneTarget = Array.isArray(target) ? [] : {};
+    if (map.get(target)) {
+      return map.get(target);
+    }
+    map.set(target, cloneTarget);
+    for (const key in target) {
+      cloneTarget[key] = deepClone(target[key], map);
+    }
+    return cloneTarget;
+  } else {
+    return target;
+  }
+};
+
+
+
+
+// 附加考虑循环引用,弱引用对象，垃圾回收机制会自动帮我们回收。
+var deepClone = function(target, map = new WeakMap()) {
+  if (typeof target === "object") {
+    let cloneTarget = Array.isArray(target) ? [] : {};
+    if (map.get(target)) {
+      return map.get(target);
+    }
+    map.set(target, cloneTarget);
+    for (const key in target) {
+      cloneTarget[key] = deepClone(target[key], map);
+    }
+    return cloneTarget;
+  } else {
+    return target;
+  }
+};
+```
+```js
+// 方法3  其他的理解
+function isObject(val) {
+  return typeof val === "object" && val !== null;
 }
 
-// 测试验证
-let template = "我是{{name}}，年龄{{age}}，性别{{sex}}";
-let person = {
-  name: "布兰",
-  age: 12,
+function deepClone(obj, hash = new WeakMap()) {
+  if (!isObject(obj)) return obj;
+  if (hash.has(obj)) {
+    return hash.get(obj);
+  }
+  let target = Array.isArray(obj) ? [] : {};
+  hash.set(obj, target);
+  Reflect.ownKeys(obj).forEach((item) => {
+    if (isObject(obj[item])) {
+      target[item] = deepClone(obj[item], hash);
+    } else {
+      target[item] = obj[item];
+    }
+  });
+
+  return target;
+}
+
+// var obj1 = {
+// a:1,
+// b:{a:2}
+// };
+// var obj2 = deepClone(obj1);
+// console.log(obj1);
+```
+```js
+// 方法4
+function deepCopy(obj, cache = new WeakMap()) {
+  if (!obj instanceof Object) return obj;
+  // 防止循环引用
+  if (cache.get(obj)) return cache.get(obj);
+  // 支持函数
+  if (obj instanceof Function) {
+    return function() {
+      return obj.apply(this, arguments);
+    };
+  }
+  // 支持日期
+  if (obj instanceof Date) return new Date(obj);
+  // 支持正则对象
+  if (obj instanceof RegExp) return new RegExp(obj.source, obj.flags);
+  // 还可以增加其他对象，比如：Map, Set等，根据情况判断增加即可，面试点到为止就可以了
+
+  // 数组是 key 为数字素银的特殊对象
+  const res = Array.isArray(obj) ? [] : {};
+  // 缓存 copy 的对象，用于处理循环引用的情况
+  cache.set(obj, res);
+
+  Object.keys(obj).forEach((key) => {
+    if (obj[key] instanceof Object) {
+      res[key] = deepCopy(obj[key], cache);
+    } else {
+      res[key] = obj[key];
+    }
+  });
+  return res;
+}
+
+// 测试
+const source = {
+  name: "Jack",
+  meta: {
+    age: 12,
+    birth: new Date("1997-10-10"),
+    ary: [1, 2, { a: 1 }],
+    say() {
+      console.log("Hello");
+    },
+  },
 };
-render(template, person); // 我是布兰，年龄12，性别undefined
+source.source = source;
+const newObj = deepCopy(source);
+console.log(newObj.meta.ary[2] === source.meta.ary[2]); // false
+console.log(newObj.meta.birth === source.meta.birth); // false
 ```
-### 手写实现一个对象的flatten方法
+```js
+// 超级全面的深拷贝
+const mapTag = "[object Map]";
+const setTag = "[object Set]";
+const arrayTag = "[object Array]";
+const objectTag = "[object Object]";
+const argsTag = "[object Arguments]";
+const boolTag = "[object Boolean]";
+const dateTag = "[object Date]";
+const numberTag = "[object Number]";
+const stringTag = "[object String]";
+const symbolTag = "[object Symbol]";
+const errorTag = "[object Error]";
+const regexpTag = "[object RegExp]";
+const funcTag = "[object Function]";
+const deepTag = [mapTag, setTag, arrayTag, objectTag, argsTag];
+
+function forEach(array, iteratee) {
+  let index = -1;
+  const length = array.length;
+  while (++index < length) {
+    iteratee(array[index], index);
+  }
+  return array;
+}
+function isObject(target) {
+  const type = typeof target;
+  return target !== null && (type === "object" || type === "function");
+}
+function getType(target) {
+  return Object.prototype.toString.call(target);
+}
+function getInit(target) {
+  const Ctor = target.constructor;
+  return new Ctor();
+}
+function cloneSymbol(targe) {
+  return Object(Symbol.prototype.valueOf.call(targe));
+}
+function cloneReg(targe) {
+  const reFlags = /\w*$/;
+  const result = new targe.constructor(targe.source, reFlags.exec(targe));
+  result.lastIndex = targe.lastIndex;
+  return result;
+}
+function cloneFunction(func) {
+  const bodyReg = /(?<={)(.|\n)+(?=})/m;
+  const paramReg = /(?<=\().+(?=\)\s+{)/;
+  const funcString = func.toString();
+  if (func.prototype) {
+    const param = paramReg.exec(funcString);
+    const body = bodyReg.exec(funcString);
+    if (body) {
+      if (param) {
+        const paramArr = param[0].split(",");
+        return new Function(...paramArr, body[0]);
+      } else {
+        return new Function(body[0]);
+      }
+    } else {
+      return null;
+    }
+  } else {
+    return eval(funcString);
+  }
+}
+// 处理 不可继续遍历的类型
+function cloneOtherType(targe, type) {
+  const Ctor = targe.constructor;
+  switch (type) {
+    case boolTag:
+    case numberTag:
+    case stringTag:
+    case errorTag:
+    case dateTag:
+      return new Ctor(targe);
+    case regexpTag:
+      return cloneReg(targe);
+    case symbolTag:
+      return cloneSymbol(targe);
+    case funcTag:
+      return cloneFunction(targe);
+    default:
+      return null;
+  }
+}
+function clone(target, map = new WeakMap()) {
+  // 克隆原始类型
+  if (!isObject(target)) {
+    return target;
+  }
+  // 初始化
+  const type = getType(target);
+  let cloneTarget;
+  if (deepTag.includes(type)) {
+    cloneTarget = getInit(target, type);
+  } else {
+    return cloneOtherType(target, type);
+  }
+  // 防止循环引用
+  if (map.get(target)) {
+    return map.get(target);
+  }
+  map.set(target, cloneTarget);
+  // 克隆set
+  if (type === setTag) {
+    target.forEach((value) => {
+      cloneTarget.add(clone(value, map));
+    });
+    return cloneTarget;
+  }
+  // 克隆map
+  if (type === mapTag) {
+    target.forEach((value, key) => {
+      cloneTarget.set(key, clone(value, map));
+    });
+    return cloneTarget;
+  }
+  // 克隆对象和数组
+  const keys = type === arrayTag ? undefined : Object.keys(target);
+  forEach(keys || target, (value, key) => {
+    if (keys) {
+      key = value;
+    }
+    cloneTarget[key] = clone(target[key], map);
+  });
+
+  return cloneTarget;
+}
+module.exports = {
+  clone,
+};
 ```
+```js
+// 其他的高级版
+function deepClone(obj, cache = new WeakMap()) {
+  if (!obj instanceof Object) return obj;
+  // 防止循环引用
+  if (cache.get(obj)) return cache.get(obj);
+  // 支持函数
+  if (obj instanceof Function) {
+    return function() {
+      return obj.apply(this, arguments);
+    };
+  }
+  // 支持日期
+  if (obj instanceof Date) return new Date(obj);
+  // 支持正则对象
+  if (obj instanceof RegExp) return new RegExp(obj.source, obj.flags);
+
+  // 数组是 key 为数字索引的特殊对象
+  const res = Array.isArray(obj) ? [] : {};
+  // 缓存 copy 的对象，用于处理循环引用的情况
+  cache.set(obj, res);
+
+  Object.keys(obj).forEach((key) => {
+    if (obj[key] instanceof Object) {
+      res[key] = deepClone(obj[key], cache);
+    } else {
+      res[key] = obj[key];
+    }
+  });
+  return res;
+}
+
+// 其他高级版本2
+// 深拷贝：对对象内部进行深拷贝，支持 Array、Date、RegExp、DOM
+const deepCopy = (sourceObj) => {
+  // 如果不是对象则退出（可停止递归）
+  if (typeof sourceObj !== "object") return;
+
+  // 深拷贝初始值：对象/数组
+  let newObj = sourceObj instanceof Array ? [] : {};
+
+  // 使用 for-in 循环对象属性（包括原型链上的属性）
+  for (let key in sourceObj) {
+    // 只访问对象自身属性
+    if (sourceObj.hasOwnProperty(key)) {
+      // 当前属性还未存在于新对象中时
+      if (!(key in newObj)) {
+        if (sourceObj[key] instanceof Date) {
+          // 判断日期类型
+          newObj[key] = new Date(sourceObj[key].getTime());
+        } else if (sourceObj[key] instanceof RegExp) {
+          // 判断正则类型
+          newObj[key] = new RegExp(sourceObj[key]);
+        } else if (
+          typeof sourceObj[key] === "object" &&
+          sourceObj[key].nodeType === 1
+        ) {
+          // 判断 DOM 元素节点
+          let domEle = document.getElementsByTagName(
+            sourceObj[key].nodeName
+          )[0];
+          newObj[key] = domEle.cloneNode(true);
+        } else {
+          // 当元素属于对象（排除 Date、RegExp、DOM）类型时递归拷贝
+          newObj[key] =
+            typeof sourceObj[key] === "object"
+              ? deepCopy(sourceObj[key])
+              : sourceObj[key];
+        }
+      }
+    }
+  }
+  return newObj;
+};
+// deepCopy 函数测试效果
+const objA = {
+  name: "jack",
+  birthday: new Date(),
+  pattern: /jack/g,
+  body: document.body,
+  others: [123, "coding", new Date(), /abc/gim],
+};
+const objB = deepCopy(objA);
+console.log(objA === objB); // false
+console.log(objA.others === objB.others); // false
+console.log(objA, objB); // 对象内容一样
+```
+### 手写对象的扁平方法
+```md
 const obj = {
   a: {
         b: 1,
@@ -1917,6 +2618,236 @@ function flatten(obj) {
   return res;
 }
 flatten();
+```
+```js
+// 没有数组的情况
+function objectFlat(obj = {}) {
+  const res = {};
+  function flat(item, preKey = "") {
+    Object.entries(item).forEach(([key, val]) => {
+      const newKey = preKey ? `${preKey}.${key}` : key;
+      if (val && typeof val === "object") {
+        flat(val, newKey);
+      } else {
+        res[newKey] = val;
+      }
+    });
+  }
+  flat(obj);
+  return res;
+}
+```
+### 手写Object.is()
+Object.is()与===方法类似，但是NaN === NaN返回true，0 === -0返回false；
+```js
+console.log(Object.is(1, 1)); // true
+console.log(Object.is('123', '123')); // true
+console.log(Object.is(NaN, NaN)); // true
+console.log(Object.is(0, -0)); // false
+```
+```js
+Object.is = (val1, val2) => {
+  if (Number.isNaN(val1) && Number.isNaN(val2)) {
+    return true;
+  }
+
+  if ((val1 === 0 && val2 === -0) || (val1 === -0 && val2 === 0)) {
+    return false;
+  }
+
+  return val1 === val2;
+};
+
+console.log(myIs(1, 1)); // true
+console.log(myIs(true, true)); // true
+console.log(myIs("123", "123")); // true
+console.log(myIs(NaN, NaN)); // true
+console.log(myIs(0, -0)); // false
+console.log(myIs(-0, 0)); // false
+```
+### 手写Object.create（）
+Object.create()方法创建一个新对象，使用现有的对象来提供新创建的对象__proto__
+```js
+Object.create = function create(proto, propertiesObject = undefined) {
+  // proto 新创建对象的原型对象, propertiesObject 要定义其可枚举属性或修改的属性描述符的对象
+  // 只能是 null 或者 object
+  if (
+    typeof proto !== "object" &&
+    proto !== null &&
+    typeof proto !== "function"
+  )
+    throw Error(
+      "Uncaught TypeError: Object prototype may only be an Object or null"
+    );
+
+  function F() {} // 创建一个空的构造函数 F
+  F.prototype = proto; // F 原型指向 proto
+  let obj = new F(); // 创建 F 的实例
+
+  if (propertiesObject !== undefined)
+    // propertiesObject有值则调用 Object.defineProperties
+    Object.defineProperties(obj, propertiesObject);
+
+  return obj; // 返回 这个 obj
+};
+```
+### 手写 Object.assign()
+Object.assign 方法用于将所有可枚举属性的值从一个或多个源对象分配到目标对象。它将返回目标对象。
+由于Object.assign是浅拷贝，仅仅会针对第一层的数据进行处理，深层嵌套的数据不会进行处理
+不可枚举数据使用Object.assign时不能拷贝
+继承的属性使用Object.assign时不能拷贝
+```js
+Object.assign = (target, ...sources) => {
+  // undefined 和 null，直接抛异常
+  if (target == null) {
+    throw new TypeError("不能对null undefined进行处理");
+  }
+
+  // 利用Object创建一个对象， 保持引用相同
+  let obj = Object(target);
+
+  // 遍历后续的 sources， 将每一项对象取出
+  sources.forEach((nextSource) => {
+    // 忽略 null undefined
+    if (nextSource != null) {
+      // 将对象的第一层数据取出，因为Object.assign是浅拷贝的
+      for (const key in nextSource) {
+        // 判断是否是自身属性，若是继承过来的数据则不进行处理
+        if (Object.prototype.hasOwnProperty.call(nextSource, key)) {
+          obj[key] = nextSource[key];
+        }
+      }
+    }
+  });
+
+  // 将合并完成的对象返回
+  return obj;
+};
+```
+### 手写 JSON.stringify
+JSON.stringify([, replacer [, space]) 方法是将一个 JavaScript 值(对象或者数组)转换为一个 JSON 字符串。此处模拟实现，不考虑可选的第二个参数 replacer 和第三个参数 space。
+
+- 基本数据类型：
+  - undefined 转换之后仍是 undefined(类型也是 undefined)
+  - boolean 值转换之后是字符串 "false"/"true"
+  - number 类型(除了 NaN 和 Infinity)转换之后是字符串类型的数值
+  - symbol 转换之后是 undefined
+  - null 转换之后是字符串 "null"
+  - string 转换之后仍是 string
+  - NaN 和 Infinity 转换之后是字符串 "null"
+- 函数类型：转换之后是 undefined
+- 如果是对象类型(非函数)
+  - 如果是一个数组：如果属性值中出现了 undefined、任意的函数以及 symbol，转换成字符串 "null" ；
+  - 如果是 RegExp 对象：返回 {} (类型是 string)；
+  - 如果是 Date 对象，返回 Date 的 toJSON 字符串值；
+  - 如果是普通对象；
+    - 如果有 toJSON() 方法，那么序列化 toJSON() 的返回值。
+    - 如果属性值中出现了 undefined、任意的函数以及 symbol 值，忽略。
+    - 所有以 symbol 为属性键的属性都会被完全忽略掉。
+- 对包含循环引用的对象（对象之间相互引用，形成无限循环）执行此方法，会抛出错误。
+```js
+function jsonStringify(data) {
+  let dataType = typeof data;
+
+  if (dataType !== "object") {
+    let result = data;
+    //data 可能是 string/number/null/undefined/boolean
+    if (Number.isNaN(data) || data === Infinity) {
+      //NaN 和 Infinity 序列化返回 "null"
+      result = "null";
+    } else if (
+      dataType === "function" ||
+      dataType === "undefined" ||
+      dataType === "symbol"
+    ) {
+      //function 、undefined 、symbol 序列化返回 undefined
+      return undefined;
+    } else if (dataType === "string") {
+      result = '"' + data + '"';
+    }
+    //boolean 返回 String()
+    return String(result);
+  } else if (dataType === "object") {
+    if (data === null) {
+      return "null";
+    } else if (data.toJSON && typeof data.toJSON === "function") {
+      return jsonStringify(data.toJSON());
+    } else if (data instanceof Array) {
+      let result = [];
+      //如果是数组
+      //toJSON 方法可以存在于原型链中
+      data.forEach((item, index) => {
+        if (
+          typeof item === "undefined" ||
+          typeof item === "function" ||
+          typeof item === "symbol"
+        ) {
+          result[index] = "null";
+        } else {
+          result[index] = jsonStringify(item);
+        }
+      });
+      result = "[" + result + "]";
+      return result.replace(/'/g, '"');
+    } else {
+      //普通对象
+      /**
+       * 循环引用抛错(暂未检测，循环引用时，堆栈溢出)
+       * symbol key 忽略
+       * undefined、函数、symbol 为属性值，被忽略
+       */
+      let result = [];
+      Object.keys(data).forEach((item, index) => {
+        if (typeof item !== "symbol") {
+          //key 如果是symbol对象，忽略
+          if (
+            data[item] !== undefined &&
+            typeof data[item] !== "function" &&
+            typeof data[item] !== "symbol"
+          ) {
+            //键值如果是 undefined、函数、symbol 为属性值，忽略
+            result.push('"' + item + '"' + ":" + jsonStringify(data[item]));
+          }
+        }
+      });
+      return ("{" + result + "}").replace(/'/g, '"');
+    }
+  }
+}
+```
+### 手写 JSON.parse
+- 把 JSON 字符串解析为原生 JavaScript 对象
+- 介绍 2 种方法实现：
+  - eval 实现；
+  - new Function 实现；
+#### eval 实现
+第一种方式最简单，也最直观，就是直接调用 eval，代码如下：
+```js
+var json = '{"a":"1", "b":2}';
+var obj = eval("(" + json + ")");  // obj 就是 json 反序列化之后得到的对象
+```
+但是直接调用 eval 会存在安全问题，如果数据中可能不是 json 数据，而是可执行的 JavaScript 代码，那很可能会造成 XSS 攻击。因此，在调用 eval 之前，需要对数据进行校验。
+```js
+var rx_one = /^[\],:{}\s]*$/;
+var rx_two = /\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g;
+var rx_three = /"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g;
+var rx_four = /(?:^|:|,)(?:\s*\[)+/g;
+
+if (
+    rx_one.test(
+        json.replace(rx_two, "@")
+            .replace(rx_three, "]")
+            .replace(rx_four, "")
+    )
+) {
+    var obj = eval("(" +json + ")");
+}
+```
+#### new Function 实现
+Function 与 eval 有相同的字符串参数特性。
+```js
+var json = '{"name":"小姐姐", "age":20}';
+var obj = (new Function('return ' + json))();
 ```
 ### 手写Promise
 ```js
@@ -2393,6 +3324,93 @@ Promise.any = function (array) {
   });
 };
 ```
+### 手写通过Promise实现sleep
+很多编程语言里都有 sleep()，delay()等方法，它能让我们的程序不那么着急的去执行下一步操作，而是延迟、等待一段时间。
+```js
+function sleep(s) {
+  s = s || 0;
+  s = parseInt(s) * 1000;
+  let now = +new Date();
+  let timer = null;
+  return new Promise((resolve, reject) => {
+    timer = setInterval(() => {
+      if (now + s < +new Date()) {
+        clearInterval(timer);
+        resolve(true);
+      }
+    }, 10);
+  });
+}
+
+(async function() {
+  console.log("Do some thing, " + new Date());
+  await sleep(3000);
+  console.log("Do other things, " + new Date());
+})();
+```
+### 并行限制的 Promise 调度器
+题目描述:JS 实现一个带并发限制的异步调度器 Scheduler，保证同时运行的任务最多有两个。
+```md
+ addTask(1000,"1");
+ addTask(500,"2");
+ addTask(300,"3");
+ addTask(400,"4");
+ 的输出顺序是：2 3 1 4
+
+ 整个的完整执行流程：
+
+一开始1、2两个任务开始执行
+500ms时，2任务执行完毕，输出2，任务3开始执行
+800ms时，3任务执行完毕，输出3，任务4开始执行
+1000ms时，1任务执行完毕，输出1，此时只剩下4任务在执行
+1200ms时，4任务执行完毕，输出4
+```
+```js
+class Scheduler {
+  constructor(limit) {
+    this.queue = [];
+    this.maxCount = limit;
+    this.runCounts = 0;
+  }
+  add(time, order) {
+    const promiseCreator = () => {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          console.log(order);
+          resolve();
+        }, time);
+      });
+    };
+    this.queue.push(promiseCreator);
+  }
+  taskStart() {
+    for (let i = 0; i < this.maxCount; i++) {
+      this.request();
+    }
+  }
+  request() {
+    if (!this.queue || !this.queue.length || this.runCounts >= this.maxCount) {
+      return;
+    }
+    this.runCounts++;
+    this.queue
+      .shift()()
+      .then(() => {
+        this.runCounts--;
+        this.request();
+      });
+  }
+}
+const scheduler = new Scheduler(2);
+const addTask = (time, order) => {
+  scheduler.add(time, order);
+};
+addTask(1000, "1");
+addTask(500, "2");
+addTask(300, "3");
+addTask(400, "4");
+scheduler.taskStart();
+```
 ### 手写异步并发数限制
 ```js
 /**
@@ -2613,6 +3631,124 @@ async function parallelSum(...args) {
   console.log("Done");
 })();
 ```
+### 手写类的继承方式(优缺点)？？？？？？？？？
+
+1. **借助构造函数实现继承**
+
+使用`借用构造函数`的方式，这种方式是通过在子类型的函数中调用超类型的构造函数来实现的，这一种方法解决了不能向超类型传递参数的缺点，但是它存在的一个问题就是无法实现函数方法的复用，并且超类型原型定义的方法子类型也没有办法访问到。
+
+```js
+function Parent1() {
+  this.name = "parent1";
+}
+// 子类无法继承父类原型链上的方法
+Parent1.prototype.say = function() {};
+function Child1() {
+  //修改执行上下文
+  Parent1.call(this);
+  this.type = "child1";
+}
+console.log(new Child1(), new Child1().say());
+```
+
+2. **借助原型链实现继承**
+
+以`原型链的方式来实现继承`，但是这种实现方式存在的缺点是，在包含有引用类型的数据时，会被所有的实例对象所共享，容易造成修改的混乱。还有就是在创建子类型的时候不能向超类型传递参数。
+
+```js
+function Parent2() {
+  this.name = "parent2";
+  this.play = [1, 2, 3];
+}
+function Child2() {
+  this.type = "child2";
+}
+Child2.prototype = new Parent2();
+
+var s1 = new Child2();
+var s2 = new Child2();
+// s1.__proto__ === s2.__proto__  true
+console.log(s1.play, s2.play);
+// 原型链继承的同一个对象引用，创建对个实例，实例使用的都是一个对象，修改一个另一个也跟着变，因为是一个。
+s1.play.push(4);
+```
+
+3. **组合方式**（构造函数+原型链）
+
+`组合继承`，组合继承是将原型链和借用构造函数组合起来使用的一种方式。通过借用构造函数的方式来实现类型的属性的继承，通过将子类型的原型设置为超类型的实例来实现方法的继承。这种方式解决了上面的两种模式单独使用时的问题，但是由于我们是以超类型的实例来作为子类型的原型，所以调用了两次超类的构造函数，造成了子类型的原型中多了很多不必要的属性。
+
+```js
+// 解决了上面两种的每个问题
+// 父类多次实例化问题
+function Parent3() {
+  this.name = "parent3";
+  this.play = [1, 2, 3];
+}
+function Child3() {
+  Parent3.call(this);
+  this.type = "child3";
+}
+// 就是为了继承父类的原型对象
+Child3.prototype = new Parent3();
+var s3 = new Child3();
+var s4 = new Child3();
+s3.play.push(4);
+console.log(s3.play, s4.play);
+```
+
+4. **组合继承优化 1**
+
+   ```js
+   function Parent4() {
+     this.name = "parent4";
+     this.play = [1, 2, 3];
+   }
+   function Child4() {
+     Parent4.call(this);
+     this.type = "child4";
+   }
+   // 就是为了继承父类的原型对象
+   // 在原型对象中有constructor属性，因为子类和父类都是一个原型对象，所以属性值都是一样的
+   // Child4.prototype.constructor = Child4  加上这句话也不行，因为Child4.prototype = Parent4.prototype是一个对象，你改变Child4.prototype 就等于改变 Parent4.prototype
+   Child4.prototype = Parent4.prototype;
+   var s5 = new Child4();
+   var s6 = new Child4();
+   console.log(s5, s6);
+
+   console.log(s5 instanceof Child4, s5 instanceof Parent4);
+   // 但是使用这种的时候  你去找我这实例是谁产生的，竟然是父类（不是我们想要的）
+   console.log(s5.constructor);
+   ```
+
+5. **组合继承优化 2**
+
+`原型式继承`，原型式继承的主要思路就是基于已有的对象来创建新的对象，实现的原理是，向函数中传入一个对象，然后返回一个以这个对象为原型的对象。这种继承的思路主要不是为了实现创造一种新的类型，只是对某个对象实现一种简单继承，ES5 中定义的 Object.create() 方法就是原型式继承的实现。缺点与原型链方式相同。
+
+```js
+function Parent5() {
+  this.name = "parent5";
+  this.play = [1, 2, 3];
+}
+function Child5() {
+  Parent5.call(this);
+  this.type = "child5";
+}
+// 对象关联 一个新的对象  子类和父类的原型进行隔离
+Child5.prototype = Object.create(Parent5.prototype);
+Child5.prototype.constructor = Child5;
+```
+
+（1）第一种是以`原型链的方式来实现继承`，但是这种实现方式存在的缺点是，在包含有引用类型的数据时，会被所有的实例对象所共享，容易造成修改的混乱。还有就是在创建子类型的时候不能向超类型传递参数。
+
+（2）第二种方式是使用`借用构造函数`的方式，这种方式是通过在子类型的函数中调用超类型的构造函数来实现的，这一种方法解决了不能向超类型传递参数的缺点，但是它存在的一个问题就是无法实现函数方法的复用，并且超类型原型定义的方法子类型也没有办法访问到。
+
+（3）第三种方式是`组合继承`，组合继承是将原型链和借用构造函数组合起来使用的一种方式。通过借用构造函数的方式来实现类型的属性的继承，通过将子类型的原型设置为超类型的实例来实现方法的继承。这种方式解决了上面的两种模式单独使用时的问题，但是由于我们是以超类型的实例来作为子类型的原型，所以调用了两次超类的构造函数，造成了子类型的原型中多了很多不必要的属性。
+
+（4）第四种方式是`原型式继承`，原型式继承的主要思路就是基于已有的对象来创建新的对象，实现的原理是，向函数中传入一个对象，然后返回一个以这个对象为原型的对象。这种继承的思路主要不是为了实现创造一种新的类型，只是对某个对象实现一种简单继承，ES5 中定义的 Object.create() 方法就是原型式继承的实现。缺点与原型链方式相同。
+
+（5）第五种方式是`寄生式继承`，寄生式继承的思路是创建一个用于封装继承过程的函数，通过传入一个对象，然后复制一个对象的副本，然后对象进行扩展，最后返回这个对象。这个扩展的过程就可以理解是一种继承。这种继承的优点就是对一个简单对象实现继承，如果这个对象不是我们的自定义类型时。缺点是没有办法实现函数的复用。
+
+（6）第六种方式是`寄生式组合继承`，组合继承的缺点就是使用超类型的实例做为子类型的原型，导致添加了不必要的原型属性。寄生式组合继承的方式是使用超类型的原型的副本来作为子类型的原型，这样就避免了创建不必要的属性。
 ### 手写深度比较（isEqual）
 ```js
 // 判断对象是否是对象还是数组
@@ -2798,6 +3934,142 @@ class Storage {
   }
 }
 ```
+### 树形结构转成列表
+```js
+[
+    {
+        id: 1,
+        text: '节点1',
+        parentId: 0,
+        children: [
+            {
+                id:2,
+                text: '节点1_1',
+                parentId:1
+            }
+        ]
+    }
+]
+// 转成
+[
+    {
+        id: 1,
+        text: '节点1',
+        parentId: 0 //这里用0表示为顶级节点
+    },
+    {
+        id: 2,
+        text: '节点1_1',
+        parentId: 1 //通过这个字段来确定子父级
+    }
+    ...
+]
+```
+```js
+// 深度优先遍历
+function treeToList(data) {
+  let res = [];
+  const dfs = (tree) => {
+    tree.forEach((item) => {
+      if (item.children) {
+        dfs(item.children);
+        delete item.children;
+      }
+      res.push(item);
+    });
+  };
+  dfs(data);
+  return res;
+}
+```
+### 列表转成树形结构
+```js
+[
+    {
+        id: 1,
+        text: '节点1',
+        parentId: 0 //这里用0表示为顶级节点
+    },
+    {
+        id: 2,
+        text: '节点1_1',
+        parentId: 1 //通过这个字段来确定子父级
+    }
+    ...
+]
+// 转成
+[
+    {
+        id: 1,
+        text: '节点1',
+        parentId: 0,
+        children: [
+            {
+                id:2,
+                text: '节点1_1',
+                parentId:1
+            }
+        ]
+    }
+]
+```
+```js
+function listToTree(data) {
+  let temp = {};
+  let treeData = [];
+  // id作为数组的索引，
+  for (let i = 0; i < data.length; i++) {
+    temp[data[i].id] = data[i];
+  }
+  for (let i in temp) {
+    // 转化为数字，除了非0结点
+    if (+temp[i].parentId != 0) {
+      // 相应父节点没有找到孩子，给孩子赋值[]
+      if (!temp[temp[i].parentId].children) {
+        temp[temp[i].parentId].children = [];
+      }
+      // 根据父节点找孩子
+      temp[temp[i].parentId].children.push(temp[i]);
+    } else {
+      treeData.push(temp[i]);
+    }
+  }
+  return treeData;
+}
+```
+### DOM节点输出JSON的格式
+```md
+<div>
+  <span>
+    <a></a>
+  </span>
+  <span>
+    <a></a>
+    <a></a>
+  </span>
+</div>
+
+把上诉dom结构转成下面的JSON格式
+
+{
+  tag: 'DIV',
+  children: [
+    {
+      tag: 'SPAN',
+      children: [
+        { tag: 'A', children: [] }
+      ]
+    },
+    {
+      tag: 'SPAN',
+      children: [
+        { tag: 'A', children: [] },
+        { tag: 'A', children: [] }
+      ]
+    }
+  ]
+}
+```
 ## 手写代码部分3
 ### 手写`——proto__`
 ```js
@@ -2925,7 +4197,385 @@ const isValid = function(s) {
   return true;
 };
 ```
+### LRU 算法
+- `LRU`（ least recently used）根据数据的历史记录来淘汰数据，重点在于**保护最近被访问/使用过的数据，淘汰现阶段最久未被访问的数据**
+- LRU：如果数据最近被访问过,那么将来被访问的几率也更高
+- LRU算法主要思想就是假设:长期不被使用的数据，未来被使用到的概率也不大。LRU的主要数据结构是哈希链表。
+- 实现思路
+    - 采用es6的Map
+    - 新数据插入到链表尾部
+    - 每当缓存命中（即缓存数据被访问），则将数据移到链表尾部
+    - 表满的时候，将链表头部的数据丢弃
+
+```js
+class LRUCache {
+  constructor(limit) {
+    this.limit = limit
+    this.cache = new Map()
+  }
+  get(key) {
+    if (this.cache.has(key)) {
+      // 访问到的 key 若在缓存中，将其提前
+      const temp = this.cache.get(key)
+      this.cache.delete(key)
+      this.cache.set(key, temp)
+      return temp
+    }
+    return -1
+  }
+
+  put(key, value) {
+    // 存在则删除
+    if (this.cache.has(key)) {
+      this.cache.delete(key)
+    // 超过缓存长度,淘汰最近没使用的
+    } else if (this.cache.size >= this.limit) {
+      this.cache.delete(this.cache.keys().next().value)
+      console.log(`key:${key}, value: ${value}`)
+    }
+    // 重新设置
+    this.cache.set(key, value)
+  }
+  toString() {
+    console.log('limit：', this.limit)
+    console.table(this.cache)
+  }
+}
+
+const lru = new LRUCache(4)
+
+lru.put(2,2)   // 入 2，剩余容量3
+lru.put(3,3)   // 入 3，剩余容量2
+lru.put(4,4)   // 入 4，剩余容量1
+lru.put(5,5)   // 入 5，已满    从头至尾         2-3-4-5
+lru.put(4,4)   // 入4，已存在 ——> 置队尾         2-3-5-4
+lru.put(1,1)   // 入1，不存在 ——> 删除队首 插入1  3-5-4-1
+lru.get(3)     // 获取3，刷新3——> 置队尾         5-4-1-3
+
+lru.toString()
+```
+#### 实际运用
+在Vue的keep-alive组件中就用了这个算法，我们可以来分析一下keep-alive的原理。
+```js
+export default {
+  name: "keep-alive",
+  // 抽象组件属性 ,它在组件实例建立父子关系的时候会被忽略,发生在 initLifecycle 的过程中
+  abstract: true, 
+  props: {
+    // 被缓存组件
+    include: patternTypes, 
+    // 不被缓存组件
+    exclude: patternTypes,
+    // 指定缓存大小
+    max: [String, Number] 
+  },
+  created() {
+    // 初始化用于存储缓存的 cache 对象
+    this.cache = Object.create(null);
+    // 初始化用于存储VNode key值的 keys 数组
+    this.keys = []; 
+  },
+  destroyed() {
+    for (const key in this.cache) {
+      // 删除所有缓存
+      pruneCacheEntry(this.cache, key, this.keys);
+    }
+  },
+  mounted() {
+    // 监听缓存（include）/不缓存（exclude）组件的变化
+    // 在变化时，重新调整 cache
+    // pruneCache：遍历 cache，如果缓存的节点名称与传入的规则没有匹配上的话，就把这个节点从缓存中移除
+    this.$watch("include", val => {
+      pruneCache(this, name => matches(val, name));
+    });
+    this.$watch("exclude", val => {
+      pruneCache(this, name => !matches(val, name));
+    });
+  },
+  render() {
+    // 获取第一个子元素的 vnode
+    const slot = this.$slots.default;
+    const vnode: VNode = getFirstComponentChild(slot);
+    const componentOptions: ?VNodeComponentOptions =
+      vnode && vnode.componentOptions;
+    if (componentOptions) {
+      // name 不在 inlcude 中或者在 exlude 中则直接返回 vnode，否则继续进行下一步
+      // check pattern
+      const name: ?string = getComponentName(componentOptions);
+      const { include, exclude } = this;
+      if (
+        // not included
+        (include && (!name || !matches(include, name))) ||
+        // excluded
+        (exclude && name && matches(exclude, name))
+      ) {
+        return vnode;
+      }
+      
+      const { cache, keys } = this;
+      // 获取键，优先获取组件的 name 字段，否则是组件的 tag
+      const key: ?string =
+        vnode.key == null
+          ? // same constructor may get registered as different local components
+            // so cid alone is not enough (#3269)
+            componentOptions.Ctor.cid +
+            (componentOptions.tag ? `::${componentOptions.tag}` : "")
+          : vnode.key;
+        
+      // --------------------------------------------------
+      // 下面就是 LRU 算法了，
+      // 如果在缓存里有则调整，
+      // 没有则放入（长度超过 max，则淘汰最近没有访问的）
+      // --------------------------------------------------
+      // 如果命中缓存，则从缓存中获取 vnode 的组件实例，并且调整 key 的顺序放入 keys 数组的末尾
+      if (cache[key]) {
+        vnode.componentInstance = cache[key].componentInstance;
+        // make current key freshest
+        remove(keys, key);
+        keys.push(key);
+      }
+      // 如果没有命中缓存,就把 vnode 放进缓存
+      else {
+        cache[key] = vnode;
+        keys.push(key);
+        // prune oldest entry
+        // 如果配置了 max 并且缓存的长度超过了 this.max，还要从缓存中删除第一个
+        if (this.max && keys.length > parseInt(this.max)) {
+          pruneCacheEntry(cache, keys[0], keys, this._vnode);
+        }
+      }
+      
+      // keepAlive标记位
+      vnode.data.keepAlive = true;
+    }
+    return vnode || (slot && slot[0]);
+  }
+};
+
+// 移除 key 缓存
+function pruneCacheEntry (
+  cache: VNodeCache,
+  key: string,
+  keys: Array<string>,
+  current?: VNode
+) {
+  const cached = cache[key]
+  if (cached && (!current || cached.tag !== current.tag)) {
+    cached.componentInstance.$destroy()
+  }
+  cache[key] = null
+  remove(keys, key)
+}
+
+// remove 方法（shared/util.js）
+/**
+ * Remove an item from an array.
+ */
+export function remove (arr: Array<any>, item: any): Array<any> | void {
+  if (arr.length) {
+    const index = arr.indexOf(item)
+    if (index > -1) {
+      return arr.splice(index, 1)
+    }
+  }
+}
+```
+- 在 keep-alive 缓存超过最大时，使用的缓存淘汰算法就是 LRU 算法，它在实现的过程中用到了 cache 对象用于保存缓存的组件实例及 key 值，keys 数组用于保存缓存组件的 key ，当 keep-alive 中渲染一个需要缓存的实例时：
+    - 判断缓存中是否已缓存了该实例，缓存了则直接获取，并调整 key 在 keys 中的位置
+    - 如果没有缓存，则缓存该实例，若 keys 的长度大于 max （缓存长度超过上限），则移除 keys[0] 缓存
+- LRU算法在很多项目和系统中都有使用，比如安卓系统的任务管理界面，会把最近使用的放在最前面，最近最久未使用的任务放到后面。
+### 实现LazyMan链式调用
+```md
+实现一个LazyMan，可以按照以下方式调用:
+LazyMan(“Hank”)输出:
+Hi! This is Hank!
+
+LazyMan(“Hank”).sleep(10).eat(“dinner”)输出
+Hi! This is Hank!
+//等待10秒..
+Wake up after 10
+Eat dinner~
+
+LazyMan(“Hank”).eat(“dinner”).eat(“supper”)输出
+Hi This is Hank!
+Eat dinner~
+Eat supper~
+
+LazyMan(“Hank”).eat(“supper”).sleepFirst(5)输出
+//等待5秒
+Wake up after 5
+Hi This is Hank!
+Eat supper
+```
+```js
+class _LazyMan {
+  constructor(name) {
+    this.tasks = [];
+    const task = () => {
+      console.log(`Hi! This is ${name}`);
+      this.next();
+    };
+    this.tasks.push(task);
+    setTimeout(() => {
+      // 把 this.next() 放到调用栈清空之后执行
+      this.next();
+    }, 0);
+  }
+  next() {
+    const task = this.tasks.shift(); // 取第一个任务执行
+    task && task();
+  }
+  sleep(time) {
+    this._sleepWrapper(time, false);
+    return this; // 链式调用
+  }
+  sleepFirst(time) {
+    this._sleepWrapper(time, true);
+    return this;
+  }
+  _sleepWrapper(time, first) {
+    const task = () => {
+      setTimeout(() => {
+        console.log(`Wake up after ${time}`);
+        this.next();
+      }, time * 1000);
+    };
+    if (first) {
+      this.tasks.unshift(task); // 放到任务队列顶部
+    } else {
+      this.tasks.push(task); // 放到任务队列尾部
+    }
+  }
+  eat(name) {
+    const task = () => {
+      console.log(`Eat ${name}`);
+      this.next();
+    };
+    this.tasks.push(task);
+    return this;
+  }
+}
+function LazyMan(name) {
+  return new _LazyMan(name);
+}
+```
+### 动态规划求解硬币找零问题
+```md
+给定不同面额的硬币 coins 和一个总金额 amount。编写一个函数来计算可以凑成总金额所需的最少的硬币个数。如果没有任何一种硬币组合能组成总金额，返回 -1
+
+示例 1：
+输入: coins = [1, 2, 5], amount = 11
+输出: 3
+解释: 11 = 5 + 5 + 1
+
+示例 2：
+输入: coins = [2], amount = 3
+输出: -1
+```
+
+```js
+const coinChange = function(coins, amount) {
+  // 用于保存每个目标总额对应的最小硬币个数
+  const f = [];
+  // 提前定义已知情况
+  f[0] = 0;
+  // 遍历 [1, amount] 这个区间的硬币总额
+  for (let i = 1; i <= amount; i++) {
+    // 求的是最小值，因此我们预设为无穷大，确保它一定会被更小的数更新
+    f[i] = Infinity;
+    // 循环遍历每个可用硬币的面额
+    for (let j = 0; j < coins.length; j++) {
+      // 若硬币面额小于目标总额，则问题成立
+      if (i - coins[j] >= 0) {
+        // 状态转移方程
+        f[i] = Math.min(f[i], f[i - coins[j]] + 1);
+      }
+    }
+  }
+  // 若目标总额对应的解为无穷大，则意味着没有一个符合条件的硬币总数来更新它，本题无解，返回-1
+  if (f[amount] === Infinity) {
+    return -1;
+  }
+  // 若有解，直接返回解的内容
+  return f[amount];
+};
+```
 ## 手写代码部分5
+### 手写axios
+```js
+function axios({
+  //注意这里使用结构赋值，可以传默认值
+  url,
+  //默认请求方式为GET
+  method = "GET",
+  //params用于接受get请求的参数，请求时直接带在url后面
+  params = {},
+  //data用于接受post方法的参数
+  data = {},
+}) {
+  //返回一个promise对象
+  return new Promise((resolve, reject) => {
+    // 定义一个字符串保存url后面的拼接参数部分
+    let queryString = "";
+    // 得到key组成的数组
+    // Object.keys() 方法会返回一个由一个给定对象的自身可枚举属性组成的数组，
+    Object.keys(params).forEach((key) => {
+      // 这里使用模板字符串简化代码，同时key是一个变量，用[]而不是点语法取出
+      queryString += `${key}=${params[key]}&`;
+    });
+    // 如果queryString非空，也就是说使用get请求传参，我们直接将参数拼接在url后面
+    if (queryString) {
+      // substring() 方法用于提取字符串中介于两个指定下标之间的字符。
+      // 注意最后一个字符是&，因此我们取length-1个字符
+      queryString = queryString.substring(0, queryString.length - 1);
+      //用？分割并拼接
+      url += "?" + queryString;
+    }
+    // 创建xhr对象
+    const request = new XMLHttpRequest();
+    // 打开连接
+    request.open(method, url, true);
+    // 绑定状态改变的监听（异步，当状态为4时才会继续执行）
+    request.onreadystatechange = function () {
+      if (request.readyState != 4) {
+        return;
+      }
+      // 发送请求
+      // 如果是get请求，已经在url中携带参数了，直接传null
+      if (method == "GET") {
+        request.send(null);
+        //如果是post请求，将data作为参数发送
+      } else if (method == "POST") {
+        // 添加请求头
+        request.setRequestHeader(
+          "Content-Type",
+          "application/json;charset=utf-8"
+        );
+        // JSON格式话data并发送请求
+        request.send(JSON.stringify(data));
+      }
+      //这时request会返回status和报文
+      // 解构赋值，这里仅返回状态码和报文
+      const { status, statusText } = request;
+      // 状态码在200到300间代表成功
+      if (status >= 200 && status < 300) {
+        // 对返回值进行结构赋值
+        const response = {
+          //  JSON.stringify 将数组,对象转换成 JSON 字符串，然后使用 JSON.parse 将该字符串重新转换成数组，对象。
+          data: JSON.parse(request.response),
+          status,
+          statusText,
+        };
+        // 执行回调函数并将response作为参数
+        resolve(response);
+      } else {
+        reject(new Error("resquest error status is" + status));
+      }
+    };
+  });
+}
+
+```
 ### 手写jQuery
 ```js
 class jQuery {
@@ -2974,6 +4624,36 @@ class myJQuery extends jQuery {
 // $p.get(1)
 // $p.each((elem) => console.log(elem.nodeName))
 // $p.on('click', () => alert('clicked'))
+```
+### 手写字符串模板
+```js
+function render(template, data) {
+  let computed = template.replace(/\{\{(\w+)\}\}/g, function(match, key) {
+    return data[key];
+  });
+  return computed;
+}
+
+
+
+function render(template, data) {
+  const reg = /\{\{(\w+)\}\}/; // 模板字符串正则
+  if (reg.test(template)) {
+    // 判断模板里是否有模板字符串
+    const name = reg.exec(template)[1]; // 查找当前模板里第一个模板字符串的字段，一个一个查找
+    template = template.replace(reg, data[name]); // 将第一个模板字符串渲染
+    return render(template, data); // 递归的渲染并返回渲染后的结构,递归的查找
+  }
+  return template; // 如果模板没有模板字符串直接返回
+}
+
+// 测试验证
+let template = "我是{{name}}，年龄{{age}}，性别{{sex}}";
+let person = {
+  name: "布兰",
+  age: 12,
+};
+render(template, person); // 我是布兰，年龄12，性别undefined
 ```
 ### 手写将虚拟Dom转化为真实Dom（类似的递归题-必考）
 ```js
@@ -3038,6 +4718,95 @@ class EventEmitter {
       this.events[type].forEach((fn) => fn.apply(this, rest));
   }
 }
+```
+### 手写Vue.Reactive
+```js
+// Dep module
+class Dep {
+  static stack = [];
+  static target = null;
+  deps = null;
+
+  constructor() {
+    this.deps = new Set();
+  }
+
+  depend() {
+    if (Dep.target) {
+      this.deps.add(Dep.target);
+    }
+  }
+
+  notify() {
+    this.deps.forEach((w) => w.update());
+  }
+
+  static pushTarget(t) {
+    if (this.target) {
+      this.stack.push(this.target);
+    }
+    this.target = t;
+  }
+
+  static popTarget() {
+    this.target = this.stack.pop();
+  }
+}
+
+// reactive
+function reactive(o) {
+  if (o && typeof o === "object") {
+    Object.keys(o).forEach((k) => {
+      defineReactive(o, k, o[k]);
+    });
+  }
+  return o;
+}
+
+function defineReactive(obj, k, val) {
+  let dep = new Dep();
+  Object.defineProperty(obj, k, {
+    get() {
+      dep.depend();
+      return val;
+    },
+    set(newVal) {
+      val = newVal;
+      dep.notify();
+    },
+  });
+  if (val && typeof val === "object") {
+    reactive(val);
+  }
+}
+
+// watcher
+class Watcher {
+  constructor(effect) {
+    this.effect = effect;
+    this.update();
+  }
+
+  update() {
+    Dep.pushTarget(this);
+    this.value = this.effect();
+    Dep.popTarget();
+    return this.value;
+  }
+}
+
+// 测试代码
+const data = reactive({
+  msg: "aaa",
+});
+
+new Watcher(() => {
+  console.log("===> effect", data.msg);
+});
+
+setTimeout(() => {
+  data.msg = "hello";
+}, 1000);
 ```
 ### 事件总线EventEmitter（发布订阅模式）
 ```js
@@ -3120,3 +4889,332 @@ EventEmitter.prototype.removeAllListeners = function(type) {
   this.events.delete(type);
 };
 ```
+### 手写防抖节流1
+```js
+// 防抖
+function debounce(fn, delay = 300) {
+  //默认300毫秒
+  let timer;
+  return function() {
+    const args = arguments;
+    if (timer) {
+      clearTimeout(timer);
+    }
+    timer = setTimeout(() => {
+      fn.apply(this, args); // 改变this指向为调用debounce所指的对象
+    }, delay);
+  };
+}
+
+window.addEventListener(
+  "scroll",
+  debounce(() => {
+    console.log(111);
+  }, 1000)
+);
+
+// 节流
+// 设置一个标志
+function throttle(fn, delay) {
+  let flag = true;
+  return () => {
+    if (!flag) return;
+    flag = false;
+    timer = setTimeout(() => {
+      fn();
+      flag = true;
+    }, delay);
+  };
+}
+
+window.addEventListener(
+  "scroll",
+  throttle(() => {
+    console.log(111);
+  }, 1000)
+);
+```
+### 手写防抖节流2
+针对高频的触发的函数，我们一般都会思考通过节流或者防抖去实现性能上的优化。
+
+节流实现原理是通过定时器以和时间差做判断。定时器有延迟的能力，事件一开始不会立即执行，事件结束后还会再执行一次；而时间差事件一开始就立即执行，时间结束之后也会立即停止。
+```js
+//防抖
+function debounce(handle, delay) {
+  var timer = null;
+  return function() {
+    var _self = this,
+      _args = arguments;
+    if (timer) {
+      clearTimeout(timer);
+    }
+    timer = setTimeout(function() {
+      handle.apply(_self, _args);
+    }, delay);
+  };
+}
+
+//节流
+function throttle(handler, wait) {
+  var lastTime = 0;
+  return function(e) {
+    var nowTime = new Date().getTime();
+    if (nowTime - lastTime > wait) {
+      handler.apply(this, arguments);
+      lastTime = nowTime;
+    }
+  };
+}
+
+function throttle(fn, gapTime) {
+  let timer = null;
+  return function() {
+    var _self = this,
+      _args = argument;
+    if (timer) {
+      return;
+    }
+    timer = setTimeout(() => {
+      fn.apply(_self, _args);
+      timer = null;
+    });
+  };
+}
+```
+### 书写防抖节流3
+```js
+// 触发高频事件 N 秒后只会执行一次，如果 N 秒内事件再次触发，则会重新计时。
+// 简单版：函数内部支持使用 this 和 event 对象；
+function debounce(func, wait) {
+  var timeout;
+  return function() {
+    var context = this;
+    var args = arguments;
+    if (timer) {
+      clearTimeout(timer);
+    }
+    timer = setTimeout(function() {
+      func.apply(context, args);
+    }, wait);
+  };
+}
+// 最终版：除了支持 this 和 event 外，还支持以下功能：
+// 支持立即执行；
+// 函数可能有返回值；
+// 支持取消功能；
+function debounce(func, wait, immediate) {
+  var timeout, result;
+
+  var debounced = function() {
+    var context = this;
+    var args = arguments;
+
+    if (timeout) clearTimeout(timeout);
+    if (immediate) {
+      // 如果已经执行过，不再执行
+      var callNow = !timeout;
+      timeout = setTimeout(function() {
+        timeout = null;
+      }, wait);
+      if (callNow) result = func.apply(context, args);
+    } else {
+      timeout = setTimeout(function() {
+        func.apply(context, args);
+      }, wait);
+    }
+    return result;
+  };
+
+  debounced.cancel = function() {
+    clearTimeout(timeout);
+    timeout = null;
+  };
+
+  return debounced;
+}
+```
+
+```js
+// 触发高频事件，且 N 秒内只执行一次。
+// 简单版：使用时间戳来实现，立即执行一次，然后每 N 秒执行一次。
+function throttle(func, wait) {
+  var context, args;
+  var previous = 0;
+
+  return function() {
+    var now = +new Date();
+    context = this;
+    args = arguments;
+    if (now - previous > wait) {
+      func.apply(context, args);
+      previous = now;
+    }
+  };
+}
+
+// 最终版：支持取消节流；另外通过传入第三个参数，options.leading 来表示是否可以立即执行一次，opitons.trailing 表示结束调用的时候是否还要执行一次，默认都是 true。注意设置的时候不能同时将 leading 或 trailing 设置为 false。
+function throttle(func, wait, options) {
+  var timeout, context, args, result;
+  var previous = 0;
+  if (!options) options = {};
+
+  var later = function() {
+    previous = options.leading === false ? 0 : new Date().getTime();
+    timeout = null;
+    func.apply(context, args);
+    if (!timeout) context = args = null;
+  };
+
+  var throttled = function() {
+    var now = new Date().getTime();
+    if (!previous && options.leading === false) previous = now;
+    var remaining = wait - (now - previous);
+    context = this;
+    args = arguments;
+    if (remaining <= 0 || remaining > wait) {
+      if (timeout) {
+        clearTimeout(timeout);
+        timeout = null;
+      }
+      previous = now;
+      func.apply(context, args);
+      if (!timeout) context = args = null;
+    } else if (!timeout && options.trailing !== false) {
+      timeout = setTimeout(later, remaining);
+    }
+  };
+
+  throttled.cancel = function() {
+    clearTimeout(timeout);
+    previous = 0;
+    timeout = null;
+  };
+  return throttled;
+}
+```
+### 书写防抖节流4
+1. 函数防抖(debounce)
+   - **概念：** `在事件被触发n秒后再执行回调，如果在这n秒内又被触发，则重新计时。`
+   - **生活中的实例：** `如果有人进电梯（触发事件），那电梯将在10秒钟后出发（执行事件监听器），这时如果又有人进电梯了（在10秒内再次触发该事件），我们又得等10秒再出发（重新计时）。
+   - **生活中的实例：** 我们知道目前的一种说法是当 1 秒内连续播放 24 张以上的图片时，在人眼的视觉中就会形成一个连贯的动画，所以在电影的播放（以前是，现在不知道）中基本是以每秒 24 张的速度播放的，为什么不 100 张或更多是因为 24 张就可以满足人类视觉需求的时候，100 张就会显得很浪费资源。
+   - **事件响应函数在一段规定时间（前/后）才执行。如果在规定时间内，再次触发，重新计算时间。**
+   - **触发高频事件后 n 秒内函数只会执行一次，如果 n 秒内高频事件再次被触发，则重新计算时间**
+   - **防抖动是将多次执行变为最后一次执行**
+   - **函数防抖是指频繁触发的情况下，只有足够的空闲时间，才执行代码一次。**
+2. 函数节流(throttle)
+   - **概念：** 规定一个单位时间，在这个单位时间内，只能有一次触发事件的回调函数执行，如果在同一个单位时间内某事件被触发多次，只有一次能生效。
+   - **生活中的实例：** 我们知道目前的一种说法是当 1 秒内连续播放 24 张以上的图片时，在人眼的视觉中就会形成一个连贯的动画，所以在电影的播放（以前是，现在不知道）中基本是以每秒 24 张的速度播放的，为什么不 100 张或更多是因为 24 张就可以满足人类视觉需求的时候，100 张就会显得很浪费资源。
+   - **高频事件触发，但在 n 秒内只会执行一次，所以节流会稀释函数的执行频率**
+   - **节流是将多次执行变成每隔一段时间执行。**
+   - **函数节流是指一定时间内 js 方法只跑一次。**
+
+函数防抖和函数节流是**在时间轴上控制函数的执行次数**。防抖可以类比为`电梯不断上乘客`,节流可以看做`幻灯片限制频率播放电影`。
+
+
+- 对于函数防抖，有以下几种应用场景：
+    - 防止表单多次提交。
+    - 对于输入框连续输入进行 AJAX 验证时，用函数防抖能有效减少请求次数。搜索框输入查询（监听输入框输入内容，设定每隔一段时间访问接口。
+    - 判断`scroll`是否滑到底部，`滚动事件`+`函数防抖`
+    - 浏览器窗口缩放时，resize 事件。
+    - 手机号，邮箱验证输入检测
+    - 总的来说，适合多次事件**一次响应**的情况
+```js
+// 包含立即执行
+function debounce(fn, wait = 200, immediate = false) {
+  let timer = null,
+    isEnd = true, // 默认后执行  用变量来判断先后执行
+    result;
+  let debounced = function(...args) {
+    if (timer) clearTimeout(timer);
+    if (immediate) {
+      // 立即执行
+      // 改变this指向
+      isEnd && (result = fn.apply(this, args));
+      isEnd = false;
+    }
+    // 后执行
+    timer = setTimeout(() => {
+      !immediate && (result = fn.apply(this, args));
+      isEnd = true;
+    }, wait);
+    return result;
+  };
+  debounced.cancel = function() {
+    if (timer) clearTimeout(timer);
+    timer = null;
+  };
+  return debounced;
+}
+
+//解决函数异步问题
+//  配合async 和  awit使用
+function debounce(fn, wait, immediate) {
+  let timer = null,
+    result;
+  let debounced = function(...args) {
+    // 使用Promise
+    return new Promise((res) => {
+      if (timer) clearInterval(timer);
+      if (immediate) {
+        // 立即执行
+        if (!timer) {
+          result = fn.apply(this, args);
+          res(result);
+        }
+        //当我们提交失败了怎么办（哭），在设定的时间间隔内，将timer设置为null, 过了设定的时间间隔，可以再次触发提交按钮的立即执行，这才是完整的。
+        timer = setTimeout(() => {
+          timer = null;
+        }, wait);
+      } else {
+        timer = setTimeout(() => {
+          result = fn.apply(this, args);
+          res(result);
+        }, wait);
+      }
+    });
+  };
+  debounced.cancel = function() {
+    if (timer) clearTimeout(timer);
+    timer = null;
+  };
+  return debounced;
+}
+
+var fn = function() {
+  console.log("boom");
+};
+
+setInterval(debounce(fn, 500), 1000); // 第一次在1500ms后触发，之后每1000ms触发一次
+
+setInterval(debounce(fn, 2000), 1000); // 不会触发一次（我把函数防抖看出技能读条，如果读条没完成就用技能，便会失败而且重新读条）
+```
+
+
+- 对于函数节流，有如下几个场景：
+    - 游戏中的刷新率
+    - DOM 元素拖拽
+    - Canvas 画笔功能
+    - 总的来说，适合**大量事件**按时间做**平均**分配触发。
+```js
+function throttle(fn, gapTime) {
+  let timer = null;
+  return function() {
+    var _self = this,
+      _args = argument;
+    if (timer) {
+      return;
+    }
+    timer = setTimeout(() => {
+      fn.apply(_self, _args);
+      timer = null;
+    });
+  };
+}
+
+let fn = () => {
+  console.log("boom");
+};
+
+setInterval(throttle(fn, 1000), 10);
+```
+

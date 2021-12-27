@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en-US">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Gulp 基础 | 前端学习总结和技巧</title>
+    <meta name="generator" content="VuePress 1.8.2">
+    <link rel="icon" href="/favicon.ico">
+    <link rel="stylesheet" href="/css/style.css">
+    <meta name="description" content="一个前端的学习小白">
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+    <meta name="keywords" content="关键字">
+    <meta name="robots" content="all">
+    <meta name="author" content="hardingcheng">
+    
+    <link rel="preload" href="/assets/css/0.styles.ae78a777.css" as="style"><link rel="preload" href="/assets/js/app.18220fda.js" as="script"><link rel="preload" href="/assets/js/3.cb90e6dd.js" as="script"><link rel="preload" href="/assets/js/1.e749a552.js" as="script"><link rel="preload" href="/assets/js/24.6fb1e180.js" as="script"><link rel="preload" href="/assets/js/9.912710f6.js" as="script"><link rel="prefetch" href="/assets/js/10.baf9a1fb.js"><link rel="prefetch" href="/assets/js/11.3c25fa72.js"><link rel="prefetch" href="/assets/js/12.60a1598d.js"><link rel="prefetch" href="/assets/js/13.bace4fcf.js"><link rel="prefetch" href="/assets/js/14.b96547a3.js"><link rel="prefetch" href="/assets/js/15.6db21969.js"><link rel="prefetch" href="/assets/js/16.1de46e97.js"><link rel="prefetch" href="/assets/js/17.e9566c41.js"><link rel="prefetch" href="/assets/js/18.77b30ff2.js"><link rel="prefetch" href="/assets/js/19.9763392d.js"><link rel="prefetch" href="/assets/js/20.9c54412b.js"><link rel="prefetch" href="/assets/js/21.8156d804.js"><link rel="prefetch" href="/assets/js/22.f195a007.js"><link rel="prefetch" href="/assets/js/23.7a2aa2b7.js"><link rel="prefetch" href="/assets/js/25.8698b860.js"><link rel="prefetch" href="/assets/js/26.b9fbb864.js"><link rel="prefetch" href="/assets/js/27.c8beb7d1.js"><link rel="prefetch" href="/assets/js/28.6505d8a9.js"><link rel="prefetch" href="/assets/js/29.69d3c9ad.js"><link rel="prefetch" href="/assets/js/30.f3ece7fa.js"><link rel="prefetch" href="/assets/js/31.cef1d3ca.js"><link rel="prefetch" href="/assets/js/32.559499fc.js"><link rel="prefetch" href="/assets/js/33.1f74f7b5.js"><link rel="prefetch" href="/assets/js/34.4a1c1fc9.js"><link rel="prefetch" href="/assets/js/35.3e90ec30.js"><link rel="prefetch" href="/assets/js/36.1cb4b662.js"><link rel="prefetch" href="/assets/js/37.c382b03a.js"><link rel="prefetch" href="/assets/js/38.d3b35e13.js"><link rel="prefetch" href="/assets/js/39.ea45324d.js"><link rel="prefetch" href="/assets/js/4.db65a195.js"><link rel="prefetch" href="/assets/js/40.1eee1a97.js"><link rel="prefetch" href="/assets/js/41.1449f415.js"><link rel="prefetch" href="/assets/js/42.0379465d.js"><link rel="prefetch" href="/assets/js/43.fe80ff9b.js"><link rel="prefetch" href="/assets/js/44.0621a5db.js"><link rel="prefetch" href="/assets/js/45.32f41ebb.js"><link rel="prefetch" href="/assets/js/5.205cc2e2.js"><link rel="prefetch" href="/assets/js/6.a85ed7ae.js"><link rel="prefetch" href="/assets/js/7.3163c07b.js"><link rel="prefetch" href="/assets/js/8.5fb0cf18.js">
+    <link rel="stylesheet" href="/assets/css/0.styles.ae78a777.css">
+  </head>
+  <body>
+    <div id="app" data-server-rendered="true"><div class="theme-container no-sidebar" data-v-1aefc0b4><div data-v-1aefc0b4><div id="loader-wrapper" class="loading-wrapper" data-v-d48f4d20 data-v-1aefc0b4 data-v-1aefc0b4><div class="loader-main" data-v-d48f4d20><div data-v-d48f4d20></div><div data-v-d48f4d20></div><div data-v-d48f4d20></div><div data-v-d48f4d20></div></div> <!----> <!----></div> <div class="password-shadow password-wrapper-out" style="display:none;" data-v-25ba6db2 data-v-1aefc0b4 data-v-1aefc0b4><h3 class="title" data-v-25ba6db2 data-v-25ba6db2>前端学习总结和技巧</h3> <p class="description" data-v-25ba6db2 data-v-25ba6db2>一个前端的学习小白</p> <label id="box" class="inputBox" data-v-25ba6db2 data-v-25ba6db2><input type="password" value="" data-v-25ba6db2> <span data-v-25ba6db2>Konck! Knock!</span> <button data-v-25ba6db2>OK</button></label> <div class="footer" data-v-25ba6db2 data-v-25ba6db2><span data-v-25ba6db2><i class="iconfont reco-theme" data-v-25ba6db2></i> <a target="blank" href="https://vuepress-theme-reco.recoluan.com" data-v-25ba6db2>vuePress-theme-reco</a></span> <span data-v-25ba6db2><i class="iconfont reco-copyright" data-v-25ba6db2></i> <a data-v-25ba6db2><span data-v-25ba6db2>hardingcheng</span>
+            
+          <span data-v-25ba6db2>2020-2021 - </span>
+          2021
+        </a></span></div></div> <div class="hide" data-v-1aefc0b4><header class="navbar" data-v-1aefc0b4><div class="sidebar-button"><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" viewBox="0 0 448 512" class="icon"><path fill="currentColor" d="M436 124H12c-6.627 0-12-5.373-12-12V80c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12zm0 160H12c-6.627 0-12-5.373-12-12v-32c0-6.627 5.373-12 12-12h424c6.627 0 12 5.373 12 12v32c0 6.627-5.373 12-12 12z"></path></svg></div> <a href="/" class="home-link router-link-active"><img src="/logo.png" alt="前端学习总结和技巧" class="logo"> <span class="site-name">前端学习总结和技巧</span></a> <div class="links"><div class="color-picker"><a class="color-button"><i class="iconfont reco-color"></i></a> <div class="color-picker-menu" style="display:none;"><div class="mode-options"><h4 class="title">Choose mode</h4> <ul class="color-mode-options"><li class="dark">dark</li><li class="auto active">auto</li><li class="light">light</li></ul></div></div></div> <div class="search-box"><i class="iconfont reco-search"></i> <input aria-label="Search" autocomplete="off" spellcheck="false" value=""> <!----></div> <nav class="nav-links can-hide"><div class="nav-item"><a href="/" class="nav-link"><i class="iconfont reco-home"></i>
+  主页
+</a></div><div class="nav-item"><div class="dropdown-wrapper"><a class="dropdown-title"><span class="title"><i class="iconfont reco-category"></i>
+      分类
+    </span> <span class="arrow right"></span></a> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/categories/HTMLCSS/" class="nav-link"><i class="undefined"></i>
+  HTMLCSS
+</a></li><li class="dropdown-item"><!----> <a href="/categories/手撕代码/" class="nav-link"><i class="undefined"></i>
+  手撕代码
+</a></li><li class="dropdown-item"><!----> <a href="/categories/HTMLCSS面经/" class="nav-link"><i class="undefined"></i>
+  HTMLCSS面经
+</a></li><li class="dropdown-item"><!----> <a href="/categories/HTMLCSS知识要点/" class="nav-link"><i class="undefined"></i>
+  HTMLCSS知识要点
+</a></li><li class="dropdown-item"><!----> <a href="/categories/设计模式/" class="nav-link"><i class="undefined"></i>
+  设计模式
+</a></li><li class="dropdown-item"><!----> <a href="/categories/数据结构/" class="nav-link"><i class="undefined"></i>
+  数据结构
+</a></li><li class="dropdown-item"><!----> <a href="/categories/JavaScript/" class="nav-link"><i class="undefined"></i>
+  JavaScript
+</a></li><li class="dropdown-item"><!----> <a href="/categories/JavaScript 面试/" class="nav-link"><i class="undefined"></i>
+  JavaScript 面试
+</a></li><li class="dropdown-item"><!----> <a href="/categories/Vue 面经/" class="nav-link"><i class="undefined"></i>
+  Vue 面经
+</a></li><li class="dropdown-item"><!----> <a href="/categories/Gulp/" class="nav-link"><i class="undefined"></i>
+  Gulp
+</a></li><li class="dropdown-item"><!----> <a href="/categories/Rollup/" class="nav-link"><i class="undefined"></i>
+  Rollup
+</a></li><li class="dropdown-item"><!----> <a href="/categories/Vite/" class="nav-link"><i class="undefined"></i>
+  Vite
+</a></li><li class="dropdown-item"><!----> <a href="/categories/Webpack/" class="nav-link"><i class="undefined"></i>
+  Webpack
+</a></li><li class="dropdown-item"><!----> <a href="/categories/Node/" class="nav-link"><i class="undefined"></i>
+  Node
+</a></li><li class="dropdown-item"><!----> <a href="/categories/TypeScript/" class="nav-link"><i class="undefined"></i>
+  TypeScript
+</a></li><li class="dropdown-item"><!----> <a href="/categories/React/" class="nav-link"><i class="undefined"></i>
+  React
+</a></li><li class="dropdown-item"><!----> <a href="/categories/源码/" class="nav-link"><i class="undefined"></i>
+  源码
+</a></li><li class="dropdown-item"><!----> <a href="/categories/Vue/" class="nav-link"><i class="undefined"></i>
+  Vue
+</a></li></ul></div></div><div class="nav-item"><a href="/tag/" class="nav-link"><i class="iconfont reco-tag"></i>
+  标签
+</a></div><div class="nav-item"><div class="dropdown-wrapper"><a class="dropdown-title"><span class="title"><i class="iconfont reco-message"></i>
+      博文
+    </span> <span class="arrow right"></span></a> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/docs/daily-blog/" class="nav-link"><i class="undefined"></i>
+  日常博文
+</a></li><li class="dropdown-item"><!----> <a href="/docs/personal-life/" class="nav-link"><i class="undefined"></i>
+  个人生活
+</a></li></ul></div></div><div class="nav-item"><a href="/docs/tool-resources/" class="nav-link"><i class="iconfont reco-category"></i>
+  资源
+</a></div><div class="nav-item"><a href="/timeline/" class="nav-link"><i class="iconfont reco-date"></i>
+  时间轴
+</a></div><div class="nav-item"><div class="dropdown-wrapper"><a class="dropdown-title"><span class="title"><i class="iconfont reco-message"></i>
+      联系
+    </span> <span class="arrow right"></span></a> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="https://github.com/hardingcheng" target="_blank" rel="noopener noreferrer" class="nav-link external"><i class="iconfont reco-github"></i>
+  GitHub
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></li></ul></div></div> <!----></nav></div></header> <div class="sidebar-mask" data-v-1aefc0b4></div> <aside class="sidebar" data-v-1aefc0b4><div class="personal-info-wrapper" data-v-39576ba9 data-v-1aefc0b4><img src="/avatar.png" alt="author-avatar" class="personal-img" data-v-39576ba9> <h3 class="name" data-v-39576ba9>
+    hardingcheng
+  </h3> <div class="num" data-v-39576ba9><div data-v-39576ba9><h3 data-v-39576ba9>33</h3> <h6 data-v-39576ba9>Articles</h6></div> <div data-v-39576ba9><h3 data-v-39576ba9>18</h3> <h6 data-v-39576ba9>Tags</h6></div></div> <ul class="social-links" data-v-39576ba9></ul> <hr data-v-39576ba9></div> <nav class="nav-links"><div class="nav-item"><a href="/" class="nav-link"><i class="iconfont reco-home"></i>
+  主页
+</a></div><div class="nav-item"><div class="dropdown-wrapper"><a class="dropdown-title"><span class="title"><i class="iconfont reco-category"></i>
+      分类
+    </span> <span class="arrow right"></span></a> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/categories/HTMLCSS/" class="nav-link"><i class="undefined"></i>
+  HTMLCSS
+</a></li><li class="dropdown-item"><!----> <a href="/categories/手撕代码/" class="nav-link"><i class="undefined"></i>
+  手撕代码
+</a></li><li class="dropdown-item"><!----> <a href="/categories/HTMLCSS面经/" class="nav-link"><i class="undefined"></i>
+  HTMLCSS面经
+</a></li><li class="dropdown-item"><!----> <a href="/categories/HTMLCSS知识要点/" class="nav-link"><i class="undefined"></i>
+  HTMLCSS知识要点
+</a></li><li class="dropdown-item"><!----> <a href="/categories/设计模式/" class="nav-link"><i class="undefined"></i>
+  设计模式
+</a></li><li class="dropdown-item"><!----> <a href="/categories/数据结构/" class="nav-link"><i class="undefined"></i>
+  数据结构
+</a></li><li class="dropdown-item"><!----> <a href="/categories/JavaScript/" class="nav-link"><i class="undefined"></i>
+  JavaScript
+</a></li><li class="dropdown-item"><!----> <a href="/categories/JavaScript 面试/" class="nav-link"><i class="undefined"></i>
+  JavaScript 面试
+</a></li><li class="dropdown-item"><!----> <a href="/categories/Vue 面经/" class="nav-link"><i class="undefined"></i>
+  Vue 面经
+</a></li><li class="dropdown-item"><!----> <a href="/categories/Gulp/" class="nav-link"><i class="undefined"></i>
+  Gulp
+</a></li><li class="dropdown-item"><!----> <a href="/categories/Rollup/" class="nav-link"><i class="undefined"></i>
+  Rollup
+</a></li><li class="dropdown-item"><!----> <a href="/categories/Vite/" class="nav-link"><i class="undefined"></i>
+  Vite
+</a></li><li class="dropdown-item"><!----> <a href="/categories/Webpack/" class="nav-link"><i class="undefined"></i>
+  Webpack
+</a></li><li class="dropdown-item"><!----> <a href="/categories/Node/" class="nav-link"><i class="undefined"></i>
+  Node
+</a></li><li class="dropdown-item"><!----> <a href="/categories/TypeScript/" class="nav-link"><i class="undefined"></i>
+  TypeScript
+</a></li><li class="dropdown-item"><!----> <a href="/categories/React/" class="nav-link"><i class="undefined"></i>
+  React
+</a></li><li class="dropdown-item"><!----> <a href="/categories/源码/" class="nav-link"><i class="undefined"></i>
+  源码
+</a></li><li class="dropdown-item"><!----> <a href="/categories/Vue/" class="nav-link"><i class="undefined"></i>
+  Vue
+</a></li></ul></div></div><div class="nav-item"><a href="/tag/" class="nav-link"><i class="iconfont reco-tag"></i>
+  标签
+</a></div><div class="nav-item"><div class="dropdown-wrapper"><a class="dropdown-title"><span class="title"><i class="iconfont reco-message"></i>
+      博文
+    </span> <span class="arrow right"></span></a> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="/docs/daily-blog/" class="nav-link"><i class="undefined"></i>
+  日常博文
+</a></li><li class="dropdown-item"><!----> <a href="/docs/personal-life/" class="nav-link"><i class="undefined"></i>
+  个人生活
+</a></li></ul></div></div><div class="nav-item"><a href="/docs/tool-resources/" class="nav-link"><i class="iconfont reco-category"></i>
+  资源
+</a></div><div class="nav-item"><a href="/timeline/" class="nav-link"><i class="iconfont reco-date"></i>
+  时间轴
+</a></div><div class="nav-item"><div class="dropdown-wrapper"><a class="dropdown-title"><span class="title"><i class="iconfont reco-message"></i>
+      联系
+    </span> <span class="arrow right"></span></a> <ul class="nav-dropdown" style="display:none;"><li class="dropdown-item"><!----> <a href="https://github.com/hardingcheng" target="_blank" rel="noopener noreferrer" class="nav-link external"><i class="iconfont reco-github"></i>
+  GitHub
+  <span><svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" x="0px" y="0px" viewBox="0 0 100 100" width="15" height="15" class="icon outbound"><path fill="currentColor" d="M18.8,85.1h56l0,0c2.2,0,4-1.8,4-4v-32h-8v28h-48v-48h28v-8h-32l0,0c-2.2,0-4,1.8-4,4v56C14.8,83.3,16.6,85.1,18.8,85.1z"></path> <polygon fill="currentColor" points="45.7,48.7 51.3,54.3 77.2,28.5 77.2,37.2 85.2,37.2 85.2,14.9 62.8,14.9 62.8,22.9 71.5,22.9"></polygon></svg> <span class="sr-only">(opens new window)</span></span></a></li></ul></div></div> <!----></nav> <!----> </aside> <div class="password-shadow password-wrapper-in" style="display:none;" data-v-25ba6db2 data-v-1aefc0b4><h3 class="title" data-v-25ba6db2 data-v-25ba6db2>Gulp 基础</h3> <!----> <label id="box" class="inputBox" data-v-25ba6db2 data-v-25ba6db2><input type="password" value="" data-v-25ba6db2> <span data-v-25ba6db2>Konck! Knock!</span> <button data-v-25ba6db2>OK</button></label> <div class="footer" data-v-25ba6db2 data-v-25ba6db2><span data-v-25ba6db2><i class="iconfont reco-theme" data-v-25ba6db2></i> <a target="blank" href="https://vuepress-theme-reco.recoluan.com" data-v-25ba6db2>vuePress-theme-reco</a></span> <span data-v-25ba6db2><i class="iconfont reco-copyright" data-v-25ba6db2></i> <a data-v-25ba6db2><span data-v-25ba6db2>hardingcheng</span>
+            
+          <span data-v-25ba6db2>2020-2021 - </span>
+          2021
+        </a></span></div></div> <div data-v-1aefc0b4><main class="page"><section><div class="page-title"><h1 class="title">Gulp 基础</h1> <div data-v-f875f3fc><i class="iconfont reco-account" data-v-f875f3fc><span data-v-f875f3fc>hardingcheng</span></i> <i class="iconfont reco-date" data-v-f875f3fc><span data-v-f875f3fc>12/25/2021</span></i> <i class="iconfont reco-eye" data-v-f875f3fc><span id="/blogs/PackagingModule/Gulp/gulp-base.html" data-flag-title="Your Article Title" class="leancloud-visitors" data-v-f875f3fc><a class="leancloud-visitors-count" style="font-size:.9rem;font-weight:normal;color:#999;"></a></span></i> <i class="tags iconfont reco-tag" data-v-f875f3fc><span class="tag-item" data-v-f875f3fc>Gulp</span></i></div></div> <div class="theme-reco-content content__default"><h2 id="什么是gulp"><a href="#什么是gulp" class="header-anchor">#</a> 什么是Gulp</h2> <ul><li>什么是Gulp？
+<ul><li>A toolkit to automate &amp; enhance your workflow；</li> <li>一个工具包，可以帮你自动化和增加你的工作流；</li> <li></li></ul></li></ul> <p><img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20211225102120.png" alt=""></p> <h2 id="gulp和webpack"><a href="#gulp和webpack" class="header-anchor">#</a> Gulp和Webpack</h2> <ul><li>gulp的核心理念是task runner
+<ul><li>可以定义自己的一系列任务，等待任务被执行；</li> <li>基于文件Stream的构建流；</li> <li>我们可以使用gulp的插件体系来完成某些任务；</li></ul></li> <li>webpack的核心理念是module bundler(静态模块化)
+<ul><li>webpack是一个模块化的打包工具；</li> <li>可以使用各种各样的loader来加载不同的模块；</li> <li>可以使用各种各样的插件在webpack打包的生命周期完成其他的任务；</li></ul></li> <li>gulp相对于webpack的优缺点：
+<ul><li>gulp相对于webpack思想更加的简单、易用，更适合编写一些自动化的任务；</li> <li>但是目前对于大型项目（Vue、React、Angular）并不会使用gulp来构建，比如默认gulp是不支持模块化的；</li></ul></li></ul> <h2 id="gulp基础"><a href="#gulp基础" class="header-anchor">#</a> Gulp基础</h2> <h3 id="gulp的基本使用"><a href="#gulp的基本使用" class="header-anchor">#</a> Gulp的基本使用</h3> <ul><li>首先，我们需要安装gulp
+<ul><li><code>npm install gulp</code></li></ul></li> <li>其次，编写gulpfile.js文件，在其中创建一个任务：
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20211225103137.png" alt=""> <img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20211225103229.png" alt=""></li> <li>最后，执行gulp命令：
+<ul><li><code>npx gulp foo</code></li></ul></li></ul> <h3 id="创建gulp任务"><a href="#创建gulp任务" class="header-anchor">#</a> 创建gulp任务</h3> <ul><li>每个gulp任务都是一个异步的JavaScript函数：
+<ul><li>此函数可以接受一个callback作为参数，调用callback函数那么任务会结束；</li> <li>或者是一个返回<code>stream</code>、<code>promise</code>、<code>event emitter</code>、<code>child process</code>或<code>observable</code>类型的函数；</li></ul></li> <li>任务可以是public或者private类型的：
+<ul><li>公开任务（Public tasks） 从 gulpfile 中被导出（export），可以通过 gulp 命令直接调用；</li> <li>私有任务（Private tasks） 被设计为在内部使用，通常作为 series() 或 parallel() 组合的组成部分；</li></ul></li></ul> <h3 id="任务组合series和parallel"><a href="#任务组合series和parallel" class="header-anchor">#</a> 任务组合series和parallel</h3> <ul><li>gulp提供了两个强大的组合方法：
+<ul><li>series()：串行任务组合；</li> <li>parallel()：并行任务组合；</li> <li>他们都可以接受任意数量的任务函数或者已经组合的操作；</li></ul></li></ul> <p><img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20211225104252.png" alt=""></p> <h3 id="读取和写入文件"><a href="#读取和写入文件" class="header-anchor">#</a> 读取和写入文件</h3> <ul><li>gulp 暴露了 src() 和 dest() 方法用于处理计算机上存放的文件。
+<ul><li>src() 接受参数，并从文件系统中读取文件然后生成一个Node流（Stream），它将所有匹配的文件读取到内存中并通过流（Stream）进行处理；</li> <li>由src() 产生的流（stream）应当从任务（task函数）中返回并发出异步完成的信号；</li> <li>dest() 接受一个输出目录作为参数，并且它还会产生一个 Node流(stream)，通过该流将内容输出到文件中；
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20211225104712.png" alt=""></li></ul></li> <li>流（stream）所提供的主要的 API是 .pipe() 方法，pipe方法的原理是什么呢？
+<ul><li>pipe方法接受一个 转换流（Transform streams）或可写流（Writable streams）；</li> <li>那么转换流或者可写流，拿到数据之后可以对数据进行处理，再次传递给下一个转换流或者可写流；</li></ul></li></ul> <h3 id="对文件进行转换"><a href="#对文件进行转换" class="header-anchor">#</a> 对文件进行转换</h3> <ul><li>如果在这个过程中，我们希望对文件进行某些处理，可以使用社区给我们提供的插件。
+<ul><li>比如我们希望ES6转换成ES5，那么可以使用babel插件；</li> <li>如果我们希望对代码进行压缩和丑化，那么可以使用uglify或者terser插件；
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20211225104857.png" alt=""> <img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20211225105105.png" alt=""></li></ul></li></ul> <h3 id="glob文件匹配"><a href="#glob文件匹配" class="header-anchor">#</a> glob文件匹配</h3> <ul><li>src() 方法接受一个 glob 字符串或由多个 glob 字符串组成的数组作为参数，用于确定哪些文件需要被操作。
+<ul><li>glob 或 glob 数组必须至少匹配到一个匹配项，否则 src() 将报错；</li></ul></li> <li>glob的匹配规则如下：
+<ul><li>(一个星号*)：在一个字符串中，匹配任意数量的字符，包括零个匹配；<code>*.js</code></li> <li>(两个星号**)：在多个字符串匹配中匹配任意数量的字符串，通常用在匹配目录下的文件；<code>src/**/*.js</code></li> <li>(取反!)：
+<ul><li>由于 glob 匹配时是按照每个 glob 在数组中的位置依次进行匹配操作的；</li> <li>所以 glob 数组中的取反（negative）glob 必须跟在一个非取反（non-negative）的 glob 后面；</li> <li>第一个 glob 匹配到一组匹配项，然后后面的取反 glob 删除这些匹配项中的一部分；</li> <li><code>['src/**/*.js','!srcipts/vendor']</code></li></ul></li></ul></li></ul> <h3 id="gulp的文件监听"><a href="#gulp的文件监听" class="header-anchor">#</a> Gulp的文件监听</h3> <p>gulp api 中的 watch() 方法利用文件系统的监控程序（file system watcher）将与进行关联。
+<img src="https://output66.oss-cn-beijing.aliyuncs.com/img/20211225105239.png" alt=""></p> <h3 id="gulp案例"><a href="#gulp案例" class="header-anchor">#</a> Gulp案例</h3> <div class="language-js line-numbers-mode"><pre class="language-js"><code><span class="token comment">// 打包html文件；</span>
+<span class="token comment">// 打包JavaScript文件；</span>
+<span class="token comment">// 打包less文件；</span>
+<span class="token comment">// Html资源注入</span>
+<span class="token comment">// 删除生成目录</span>
+<span class="token comment">// 创建打包任务</span>
+<span class="token comment">// 创建开发任务</span>
+<span class="token keyword">const</span> <span class="token punctuation">{</span> src<span class="token punctuation">,</span> dest<span class="token punctuation">,</span> watch<span class="token punctuation">,</span> series<span class="token punctuation">,</span> parallel <span class="token punctuation">}</span> <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">&quot;gulp&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> htmlMin <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">&quot;gulp-htmlmin&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> babel <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">&quot;gulp-babel&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> terser <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">&quot;gulp-terser&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> less <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">&quot;gulp-less&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// less</span>
+<span class="token keyword">const</span> postcss <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">&quot;gulp-postcss&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// postcss</span>
+<span class="token keyword">const</span> postcssPresetEnv <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">&quot;postcss-preset-env&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> inject <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">&quot;gulp-inject&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> browserSync <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">&quot;browser-sync&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">const</span> del <span class="token operator">=</span> <span class="token function">require</span><span class="token punctuation">(</span><span class="token string">&quot;del&quot;</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 打包html文件任务</span>
+<span class="token keyword">const</span> <span class="token function-variable function">htmlTask</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+  <span class="token keyword">return</span> <span class="token function">src</span><span class="token punctuation">(</span><span class="token string">&quot;./src/*.html&quot;</span><span class="token punctuation">,</span> <span class="token punctuation">{</span> base<span class="token operator">:</span> <span class="token string">&quot;./src&quot;</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">pipe</span><span class="token punctuation">(</span>
+      <span class="token function">htmlMin</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+        collapseWhitespace<span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+      <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">pipe</span><span class="token punctuation">(</span><span class="token function">dest</span><span class="token punctuation">(</span><span class="token string">&quot;./dist&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 打包JavaScript文件任务</span>
+<span class="token keyword">const</span> <span class="token function-variable function">jsTask</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+  <span class="token keyword">return</span> <span class="token function">src</span><span class="token punctuation">(</span><span class="token string">&quot;./src/js/**.js&quot;</span><span class="token punctuation">,</span> <span class="token punctuation">{</span> base<span class="token operator">:</span> <span class="token string">&quot;./src&quot;</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">pipe</span><span class="token punctuation">(</span><span class="token function">babel</span><span class="token punctuation">(</span><span class="token punctuation">{</span> presets<span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">&quot;@babel/preset-env&quot;</span><span class="token punctuation">]</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">pipe</span><span class="token punctuation">(</span><span class="token function">terser</span><span class="token punctuation">(</span><span class="token punctuation">{</span> mangle<span class="token operator">:</span> <span class="token punctuation">{</span> toplevel<span class="token operator">:</span> <span class="token boolean">true</span> <span class="token punctuation">}</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">pipe</span><span class="token punctuation">(</span><span class="token function">dest</span><span class="token punctuation">(</span><span class="token string">&quot;./dist&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 打包less文件任务</span>
+<span class="token keyword">const</span> <span class="token function-variable function">lessTask</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+  <span class="token keyword">return</span> <span class="token function">src</span><span class="token punctuation">(</span><span class="token string">&quot;./src/css/*.less&quot;</span><span class="token punctuation">,</span> <span class="token punctuation">{</span> base<span class="token operator">:</span> <span class="token string">&quot;./src&quot;</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">pipe</span><span class="token punctuation">(</span><span class="token function">less</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">pipe</span><span class="token punctuation">(</span><span class="token function">postcss</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token function">postcssPresetEnv</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">pipe</span><span class="token punctuation">(</span><span class="token function">dest</span><span class="token punctuation">(</span><span class="token string">&quot;./dist&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Html资源注入任务</span>
+<span class="token keyword">const</span> <span class="token function-variable function">injectHtml</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+  <span class="token keyword">return</span> <span class="token function">src</span><span class="token punctuation">(</span><span class="token string">&quot;./dist/*.html&quot;</span><span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">pipe</span><span class="token punctuation">(</span>
+      <span class="token function">inject</span><span class="token punctuation">(</span><span class="token function">src</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token string">&quot;./dist/js/*.js&quot;</span><span class="token punctuation">,</span> <span class="token string">&quot;./dist/css/*.css&quot;</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token punctuation">{</span> relative<span class="token operator">:</span> <span class="token boolean">true</span> <span class="token punctuation">}</span><span class="token punctuation">)</span>
+    <span class="token punctuation">)</span>
+    <span class="token punctuation">.</span><span class="token function">pipe</span><span class="token punctuation">(</span><span class="token function">dest</span><span class="token punctuation">(</span><span class="token string">&quot;./dist&quot;</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 搭建本地服务器</span>
+<span class="token comment">// 开启浏览器</span>
+<span class="token keyword">const</span> bs <span class="token operator">=</span> browserSync<span class="token punctuation">.</span><span class="token function">create</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token keyword">const</span> <span class="token function-variable function">serve</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+  <span class="token comment">// 监听源代码变化，让浏览器刷新</span>
+  <span class="token function">watch</span><span class="token punctuation">(</span><span class="token string">&quot;./src/*.html&quot;</span><span class="token punctuation">,</span> <span class="token function">series</span><span class="token punctuation">(</span>htmlTask<span class="token punctuation">,</span> injectHtml<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">watch</span><span class="token punctuation">(</span><span class="token string">&quot;./src/js/*.js&quot;</span><span class="token punctuation">,</span> <span class="token function">series</span><span class="token punctuation">(</span>jsTask<span class="token punctuation">,</span> injectHtml<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">watch</span><span class="token punctuation">(</span><span class="token string">&quot;./src/css/*.less&quot;</span><span class="token punctuation">,</span> <span class="token function">series</span><span class="token punctuation">(</span>jsTask<span class="token punctuation">,</span> lessTask<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  bs<span class="token punctuation">.</span><span class="token function">init</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+    port<span class="token operator">:</span> <span class="token number">8080</span><span class="token punctuation">,</span>
+    open<span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+    files<span class="token operator">:</span> <span class="token string">&quot;./dist/*&quot;</span><span class="token punctuation">,</span>
+    server<span class="token operator">:</span> <span class="token punctuation">{</span>
+      baseDir<span class="token operator">:</span> <span class="token string">&quot;./dist&quot;</span><span class="token punctuation">,</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 删除生成目录任务</span>
+<span class="token keyword">const</span> <span class="token function-variable function">clean</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=&gt;</span> <span class="token punctuation">{</span>
+  <span class="token keyword">return</span> <span class="token function">del</span><span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token string">&quot;dist&quot;</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 创建打包任务</span>
+<span class="token keyword">const</span> buildTask <span class="token operator">=</span> <span class="token function">series</span><span class="token punctuation">(</span>
+  clean<span class="token punctuation">,</span>
+  <span class="token function">parallel</span><span class="token punctuation">(</span>htmlTask<span class="token punctuation">,</span> jsTask<span class="token punctuation">,</span> lessTask<span class="token punctuation">)</span><span class="token punctuation">,</span>
+  injectHtml
+<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// 创建开发任务</span>
+<span class="token keyword">const</span> serveTask <span class="token operator">=</span> <span class="token function">series</span><span class="token punctuation">(</span>buildTask<span class="token punctuation">,</span> serve<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+module<span class="token punctuation">.</span>exports <span class="token operator">=</span> <span class="token punctuation">{</span>
+  serveTask<span class="token punctuation">,</span>
+  buildTask<span class="token punctuation">,</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span>
+
+
+
+<span class="token comment">// 在packjson中添加脚本</span>
+<span class="token string">&quot;scripts&quot;</span><span class="token operator">:</span><span class="token punctuation">{</span>
+    <span class="token string">&quot;serve&quot;</span><span class="token operator">:</span> <span class="token string">&quot;gulp serveTask&quot;</span><span class="token punctuation">,</span>
+    <span class="token string">&quot;build&quot;</span><span class="token operator">:</span> <span class="token string">&quot;gulp buildTask&quot;</span>
+<span class="token punctuation">}</span>
+</code></pre> <div class="line-numbers-wrapper"><span class="line-number">1</span><br><span class="line-number">2</span><br><span class="line-number">3</span><br><span class="line-number">4</span><br><span class="line-number">5</span><br><span class="line-number">6</span><br><span class="line-number">7</span><br><span class="line-number">8</span><br><span class="line-number">9</span><br><span class="line-number">10</span><br><span class="line-number">11</span><br><span class="line-number">12</span><br><span class="line-number">13</span><br><span class="line-number">14</span><br><span class="line-number">15</span><br><span class="line-number">16</span><br><span class="line-number">17</span><br><span class="line-number">18</span><br><span class="line-number">19</span><br><span class="line-number">20</span><br><span class="line-number">21</span><br><span class="line-number">22</span><br><span class="line-number">23</span><br><span class="line-number">24</span><br><span class="line-number">25</span><br><span class="line-number">26</span><br><span class="line-number">27</span><br><span class="line-number">28</span><br><span class="line-number">29</span><br><span class="line-number">30</span><br><span class="line-number">31</span><br><span class="line-number">32</span><br><span class="line-number">33</span><br><span class="line-number">34</span><br><span class="line-number">35</span><br><span class="line-number">36</span><br><span class="line-number">37</span><br><span class="line-number">38</span><br><span class="line-number">39</span><br><span class="line-number">40</span><br><span class="line-number">41</span><br><span class="line-number">42</span><br><span class="line-number">43</span><br><span class="line-number">44</span><br><span class="line-number">45</span><br><span class="line-number">46</span><br><span class="line-number">47</span><br><span class="line-number">48</span><br><span class="line-number">49</span><br><span class="line-number">50</span><br><span class="line-number">51</span><br><span class="line-number">52</span><br><span class="line-number">53</span><br><span class="line-number">54</span><br><span class="line-number">55</span><br><span class="line-number">56</span><br><span class="line-number">57</span><br><span class="line-number">58</span><br><span class="line-number">59</span><br><span class="line-number">60</span><br><span class="line-number">61</span><br><span class="line-number">62</span><br><span class="line-number">63</span><br><span class="line-number">64</span><br><span class="line-number">65</span><br><span class="line-number">66</span><br><span class="line-number">67</span><br><span class="line-number">68</span><br><span class="line-number">69</span><br><span class="line-number">70</span><br><span class="line-number">71</span><br><span class="line-number">72</span><br><span class="line-number">73</span><br><span class="line-number">74</span><br><span class="line-number">75</span><br><span class="line-number">76</span><br><span class="line-number">77</span><br><span class="line-number">78</span><br><span class="line-number">79</span><br><span class="line-number">80</span><br><span class="line-number">81</span><br><span class="line-number">82</span><br><span class="line-number">83</span><br><span class="line-number">84</span><br><span class="line-number">85</span><br><span class="line-number">86</span><br><span class="line-number">87</span><br><span class="line-number">88</span><br><span class="line-number">89</span><br><span class="line-number">90</span><br><span class="line-number">91</span><br><span class="line-number">92</span><br><span class="line-number">93</span><br><span class="line-number">94</span><br><span class="line-number">95</span><br><span class="line-number">96</span><br><span class="line-number">97</span><br><span class="line-number">98</span><br><span class="line-number">99</span><br><span class="line-number">100</span><br><span class="line-number">101</span><br><span class="line-number">102</span><br><span class="line-number">103</span><br></div></div></div></section> <footer class="page-edit"><!----> <div class="last-updated"><span class="prefix">上次更新时间: </span> <span class="time">a few seconds ago</span></div></footer> <!----> <div class="comments-wrapper"><!----></div> <ul class="side-bar sub-sidebar-wrapper" style="width:12rem;" data-v-cb1513f6><li class="level-2" data-v-cb1513f6><a href="/blogs/PackagingModule/Gulp/gulp-base.html#什么是gulp" class="sidebar-link reco-side-什么是gulp" data-v-cb1513f6>什么是Gulp</a></li><li class="level-2" data-v-cb1513f6><a href="/blogs/PackagingModule/Gulp/gulp-base.html#gulp和webpack" class="sidebar-link reco-side-gulp和webpack" data-v-cb1513f6>Gulp和Webpack</a></li><li class="level-2" data-v-cb1513f6><a href="/blogs/PackagingModule/Gulp/gulp-base.html#gulp基础" class="sidebar-link reco-side-gulp基础" data-v-cb1513f6>Gulp基础</a></li><li class="level-3" data-v-cb1513f6><a href="/blogs/PackagingModule/Gulp/gulp-base.html#gulp的基本使用" class="sidebar-link reco-side-gulp的基本使用" data-v-cb1513f6>Gulp的基本使用</a></li><li class="level-3" data-v-cb1513f6><a href="/blogs/PackagingModule/Gulp/gulp-base.html#创建gulp任务" class="sidebar-link reco-side-创建gulp任务" data-v-cb1513f6>创建gulp任务</a></li><li class="level-3" data-v-cb1513f6><a href="/blogs/PackagingModule/Gulp/gulp-base.html#任务组合series和parallel" class="sidebar-link reco-side-任务组合series和parallel" data-v-cb1513f6>任务组合series和parallel</a></li><li class="level-3" data-v-cb1513f6><a href="/blogs/PackagingModule/Gulp/gulp-base.html#读取和写入文件" class="sidebar-link reco-side-读取和写入文件" data-v-cb1513f6>读取和写入文件</a></li><li class="level-3" data-v-cb1513f6><a href="/blogs/PackagingModule/Gulp/gulp-base.html#对文件进行转换" class="sidebar-link reco-side-对文件进行转换" data-v-cb1513f6>对文件进行转换</a></li><li class="level-3" data-v-cb1513f6><a href="/blogs/PackagingModule/Gulp/gulp-base.html#glob文件匹配" class="sidebar-link reco-side-glob文件匹配" data-v-cb1513f6>glob文件匹配</a></li><li class="level-3" data-v-cb1513f6><a href="/blogs/PackagingModule/Gulp/gulp-base.html#gulp的文件监听" class="sidebar-link reco-side-gulp的文件监听" data-v-cb1513f6>Gulp的文件监听</a></li><li class="level-3" data-v-cb1513f6><a href="/blogs/PackagingModule/Gulp/gulp-base.html#gulp案例" class="sidebar-link reco-side-gulp案例" data-v-cb1513f6>Gulp案例</a></li></ul></main> <!----></div></div></div></div><div class="global-ui"><div class="back-to-ceiling" style="right:1rem;bottom:6rem;width:2.5rem;height:2.5rem;border-radius:.25rem;line-height:2.5rem;display:none;" data-v-c6073ba8 data-v-c6073ba8><svg t="1574745035067" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="5404" class="icon" data-v-c6073ba8><path d="M526.60727968 10.90185116a27.675 27.675 0 0 0-29.21455937 0c-131.36607665 82.28402758-218.69155461 228.01873535-218.69155402 394.07834331a462.20625001 462.20625001 0 0 0 5.36959153 69.94390903c1.00431239 6.55289093-0.34802892 13.13561351-3.76865779 18.80351572-32.63518765 54.11355614-51.75690182 118.55860487-51.7569018 187.94566865a371.06718723 371.06718723 0 0 0 11.50484808 91.98906777c6.53300375 25.50556257 41.68394495 28.14064038 52.69160883 4.22606766 17.37162448-37.73630017 42.14135425-72.50938081 72.80769204-103.21549295 2.18761121 3.04276886 4.15646224 6.24463696 6.40373557 9.22774369a1871.4375 1871.4375 0 0 0 140.04691725 5.34970492 1866.36093723 1866.36093723 0 0 0 140.04691723-5.34970492c2.24727335-2.98310674 4.21612437-6.18497483 6.3937923-9.2178004 30.66633723 30.70611158 55.4360664 65.4791928 72.80769147 103.21549355 11.00766384 23.91457269 46.15860503 21.27949489 52.69160879-4.22606768a371.15156223 371.15156223 0 0 0 11.514792-91.99901164c0-69.36717486-19.13165746-133.82216804-51.75690182-187.92578088-3.42062944-5.66790279-4.76302748-12.26056868-3.76865837-18.80351632a462.20625001 462.20625001 0 0 0 5.36959269-69.943909c-0.00994388-166.08943902-87.32547796-311.81420293-218.6915546-394.09823051zM605.93803103 357.87693858a93.93749974 93.93749974 0 1 1-187.89594924 6.1e-7 93.93749974 93.93749974 0 0 1 187.89594924-6.1e-7z" p-id="5405" data-v-c6073ba8></path><path d="M429.50777625 765.63860547C429.50777625 803.39355007 466.44236686 1000.39046097 512.00932183 1000.39046097c45.56695499 0 82.4922232-197.00623328 82.5015456-234.7518555 0-37.75494459-36.9345906-68.35043303-82.4922232-68.34111062-45.57627738-0.00932239-82.52019037 30.59548842-82.51086798 68.34111062z" p-id="5406" data-v-c6073ba8></path></svg></div><!----><!----><!----><!----><div class="RibbonAnimation"></div></div></div>
+    <script src="/assets/js/app.18220fda.js" defer></script><script src="/assets/js/3.cb90e6dd.js" defer></script><script src="/assets/js/1.e749a552.js" defer></script><script src="/assets/js/24.6fb1e180.js" defer></script><script src="/assets/js/9.912710f6.js" defer></script>
+  </body>
+</html>
