@@ -2637,6 +2637,21 @@ function objectFlat(obj = {}) {
   return res;
 }
 ```
+### 手写判断一个对象是不是可迭代的
+- 判断一个对象是不是可迭代的
+  - **每个可迭代对象必然包含一个 [Symbol.iterator] 方法属性**
+  - 每个可迭代对象都有一个 [Symbol.iterator] 方法属性，没有的话，肯定不是可迭代对象。
+### 手写判断一个对象是否为空
+- 判断一个对象是否为空
+```js
+function objectEmptyCheck(value) {
+  return (
+    value && Object.keys(value).length === 0 && value.constructor === Object
+  );
+}
+let objectEmptyCheck = (obj) => (JSON.stringify(obj) === "{}" ? true : false);
+
+```
 ### 手写Object.is()
 Object.is()与===方法类似，但是NaN === NaN返回true，0 === -0返回false；
 ```js
