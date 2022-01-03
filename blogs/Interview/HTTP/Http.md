@@ -4,5 +4,3478 @@ date: 2021-12-27
 tags:
   - HTTP
 categories:
-  - HTTP 面试
+  - HTTP
 ---
+## HTTP
+### 浏览器的最大请求并发数
+并发数量简单通俗的讲就是，当浏览器网页的时候同时工作的进行数量。HTTP 客户端一般对同一个服务器的并发连接个数都是有限制的。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106162358.png)
+
+### 常用的请求方法
+- Ajax
+  - 全称 `Asynchronous JavaScript and XML`（异步的 `JavaScript` 和 `XML`）最早出现的发送后端请求技术，隶属于原始 js 中，核心使用 `XMLHttpRequest` 对象，多个请求之间如果有先后关系的话，就会出现回调地狱。
+- jQuery ajax
+  - 是 `jQuery` 底层 `Ajax` 实现。简单易用的高层实现见 `$.get`, `$.post` 等 `$.ajax()` 返回其创建的 `XMLHttpRequest` 对象。大多数情况下你无需直接操作该函数，除非你需要操作不常用的选项，以获得更多的灵活性。
+- axios
+  - `axios` 不是原生 `JS` 的，需要进行安装，它不但可以在客户端使用，也可以在 `nodejs` 端使用。Axios 也可以在请求和响应阶段进行拦截。同样也是基于 `Promise` 对象的。特性：从浏览器中创建 `XMLHttpRequests`、从 `node.js` 创建 `http` 请求、支持 `Promise API`、拦截请求和响应等。
+- fetch
+  - `Fetch` 提供了对 `Request` 和 `Response` （以及其他与网络请求有关的）对象的通用定义。使之今后可以被使用到更多地应用场景中：无论是 `service workers`、`Cache API`、又或者是其他处理请求和响应的方式，甚至是任何一种需要你自己在程序中生成响应的方式。`Fetch` 号称是`AJAX` 的替代品，是在 `ES6` 出现的，使用了 `ES6` 中的 `Promise` 对象。`Fetch` 是基于 `promise` 设计的。`Fetch` 的代码结构比起 `ajax` 简单多了，参数有点像 `jQuery ajax`。但是，一定记住 `fetch` 不是 `ajax` 的进一步封装，而是原生 `js`。`Fetch` 函数就是原生 `js`，没有使用 `XMLHttpRequest` 对象。
+### Ajax
+`XMLHttpRequest` 让发送一个 `HTTP` 请求变得非常容易。你只需要简单的创建一个请求对象实例，打开一个 `URL`，然后发送这个请求。当传输完毕后，结果的`HTTP`状态以及返回的响应内容也可以从请求对象中获取。
+```js
+function reqListener() {
+  console.log(this.responseText);
+}
+
+var oReq = new XMLHttpRequest();
+oReq.onload = reqListener;
+// 通过XMLHttpRequest生成的请求可以有两种方式来获取数据，异步模式或同步模式。请求的类型是由这个XMLHttpRequest对象的open()方法的第三个参数async的值决定的。如果该参数的值为false
+oReq.open("get", "newFile.txt", true);
+oReq.send();
+```
+### Jquery Ajax
+```js
+$.ajax({
+  url: "/api/getWeather",
+  data: {
+    zipcode: 97201,
+  },
+  success: function(result) {
+    $("#weather-temp").html("<strong>" + result + "</strong> degrees");
+  },
+});
+```
+传统 `Ajax` 指的是 `XMLHttpRequest（XHR）`， 最早出现的发送后端请求技术，隶属于原始 `js` 中，核心使用 `XMLHttpRequest `对象，多个请求之间如果有先后关系的话，就会出现回调地狱。`Jquery Ajax` 的出现是对原生 `XHR` 的封装，除此以外还增添了对 `JSONP` 的支持，`Jquery Ajax` 经过多年的更新维护，真的已经是非常的方便了，但是随着 `react,vue,angular` 新一代框架的兴起，以及 `ES` 规范的完善，更多 `API` 的更新，它逐渐暴露了自己的不足:
+- 本身是针对 MVC 的编程,不符合现在前端 MVVM 的浪潮
+- 基于原生的 XHR 开发，XHR 本身的架构不清晰,已经有了 fetch 的替代方案
+- JQuery 整个项目太大，单纯使用 ajax 却要引入整个 JQuery 非常的不合理（采取个性化打包的方案又不能享受 CDN 服务）
+- 不符合关注分离（Separation of Concerns）的原则
+- 配置和调用方式非常混乱，而且基于事件的异步模型不友好
+```js
+var list = {};
+$.ajax({
+  //请求方式 POST || GET
+  type: "POST",
+  //请求的媒体类型
+  contentType: "application/json;charset=UTF-8",
+  //请求地址
+  url: "http://127.0.0.1/xxxx/",
+  //数据，json字符串
+  data: JSON.stringify(list),
+  //请求成功
+  success: function(result) {
+    console.log(result);
+  },
+  //请求失败，包含具体的错误信息
+  error: function(e) {
+    console.log(e.status);
+    console.log(e.responseText);
+  },
+});
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211130120441.png)
+
+### Axios
+```js
+// 为给定 ID 的 user 创建请求
+axios
+  .get("/user?ID=12345")
+  .then(function(response) {
+    console.log(response);
+  })
+  .catch(function(error) {
+    console.log(error);
+  });
+
+// 上面的请求也可以这样做
+axios
+  .get("/user", {
+    params: {
+      ID: 12345,
+    },
+  })
+  .then(function(response) {
+    console.log(response);
+  })
+  .catch(function(error) {
+    console.log(error);
+  });
+
+axios
+  .post("/user", {
+    firstName: "Fred",
+    lastName: "Flintstone",
+  })
+  .then(function(response) {
+    console.log(response);
+  })
+  .catch(function(error) {
+    console.log(error);
+  });
+
+// 执行多个并发请求
+function getUserAccount() {
+  return axios.get("/user/12345");
+}
+
+function getUserPermissions() {
+  return axios.get("/user/12345/permissions");
+}
+
+axios.all([getUserAccount(), getUserPermissions()]).then(
+  axios.spread(function(acct, perms) {
+    // 两个请求现在都执行完成
+  })
+);
+```
+
+- 从浏览器中创建 XMLHttpRequests
+- 从 node.js 创建 http 请求
+- 支持 Promise API
+- 拦截请求和响应
+- 转换请求数据和响应数据
+- 取消请求
+- 自动转换 JSON 数据
+- 客户端支持防御 XSRF
+- axios 创建请求时可以用的配置选项。只有 url 是必需的。如果没有指定 method，请求将默认使用 get 方法。
+#### axios 的取消请求？
+Axios 是一个基于 Promise 的 HTTP 客户端，同时支持浏览器和 Node.js 环境。它是一个优秀的 HTTP 客户端，被广泛地应用在大量的 Web 项目中。对于浏览器环境来说，Axios 底层是利用 XMLHttpRequest 对象来发起 HTTP 请求。
+
+如果要取消请求的话，我们可以通过调用 XMLHttpRequest 对象上的 abort 方法来取消请求：
+```js
+let xhr = new XMLHttpRequest();
+xhr.open("GET", "https://developer.mozilla.org/", true);
+xhr.send();
+setTimeout(() => xhr.abort(), 300);
+```
+
+而对于 Axios 来说，我们可以通过 Axios 内部提供的 CancelToken 来取消请求：
+```js
+const CancelToken = axios.CancelToken;
+const source = CancelToken.source();
+axios.post(
+  "/user/12345",
+  {
+    name: "semlinker",
+  },
+  {
+    cancelToken: source.token,
+  }
+);
+
+source.cancel("Operation canceled by the user."); // 取消请求，参数是可选的
+```
+此外，你也可以通过调用 CancelToken 的构造函数来创建 CancelToken，具体如下所示：
+```js
+const CancelToken = axios.CancelToken;
+let cancel;
+
+axios.get("/user/12345", {
+  cancelToken: new CancelToken(function executor(c) {
+    cancel = c;
+  }),
+});
+
+cancel(); // 取消请求
+```
+#### CancelToken 的工作原理
+我们是通过调用 CancelToken 构造函数来创建 CancelToken 对象：
+```js
+new axios.CancelToken((cancel) => {
+  if (!pendingRequest.has(requestKey)) {
+    pendingRequest.set(requestKey, cancel);
+  }
+});
+```
+所以接下来，我们来分析 CancelToken 构造函数，该函数被定义在 lib/cancel/CancelToken.js 文件中：
+```js
+// lib/cancel/CancelToken.js
+function CancelToken(executor) {
+  if (typeof executor !== "function") {
+    throw new TypeError("executor must be a function.");
+  }
+
+  var resolvePromise;
+  this.promise = new Promise(function promiseExecutor(resolve) {
+    resolvePromise = resolve;
+  });
+
+  var token = this;
+  executor(function cancel(message) {
+    // 设置cancel对象
+    if (token.reason) {
+      return; // Cancellation has already been requested
+    }
+    token.reason = new Cancel(message);
+    resolvePromise(token.reason);
+  });
+}
+```
+由以上代码可知，cancel 对象是一个函数，当我们调用该函数后，会创建 Cancel 对象并调用 resolvePromise 方法。该方法执行后，CancelToken 对象上 promise 属性所指向的 promise 对象的状态将变为 resolved。
+```js
+// lib/adapters/xhr.js
+if (config.cancelToken) {
+  config.cancelToken.promise.then(function onCanceled(cancel) {
+    if (!request) {
+      return;
+    }
+    request.abort(); // 取消请求
+    reject(cancel);
+    request = null;
+  });
+}
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211129222004.png)
+
+#### axios 如何判断重复请求
+当请求方式、请求 URL 地址和请求参数都一样时，我们就可以认为请求是一样的。因此在每次发起请求时，我们就可以根据当前请求的请求方式、请求 URL 地址和请求参数来生成一个唯一的 key，同时为每个请求创建一个专属的 CancelToken，然后把 key 和 cancel 函数以键值对的形式保存到 Map 对象中，使用 Map 的好处是可以快速的判断是否有重复的请求：
+```js
+import qs from "qs";
+
+const pendingRequest = new Map();
+// GET -> params；POST -> data
+const requestKey = [method, url, qs.stringify(params), qs.stringify(data)].join(
+  "&"
+);
+const cancelToken = new CancelToken(function executor(cancel) {
+  if (!pendingRequest.has(requestKey)) {
+    pendingRequest.set(requestKey, cancel);
+  }
+});
+```
+当出现重复请求的时候，我们就可以使用 cancel 函数来取消前面已经发出的请求，在取消请求之后，我们还需要把取消的请求从 pendingRequest 中移除。现在我们已经知道如何取消请求和如何判断重复请求，下面我们来介绍如何取消重复请求。
+
+#### axios 如何取消重复请求
+因为我们需要对所有的请求都进行处理，所以我们可以考虑使用 Axios 的拦截器机制来实现取消重复请求的功能。Axios 为开发者提供了请求拦截器和响应拦截器，它们的作用如下：
+- 请求拦截器：该类拦截器的作用是在请求发送前统一执行某些操作，比如在请求头中添加 token 字段。
+- 响应拦截器：该类拦截器的作用是在接收到服务器响应后统一执行某些操作，比如发现响应状态码为 401 时，自动跳转到登录页。
+```js
+// generateReqKey：用于根据当前请求的信息，生成请求 Key；
+function generateReqKey(config) {
+  const { method, url, params, data } = config;
+  return [method, url, Qs.stringify(params), Qs.stringify(data)].join("&");
+}
+// addPendingRequest：用于把当前请求信息添加到pendingRequest对象中；
+const pendingRequest = new Map();
+function addPendingRequest(config) {
+  const requestKey = generateReqKey(config);
+  config.cancelToken =
+    config.cancelToken ||
+    new axios.CancelToken((cancel) => {
+      if (!pendingRequest.has(requestKey)) {
+        pendingRequest.set(requestKey, cancel);
+      }
+    });
+}
+// removePendingRequest：检查是否存在重复请求，若存在则取消已发的请求。
+function removePendingRequest(config) {
+  const requestKey = generateReqKey(config);
+  if (pendingRequest.has(requestKey)) {
+    const cancelToken = pendingRequest.get(requestKey);
+    cancelToken(requestKey);
+    pendingRequest.delete(requestKey);
+  }
+}
+//  设置请求拦截器
+axios.interceptors.request.use(
+  function(config) {
+    removePendingRequest(config); // 检查是否存在重复请求，若存在则取消已发的请求
+    addPendingRequest(config); // 把当前请求信息添加到pendingRequest对象中
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+//  设置响应拦截器
+axios.interceptors.response.use(
+  (response) => {
+    removePendingRequest(response.config); // 从pendingRequest对象中移除请求
+    return response;
+  },
+  (error) => {
+    removePendingRequest(error.config || {}); // 从pendingRequest对象中移除请求
+    if (axios.isCancel(error)) {
+      console.log("已取消的重复请求：" + error.message);
+    } else {
+      // 添加异常处理
+    }
+    return Promise.reject(error);
+  }
+);
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211129221814.png)
+
+#### axios 带上 cookie
+axios 请求默认是不携带 cookie 的，让了让其带上 cookie，需要做一些设置。允许携带 cookie `axios.defaults.withCredentials=true`
+
+#### 带并发数限制的 axios 请求函数?
+```js
+const axios = require("axios");
+const arr = new Array(100).fill("https://www.baidu.com");
+
+/**
+ * @param {Array<String>} arr 请求地址
+ * @param {Number} n 控制并发数量
+ */
+function ajax(arr, n) {
+  const { length } = arr;
+  const result = [];
+  let flag = 0; // 控制进度，表示当前位置
+  let sum = 0; // 记录请求完成总数
+
+  return new Promise((resolve, reject) => {
+    // 先连续调用n次，就代表最大并发数量
+    while (flag < n) {
+      next();
+    }
+    function next() {
+      const cur = flag++; // 利用闭包保存当前位置，以便结果能顺序存储
+      if (cur >= length) return;
+
+      const url = arr[cur];
+      axios
+        .get(url)
+        .then((res) => {
+          result[cur] = res; // 保存结果。为了体现顺序，这里保存索引值
+          if (++sum >= length) {
+            resolve(result);
+          } else {
+            next();
+          }
+        })
+        .catch(reject);
+    }
+  });
+}
+
+ajax(arr, 10).then((res) => {
+  console.log(res);
+});
+```
+#### 手写简易版 axios
+```js
+ function axios({
+  //注意这里使用结构赋值，可以传默认值
+  url,
+  //默认请求方式为GET
+  method = "GET",
+  //params用于接受get请求的参数，请求时直接带在url后面
+  params = {},
+  //data用于接受post方法的参数
+  data = {},
+}) {
+  //返回一个promise对象
+  return new Promise((resolve, reject) => {
+    // 定义一个字符串保存url后面的拼接参数部分
+    let queryString = "";
+    // 得到key组成的数组
+    // Object.keys() 方法会返回一个由一个给定对象的自身可枚举属性组成的数组，
+    Object.keys(params).forEach((key) => {
+      // 这里使用模板字符串简化代码，同时key是一个变量，用[]而不是点语法取出
+      queryString += `${key}=${params[key]}&`;
+    });
+    // 如果queryString非空，也就是说使用get请求传参，我们直接将参数拼接在url后面
+    if (queryString) {
+      // substring() 方法用于提取字符串中介于两个指定下标之间的字符。
+      // 注意最后一个字符是&，因此我们取length-1个字符
+      queryString = queryString.substring(0, queryString.length - 1);
+      //用？分割并拼接
+      url += "?" + queryString;
+    }
+    // 创建xhr对象
+    const request = new XMLHttpRequest();
+    // 打开连接
+    request.open(method, url, true);
+    // 绑定状态改变的监听（异步，当状态为4时才会继续执行）
+    request.onreadystatechange = function () {
+      if (request.readyState != 4) {
+        return;
+      }
+      // 发送请求
+      // 如果是get请求，已经在url中携带参数了，直接传null
+      if (method == "GET") {
+        request.send(null);
+        //如果是post请求，将data作为参数发送
+      } else if (method == "POST") {
+        // 添加请求头
+        request.setRequestHeader(
+          "Content-Type",
+          "application/json;charset=utf-8"
+        );
+        // JSON格式话data并发送请求
+        request.send(JSON.stringify(data));
+      }
+      //这时request会返回status和报文
+      // 解构赋值，这里仅返回状态码和报文
+      const { status, statusText } = request;
+      // 状态码在200到300间代表成功
+      if (status >= 200 && status < 300) {
+        // 对返回值进行结构赋值
+        const response = {
+          //  JSON.stringify 将数组,对象转换成 JSON 字符串，然后使用 JSON.parse 将该字符串重新转换成数组，对象。
+          data: JSON.parse(request.response),
+          status,
+          statusText,
+        };
+        // 执行回调函数并将response作为参数
+        resolve(response);
+      } else {
+        reject(new Error("resquest error status is" + status));
+      }
+    };
+  });
+}
+```
+### Fetch
+#### Fetch介绍
+Fetch 提供了对 Request 和 Response （以及其他与网络请求有关的）对象的通用定义。使之今后可以被使用到更多地应用场景中：无论是 service workers、Cache API、又或者是其他处理请求和响应的方式，甚至是任何一种需要你自己在程序中生成响应的方式。Fetch 号称是 AJAX 的替代品，是在 ES6 出现的，使用了 ES6 中的 Promise 对象。Fetch 是基于 promise 设计的。Fetch 的代码结构比起 ajax 简单多了，参数有点像 jQuery ajax。但是，一定记住 fetch 不是 ajax 的进一步封装，而是原生 js。Fetch 函数就是原生 js，没有使用 XMLHttpRequest 对象。
+#### Fetch 详解
+Fetch 提供了对 Request 和 Response （以及其他与网络请求有关的）对象的通用定义。
+Fetch 是一个现代的概念, 等同于 XMLHttpRequest。它提供了许多与 XMLHttpRequest 相同的功能，但被设计成更具可扩展性和高效性。
+Fetch API 提供了一个 JavaScript 接口，用于访问和操纵 HTTP 管道的部分，例如请求和响应。它还提供了一个全局 fetch()方法，该方法提供了一种简单，合理的方式来跨网络异步获取资源。
+
+- 请注意，fetch 规范与 jQuery.ajax()主要有两种方式的不同，牢记：
+    - 当接收到一个代表错误的 HTTP 状态码时，从 fetch()返回的 Promise 不会被标记为 reject， 即使该 HTTP 响应的状态码是 404 或 500。相反，它会将 Promise 状态标记为 resolve （但是会将 resolve 的返回值的 ok 属性设置为 false ），仅当网络故障时或请求被阻止时，才会标记为 reject。
+    - 默认情况下，fetch 不会从服务端发送或接收任何 cookies, 如果站点依赖于用户 session，则会导致未经认证的请求（要发送 cookies，必须设置 credentials 选项）。
+```js
+// 一个基本的 fetch请求设置起来很简单。
+fetch("http://example.com/movies.json")
+  .then(function(response) {
+    return response.json();
+  })
+  .then(function(myJson) {
+    console.log(myJson);
+  });
+
+// 这里我们通过网络获取一个JSON文件并将其打印到控制台。最简单的用法是只提供一个参数用来指明想fetch()到的资源路径，然后返回一个包含响应结果的promise(一个 Response 对象)。
+// 当然它只是一个 HTTP 响应，而不是真的JSON。为了获取JSON的内容，我们需要使用 json()方法（在Bodymixin 中定义，被 Request 和 Response 对象实现）。
+```
+```js
+// fetch() 接受第二个可选参数，一个可以控制不同配置的 init 对象：
+// Example POST method implementation:
+
+postData("http://example.com/answer", { answer: 42 })
+  .then((data) => console.log(data)) // JSON from `response.json()` call
+  .catch((error) => console.error(error));
+
+function postData(url, data) {
+  // Default options are marked with *
+  return fetch(url, {
+    body: JSON.stringify(data), // must match 'Content-Type' header
+    cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+    credentials: "same-origin", // include, same-origin, *omit
+    headers: {
+      "user-agent": "Mozilla/4.0 MDN Example",
+      "content-type": "application/json",
+    },
+    method: "POST", // *GET, POST, PUT, DELETE, etc.
+    mode: "cors", // no-cors, cors, *same-origin
+    redirect: "follow", // manual, *follow, error
+    referrer: "no-referrer", // *client, no-referrer
+  }).then((response) => response.json()); // parses response to JSON
+}
+```
+#### fetch 的优点
+- 语法简洁，更加语义化
+- 基于标准 Promise 实现，支持 async/await
+- 同构方便，使用 isomorphic-fetch
+- 更加底层，提供的 API 丰富（request, response）
+- 脱离了 XHR，是 ES 规范里新的实现方式
+#### fetch 的取消请求？
+使用 AbortController 取消 Fetch 请求和事件监听。
+
+在没有 Fetch API 之前，一般通过 XMLHttpRequest 来实现数据更新，当我们发出请求后想临时取消，可以调用 XMLHttpRequest.abort() 方法来终止该请求。
+
+有了 AbortController，同样可以实现取消 Fetch 请求。
+```js
+const controller = new AbortController();
+const signal = controller.signal;
+
+fetch("/", { signal }).catch((err) => {
+  console.log(err); // DOMException: The user aborted a request.
+  console.log("aborted:", signal.aborted); // aborted: true
+});
+
+controller.abort();
+```
+#### fetch 怎么携带 cookie？
+fetch 发送请求默认是不发送 cookie 的，不管是同域还是跨域；那么问题就来了，对于那些需要权限验证的请求就可能无法正常获取数据，这时可以配置其 credentials 项，其有 3 个值：
+- omit: 默认值，忽略 cookie 的发送
+- same-origin: 表示 cookie 只能同域发送，不能跨域发送
+- include: cookie 既可以同域发送，也可以跨域发送
+#### 带并发数限制的 fetch 请求函数
+```js
+function handleFetchQueue(urls, max, callback) {
+  const urlCount = urls.length;
+  const requestsQueue = [];
+  const results = [];
+  let i = 0;
+  const handleRequest = (url) => {
+    const req = fetch(url)
+      .then((res) => {
+        console.log("当前并发： " + requestsQueue);
+        const len = results.push(res);
+        if (len < urlCount && i + 1 < urlCount) {
+          requestsQueue.shift();
+          handleRequest(urls[++i]);
+        } else if (len === urlCount) {
+          "function" === typeof callback && callback(results);
+        }
+      })
+      .catch((e) => {
+        results.push(e);
+      });
+    if (requestsQueue.push(req) < max) {
+      handleRequest(urls[++i]);
+    }
+  };
+  handleRequest(urls[i]);
+}
+
+const urls = Array.from({ length: 10 }, (v, k) => k);
+
+const fetch = function (idx) {
+  return new Promise((resolve) => {
+    console.log(`start request ${idx}`);
+    const timeout = parseInt(Math.random() * 1e4);
+    setTimeout(() => {
+      console.log(`end request ${idx}`);
+      resolve(idx);
+    }, timeout);
+  });
+};
+
+const max = 4;
+
+const callback = () => {
+  console.log("run callback");
+};
+
+handleFetchQueue(urls, max, callback);
+```
+### Ajax、Fetch、Axios 的优缺点
+- ajax 的优缺点：
+    - 属 js 原生，基于 XHR 进行开发，XHR 结构不清晰。
+    - 针对 mvc 编程，由于近来 vue 和 React 的兴起，不符合 mvvm 前端开发流程。
+    - 单纯使用 ajax 封装，核心是使用 XMLHttpRequest 对象,使用较多并有先后顺序的话，容易产生回调地狱。
+- fetch 的优缺点：
+    - 属于原生 js，脱离了 xhr ,号称可以替代 ajax 技术。
+    - 基于 Promise 对象设计的，可以解决回调地狱问题。
+    - 提供了丰富的 API，使用结构简单。
+    - 默认不带 cookie，使用时需要设置。
+    - 没有办法检测请求的进度，无法取消或超时处理。
+    - 返回结果是 Promise 对象，获取结果有多种方法，数据类型有对应的获取方法，封装时需要分别处理，易出错。
+    - 浏览器支持性比较差。
+    - 语法简洁，更加语义化
+    - 基于标准 Promise 实现，支持 async/await
+    - 同构方便
+    - 更加底层，提供的 API 丰富（request, response）
+    - 脱离了 XHR，是 ES 规范里新的实现方式
+    - fetch 只对网络请求报错，对 400，500 都当做成功的请求，服务器返回 400，500 错误码时并不会 reject，只有网络错误这些导致请求不能完成时，fetch 才会被 reject。
+    - fetch 默认不会带 cookie，需要添加配置项： fetch(url, {credentials: 'include'})
+    - fetch 不支持超时控制，
+    - fetch 没有办法原生监测请求的进度，而 XHR 可以
+- axios 的优缺点：
+    - 在浏览器中创建 XMLHttpRequest 请求，在 node.js 中创建 http 请求。
+    - 解决回调地狱问题。
+    - 自动转化为 json 数据类型。
+    - 支持 Promise 技术，提供并发请求接口。
+    - 可以通过网络请求检测进度。
+    - 提供超时处理。
+    - 浏览器兼容性良好。
+    - 有拦截器，可以对请求和响应统一处理。
+    - 一个基于 Promise 用于浏览器和 nodejs 的 HTTP 客户端，本质上也是对原生 XHR 的封装，只不过它是 Promise 的实现版本，符合最新的 ES 规范，
+    - 支持 Promise API
+    - 客户端支持防止 CSRF
+    - 提供了一些并发请求的接口（重要，方便了很多的操作）
+    - 拦截请求和响应
+    - 转换请求和响应数据
+    - 取消请求
+    - 自动转换 JSON 数据
+### 两个页面之间的通信如何做？
+#### postMessage
+window.postMessage()方法可以安全地实现 Window 对象之间的跨域通信。例如，在一个页面和它生成的弹出窗口之间，或者是页面和嵌入其中的 iframe 之间。
+
+通常情况下，不同页面上的脚本允许彼此访问，当且仅当它们源自的页面共享相同的协议，端口号和主机（也称为“同源策略”）。window.postMessage()提供了一个受控的机制来安全地规避这个限制（如果使用得当的话）。
+
+一般来说，一个窗口可以获得对另一个窗口的引用(例如，通过 targetWindow=window.opener)，然后使用targetWindow.postMessage()在其上派发 MessageEvent。接收窗口随后可根据需要自行处理此事件。传递给 window.postMessage()的参数通过事件对象暴露给接收窗口。
+```js
+// postMessage程序
+var receiver = document.getElementById("receiver").contentWindow; //origin窗口
+var btn = document.getElementById("send"); //发送消息
+btn.addEventListener("click", function(e) {
+  e.preventDefault();
+  var val = document.getElementById("text").value;
+  receiver.postMessage("Hello " + val + "！", "http://res.42du.cn"); //将信息发送到http://res.42du.cn窗口
+});
+
+// 参数和语法
+targetWindow.postMessage(message, targetOrigin, [transfer]);
+//message:发送的信息
+//targetOrigin:argetOrigin就是指定目标窗口的来源，必须与消息发送目标相一致，可以是字符串“*”或URI。 *表示任何目标窗口都可接收，为安全起见，请一定要明确提定接收方的URI。
+//transfer是可选参数
+
+// 接收端
+window.addEventListener("message", receiveMessage, false);
+function receiveMessage(event) {
+  if (event.origin !== "http://www.42du.cn") return;
+}
+//event对象有三个属性，分别是origin，data和source。event.data表示接收到的消息；event.origin表示postMessage的发送来源，包括协议，域名和端口；event.source表示发送消息的窗口对象的引用; 我们可以用这个引用来建立两个不同来源的窗口之间的双向通信。
+```
+```html
+// 发送端
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>42度空间-window.postMessage()跨域消息传递</title>
+</head>
+<body>
+<div>
+    <input id="text" type="text" value="42度空间" />
+    <button id="send" >发送消息</button>
+</div>
+<iframe id="receiver" src="http://res.42du.cn/static/html/receiver.html" width="500" height="60">
+    <p>你的浏览器不支持IFrame。</p>
+</iframe>
+<script>
+    window.onload = function() {
+        var receiver = document.getElementById('receiver').contentWindow;
+        var btn = document.getElementById('send');
+        btn.addEventListener('click', function (e) {
+            e.preventDefault();
+            var val = document.getElementById('text').value;
+            receiver.postMessage("Hello "+val+"！", "http://res.42du.cn");
+        });
+    }
+</script>
+</body>
+</html>
+```
+```
+// 接收程序
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>42度空间-从www.42du.cn接收消息</title>
+</head>
+<body>
+<div id="message">
+    Hello World!
+</div>
+<script>
+    window.onload = function() {
+        var messageEle = document.getElementById('message');
+        window.addEventListener('message', function (e) {
+            alert(e.origin);
+            if (e.origin !== "http://www.42du.cn") {
+                return;
+            }
+            messageEle.innerHTML = "从"+ e.origin +"收到消息： " + e.data;
+        });
+    }
+</script>
+</body>
+</html>
+```
+#### WebSocket
+所有的 WebSocket 都监听同一个服务器地址，利用 send 发送消息，利用 onmessage 获取消息的变化，不仅能窗口，还能跨浏览器，兼容性最佳，只是需要消耗点服务器资源。
+```js
+var ws = new WebSocket("ws://localhost:3000/");
+ws.onopen = function(event) {
+  // 或者把此方法注册到其他事件中，即可与其他服务器通信
+  ws.send({ now: Date.now() }); // 通过服务器中转消息
+};
+ws.onmessage = function(event) {
+  // 消费消息
+  console.log(event.data);
+};
+```
+#### localstorage
+一个窗口更新 localStorage，另一个窗口监听 window 对象的”storage”事件，来实现通信。(localStorage 需要同源窗口才能共享，即协议，域名，端口一致)
+```js
+// 本窗口的设值代码
+localStorage.setItem("aaa", (Math.random() * 10).toString());
+
+// 其他窗口监听storage事件
+window.addEventListener("storage", function(e) {
+  console.log(e);
+  console.log(e.newValue);
+});
+```
+### Service Worker?
+#### 是什么
+一个服务器与浏览器之间的中间人角色，如果网站中注册了 service worker 那么它可以拦截当前网站所有的请求，进行判断（需要编写相应的判断程序），如果需要向服务器发起请求的就转给服务器，如果可以直接使用缓存的就直接返回缓存不再转给服务器。从而大大提高浏览体验。
+
+Service Worker 旨在通过代码精确控制缓存文件和 HTTP 请求，是已经被废弃掉的 AppCache 技术的替代方案。javaScript 是单线程的，随着 web 业务的复杂化，开发者逐渐在 js 中做了许多耗费资源的运算过程，这使得单线程的弊端更加凹显。web worker 正是基于此被创造出来，它是脱离在主线程之外的，我们可以将复杂耗费时间的事情交给 web worker 来做。但是 web worker 作为一个独立的线程，他的功能应当不仅于此。sw 便是在 web worker 的基础上增加了离线缓存的能力。当然在 Service Worker 之前也有在 HTML5 上做离线缓存的 API 叫 AppCache, 但是 AppCache 存在很多缺点。
+
+Service Worker是由事件驱动的,具有生命周期，可以拦截处理页面的所有网络请求(fetch)，可以访问 cache 和 indexDB，支持推送，并且可以让开发者自己控制管理缓存的内容以及版本，为离线弱网环境下的 web 的运行提供了可能，让 web 在体验上更加贴近 native。换句话说他可以把你应用里的所有静态动态资源根据不同策略缓存起来，在你下次打开时不再需要去服务器请求，这样一来就减少了网络耗时，使得 web 应用可以秒开，并且在离线环境下也变得可用。做到这一切你只需要增加一个Service Worker文件，不会对原有的代码产生任何侵入，是不是很 perfect。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211120195536.png)
+
+- Service Worker 的生命周期
+  - 当一个 servicework 被注册成功后，它将开始它的生命周期，我们对 servicework 的操作一般都是在其生命周期里面进行的。servicework 的生命周期分为这么几个状态 安装中, 安装后, 激活中, 激活后, 废弃。
+    - 安装( installing )：这个状态发生在 Service Worker 注册之后，表示开始安装，这个状态会触发 install 事件，一般会在 install 事件的回调里面进行静态资源的离线缓存， 如果这些静态资源缓存失败了，那 Service Worker 安装就会失败，生命周期终止。
+    - 安装后( installed )：当成功捕获缓存到的资源时，servicework 会变为这个状态，当此时没有其他的 servicework 线程在工作时，会立即进入激活状态，如果此时有正在工作的 servicework 工作线程，则会等待其他的 Service Worker 线程被关闭后才会被激活。可以使用 self.skipWaiting() 方法强制正在等待的 servicework 工作线程进入激活状态。
+    - 激活( activating )：在这个状态下会触发 activate 事件，在 activate 事件的回调中去清理旧版缓存。
+    - 激活后( activated )：在这个状态下，servicework 会取得对整个页面的控制。
+    - 废弃状态 ( redundant )：这个状态表示一个 Service Worker 的生命周期结束。新版本的 Service Worker 替换了旧版本的 Service Worker 会出现这个状态。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211120195913.png)
+
+- Service Worker 文件只在首次注册的时候执行了一次。
+- 安装、激活流程也只是在首次执行 Service Worker 文件的时候进行了一次。
+- 首次注册成功的 Service Worker 不能拦截当前页面的请求。
+- 非首次注册的 Service Worker 可以控制当前的页面并能拦截请求。
+- Service Worker 首次注册或者有新版本触发更新的时候，才会重新创建一个 worker 工作线程并解析执行 Service Worker 文件，在这之后并进入 Service Worker 的安装和激活生命周期。
+
+#### 更新 Service Worker
+- 更新一个 servicework，最直接的办法就是修改 servicework.js 这个文件，当刷新浏览器时，浏览器尝试重新下载 servicework.js 脚本文件，然后会与之前的版本比对，一旦发现文件内容不一致，就会进入更新流程。
+  - 新的 servicework 被启动安装并触发 install 事件。
+  - 安装成功后，新版 servicework 进入等待状态，此时页面的控制权还在老版 servicework 手中。
+  - 当 servicework 控制的所有终端都关闭之后，或者手动 self.skipWaiting()，旧的 servicework 才能被终止，此时新的 servicework 被激活，触发 activate 事件。
+  - 用户再次访问页面，或刷新页面，新的 service work 启动控制页面。
+
+#### Service Worker的特点
+- 基于 web Worker（一个独立于 JavaScript 主线程的独立线程，在里面执行需要消耗大量资源的操作不会阻塞主线程）
+- 本质上充当服务器与浏览器之间的代理服务器（可以拦截全站的请求，并作出相应的动作->由开发者指定的动作
+- 在 web worker 的基础上增加了离线缓存的能力
+- 创建有效的离线体验（将一些不常更新的内容缓存在浏览器，提高访问体验）
+- 由事件驱动的，具有生命周期
+- 可以访问 catche 和 indexDB
+- 支持推送
+- 并且可以让开发者自己控制管理缓存的内容以及版本
+
+#### 注意事项
+- service worker 运行在 worker 上下文-----不可以访问 DOM
+- 完全异步，同步 API（如 XHR 和 localStorage）不能再 service work 中使用
+- 处于安全考虑，service worker 只能为 https 承载
+- 在 Firefox 浏览器的用户隐私模式，service work 不可用
+- 其生命周期与页面无关（关联页面未关闭时，它也可以退出，没有关联页面，它也可以启动）
+- Service Worker 做缓存还是挺有用的，相比较 Cache-Control 之类的 Headers 来做缓存控制而言，拥有更细粒度的控制过程，并且可以做相应的错误和降级处理。但是依然需要注意缓存带来的时效性问题，否则得不偿失。
+
+#### Service Worker 的简单实践
+1. **注册**。 serviceWorker 对象存在于 navigator 对象下，可以再主线程中调用 navigator.serviceWorker.register()方法来注册 servicework,register 方法接受两个参数,第一个参数表示 servicework.js 相对于 origin 的路径，第二个参数是 Serivce Worker 的配置项，可选填，其中比较重要的是 scope 属性，用来指定你想让 service worker 控制的内容的目录。 默认值为 servicework.js 所在的目录。这个属性所表示的路径不能在 service worker 文件的路径之上，默认是 Serivce Worker 文件所在的目录。 成功注册或返回一个 promise。
+```js
+// 页面的入口文件
+
+if (navigator.serviceWorker) {
+  window.addEventListener("load", () => {
+    console.log("开始注册ServiceWorker");
+    navigator.serviceWorker
+      .register("./serviceworker.js")
+      .then((reg) => {
+        if (reg.installing) {
+          console.log("Service worker installing");
+        } else if (reg.waiting) {
+          console.log("Service worker installed");
+        } else if (reg.active) {
+          console.log("Service worker active");
+        }
+        console.log("ServiceWorker register success: ", reg);
+      })
+      .catch((err) => {
+        console.log("ServiceWorker register failed: ", err);
+      });
+  });
+}
+```
+2. **安装**
+```js
+self.addEventListener("install", (event) => {
+  console.log("install事件");
+  self.skipWaiting(); //用来强制更新的servicework跳过等待时间
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(function(cache) {
+      return cache.addAll(urlsToCache);
+    })
+  );
+});
+```
+首先 self.skipWaiting() 执行，告知浏览器直接跳过等待阶段，淘汰过期的 Service Worker 脚本，直接开始尝试激活新的 Service Worker。然后使用 caches.open 打开一个 Cache，打开后，通过 cache.addAll 尝试缓存我们预先声明的文件。 CacheStorage 全局的 cache Api 并非只有在 sw 中才能用 浏览器控制台直接用也是可以的，所以是挂在 window 下的
+
+event.waitUntil() 只能在 Service Worker 的 install 或者 activate 事件中使用；看起来像是一个 callback，用来延长事件的作用时间,但是，即便你不使用它，程序也可能正常运行。如果你传递了一个 Promise 给它，那么只有当该 Promise resolved 时，Service Worker 才会完成 install；如果 Promise rejected 掉，那么整个 Service Worker 便会被废弃掉。因此，cache.addAll 里面，只要有一个资源获取失败，整个 Service Worker 便会失效。
+
+在 install 事件回调被调用时，它把即将被激活的 worker 线程状态延迟为 installing 状态，直到传递的 Promise 被成功地 resolve。这主要用于确保：Service Worker 工作线程在所有依赖的核心 cache 被缓存之前都不会被激活。
+
+在 activate 事件回调被调用时，它把即将被激活的 worker 线程状态延迟为 activating 状态，直到传递的 Promise 被成功地 resolve。这主要用于确保：任何功能事件不会被分派到 ServiceWorkerGlobalScope 对象，直到它删除过期的缓存条目。
+
+当 waitUntil()运行时，如果 Promise 是 rejected 那么 installing 或者 activating 的状态会被设置为 redundant。
+3. **激活**
+```js
+self.addEventListener("activate", (event) => {
+  console.log("activate事件");
+  var cacheWhitelist = [CACHE_NAME];
+  self.clients.claim(); // 保证 激活之后能够马上作用于所有的终端
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (cacheWhitelist.indexOf(cacheName) === -1) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+});
+```
+在激活 servicework 时需要删除之前的缓存，可将需要的缓存放在有个白名单中，然后通过 caches.keys()拿到所有缓存，将不再白名单中的缓存删掉。
+4. **拦截网络请求**
+```js
+  self.addEventListener('fetch', (event) => {
+    event.respondWith(
+      caches.match(event.request).then((response) => {
+        if (response)
+          return response;
+        }
+        return fetch(event.request);
+      })
+    );
+  });
+```
+
+通过监听 servicework 的 fetch 事件来拦截网络请求，调用 event 上的 respondWith() 方法来劫持当前 servicework 控制域下的 HTTP 请求，该方法会直接返回一个 Promise 结果 ，这个结果就会是 http 请求的响应。上面代码中就一个简单的逻辑，先劫持 http 请求，然后看看缓存中是否有这个请求的资源，如果有则直接返回，如果没有就去请求服务器上的资源。 event.respondWith 方法只能在 Service Worker 的 fetch 事件中使用。
+
+Cache Stroage 只能缓存静态资源，所以它只能缓存用户的 GET 请求；Cache Stroage 中的缓存不会过期，但是浏览器对它的大小是有限制的，所以需要我们定期进行清理。
+对应 post 请求我们也可以通过 fetch 方法拦截到，来进行一些自定义的返回。
+
+5. **service worker 与主线程之间的通信**
+- **主线程**
+```js
+// 传递
+navigator.serviceWorker.controller &&
+  navigator.serviceWorker.controller.postMessage("this message is from page");
+
+// 接收
+navigator.serviceWorker.addEventListener("message", function(e) {
+  console.log("service worker传递的信息", e.data);
+});
+```
+- **service worker**
+```js
+self.addEventListener("message", (event) => {
+  console.log("页面传递过来的数据", event.data); // 收到主线程传递的信息
+  event.source.postMessage("this message is from sw.js to page"); // 向主线程传递信息
+});
+```
+- **service worker 卸载**
+```js
+navigator.serviceWorker.getRegistrations().then(function(registrations) {
+  for (let registration of registrations) {
+    //安装在网页的service worker不止一个，找到我们的那个并删除
+    console.log(registration);
+    if (registration && registration.scope === "http://localhost:8080/") {
+      registration.unregister();
+    }
+  }
+});
+```
+- serviceworker 和 http 缓存
+  - 在缓存文件更新方面
+    - 如果是 http 缓存，一刷新页面就可以拿到最新的资源
+    - 如果是 sw 缓存， 一刷新页面，会返回当前缓存中的资源（不是最新），然后请求 sw.js 文件发现更新后重新进入 sw 生命周期，重新去更新缓存，当你再次刷新时才能拿到最新资源。所以在缓存资源更新时，sw 会延迟一次刷新才能获取最新资源
+  - 在缓存控制方面：
+    - http 一般是由服务器端控制的，而 sw 则是可以前端自己控制，可以更好地控制缓存。
+    - 协商缓存返回状态码 304， 强缓存返回的是 200， 在这点上 server worker 和强缓存比较类似的返回也是 200， 会对请求进行拦截，不会真是的发出请求。
+### WebWorker
+#### 概述
+JavaScript 语言采用的是单线程模型，也就是说，所有任务只能在一个线程上完成，一次只能做一件事。前面的任务没做完，后面的任务只能等着。随着电脑计算能力的增强，尤其是多核 CPU 的出现，单线程带来很大的不便，无法充分发挥计算机的计算能力。
+
+​Web Worker 的作用，就是为 JavaScript 创造多线程环境，允许主线程创建 Worker 线程，将一些任务分配给后者运行。在主线程运行的同时，Worker 线程在后台运行，两者互不干扰。等到 Worker 线程完成计算任务，再把结果返回给主线程。这样的好处是，一些计算密集型或高延迟的任务，被 Worker 线程负担了，主线程（通常负责 UI 交互）就会很流畅，不会被阻塞或拖慢。
+
+Worker 线程一旦新建成功，就会始终运行，不会被主线程上的活动（比如用户点击按钮、提交表单）打断。这样有利于随时响应主线程的通信。但是，这也造成了 Worker 比较耗费资源，不应该过度使用，而且一旦使用完毕，就应该关闭。
+
+Web Worker 有以下几个使用注意点。
+- 同源限制
+  - 分配给 Worker 线程运行的脚本文件，必须与主线程的脚本文件同源。
+- DOM 限制
+  - Worker 线程所在的全局对象，与主线程不一样，无法读取主线程所在网页的 DOM 对象，也无法使用 document、window、parent 这些对象。但是，Worker 线程可以 navigator 对象和 location 对象。
+- 通信联系
+  - Worker 线程和主线程不在同一个上下文环境，它们不能直接通信，必须通过消息完成。
+- 脚本限制
+  - Worker 线程不能执行 alert()方法和 confirm()方法，但可以使用 XMLHttpRequest 对象发出 AJAX 请求。
+- 文件限制
+  - Worker 线程无法读取本地文件，即不能打开本机的文件系统（file://），它所加载的脚本，必须来自网络。
+
+#### 基本用法
+1. **主线程**
+主线程采用 new 命令，调用 Worker()构造函数，新建一个 Worker 线程。
+```js
+var worker = new Worker("work.js");
+```
+Worker()构造函数的参数是一个脚本文件，该文件就是 Worker 线程所要执行的任务。由于 Worker 不能读取本地文件，所以这个脚本必须来自网络。如果下载没有成功（比如 404 错误），Worker 就会默默地失败。
+然后，主线程调用 worker.postMessage()方法，向 Worker 发消息。
+```js
+worker.postMessage("Hello World");
+worker.postMessage({ method: "echo", args: ["Work"] });
+```
+worker.postMessage()方法的参数，就是主线程传给 Worker 的数据。它可以是各种数据类型，包括二进制数据。
+接着，主线程通过 worker.onmessage 指定监听函数，接收子线程发回来的消息。
+```js
+worker.onmessage = function(event) {
+  console.log("Received message " + event.data);
+  doSomething();
+};
+
+function doSomething() {
+  // 执行任务
+  worker.postMessage("Work done!");
+}
+```
+上面代码中，事件对象的 data 属性可以获取 Worker 发来的数据。Worker 完成任务以后，主线程就可以把它关掉。
+```js
+worker.terminate();
+```
+2.  **Worker 线程**
+Worker 线程内部需要有一个监听函数，监听 message 事件。
+```js
+self.addEventListener(
+  "message",
+  function(e) {
+    self.postMessage("You said: " + e.data);
+  },
+  false
+);
+```
+上面代码中，self 代表子线程自身，即子线程的全局对象。因此，等同于下面两种写法。
+```js
+// 写法一
+this.addEventListener(
+  "message",
+  function(e) {
+    this.postMessage("You said: " + e.data);
+  },
+  false
+);
+
+// 写法二
+addEventListener(
+  "message",
+  function(e) {
+    postMessage("You said: " + e.data);
+  },
+  false
+);
+```
+除了使用 self.addEventListener()指定监听函数，也可以使用 self.onmessage 指定。监听函数的参数是一个事件对象，它的 data 属性包含主线程发来的数据。self.postMessage()方法用来向主线程发送消息。根据主线程发来的数据，Worker 线程可以调用不同的方法，下面是一个例子。
+```js
+self.addEventListener(
+  "message",
+  function(e) {
+    var data = e.data;
+    switch (data.cmd) {
+      case "start":
+        self.postMessage("WORKER STARTED: " + data.msg);
+        break;
+      case "stop":
+        self.postMessage("WORKER STOPPED: " + data.msg);
+        self.close(); // Terminates the worker.
+        break;
+      default:
+        self.postMessage("Unknown command: " + data.msg);
+    }
+  },
+  false
+);
+```
+3. **Worker 加载脚本**
+Worker 内部如果要加载其他脚本，有一个专门的方法 importScripts()。
+```js
+importScripts("script1.js");
+```
+该方法可以同时加载多个脚本。
+```js
+importScripts("script1.js", "script2.js");
+```
+4. **错误处理**
+主线程可以监听 Worker 是否发生错误。如果发生错误，Worker 会触发主线程的 error 事件。
+```js
+worker.onerror(function(event) {
+  console.log(
+    ["ERROR: Line ", e.lineno, " in ", e.filename, ": ", e.message].join("")
+  );
+});
+// 或者
+worker.addEventListener("error", function(event) {
+  // ...
+});
+```
+Worker 内部也可以监听 error 事件。
+5. **关闭 Worker**
+使用完毕，为了节省系统资源，必须关闭 Worker。
+```js
+// 主线程
+worker.terminate();
+
+// Worker 线程
+self.close();
+```
+#### 数据通信
+前面说过，主线程与 Worker 之间的通信内容，可以是文本，也可以是对象。需要注意的是，这种通信是拷贝关系，即是传值而不是传址，Worker 对通信内容的修改，不会影响到主线程。事实上，浏览器内部的运行机制是，先将通信内容串行化，然后把串行化后的字符串发给 Worker，后者再将它还原。
+
+主线程与 Worker 之间也可以交换二进制数据，比如 File、Blob、ArrayBuffer 等类型，也可以在线程之间发送。下面是一个例子。
+```js
+// 主线程
+var uInt8Array = new Uint8Array(new ArrayBuffer(10));
+for (var i = 0; i < uInt8Array.length; ++i) {
+  uInt8Array[i] = i * 2; // [0, 2, 4, 6, 8,...]
+}
+worker.postMessage(uInt8Array);
+// Worker 线程
+self.onmessage = function(e) {
+  var uInt8Array = e.data;
+  postMessage(
+    "Inside worker.js: uInt8Array.toString() = " + uInt8Array.toString()
+  );
+  postMessage(
+    "Inside worker.js: uInt8Array.byteLength = " + uInt8Array.byteLength
+  );
+};
+```
+但是，拷贝方式发送二进制数据，会造成性能问题。比如，主线程向 Worker 发送一个 500MB 文件，默认情况下浏览器会生成一个原文件的拷贝。为了解决这个问题，JavaScript 允许主线程把二进制数据直接转移给子线程，但是一旦转移，主线程就无法再使用这些二进制数据了，这是为了防止出现多个线程同时修改数据的麻烦局面。这种转移数据的方法，叫做 Transferable Objects。这使得主线程可以快速把数据交给 Worker，对于影像处理、声音处理、3D 运算等就非常方便了，不会产生性能负担。
+
+如果要直接转移数据的控制权，就要使用下面的写法。
+```js
+// Transferable Objects 格式
+worker.postMessage(arrayBuffer, [arrayBuffer]);
+
+// 例子
+var ab = new ArrayBuffer(1);
+worker.postMessage(ab, [ab]);
+```
+#### 同页面的 Web Worker
+通常情况下，Worker 载入的是一个单独的 JavaScript 脚本文件，但是也可以载入与主线程在同一个网页的代码。
+```html
+<!DOCTYPE html>
+  <body>
+    <script id="worker" type="app/worker">
+      addEventListener('message', function () {
+        postMessage('some message');
+      }, false);
+    </script>
+  </body>
+</html>
+```
+上面是一段嵌入网页的脚本，注意必须指定`<script>`标签的 type 属性是一个浏览器不认识的值，上例是 app/worker。
+然后，读取这一段嵌入页面的脚本，用 Worker 来处理。
+```js
+var blob = new Blob([document.querySelector("#worker").textContent]);
+var url = window.URL.createObjectURL(blob);
+var worker = new Worker(url);
+
+worker.onmessage = function(e) {
+  // e.data === 'some message'
+};
+```
+上面代码中，先将嵌入网页的脚本代码，转成一个二进制对象，然后为这个二进制对象生成 URL，再让 Worker 加载这个 URL。这样就做到了，主线程和 Worker 的代码都在同一个网页上面。
+#### 实例：Worker 线程完成轮询
+有时，浏览器需要轮询服务器状态，以便第一时间得知状态改变。这个工作可以放在 Worker 里面。
+```js
+function createWorker(f) {
+  var blob = new Blob(['(' + f.toString() +')()']);
+  var url = window.URL.createObjectURL(blob);
+  var worker = new Worker(url);
+  return worker;
+}
+
+var pollingWorker = createWorker(function (e) {
+  var cache;
+
+  function compare(new, old) { ... };
+
+  setInterval(function () {
+    fetch('/my-api-endpoint').then(function (res) {
+      var data = res.json();
+
+      if (!compare(data, cache)) {
+        cache = data;
+        self.postMessage(data);
+      }
+    })
+  }, 1000)
+});
+
+pollingWorker.onmessage = function () {
+  // render data
+}
+
+pollingWorker.postMessage('init');
+// 上面代码中，Worker 每秒钟轮询一次数据，然后跟缓存做比较。如果不一致，就说明服务端有了新的变化，因此就要通知主线程。
+```
+
+#### 实例： Worker 新建 Worker
+Worker 线程内部还能再新建 Worker 线程（目前只有 Firefox 浏览器支持）。下面的例子是将一个计算密集的任务，分配到 10 个 Worker。主线程代码如下。
+```js
+var worker = new Worker("worker.js");
+worker.onmessage = function(event) {
+  document.getElementById("result").textContent = event.data;
+};
+```
+Worker 线程代码如下。
+```js
+// worker.js
+
+// settings
+var num_workers = 10;
+var items_per_worker = 1000000;
+
+// start the workers
+var result = 0;
+var pending_workers = num_workers;
+for (var i = 0; i < num_workers; i += 1) {
+  var worker = new Worker("core.js");
+  worker.postMessage(i * items_per_worker);
+  worker.postMessage((i + 1) * items_per_worker);
+  worker.onmessage = storeResult;
+}
+
+// handle the results
+function storeResult(event) {
+  result += event.data;
+  pending_workers -= 1;
+  if (pending_workers <= 0) postMessage(result); // finished!
+}
+```
+上面代码中，Worker 线程内部新建了 10 个 Worker 线程，并且依次向这 10 个 Worker 发送消息，告知了计算的起点和终点。计算任务脚本的代码如下。
+```js
+// core.js
+var start;
+onmessage = getStart;
+function getStart(event) {
+  start = event.data;
+  onmessage = getEnd;
+}
+
+var end;
+function getEnd(event) {
+  end = event.data;
+  onmessage = null;
+  work();
+}
+
+function work() {
+  var result = 0;
+  for (var i = start; i < end; i += 1) {
+    // perform some complex calculation here
+    result += 1;
+  }
+  postMessage(result);
+  close();
+}
+```
+#### API
+
+1. **主线程**
+浏览器原生提供 Worker()构造函数，用来供主线程生成 Worker 线程。
+```js
+var myWorker = new Worker(jsUrl, options);
+```
+Worker()构造函数，可以接受两个参数。第一个参数是脚本的网址（必须遵守同源政策），该参数是必需的，且只能加载 JS 脚本，否则会报错。第二个参数是配置对象，该对象可选。它的一个作用就是指定 Worker 的名称，用来区分多个 Worker 线程。
+```js
+// 主线程
+var myWorker = new Worker("worker.js", { name: "myWorker" });
+
+// Worker 线程
+self.name; // myWorker
+```
+Worker()构造函数返回一个 Worker 线程对象，用来供主线程操作 Worker。Worker 线程对象的属性和方法如下。
+```md
+Worker.onerror：指定 error 事件的监听函数。
+Worker.onmessage：指定 message 事件的监听函数，发送过来的数据在 Event.data 属性中。
+Worker.onmessageerror：指定 messageerror 事件的监听函数。发送的数据无法序列化成字符串时，会触发这个事件。
+Worker.postMessage()：向 Worker 线程发送消息。
+Worker.terminate()：立即终止 Worker 线程。
+```
+2. **Worker 线程**
+Web Worker 有自己的全局对象，不是主线程的 window，而是一个专门为 Worker 定制的全局对象。因此定义在 window 上面的对象和方法是全部都可以使用。Worker 线程有一些自己的全局属性和方法。
+```md
+self.name： Worker 的名字。该属性只读，由构造函数指定。
+self.onmessage：指定 message 事件的监听函数。
+self.onmessageerror：指定 messageerror 事件的监听函数。发送的数据无法序列化成字符串时，会触发这个事件。
+self.close()：关闭 Worker 线程。
+self.postMessage()：向产生这个 Worker 线程发送消息。
+self.importScripts()：加载 JS 脚本。
+```
+### WebWorker 和 Service Worker 区别?
+- Web Worker
+  - Worker 和 主线程互不干扰，通常用于替主线程分担计算密集型任务，防止主线程中 JS 执行时阻塞 UI。
+  - Worker 本身也会耗费资源，因此一旦使用完毕，就应该分别使用 terminate 和 close 方法关闭。
+  - worker 线程无法读取本地文件，因此其脚本文件也必须为网络资源，且必须与主线程脚本文件同源
+  - worker 无法读取/操作 dom 对象，没有 alert()和 confirm()方法，也无法获取 document、window、parent，但是可以获取 navigator 和 location。
+- service worker
+  - 基于 web worker(因此拥有 web worker 的各种特性)，充当服务器与浏览器之间的代理服务器（可以拦截请求，并作出开发者指定的动作），拥有离线缓存能力
+  - 它设计为完全异步，同步 API（如 XHR 和 localStorage）不能在 service worker 中使用
+  - 出于安全考量，Service Worker 只能使用在 https 或本地的 localhost 环境下
+  - 不同于 Web Worker，Service Worker 是一个进程而不是线程，其生命周期与页面无关（关联页面未关闭时，它也可以退出，没有关联页面时，它也可以启动），且可以被多个页面公用
+### JWT
+#### 什么是 JWT
+- JSON Web Token（简称 JWT）是目前最流行的跨域认证解决方案。
+- 是一种认证授权机制。
+- JWT 的声明一般被用来在身份提供者和服务提供者间传递被认证的用户身份信息，以便于从资源服务器获取资源。比如用在用户登录上。
+- 可以使用 HMAC 算法或者是 RSA 的公/私秘钥对 JWT 进行签名。因为数字签名的存在，这些传递的信息是可信的。
+### Cookies、SessionStorage、localStorage 和 indexDB 的区别
+- cookie 是网站为了标示用户身份而储存在用户本地的数据
+    - 是否在 http 请求只能够携带
+      - cookie 数据始终在同源的 http 请求中携带，跨域需要设置 withCredentials = true
+      - sessionStorage 和 localStorage 不会自动把数据发给服务器，仅在本地保存
+- 存储大小：
+    - cookie 数据大小不能超过 4k；
+    - SessionStorage 和 localStorage 虽然也有存储大小的限制，但比 cookie 大得多，可以达到 5M 或更大，因不同浏览器大小不同；
+- 有效时间：
+   - cookie 设置的 cookie 过期时间之前一直有效，即使窗口或浏览器关闭
+   - localStorage 硬盘存储持久数据，浏览器关闭后数据不丢失除非主动删除数据
+   - sessionStorage 存在内存中，数据在当前浏览器窗口关闭后自动删除
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211015134146.png)
+### Cookie、Session、WebStorage、localStorage、SessionStorage
+#### Cookie 有没有默认过期时间?
+- Cookie分类：
+    - 会话 Cookie
+        - 会话 Cookie 是一种临时 Cookie，它记录用户访问站点的设置和偏好。用户退出浏览器时，会话 Cookie 就被删除了。
+    - 持久 Cookie
+        - 持久 Cookie 的生存时间更长一些，他们存储在硬盘上，浏览器退出，计算机重启时，他们仍然存在。通常用持久 Cookie 维护某个用户会周期性访问的站点的配置文件或登录名。
+    - 会话 Cookie 和持久 Cookie 之间的唯一区别就是他们的过期时间。没有指定 Expires(过期时间)时，默认为会话 Cookie。
+#### Cookie
+- HTTP 是无状态的协议（对于事务处理没有记忆能力，每次客户端和服务端会话完成时，服务端不会保存任何会话信息）：每个请求都是完全独立的，服务端无法确认当前访问者的身份信息，无法分辨上一次的请求发送者和这一次的发送者是不是同一个人。所以服务器与浏览器为了进行会话跟踪（知道是谁在访问我），就必须主动的去维护一个状态，这个状态用于告知服务端前后两个请求是否来自同一浏览器。而这个状态需要通过 cookie 或者 session 去实现。
+- cookie 存储在客户端： cookie 是服务器发送到用户浏览器并保存在本地的一小块数据，它会在浏览器下次向同一服务器再发起请求时被携带并发送到服务器上。
+- cookie 是不可跨域的： 每个 cookie 都会绑定单一的域名，无法在别的域名下获取使用，一级域名和二级域名之间是允许共享使用的（靠的是 domain）。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210923132748.png)
+
+#### Cookie 的使用
+cookie 可通过 document.cookie 获取全部 cookie。它是一段字符串，是键值对的形式。
+```js
+Cookies.set("name", "value", { expires: 7 }); // 设置一个cookie，7天后失效
+
+Cookies.get("name"); // => 'value'
+
+Cookies.remove("name");
+```
+#### 使用 Cookie 时需要考虑的问题
+- 因为存储在客户端，容易被客户端篡改，使用前需要验证合法性
+- 不要存储敏感数据，比如用户密码，账户余额
+- 使用 httpOnly 在一定程度上提高安全性
+- 尽量减少 cookie 的体积，能存储的数据量不能超过 4kb
+- 设置正确的 domain 和 path，减少数据传输
+- cookie 无法跨域
+- 一个浏览器针对一个网站最多存 20 个 Cookie，浏览器一般只允许存放 300 个 Cookie
+- 移动端对 cookie 的支持不是很好，而 session 需要基于 cookie 实现，所以移动端常用的是 token
+#### Session
+session 是另一种记录服务器和客户端会话状态的机制。
+session 是基于 cookie 实现的，session 存储在服务器端，sessionId 会被存储到客户端的 cookie 中。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210923153926.png)
+
+- Session 认证流程
+  - 用户第一次请求服务器的时候，服务器根据用户提交的相关信息，创建对应的 Session
+  - 请求返回时将此 Session 的唯一标识信息 SessionID 返回给浏览器
+  - 浏览器接收到服务器返回的 SessionID 信息后，会将此信息存入到 Cookie 中，同时 Cookie 记录此 SessionID 属于哪个域名
+  - 当用户第二次访问服务器的时候，请求会自动判断此域名下是否存在 Cookie 信息，如果存在自动将 Cookie 信息也发送给服务端，服务端会从 Cookie 中获取 SessionID，再根据 SessionID 查找对应的 Session 信息，如果没有找到说明用户没有登录或者登录失效，如果找到 Session 证明用户已经登录可执行后面操作。
+  - SessionID 是连接 Cookie 和 Session 的一道桥梁。
+
+#### 使用 Session 时需要考虑的问题
+- 将 Session 存储在服务器里面，当用户同时在线量比较多时，这些 Session 会占据较多的内存，需要在服务端定期的去清理过期的 Session
+- 当网站采用集群部署的时候，会遇到多台 web 服务器之间如何做 Session 共享的问题。
+- 当多个应用要共享 Session 时，除了以上问题，还会遇到跨域问题，因为不同的应用可能部署的主机不一样，需要在各个应用做好 cookie 跨域的处理。
+- sessionId 是存储在 cookie 中的，假如浏览器禁止 cookie 或不支持 cookie 怎么办？ 一般会把 sessionId 跟在 url 参数后面即重写 url，所以 session 不一定非得需要靠 cookie 实现
+- 移动端对 cookie 的支持不是很好，而 Session 需要基于 cookie 实现，所以移动端常用的是 token
+
+#### Cookie 和 Session
+- 安全性： Session 比 Cookie 安全，Session 是存储在服务器端的，Cookie 是存储在客户端的。
+- 存取值的类型不同：Cookie 只支持存字符串数据，想要设置其他类型的数据，需要将其转换成字符串，Session 可以存任意数据类型。
+- 有效期不同： Cookie 可设置为长时间保持，比如我们经常使用的默认登录功能，Session 一般失效时间较短，客户端关闭（默认情况下）或者 Session 超时都会失效。
+- 存储大小不同： 单个 Cookie 保存的数据不能超过 4K，Session 可存储数据远高于 Cookie，但是当访问量过多，会占用过多的服务器资源。
+
+#### WebStorage
+- webstorage 是本地存储，存储在客户端，包括 localStorage 和 sessionStorage；
+- localStorage 生命周期是永久，这意味着除非用户手动去清除 localStorage 信息，否则这些信息将永远存在。存放数据大小为一般为 5MB,而且它仅在客户端（即浏览器）中保存，不参与和服务器的通信；
+- sessionStorage 仅在当前会话下有效，关闭页面或浏览器后被清除。存放数据大小为一般为 5MB，而且它仅在客户端（即浏览器）中保存，不参与和服务器的通信。源生接口可以接受，亦可再次封装来对 Object 和 Array 有更好的支持。
+- WebStorage 的目标
+  - 提供一种在 cookie 之外存储会话数据的路径
+  - 提供一种存储大量可以跨会话存在的数据的机制
+  - HTML5 的 WebStorage 提供了两种 API：localStorage（本地存储）和 sessionStorage（会话存储）
+- 作用域的不同：
+  - 不同浏览器无法共享 localStorage 或 sessionStorage 中的信息。
+  - 相同浏览器的不同页面间可 以共享相同的 localStorage（页面属于相同域名和端口），但是不同页面或标签页间无法共享 sessionStorage 的信息。
+- 存储大小：
+  - localStorage 和 sessionStorage 的存储数据大小一般都是：5MB
+- 存储位置：
+  - localStorage 和 sessionStorage 都保存在客户端，不与服务器进行交互通信
+- 存储内容类型：
+  - localStorage 和 sessionStorage 只能存储字符串类型，对于复杂的对象可以使用 ECMAScript 提供的 JSON 对象的 stringify 和 parse 来处理
+- 获取方式：
+  - localStorage：window.localStorage;；sessionStorage：window.sessionStorage;
+- WebStorage 的优点：
+  - 存储空间更大：cookie 为 4KB，而 WebStorage 是 5MB
+  - 节省网络流量：WebStorage 不会传送到服务器，存储在本地的数据可以直接获取，也不会像 cookie 一样每次请求都会传送到服务器，所以减少了客户端和服务器端的交互，节省了网络流量对于那种只需要在用户浏览一组页面期间保存而关闭浏览器后就可以丢弃的数据，sessionStorage 会非常方便
+  - 快速显示：有的数据存储在 WebStorage 上，再加上浏览器本身的缓存。获取数据时可以从本地获取会比从服务器端获取快得多，所以速度更快
+  - 安全性：WebStorage 不会随着 HTTP header 发送到服务器端，所以安全性相对于 cookie 来说比较高一些，不会担心截获，但是仍然存在伪造问题
+  - WebStorage 提供了一些方法，数据操作比 cookie 方便
+- WebStorage 的优点：
+  - 存储空间更大：cookie 为 4KB，而 WebStorage 是 5MB
+  - 节省网络流量：WebStorage 不会传送到服务器，存储在本地的数据可以直接获取，也不会像 cookie 一样每次请求都会传送到服务器，所以减少了客户端和服务器端的交互，节省了网络流量对于那种只需要在用户浏览一组页面期间保存而关闭浏览器后就可以丢弃的数据，sessionStorage 会非常方便
+  - 快速显示：有的数据存储在 WebStorage 上，再加上浏览器本身的缓存。获取数据时可以从本地获取会比从服务器端获取快得多，所以速度更快
+  - 安全性：WebStorage 不会随着 HTTP header 发送到服务器端，所以安全性相对于 cookie 来说比较高一些，不会担心截获，但是仍然存在伪造问题
+  - WebStorage 提供了一些方法，数据操作比 cookie 方便
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210923222357.png)
+
+#### sessionStorage、localStorage 和 cookie 的区别
+- 相同点是都是保存在浏览器端、且同源的
+
+- cookie 数据始终在同源的 http 请求中携带（即使不需要），即 cookie 在浏览器和服务器间来回传递，而 sessionStorage 和 localStorage 不会自动把数据发送给服务器，仅在本地保存。cookie 数据还有路径（path）的概念，可以限制 cookie 只属于某个路径下
+- 存储大小限制也不同，cookie 数据不能超过 4K，同时因为每次 http 请求都会携带 cookie、所以 cookie 只适合保存很小的数据，如会话标识。sessionStorage 和 localStorage 虽然也有存储大小的限制，但比 cookie 大得多，可以达到 5M 或更大
+- 数据有效期不同，sessionStorage：仅在当前浏览器窗口关闭之前有效；localStorage：始终有效，窗口或浏览器关闭也一直保存，因此用作持久数据；cookie：只在设置的 cookie 过期时间之前有效，即使窗口关闭或浏览器关闭
+- 作用域不同，sessionStorage 不在不同的浏览器窗口中共享，即使是同一个页面； localstorage 在所有同源窗口中都是共享的；cookie 也是在所有同源窗口中都是共享的
+- webStorage 支持事件通知机制，可以将数据更新的通知发送给监听者。webStorage 的 api 接口使用更方便
+- localStorage 适合持久化缓存数据，比如页面的默认偏好配置等；sessionStorage 适合一次性临时数据保存。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210923222632.png)
+
+### Cookie、Session、Token、JWT
+#### 什么是认证（Authentication）
+- 通俗地讲就是验证当前用户的身份，证明“你是你自己”（比如：你每天上下班打卡，都需要通过指纹打卡，当你的指纹和系统里录入的指纹相匹配时，就打卡成功）
+- 互联网中的认证：
+  - 用户名密码登录
+  - 邮箱发送登录链接
+  - 手机号接收验证码
+  - 只要你能收到邮箱/验证码，就默认你是账号的主人
+#### 什么是授权（Authorization）
+- 用户授予第三方应用访问该用户某些资源的权限
+    - 你在安装手机应用的时候，APP 会询问是否允许授予权限（访问相册、地理位置等权限）
+    - 你在访问微信小程序时，当登录时，小程序会询问是否允许授予权限（获取昵称、头像、地区、性别等个人信息）
+- 实现授权的方式有：cookie、session、token、OAuth2.0
+#### 什么是凭证（Credentials）
+- 实现认证和授权的前提是需要一种媒介（证书） 来标记访问者的身份
+  - 在战国时期，商鞅变法，发明了照身帖。照身帖由官府发放，是一块打磨光滑细密的竹板，上面刻有持有人的头像和籍贯信息。国人必须持有，如若没有就被认为是黑户，或者间谍之类的。
+  - 在现实生活中，每个人都会有一张专属的居民身份证，是用于证明持有人身份的一种法定证件。通过身份证，我们可以办理手机卡/银行卡/个人贷款/交通出行等等，这就是认证的凭证。
+  - 在互联网应用中，一般网站（如掘金）会有两种模式，游客模式和登录模式。游客模式下，可以正常浏览网站上面的文章，一旦想要点赞/收藏/分享文章，就需要登录或者注册账号。当用户登录成功后，服务器会给该用户使用的浏览器颁发一个令牌（token），这个令牌用来表明你的身份，每次浏览器发送请求时会带上这个令牌，就可以使用游客模式下无法使用的功能。
+#### 什么是 Cookie
+- HTTP 是无状态的协议（对于事务处理没有记忆能力，每次客户端和服务端会话完成时，服务端不会保存任何会话信息）：每个请求都是完全独立的，服务端无法确认当前访问者的身份信息，无法分辨上一次的请求发送者和这一次的发送者是不是同一个人。所以服务器与浏览器为了进行会话跟踪（知道是谁在访问我），就必须主动的去维护一个状态，这个状态用于告知服务端前后两个请求是否来自同一浏览器。而这个状态需要通过 cookie 或者 session 去实现。
+- cookie 存储在客户端： cookie 是服务器发送到用户浏览器并保存在本地的一小块数据，它会在浏览器下次向同一服务器再发起请求时被携带并发送到服务器上。
+- cookie 是不可跨域的： 每个 cookie 都会绑定单一的域名，无法在别的域名下获取使用，一级域名和二级域名之间是允许共享使用的（靠的是 domain）。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211112072406.png)
+
+#### 什么是 Session
+session 是另一种记录服务器和客户端会话状态的机制
+session 是基于 cookie 实现的，session 存储在服务器端，sessionId 会被存储到客户端的 cookie 中
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211112072500.png)
+
+- session 认证流程：
+  - 用户第一次请求服务器的时候，服务器根据用户提交的相关信息，创建对应的 Session
+  - 请求返回时将此 Session 的唯一标识信息 SessionID 返回给浏览器
+  - 浏览器接收到服务器返回的 SessionID 信息后，会将此信息存入到 Cookie 中，同时 Cookie 记录此 SessionID 属于哪个域名
+  - 当用户第二次访问服务器的时候，请求会自动判断此域名下是否存在 Cookie 信息，如果存在自动将 Cookie 信息也发送给服务端，服务端会从 Cookie 中获取 SessionID，再根据 SessionID 查找对应的 Session 信息，如果没有找到说明用户没有登录或者登录失效，如果找到 Session 证明用户已经登录可执行后面操作。
+- SessionID 是连接 Cookie 和 Session 的一道桥梁，大部分系统也是根据此原理来验证用户登录状态。
+#### Cookie 和 Session 的区别
+- 安全性： Session 比 Cookie 安全，Session 是存储在服务器端的，Cookie 是存储在客户端的。
+- 存取值的类型不同：Cookie 只支持存字符串数据，想要设置其他类型的数据，需要将其转换成字符串，Session 可以存任意数据类型。
+- 有效期不同： Cookie 可设置为长时间保持，比如我们经常使用的默认登录功能，Session 一般失效时间较短，客户端关闭（默认情况下）或者 Session 超时都会失效。
+- 存储大小不同： 单个 Cookie 保存的数据不能超过 4K，Session 可存储数据远高于 Cookie，但是当访问量过多，会占用过多的服务器资源。
+#### 什么是 Token（令牌）
+- Acesss Token
+  - 访问资源接口（API）时所需要的资源凭证
+  - 简单 token 的组成： uid(用户唯一的身份标识)、time(当前时间的时间戳)、sign（签名，token 的前几位以哈希算法压缩成的一定长度的十六进制字符串）
+  - 特点：
+    - 服务端无状态化、可扩展性好
+    - 支持移动端设备
+    - 安全
+    - 支持跨程序调用
+  - token 的身份验证流程：
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211112072747.png)
+    - 客户端使用用户名跟密码请求登录
+    - 服务端收到请求，去验证用户名与密码
+    - 验证成功后，服务端会签发一个 token 并把这个 token 发送给客户端
+    - 客户端收到 token 以后，会把它存储起来，比如放在 cookie 里或者 localStorage 里
+    - 客户端每次向服务端请求资源的时候需要带着服务端签发的 token
+    - 服务端收到请求，然后去验证客户端请求里面带着的 token ，如果验证成功，就向客户端返回请求的数据
+  - 每一次请求都需要携带 token，需要把 token 放到 HTTP 的 Header 里
+  - 基于 token 的用户认证是一种服务端无状态的认证方式，服务端不用存放 token 数据。用解析 token 的计算时间换取 session 的存储空间，从而减轻服务器的压力，减少频繁的查询数据库
+  - token 完全由应用管理，所以它可以避开同源策略
+- Refresh Token
+  - 另外一种 token——refresh token
+  - refresh token 是专用于刷新 access token 的 token。如果没有 refresh token，也可以刷新 access token，但每次刷新都要用户输入登录用户名与密码，会很麻烦。有了 refresh token，可以减少这个麻烦，客户端直接用 refresh token 去更新 access token，无需用户进行额外的操作。
+  - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211112072946.png)
+  - Access Token 的有效期比较短，当 Acesss Token 由于过期而失效时，使用 Refresh Token 就可以获取到新的 Token，如果 Refresh Token 也失效了，用户就只能重新登录了。
+  - Refresh Token 及过期时间是存储在服务器的数据库中，只有在申请新的 Acesss Token 时才会验证，不会对业务接口响应时间造成影响，也不需要向 Session 一样一直保持在内存中以应对大量的请求。
+#### Token 和 Session 的区别
+- Session 是一种记录服务器和客户端会话状态的机制，使服务端有状态化，可以记录会话信息。而 Token 是令牌，访问资源接口（API）时所需要的资源凭证。Token 使服务端无状态化，不会存储会话信息。
+- Session 和 Token 并不矛盾，作为身份认证 Token 安全性比 Session 好，因为每一个请求都有签名还能防止监听以及重放攻击，而 Session 就必须依赖链路层来保障通讯安全了。如果你需要实现有状态的会话，仍然可以增加 Session 来在服务器端保存一些状态。
+- 所谓 Session 认证只是简单的把 User 信息存储到 Session 里，因为 SessionID 的不可预测性，暂且认为是安全的。而 Token ，如果指的是 OAuth Token 或类似的机制的话，提供的是 认证 和 授权 ，认证是针对用户，授权是针对 App 。其目的是让某 App 有权利访问某用户的信息。这里的 Token 是唯一的。不可以转移到其它 App 上，也不可以转到其它用户上。Session 只提供一种简单的认证，即只要有此 SessionID ，即认为有此 User 的全部权利。是需要严格保密的，这个数据应该只保存在站方，不应该共享给其它网站或者第三方 App。所以简单来说：如果你的用户数据可能需要和第三方共享，或者允许第三方调用 API 接口，用 Token 。如果永远只是自己的网站，自己的 App，用什么就无所谓了。
+#### 什么是 JWT
+JWT 基本上由.分隔的三部分组成，分别是头部，有效载荷和签名。 一个简单的 JWT 的例子，如下所示：
+```js
+eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiemhhbmdzYW4ifQ.ec7IVPU-ePtbdkb85IRnK4t4nUVvF2bBf8fGhJmEwSs
+```
+如果你细致得去看的话会发现其实这是一个分为 3 段的字符串，段与段之间用 点号 隔开，在 JWT 的概念中，每一段的名称分别为：
+```js
+Header.Payload.Signature
+```
+- Header
+  - JWT 的 Header 通常包含两个字段，分别是：typ(type) 和 alg(algorithm)
+  - typ：token 的类型，这里固定为 JWT
+  - alg：使用的 hash 算法，例如：HMAC SHA256 或者 RSA
+- Payload
+  - JWT 中的 Payload 其实就是真实存储我们需要传递的信息的部分，例如正常我们会存储些用户 ID、用户名之类的。此外，还包含一些例如发布人、过期日期等的元数据。
+- Signature
+  - Signature 部分其实就是对我们前面的 Header 和 Payload 部分进行签名，保证 Token 在传输的过程中没有被篡改或者损坏，签名的算法也很简单，但是，为了加密，所以除了 Header 和 Payload 之外，还多了一个密钥字段
+  
+- JSON Web Token（简称 JWT）是目前最流行的跨域认证解决方案。
+- 是一种认证授权机制。
+- JWT 是为了在网络应用环境间传递声明而执行的一种基于 JSON 的开放标准（RFC 7519）。JWT 的声明一般被用来在身份提供者和服务提供者间传递被认证的用户身份信息，以便于从资源服务器获取资源。比如用在用户登录上。
+- 可以使用 HMAC 算法或者是 RSA 的公/私秘钥对 JWT 进行签名。因为数字签名的存在，这些传递的信息是可信的。
+ 生成 JWT
+  - jwt.io/
+  - www.jsonwebtoken.io/
+- JWT 的原理
+  - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211112074303.png)
+  - JWT 认证流程：
+    - 用户输入用户名/密码登录，服务端认证成功后，会返回给客户端一个 JWT
+    - 客户端将 token 保存到本地（通常使用 localstorage，也可以使用 cookie）
+    - 当用户希望访问一个受保护的路由或者资源的时候，需要请求头的 Authorization 字段中使用 Bearer 模式添加 JWT，其内容看起来是下面这样`Authorization: Bearer <token>`
+    - 服务端的保护路由将会检查请求头 Authorization 中的 JWT 信息，如果合法，则允许用户的行为
+    - 因为 JWT 是自包含的（内部包含了一些会话信息），因此减少了需要查询数据库的需要
+    - 因为 JWT 并不使用 Cookie 的，所以你可以使用任何域名提供你的 API 服务而不需要担心跨域资源共享问题（CORS）
+    - 因为用户的状态不再存储在服务端的内存中，所以这是一种无状态的认证机制
+- JWT 的使用方式
+  - 客户端收到服务器返回的 JWT，可以储存在 Cookie 里面，也可以储存在 localStorage。
+  - 方式一
+    - 当用户希望访问一个受保护的路由或者资源的时候，可以把它放在 Cookie 里面自动发送，但是这样不能跨域，所以更好的做法是放在 HTTP 请求头信息的 Authorization 字段里，使用 Bearer 模式添加 JWT。
+    ```js
+    GET /calendar/v1/events
+    Host: api.example.com
+    Authorization: Bearer <token>
+    ```
+    - 用户的状态不会存储在服务端的内存中，这是一种 无状态的认证机制
+    - 服务端的保护路由将会检查请求头 Authorization 中的 JWT 信息，如果合法，则允许用户的行为。
+    - 由于 JWT 是自包含的，因此减少了需要查询数据库的需要
+    - JWT 的这些特性使得我们可以完全依赖其无状态的特性提供数据 API 服务，甚至是创建一个下载流服务。
+    - 因为 JWT 并不使用 Cookie ，所以你可以使用任何域名提供你的 API 服务而不需要担心跨域资源共享问题（CORS）
+  - 方式二
+    - 跨域的时候，可以把 JWT 放在 POST 请求的数据体里。
+  - 方式三
+    - 通过 URL 传输`http://www.example.com/user?token=xxx`
+#### Token 和 JWT 的区别
+- 相同：
+  - 都是访问资源的令牌
+  - 都可以记录用户的信息
+  - 都是使服务端无状态化
+  - 都是只有验证成功后，客户端才能访问服务端上受保护的资
+- 区别：
+  - Token：服务端验证客户端发送过来的 Token 时，还需要查询数据库获取用户信息，然后验证 Token 是否有效。
+  - JWT： 将 Token 和 Payload 加密后存储于客户端，服务端只需要使用密钥解密进行校验（校验也是 JWT 自己实现的）即可，不需要查询或者减少查询数据库，因为 JWT 自包含了用户信息和加密的数据。
+#### 常见的前后端鉴权方式
+- Session-Cookie
+- Token 验证（包括 JWT，SSO）
+- OAuth2.0（开放授权）
+#### 常见的加密算法
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211112102921.png)
+
+- 哈希算法(Hash Algorithm)又称散列算法、散列函数、哈希函数，是一种从任何一种数据中创建小的数字“指纹”的方法。哈希算法将数据重新打乱混合，重新创建一个哈希值。
+- 哈希算法主要用来保障数据真实性(即完整性)，即发信人将原始消息和哈希值一起发送，收信人通过相同的哈希函数来校验原始数据是否真实。
+- 哈希算法通常有以下几个特点：
+  - 正像快速：原始数据可以快速计算出哈希值
+  - 逆向困难：通过哈希值基本不可能推导出原始数据
+  - 输入敏感：原始数据只要有一点变动，得到的哈希值差别很大
+  - 冲突避免：很难找到不同的原始数据得到相同的哈希值，宇宙中原子数大约在 10 的 60 次方到 80 次方之间，所以 2 的 256 次方有足够的空间容纳所有的可能，算法好的情况下冲突碰撞的概率很低：
+    - 2 的 128 次方为 340282366920938463463374607431768211456，也就是 10 的 39 次方级别
+    - 2 的 160 次方为 1.4615016373309029182036848327163e+48，也就是 10 的 48 次方级别
+    - 2 的 256 次方为 1.1579208923731619542357098500869 × 10 的 77 次方，也就是 10 的 77 次方
+- 注意：
+  - 以上不能保证数据被恶意篡改，原始数据和哈希值都可能被恶意篡改，要保证不被篡改，可以使用 RSA 公钥私钥方案，再配合哈希值。
+  - 哈希算法主要用来防止计算机传输过程中的错误，早期计算机通过前 7 位数据第 8 位奇偶校验码来保障（12.5% 的浪费效率低），对于一段数据或文件，通过哈希算法生成 128bit 或者 256bit 的哈希值，如果校验有问题就要求重传。
+#### 常见问题
+- 使用 cookie 时需要考虑的问题
+  - 因为存储在客户端，容易被客户端篡改，使用前需要验证合法性
+  - 不要存储敏感数据，比如用户密码，账户余额
+  - 使用 httpOnly 在一定程度上提高安全性
+  - 尽量减少 cookie 的体积，能存储的数据量不能超过 4kb
+  - 设置正确的 domain 和 path，减少数据传输
+  - cookie 无法跨域
+  - 一个浏览器针对一个网站最多存 20 个 Cookie，浏览器一般只允许存放 300 个 Cookie
+  - 移动端对 cookie 的支持不是很好，而 session 需要基于 cookie 实现，所以移动端常用的是 token
+
+- 使用 session 时需要考虑的问题
+  - 将 session 存储在服务器里面，当用户同时在线量比较多时，这些 session 会占据较多的内存，需要在服务端定期的去清理过期的 session
+  - 当网站采用集群部署的时候，会遇到多台 web 服务器之间如何做 session 共享的问题。因为 session 是由单个服务器创建的，但是处理用户请求的服务器不一定是那个创建 session 的服务器，那么该服务器就无法拿到之前已经放入到 session 中的登录凭证之类的信息了。
+  - 当多个应用要共享 session 时，除了以上问题，还会遇到跨域问题，因为不同的应用可能部署的主机不一样，需要在各个应用做好 cookie 跨域的处理。
+  - sessionId 是存储在 cookie 中的，假如浏览器禁止 cookie 或不支持 cookie 怎么办？ 一般会把 sessionId 跟在 url 参数后面即重写 url，所以 session 不一定非得需要靠 cookie 实现
+  - 移动端对 cookie 的支持不是很好，而 session 需要基于 cookie 实现，所以移动端常用的是 token
+
+- 使用 token 时需要考虑的问题
+  - 如果你认为用数据库来存储 token 会导致查询时间太长，可以选择放在内存当中。比如 redis 很适合你对 token 查询的需求。
+  - token 完全由应用管理，所以它可以避开同源策略
+  - token 可以避免 CSRF 攻击(因为不需要 cookie 了)
+  - 移动端对 cookie 的支持不是很好，而 session 需要基于 cookie 实现，所以移动端常用的是 token
+
+- 使用 JWT 时需要考虑的问题
+  - 因为 JWT 并不依赖 Cookie 的，所以你可以使用任何域名提供你的 API 服务而不需要担心跨域资源共享问题（CORS）
+  - JWT 默认是不加密，但也是可以加密的。生成原始 Token 以后，可以用密钥再加密一次。
+  - JWT 不加密的情况下，不能将秘密数据写入 JWT。
+  - JWT 不仅可以用于认证，也可以用于交换信息。有效使用 JWT，可以降低服务器查询数据库的次数。
+  - JWT 最大的优势是服务器不再需要存储 Session，使得服务器认证鉴权业务可以方便扩展。但这也- 是 JWT 最大的缺点：由于服务器不需要存储 Session 状态，因此使用过程中无法废弃某个 Token 或者更改 Token 的权限。也就是说一旦 JWT 签发了，到期之前就会始终有效，除非服务器部署额外的逻辑。
+  - JWT 本身包含了认证信息，一旦泄露，任何人都可以获得该令牌的所有权限。为了减少盗用，JWT 的有效期应该设置得比较短。对于一些比较重要的权限，使用时应该再次对用户进行认证。
+  - JWT 适合一次性的命令认证，颁发一个有效期极短的 JWT，即使暴露了危险也很小，由于每次操作都会生成新的 JWT，因此也没必要保存 JWT，真正实现无状态。
+  - 为了减少盗用，JWT 不应该使用 HTTP 协议明码传输，要使用 HTTPS 协议传输。
+
+- 使用加密算法时需要考虑的问题
+  - 绝不要以明文存储密码
+  - 永远使用 哈希算法 来处理密码，绝不要使用 Base64 或其他编码方式来存储密码，这和以明文存储密码是一样的，使用哈希，而不要使用编码。编码以及加密，都是双向的过程，而密码是保密的，应该只被它的所有者知道， 这个过程必须是单向的。哈希正是用于做这个的，从来没有解哈希这种说法， 但是编码就存在解码，加密就存在解密。
+  - 绝不要使用弱哈希或已被破解的哈希算法，像 MD5 或 SHA1 ，只使用强密码哈希算法。
+  - 绝不要以明文形式显示或发送密码，即使是对密码的所有者也应该这样。如果你需要 “忘记密码” 的功能，可以随机生成一个新的 一次性的（这点很重要）密码，然后把这个密码发送给用户。
+### HTTPS
+`HTTPS` 是超文本传输安全协议，即`HTTP + SSL/TLS`。说白了，就是一个加强版的`HTTP`。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103143545.png)
+### HTTPS协议的工作原理
+客户端在使用 HTTPS 方式与 Web 服务器通信时有以下几个步骤： 
+- 客户端使用 HTTPS URL 访问服务器，则要求 WEB 服务器建立 SSL 链接。 
+- WEB 服务器接收到客户端的请求之后，会将网站的证书（证书中包含了公钥），传输给客户端。 
+- 客户端和 WEB 服务器端开始协商 SSL 链接的安全等级，也就是加密等级。 
+- 客户端浏览器通过双方协商一致的安全等级，建立会话密钥，然后通过网站的公钥来加密会话密钥，并传送给网站。 
+- WEB 服务器通过自己的私钥解密出会话密钥。 
+- WEB 服务器通过会话密钥加密与客户端之间的通信。
+
+
+- HTTPS 的整体过程分为证书验证和数据传输阶段
+  - ① 证书验证阶段：
+    - 浏览器发起 HTTPS 请求；
+    - 服务端返回 HTTPS 证书；
+    - 客户端验证证书是否合法，如果不合法则提示告警。
+  - ② 数据传输阶段：
+    - 当证书验证合法后，在本地生成随机数；
+    - 通过公钥加密随机数，并把加密后的随机数传输到服务端；
+    - 服务端通过私钥对随机数进行解密；
+    - 服务端通过客户端传入的随机数构造对称加密算法，对返回结果内容进行加密后传输。
+### HTTP 与 HTTPS 有什么区别？
+HTTP 与 HTTPS 的区别:
+- HTTP：是互联网上应用最为广泛的一种网络协议，是一个客户端和服务器端请求和应答的标准（TCP），用于从 WWW 服务器传输超文本到本地浏览器的传输协议，它可以使浏览器更加高效，使网络传输减少。
+- HTTPS：是以安全为目标的 HTTP 通道，简单讲是 HTTP 的安全版，即 HTTP 下加入 SSL 层，HTTPS 的安全基础是 SSL，因此加密的详细内容就需要 SSL。HTTPS 协议的主要作用可以分为两种：一种是建立一个信息安全通道，来保证数据传输的安全；另一种就是确认网站的真实性。
+- HTTPS 协议需要到 CA 申请证书，一般免费证书较少，因而需要一定费用。
+- HTTP 是超文本传输协议，信息是明文传输，HTTPS 则是具有安全性的 SSL 加密传输协议。
+- HTTP 和 HTTPS 使用的是完全不同的连接方式，用的端口也不一样，前者是 80，后者是 443。
+- HTTP 的连接很简单，是无状态的；HTTPS 协议是由 SSL+HTTP 协议构建的可进行加密传输、身份认证的网络协议，比 HTTP 协议安全。
+
+
+- HTTPS 的优点
+  - 使用 HTTPS 协议可认证用户和服务器，确保数据发送到正确的客户机和服务器；
+  - HTTPS 协议是由 SSL+HTTP 协议构建的可进行加密传输、身份认证的网络协议，要比 http 协议安全，可防止数据在传输过程中不被窃取、改变，确保数据的完整性。
+- HTTPS 的缺点
+  - HTTPS 握手阶段比较`费时`，会使页面加载时间延长 50%，增加 10%~20%的耗电。
+  - HTTPS `缓存`不如 HTTP 高效，会增加数据开销。
+  - SSL 证书也需要钱，功能越强大的`证书费`用越高。
+  - SSL 证书需要绑定 `IP`，不能再同一个 ip 上绑定多个域名，ipv4 资源支持不了这种消耗
+### 有哪些区别SSL协议是使用对称加密还是非对称加密
+HTTPS在内容传输的加密上使用的是对称加密，非对称加密只作用在证书验证阶段。
+- 为什么数据传输是用对称加密？
+  - 首先：非对称加密的加解密效率是非常低的，而 HTTP 的应用场景中通常端与端之间存在大量的交互，非对称加密的效率是无法接受的。
+  - 另外：在 HTTPS 的场景中只有服务端保存了私钥，一对公私钥只能实现单向的加解密，所以 HTTPS 中内容传输加密采取的是对称加密，而不是非对称加密。
+### HTTP0.9、HTTP1.0、HTTP1.1、HTTP2.0、HTTP3.0 的区别
+#### HTTP0.9
+HTTP/0.9 诞生于 1991 年，是 HTTP 协议的最初版，构造十分简单：
+- 请求端只支持 GET 请求
+- 响应端只能返回 HTML 文本数据
+```
+GET /index.html
+```
+```html
+<html>
+  <body>
+    Hello World
+  </body>
+</html>
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103144347.png)
+
+可以看到，HTTP/0.9 只能发送 GET 请求，且每一个请求都单独创建一个 TCP 连接，响应端只能返回 HTML 格式的数据，响应完成之后 TCP 请求断开。这样的请求方式虽然能够满足当时的使用需求，但也还是暴露出了一些问题。
+
+- HTTP/0.9 痛点：
+    - 请求方式唯一，返回格式唯一
+    - TCP 连接无法复用
+#### HTTP/1.0
+HTTP/1.0 诞生于 1996 年，它在 HTTP/0.9 的基础上，增加了 HTTP 头部字段，极大扩展了 HTTP 的使用场景。这个版本的 HTTP 不仅可以传输文字，还能传输图像、视频、二进制文件，为互联网的迅速发展奠定了坚实的基础。
+
+- 核心特点如下：
+    - 每次 HTTP 请求/响应都会重新建立 TCP 连接
+    - 请求端增加 HTTP 协议版本，响应端增加状态码。
+    - 请求方法增加 POST、HEAD。
+    - 协议头带有版本号、协议类型、状态码字段
+    - 响应类型：超文本、脚本、媒体、样式表
+    - 请求端和响应端增加头部字段。
+        - Content-Type 让响应数据不只限于超文本。
+        - Expires、Last-Modified 缓存头。
+        - Authorization 身份认证。
+        - Connection: keep-alive 支持长连接，但非标准。
+```
+GET /mypage.html HTTP/1.0
+User-Agent: NCSA_Mosaic/2.0 (Windows 3.1)
+```
+```js
+200 OK
+Date: Tue, 15 Nov 1994 08:12:31 GMT
+Server: CERN/3.0 libwww/2.17
+Content-Type: text/html
+
+
+<html>
+  <body>
+    Hello World
+  </body>
+</html>
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103144944.png)
+
+可以看到，HTTP/1.0 扩展了请求方法和响应状态码，并且支持定义 HTTP 头部字段，通过 Content-Type 头，我们就能传输任何格式的数据了。同时可以看出，HTTP/1.0 仍然是一个请求对应一个 TCP 连接，不能形成复用。
+
+- HTTP/1.0 痛点：
+    - TCP 连接无法复用。
+    - HTTP 队头阻塞，一个 HTTP 请求响应结束之后，才能发起下一个 HTTP 请求。
+    - 一台服务器只能提供一个 HTTP 服务。
+
+#### HTTP/1.1
+HTTP/1.1 诞生于 1999 年，它进一步完善了 HTTP 协议，一直用到了 20 多年后的今天，仍然是使用最广的 HTTP 版本。
+
+- 核心特点如下：
+    - 持久连接
+        - 引入长连接，就是TCP连接默认不关闭，可以被多个请求复用，通过请求头connection:keep-alive设置
+        - HTTP/1.1 默认开启持久连接，在 TCP 连接建立后不立即关闭，让多个 HTTP 请求得以复用
+    - 管线化技术
+        - 单个 TCP 连接上可以传送多个 HTTP 请求和响应
+        - HTTP/1.1 中，多个 HTTP 请求不用排队发送，可以批量发送，这就解决了 HTTP 队头阻塞问题。但批量发送的 HTTP 请求，必须按照发送的顺序返回响应，相当于问题解决了一半，仍然不是最佳体验
+    - 支持响应分块
+        - 支持分块响应，断点续传，利于大文件传输，能过请求头中的`Range`实现
+        - HTTP/1.1 实现了流式渲染，响应端可以不用一次返回所有数据，可以将数据拆分成多个模块，产生一块数据，就发送一块数据，这样客户端就可以同步对数据进行处理，减少响应延迟，降低白屏时间
+        - Bigpipe 的实现就是基于这个特性，具体是通过定义 `Transfer-Encoding` 头来实现的
+    - 增加 Host 头
+        - 使用了虚拟网络，在一台物理服务器上可以存在多个虚拟主机，并且共享一个IP地址
+        - HTTP/1.1 实现了虚拟主机技术，将一台服务器分成若干个主机，这样就可以在一台服务器上部署多个网站了
+        - 通过配置 Host 的域名和端口号，即可支持多个 HTTP 服务：Host: `<domain>:<port>`
+    - 其他扩展
+        - 增加 Cache-Control、E-Tag 缓存头
+            - 强化了缓存管理和控制Cache-Control、ETag/If-None-Match
+        - 增加 PUT、PATCH、HEAD、 OPTIONS、DELETE、CONNECT 请求方法
+
+```
+GET /en-US/docs/Glossary/Simple_header HTTP/1.1
+Host: developer.mozilla.org
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:50.0) Gecko/20100101 Firefox/50.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-US,en;q=0.5
+Accept-Encoding: gzip, deflate, br
+Referer: https://developer.mozilla.org/en-US/docs/Glossary/Simple_header
+```
+```js
+
+200 OK
+Connection: Keep-Alive
+Content-Encoding: gzip
+Content-Type: text/html; charset=utf-8
+Date: Wed, 20 Jul 2016 10:55:30 GMT
+Etag: "547fa7e369ef56031dd3bff2ace9fc0832eb251a"
+Keep-Alive: timeout=5, max=1000
+Last-Modified: Tue, 19 Jul 2016 00:59:33 GMT
+Server: Apache
+Transfer-Encoding: chunked
+Vary: Cookie, Accept-Encoding
+
+
+
+<html>
+  <body>
+    Hello World
+  </body>
+</html>
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103145846.png)
+
+#### HTTP1.0 和 HTTP1.1 的区别
+- HTTP1.0
+  - 队头阻塞：下个请求必须在前一个请求返回后才能发出，导致带宽无法被充分利用，后续请求被阻塞（HTTP 1.1 尝试使用流水线（Pipelining）技术，但先天 FIFO（先进先出）机制导致当前请求的执行依赖于上一个请求执行的完成，容易引起队头阻塞，并没有从根本上解决问题）；
+  - 协议开销大：header 里携带的内容过大，且不能压缩，增加了传输的成本；
+  - 单向请求：只能单向请求，客户端请求什么，服务器返回什么
+
+- HTTP1.1
+  - 长连接：HTTP1.1 支持长连接和请求的流水线处理，在一个 TCP 连接上可以传送多个 HTTP 请求和响应，减少了建立和关闭连接的消耗和延迟，在 HTTP1.1 中默认开启长连接 keep-alive，一定程度上弥补了 HTTP1.0 每次请求都要创建连接的缺点。
+  - 节约带宽： HTTP1.0 中存在一些浪费带宽的现象，例如客户端只是需要某个对象的一部分，而服务器却将整个对象送过来了，并且不支持断点续传功能。HTTP1.1 支持只发送 header 信息（不带任何 body 信息），如果服务器认为客户端有权限请求服务器，则返回 100，客户端接收到 100 才开始把请求 body 发送到服务器；如果返回 401，客户端就可以不用发送请求 body 了节约了带宽。
+  - HOST 域： 在 HTTP1.0 中认为每台服务器都绑定一个唯一的 IP 地址，因此，请求消息中的 URL 并没有传递主机名（hostname），HTTP1.0 没有 host 域。随着虚拟主机技术的发展，在一台物理服务器上可以存在多个虚拟主机（Multi-homed Web Servers），并且它们共享一个 IP 地址。HTTP1.1 的请求消息和响应消息都支持 host 域，且请求消息中如果没有 host 域会报告一个错误（400 Bad Request）。
+  - 缓存处理：在 HTTP1.0 中主要使用 header 里的 If-Modified-Since,Expires 来做为缓存判断的标准，HTTP1.1 则引入了更多的缓存控制策略例如 Entity tag，If-Unmodified-Since, If-Match, If-None-Match 等更多可供选择的缓存头来控制缓存策略。
+  - 错误通知的管理：在 HTTP1.1 中新增了 24 个错误状态响应码，如 409（Conflict）表示请求的资源与资源的当前状态发生冲突；410（Gone）表示服务器上的某个资源被永久性的删除。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211107112111.png)
+
+#### HTTP/2.0
+HTTP/2 诞生于 2015 年，它的最大的特点是 All in 二进制，基于二进制的特性，对 HTTP 传输效率进行了深度优化。
+
+HTTP/2 将一个 HTTP 请求划分为 3 个部分：
+- 帧：一段二进制数据，是 HTTP/2 传输的最小单位。
+- 消息：一个请求或响应对应的一个或多个帧。
+- 数据流：已建立的连接内的双向字节流，可以承载一条或多条消息。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103150008.png)
+
+图中可以看到，一个 TCP 连接上有多个数据流，一个数据流承载着双向消息，一条消息包含了多个帧，每个帧都有唯一的标识，指向所在的数据流，来自不同数据流的帧可以交错发送，然后再根据每个帧头的数据流标识符重新组装，这样就实现了数据传输。
+
+- HTTP/2 核心特点如下：
+    - 使用新的二进制协议，不再是纯文本，避免文本歧义，缩小了请求体积
+    - 请求优先级
+        - 多个 HTTP 请求同时发送时，会产生多个数据流，数据流中有一个优先级的标识，服务器端可以根据这个标识来决定响应的优先顺序。
+    - 多路复用
+        - 多路复用，同域名下所有通信都是在单链接(双向数据流)完成，提高连接的复用率，在拥塞控制方面有更好的能力提升
+        - TCP 传输时，不用按照 HTTP 的发送顺序进行响应，可以交错发送，接收端根据帧首部的标识符，就能找到对应的流，进而重新组合得到最终数据。
+    - 服务器端推送
+        - HTTP/2 允许服务器未经请求，主动向客户端发送资源，并缓存到客户端中，以避免二次请求。
+        - HTTP/1.1 中请求一个页面时，浏览器会先发送一个 HTTP 请求，然后得到响应的 HTML 内容并开始解析，如果发现有 `<script src="xxxx.js">` 标签，则会再次发起 HTTP 请求获取对应的 JS 内容。而 HTTP/2 可以在返回 HTML 的同时，将需要用到的 JS、CSS 等内容一并返回给客户端，当浏览器解析到对应标签时，也就不需要再次发起请求了。
+    - 头部压缩
+        - 使用HPACK算法将头部压缩，用哈夫曼编码建立索表，传送索引大大节约了带宽
+        - HTTP/1.1 的头部字段包含大量信息，而且每次请求都得带上，占用了大量的字节。
+        - HTTP/2.0 中通信双方各自缓存一份头部字段表，如：把 `Content-Type:text/html` 存入索引表中，后续如果要用到这个头，只需要发送对应的索引号就可以了。
+    - 增加了安全性，使用HTTP 2.0，要求必须至少TLS 1.2
+
+除此之外，虽然 HTTP/2 没有规定必须使用 TLS 安全协议，但所有实现 HTTP/2 的 Web 浏览器都只支持配置过 TLS 的网站，这是为了鼓励大家使用更加安全的 HTTPS。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103150427.png)
+
+可以看到，在 HTTP/2 中发送请求时，既不需要排队发送，也不需要排队返回，彻底解决了 HTTP 队头阻塞问题。对于头部信息，资源缓存等痛点也进行了优化，似乎已经是一种很完美的方案了。
+
+HTTP/2 在 HTTP + TCP 的架构上已经优化到了极致，如果要想继续优化，那就只能从这个架构入手了。
+
+- 首先需要优化的是 TCP，因为 TCP 核心是保证传输层的可靠性，传输效率其实并不好。
+    - TCP 也存在队头阻塞，TCP 在传输时使用序列号标识数据的顺序，一旦某个数据丢失，后面的数据需要等待这个数据重传后才能进行下一步处理。
+    - TCP 每一次建立都需要三次握手，释放连接需要四次挥手，无形中增加了传输时长。TCP以及TCP+TLS建立连接的延时，HTTP2使用TCP协议来传输的，而如果使用HTTPS的话，还需要TLS协议进行安全传输，而使用TLS也需要一个握手过程，在传输数据之前，导致我们花掉3~4个RTT
+    - TCP 存在拥塞控制，内置了慢启动，拥塞避免等算法，传输效率并不稳定。
+
+如果要解决这些问题，就需要替换掉 TCP，而这也是 HTTP/3 的解决思路，我们接着往下看。
+
+#### HTTP1.1 和 HTTP2.0 的区别
+- HTTP2是一个二进制协议，HTTP1是超文本协议，传输的内容都不是一样的
+- HTTP2报头压缩，可以使用HPACK进行头部压缩，HTTP1则不论什么请求都会发送
+- HTTP2服务端推送(Server push)，允许服务器预先将网页所需要的资源push到浏览器的内存当中
+- HTTP2遵循多路复用，代替同一域名下的内容，只建立一次连接，HTTP1.x不是，对域名有6~8个连接限制
+- HTTP2引入二进制数据帧和流的概念，其中帧对数据进行顺序标识，这样浏览器收到数据之后，就可以按照序列对数据进行合并，而不会出现合并后数据错乱的情况，同样是因为有了序列，服务器就可以并行的传输数据，这就是流所做的事情。HTTP2对同一域名下所有请求都是基于流的，也就是说同一域名下不管访问多少文件，只建立一次连接。
+
+
+
+- 多路复用：HTTP2.0 使用了多路复用的技术，做到同一个连接并发处理多个请求，而且并发请求的数量比 HTTP1.1 大了好几个数量级。HTTP1.1 也可以多建立几个 TCP 连接，来支持处理更多并发的请求，但是创建 TCP 连接本身也是有开销的。
+- 头部数据压缩(采用 HPACK 压缩算法压缩头部，减小了传输的体积)： 在 HTTP1.1 中，HTTP 请求和响应都是由状态行、请求/响应头部、消息主体三部分组成。一般而言，消息主体都会经过 gzip 压缩，或者本身传输的就是压缩过后的二进制文件，但状态行和头部却没有经过任何压缩，直接以纯文本传输。随着 Web 功能越来越复杂，每个页面产生的请求数也越来越多，导致消耗在头部的流量越来越多，尤其是每次都要传输 UserAgent、Cookie 这类不会频繁变动的内容，完全是一种浪费。HTTP1.1 不支持 header 数据的压缩，HTTP2.0 使用 HPACK 算法对 header 的数据进行压缩，这样数据体积小了，在网络上传输就会更快。
+- 服务器推送： 服务端推送是一种在客户端请求之前发送数据的机制。网页使用了许多资源：HTML、样式表、脚本、图片等等。在 HTTP1.1 中这些资源每一个都必须明确地请求。这是一个很慢的过程。浏览器从获取 HTML 开始，然后在它解析和评估页面的时候，增量地获取更多的资源。因为服务器必须等待浏览器做每一个请求，网络经常是空闲的和未充分使用的。为了改善延迟，HTTP2.0 引入了 server push，它允许服务端推送资源给浏览器，在浏览器明确地请求之前，免得客户端再次创建连接发送请求到服务器端获取。这样客户端可以直接从本地加载这些资源，不用再通过网络。
+- 非阻塞下载
+
+缺点：HTTP 2 中，多个请求在一个 TCP 管道中的，出现了丢包时，HTTP 2 的表现反倒不如 HTTP 1.1 了。因为 TCP 为了保证可靠传输，有个特别的“丢包重传”机制，丢失的包必须要等待重新传输确认，HTTP 2 出现丢包时，整个 TCP 都要开始等待重传，那么就会阻塞该 TCP 连接中的所有请求。而对于 HTTP 1.1 来说，可以开启多个 TCP 连接，出现这种情况反到只会影响其中一个连接，剩余的 TCP 连接还可以正常传输数据。
+#### HTTP/3
+由于HTTP 2.0依赖于TCP，TCP有什么问题那HTTP2就会有什么问题。最主要的还是队头阻塞，在应用层的问题解决了，可是在TCP协议层的队头阻塞还没有解决。
+
+TCP在丢包的时候会进行重传，前面有一个包没收到，就只能把后面的包放到缓冲区，应用层是无法取数据的，也就是说HTTP2的多路复用并行性对于TCP的丢失恢复机制不管用，因此丢失或重新排序的数据都会导致交互挂掉。为了解决这个问题，Google又发明了QUIC协议。
+
+HTTP/3 目前还在草案阶段，它的主要特点是对传输层进行了优化，使用 QUIC 替换 TCP，彻底规避了 TCP 传输的效率问题。
+
+QUIC 由 Google 提出的基于 UDP 进行多路复用的传输协议。QUIC 没有连接的概念，不需要三次握手，在应用程序层面，实现了 TCP 的可靠性，TLS 的安全性和 HTTP2 的并发性。在设备支持层面，只需要客户端和服务端的应用程序支持 QUIC 协议即可，无操作系统和中间设备的限制。
+
+- HTTP/3 核心特点如下：
+- 传输层连接更快
+    - HTTP/3 基于 QUIC 协议，可以实现 0-RTT 建立连接，而 TCP 需要 3-RTT 才能建立连接
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103160129.png)
+
+- 传输层多路复用
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103160240.png)
+上图中的 Stream 之间相互独立，如果 Stream2 丢了一个 Pakcet，不会影响 Stream3 和 Stream4 正常读取。
+    - HTTP/3 传输层使用 QUIC 协议，数据在传输时会被拆分成了多个 packet 包，每一个 packet 包都可以独立、交错发送，不用按顺序发送，也就避免了 TCP 队头阻塞。
+- 改进的拥塞控制
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103160341.png)
+- **单调递增的 Packet Number。**在 TCP 中，每一个数据包都有一个序列号标识（seq），如果接收端超时没有收到，就会要求重发标识为 seq 的包，如果这时超时的包也接收到了，则无法区分哪个是超时的包，哪个是重传的包。QUIC 中的每一个包的标识（Packet Number）都是单调递增的，重传的 Packet Number 一定大于超时的 Packet Number，这样就能区分开了。
+- **不允许 Reneging。**在 TCP 中，如果接收方内存不够或 Buffer 溢出，则可能会把已接收的包丢弃（Reneging），这种行为对数据重传产生了很大的干扰，在 QUIC 中是明确禁止的。在 QUIC 中，一个包只要被确认，就一定是被正确接收了。
+- **更多的 ACK 块。**一般来说，接收方收到发送方的消息后都会发送一个 ACK 标识，表示收到了数据。但每收到一个数据就发送一个 ACK 效率太低了，通常是收到多个数据后再统一回复 ACK。TCP 中每收到 3 个数据包就要返回一个 ACK，而 QUIC 最多可以收到 256 个包之后，才返回 ACK。在丢包率比较严重的网络下，更多的 ACK 块可以减少重传量，提升网络效率。
+- **Ack Delay。**TCP 计算 RTT 时没有考虑接收方处理数据的延迟，如下图所示，这段延迟即 ACK Delay。QUIC 考虑了这段延迟，使得 RTT 的计算更加准确。
+
+
+- 优化的流量控制
+    - Stream 级别的流量控制中，`接收窗口 = 最大接收窗口- 已接收数据`。
+    - Connection 级别的流量控制中，`接收窗口 = Stream1接收窗口 + Stream2接收窗口 + ... + StreamN接收窗口`。
+    - TCP 通过滑动窗口来控制流量，如果某一个包丢失了，滑动窗口并不能跨过丢失的包继续滑动，而是会卡在丢失的位置，等待数据重传后，才能继续滑动。
+    - QUIC 流量控制的核心是：不能建立太多的连接，以免响应端处理不过来；不能让某一个连接占用大量的资源，让其他连接没有资源可用。为此 QUIC 流量控制分为 2 个级别：连接级别（Connection Level）和 Stream 级别（Stream Level）。
+
+
+- 加密认证的报文
+    - TCP 头部没有经过任何加密和认证，在传输过程中很容易被中间网络设备篡改，注入和窃听。
+    - QUIC 中报文都是经过加密和认证的，在传输过程中保证了数据的安全。
+
+
+- 连接迁移
+    - TCP 连接是由（源 IP，源端口，目的 IP，目的端口）组成，这四者中一旦有一项发生改变，这个连接也就不能用了。如果我们从 5G 网络切换到 WiFi 网络，IP 地址就会改变，这个时候 TCP 连接也自然断掉了。
+    - QUIC 使用客户端生成的 64 位 ID 来表示一条连接，只要 ID 不变，这条连接也就一直维持着，不会中断。
+
+
+- 前向纠错机制
+    - 发送端需要发送三个包，QUIC 在传输时会计算出这三个包的异或值，并单独发出一个校验包，也就是总共发出了四个包。
+    - 如果某一个包（非校验包）传输时丢失了，则可以通过另外三个包计算出丢失数据包的内容。
+    - 当然这种技术只能用在丢失一个包的情况下，如果丢失了多个包，就只能进行重传了。
+    - QUIC 中发送数据时，除了发送本身的数据包，还会发送验证包，以减少数据丢失导致的重传。
+    - 例如：可以看出，QUIC 丢掉了 TCP 的包袱，基于 UDP，实现了一个安全高效可靠的 HTTP 通信协议。凭借着 0-RTT 建立连接、传输层多路复用、连接迁移、改进的拥塞控制、流量控制等特性，QUIC 在绝大多数场景下获得了比 HTTP/2 更好的效果，HTTP/3 真是未来可期。
+
+
+
+
+
+- HTTP/3
+  - 基于 UDP 的 QUIC 连接迁移实现
+    - TCP 的连接重连之痛
+      - 一条 TCP 连接是由四元组标识的（源 IP，源端口，目的 IP，目的端口）。什么叫连接迁移呢？就是当其中任何一个元素发生变化时，这条连接依然维持着，能够保持业务逻辑不中断。
+    - 用户的地址发生变化时，如 WIFI 切换到 4G 场景，基于 TCP 的 HTTP 协议无法保持连接的存活。QUIC 基于连接 ID 唯一识别连接。当源地址发生改变时，QUIC 仍然可以保证连接存活和数据正常收发。
+    - QUIC 是基于 UDP 协议的，任何一条 QUIC 连接不再以 IP 及端口四元组标识，而是以一个 64 位的随机数作为 ID 来标识，这样就算 IP 或者端口发生变化时，只要 ID 不变，这条连接依然维持着，上层业务逻辑感知不到变化，不会中断，也就不需要重连。
+  - 低连接延时
+    - TLS 的连接时延问题
+      - 对于数据量小的请求而言，单一次的请求握手就占用了大量的时间，对于用户体验的影响非常大。同时，在用户网络不佳的情况下，RTT 延时会变得较高，极其影响用户体验。
+      - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211107112541.png)
+      - 从对比我们可以看到，即使用上了 TLS 1.3，精简了握手过程，最快能做到 0-RTT 握手(首次是 1-RTT)；但是对用户感知而言, 还要加上 1RTT 的 TCP 握手开销。
+      - QUIC 通过合并加密与连接管理解决了这个问题，我们来看看其是如何实现真正意义上的 0-RTT 的握手, 让与 server 进行第一个数据包的交互就能带上用户数据。
+      - QUIC 由于基于 UDP，无需 TCP 连接，在最好情况下，短连接下 QUIC 可以做到 0RTT 开启数据传输。而基于 TCP 的 HTTPS，即使在最好的 TLS1.3 的 early data 下仍然需要 1RTT 开启数据传输。而对于目前线上常见的 TLS1.2 完全握手的情况，则需要 3RTT 开启数据传输。对于 RTT 敏感的业务，QUIC 可以有效的降低连接建立延迟。
+      - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211107134603.png)
+  - 可自定义的拥塞控制
+    - Quic 使用可插拔的拥塞控制，相较于 TCP，它能提供更丰富的拥塞控制信息。比如对于每一个包，不管是原始包还是重传包，都带有一个新的序列号(seq)，这使得 Quic 能够区分 ACK 是重传包还是原始包，从而避免了 TCP 重传模糊的问题。Quic 同时还带有收到数据包与发出 ACK 之间的时延信息。这些信息能够帮助更精确的计算 RTT。此外，Quic 的 ACK Frame 支持 256 个 NACK 区间，相比于 TCP 的 SACK(Selective Acknowledgment)更弹性化，更丰富的信息会让 client 和 server 哪些包已经被对方收到。
+    - QUIC 的传输控制不再依赖内核的拥塞控制算法，而是实现在应用层上，这意味着我们根据不同的业务场景，实现和配置不同的拥塞控制算法以及参数。GOOGLE 提出的 BBR 拥塞控制算法与 CUBIC 是思路完全不一样的算法，在弱网和一定丢包场景，BBR 比 CUBIC 更不敏感，性能也更好。在 QUIC 下我们可以根据业务随意指定拥塞控制算法和参数，甚至同一个业务的不同连接也可以使用不同的拥塞控制算法。
+  - 无队头阻塞
+    - TCP 的队头阻塞问题
+      - 虽然 HTTP2 实现了多路复用，但是因为其基于面向字节流的 TCP，因此一旦丢包，将会影响多路复用下的所有请求流。QUIC 基于 UDP，在设计上就解决了队头阻塞问题。
+      - TCP 队头阻塞的主要原因是数据包超时确认或丢失阻塞了当前窗口向右滑动，我们最容易想到的解决队头阻塞的方案是不让超时确认或丢失的数据包将当前窗口阻塞在原地。QUIC 也正是采用上述方案来解决 TCP 队头阻塞问题的。
+      - TCP 为了保证可靠性，使用了基于字节序号的 Sequence Number 及 Ack 来确认消息的有序到达。
+      - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211107134825.png)
+      - 如上图，应用层可以顺利读取 stream1 中的内容，但由于 stream2 中的第三个 segment 发生了丢包，TCP 为了保证数据的可靠性，需要发送端重传第 3 个 segment 才能通知应用层读取接下去的数据。所以即使 stream3 stream4 的内容已顺利抵达，应用层仍然无法读取，只能等待 stream2 中丢失的包进行重传。
+      - 在弱网环境下，HTTP2 的队头阻塞问题在用户体验上极为糟糕。
+    - QUIC 的无队头阻塞解决方案
+      - QUIC 同样是一个可靠的协议，它使用 Packet Number 代替了 TCP 的 Sequence Number，并且每个 Packet Number 都严格递增，也就是说就算 Packet N 丢失了，重传的 Packet N 的 Packet Number 已经不是 N，而是一个比 N 大的值，比如 Packet N+M。
+      - QUIC 使用的 Packet Number 单调递增的设计，可以让数据包不再像 TCP 那样必须有序确认，QUIC 支持乱序确认，当数据包 Packet N 丢失后，只要有新的已接收数据包确认，当前窗口就会继续向右滑动。待发送端获知数据包 Packet N 丢失后，会将需要重传的数据包放到待发送队列，重新编号比如数据包 Packet N+M 后重新发送给接收端，对重传数据包的处理跟发送新的数据包类似，这样就不会因为丢包重传将当前窗口阻塞在原地，从而解决了队头阻塞问题。那么，既然重传数据包的 Packet N+M 与丢失数据包的 Packet N 编号并不一致，我们怎么确定这两个数据包的内容一样呢？
+      - QUIC 使用 Stream ID 来标识当前数据流属于哪个资源请求，这同时也是数据包多路复用传输到接收端后能正常组装的依据。重传的数据包 Packet N+M 和丢失的数据包 Packet N 单靠 Stream ID 的比对一致仍然不能判断两个数据包内容一致，还需要再新增一个字段 Stream Offset，标识当前数据包在当前 Stream ID 中的字节偏移量。
+      - 有了 Stream Offset 字段信息，属于同一个 Stream ID 的数据包也可以乱序传输了（HTTP/2 中仅靠 Stream ID 标识，要求同属于一个 Stream ID 的数据帧必须有序传输），通过两个数据包的 Stream ID 与 Stream Offset 都一致，就说明这两个数据包的内容一致。
+      - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211107134949.png)
+  - 报文 Body 都是经过加密的
+    - QUIC 的 packet 除了个别报文比如 PUBLIC_RESET 和 CHLO，所有报文头部都是经过认证的，报文 Body 都是经过加密的。这样只要对 QUIC 报文任何修改，接收端都能够及时发现，有效地降低了安全风险。
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211107135122.png)
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211107111256.png)
+
+
+
+- 特点
+    - 在传输层直接干掉TCP，用UDP替代
+    - 实现了一套新的拥塞控制算法，彻底解决TCP中队头阻塞的问题
+    - 实现了类似TCP的流量控制、传输可靠性的功能。虽然UDP不提供可靠性的传输，但QUIC在UDP的基础之上增加了一层来保证数据可靠性传输。它提供了数据包重传、拥塞控制以及其他一些TCP中存在的特性
+    - 实现了快速握手功能。由于QUIC是基于UDP的，所以QUIC可以实现使用0-RTT或者1-RTT来建立连接，这意味着QUIC可以用最快的速度来发送和接收数据。
+    - 集成了TLS加密功能。目前QUIC使用的是TLS1.3
+
+
+#### HTTP3.0 相对于 HTTP2.0 的区别
+HTTP 协议是应用层协议，都是建立在传输层之上的。我们也都知道传输层上面不只有 TCP 协议，还有另外一个强大的协议 UDP 协议，2.0 和 1.0 都是基于 TCP 的，因此都会有 TCP 带来的硬伤以及局限性。而 HTTP3.0 则是建立在 UDP 的基础上。所以其与 HTTP2.0 之间有质的不同。
+
+通过多路复用，HTTP/2 解决了队头阻塞问题。但如果 TCP 流中出现了丢包，根据 TCP 的拥塞控制机制，其他数据流就只能等待丢包被重新发送和接收。所以，TCP 的队头阻塞问题在 HTTP/2 中依然存在。HTTP/3 通过使用基于 UDP 的传输协议 QUIC 解决了这一问题。
+
+
+HTTP/3 是自 HTTP/2 之后最新且最主要的 HTTP 版本。因为 HTTP/3 本身就是为 QUIC 协议设计的，所以也被描述为基于 QUIC 的 HTTP/2。HTTP/3 的目标是通过使用谷歌的 QUIC 协议提供快速、可靠安全的网络连接。
+#### QUIC 协议
+QUIC 是一种新的多路传输层网络协议标准，建立在 UDP 之上。QUIC 的主要目标是通过减少页面加载时间提升用户体验，并提高 HTTPS 的传输性能。它在本质上是 TCP+TLS+HTTP/2。
+
+设计 HTTP/3 的目的就是要充分利用 QUIC 的优势。QUIC 协议本身可以处理数据流，所以排除了 TCP 队头阻塞问题。
+
+- QUIC 的一些关键特性包括：
+  - 基于 UDP
+  - 使用没有队头阻塞的连接复用
+  - 重构 TCP 的关键机制（连接复用、连接建立、拥塞控制、可靠性），并成为可靠的传输协议
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211107111633.png)
+
+- 交换数据包
+  - 安全的首包
+    - 首先，客户端在一个 CRYPTO 帧中传输包含 TLS 1.3 Client Hello 的首包。Client Hello 包含不同类型的的扩展项，如目标服务器的 SNI（Server Name Indication，服务器名称指示 ）、QUIC 传输参数、压缩证书等，以及客户端支持的压缩方法和不同的加密套件。
+    - 如果服务器接受 QUIC 和 TLS 1.3 参数，它也会在 CRYPTO 帧中发送包含对客户端首包确认信息和 TLS 1.3 Server Hello 的首包信息。Server Hello 中包含被服务器接收的加密套件和不同的扩展（如密钥共享、支持的版本等）。在客户端接收到 Server Hello 后，会向服务器发送一个 ACK 确认包。
+    - 这三个首包都可能包含一个填充帧，以根据需要增加数据包的大小。
+  - 握手包
+    - 客户端和服务器之间的首包被交换以后，服务器会发送一个握手数据包，其中包含余下的服务器端消息，如证书、与服务器身份验证相关的加密扩展。客户端会验证这些证书，然后 QUIC 握手以客户端发送的握手消息结束。
+  - 安全的净荷包
+    - 一旦安全的 QUIC 连接建立，客户端与服务器之间的信息便可以安全传输。
+- 我们为什么要用 QUIC？
+  - 传统的 TCP 协议是建立在操作系统层和中间路由模块之上实现的，它的握手阶段信息很容易被这些中间模块篡改而变得不安全。
+  - 但 QUIC 协议是在 UDP 之上的用户级（如浏览器）中实现的，因此它更加灵活、对用户更友好，并且能够在短时间内支持更多设备。
+  - 在 QUIC 中，传输相关的信息被不同的保护层加密，握手包在传输链路上不容易被识别和修改。因此它提供了更安全的网络数据传输。
+#### HTTP0.9、HTTP1.0、HTTP1.1、HTTP2.0、HTTP3.0总结
+从 HTTP/0.9 到 HTTP/3，逐步介绍了每个版本的核心特点，最后再分别一句话总结一下。
+
+- HTTP/0.9 实现基本请求响应。
+- HTTP/1.0 增加 HTTP 头，丰富传输资源类型，奠定互联网发展基础。
+- HTTP/1.1 增加持久连接、管线化、响应分块，提升了 HTTP 传输效率。
+- HTTP/2 采用二进制传输格式，通过 HTTP 多路复用、头部压缩、服务器端推送，将传输效率在 HTTP + TCP 架构上发挥到了极致。
+- HTTP/3 将传输层替换为 QUIC，通过改进的拥塞控制、流量控制、0-RTT 建连、传输层多路复用、连接迁移等特性，进一步提升了 HTTP 传输效率。
+
+### HTTP 
+#### HTTP 的特点和缺点
+特点：无连接、无状态、灵活、简单快速
+- 无连接：每一次请求都要连接一次，请求结束就会断掉，不会保持连接
+- 无状态：每一次请求都是独立的，请求结束不会记录连接的任何信息(提起裤子就不认人的意思)，减少了网络开销，这是优点也是缺点
+- 灵活：通过http协议中头部的Content-Type标记，可以传输任意数据类型的数据对象(文本、图片、视频等等)，非常灵活
+- 简单快速：发送请求访问某个资源时，只需传送请求方法和URL就可以了，使用简单，正由于http协议简单，使得http服务器的程序规模小，因而通信速度很快
+
+缺点：无状态、不安全、明文传输、队头阻塞
+- 无状态：请求不会记录任何连接信息，没有记忆，就无法区分多个请求发起者身份是不是同一个客户端的，意味着如果后续处理需要前面的信息，则它必须重传，这样可能导致每次连接传送的数据量增大
+- 不安全：明文传输可能被窃听不安全，缺少身份认证也可能遭遇伪装，还有缺少报文完整性验证可能遭到篡改
+- 明文传输：报文(header部分)使用的是明文，直接将信息暴露给了外界，WIFI陷阱就是复用明文传输的特点，诱导你连上热点，然后疯狂抓取你的流量，从而拿到你的敏感信息
+- 队头阻塞：开启长连接(下面有讲)时，只建立一个TCP连接，同一时刻只能处理一个请求，那么当请求耗时过长时，其他请求就只能阻塞状态(如何解决下面有讲)
+#### HTTP 报文组成部分
+HTTP报文：由请求报文和响应报文组成。
+
+请求报文：由请求行、请求头、空行、请求体四部分组成
+
+响应报文：由状态行、响应头、空行、响应体四部分组成
+
+请求行：包含http方法，请求地址，http协议以及版本
+请求头/响应头：就是一些key:value来告诉服务端我要哪些内容，要注意什么类型等，请求头/响应头每一个字段详解[](https://kb.cnblogs.com/page/92320/)
+空行：用来区分首部与实体，因为请求头都是key:value的格式，当解析遇到空行时，服务端就知道下一个不再是请求头部分，就该当作请求体来解析了。
+请求体：请求的参数。
+状态行：包含http协议及版本、数字状态码、状态码英文名称。
+响应体：服务端返回的数据。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210824184941.png)
+
+```md
+首行是 Request-Line 包括：请求方法，请求 URI，协议版本，CRLF
+首行之后是若干行请求头，包括 general-header，request-header 或者 entity-header，每个一行以 CRLF 结束
+请求头和消息实体之间有一个 CRLF 分隔
+根据实际请求需要可能包含一个消息实体 一个请求报文例子如下：
+```
+```md
+GET /Protocols/rfc2616/rfc2616-sec5.html HTTP/1.1
+Host: www.w3.org
+Connection: keep-alive
+Cache-Control: max-age=0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,_/_;q=0.8
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.153 Safari/537.36
+Referer: https://www.google.com.hk/
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: zh-CN,zh;q=0.8,en;q=0.6
+Cookie: authorstyle=yes
+If-None-Match: "2cc8-3e3073913b100"
+If-Modified-Since: Wed, 01 Sep 2004 13:24:52 GMT
+
+name=qiu&age=25
+```
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210824184846.png)
+
+```md
+首行是状态行包括：HTTP 版本，状态码，状态描述，后面跟一个 CRLF
+首行之后是若干行响应头，包括：通用头部，响应头部，实体头部
+响应头部和响应实体之间用一个 CRLF 空行分隔
+最后是一个可能的消息实体 响应报文例子如下：
+```
+```md
+HTTP/1.1 200 OK
+Date: Tue, 08 Jul 2014 05:28:43 GMT
+Server: Apache/2
+Last-Modified: Wed, 01 Sep 2004 13:24:52 GMT # 最后修改时间，用于协商缓存
+ETag: "40d7-3e3073913b100" # 文件 hash，用于协商缓存
+Accept-Ranges: bytes
+Content-Length: 16599
+Cache-Control: max-age=21600 # 强缓存（浏览器端）最大过期时间
+Expires: Tue, 08 Jul 2014 11:28:43 GMT # 强缓存（浏览器端）过期时间
+P3P: policyref="http://www.w3.org/2001/05/P3P/p3p.xml"
+Content-Type: text/html; charset=iso-8859-1
+
+{"name": "qiu", "age": 25}
+```
+#### HTTP 请求方法(9种)
+HTTP1.0： `GET`、`POST`、`HEAD`
+
+HTTP1.1： `PUT`、`PATCH`、`DELETE`、`OPTIONS`、`TRACE`、`CONNECT`
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103162910.png)
+
+#### GET 和 POST 的区别
+- **GET 在浏览器回退时是无害的，而 POST 会再次提交请求；** 
+- GET 产生的 URL 地址可以被收藏，而 POST 不可以； 
+- **GET 请求会被浏览器主动缓存，而 POST 不会，除非手动设置；** 
+- GET 请求只能进行 URL 编码，而 POST 支持多种编码方式； 
+- **GET 请求参数会被完整保留在浏览器历史记录里，而 POST 中的参数不会保留；** 
+- **GET 请求在 URL 中传送的参数是有长度限制的，而 POST 是没有限制的；** 
+- **GET 参数通过 URL 传递的，POST 放在 Request body 中。** 
+- 对参数的数据类型，GET 只接受 ASCII 字符，而 POST 没有限制； 
+- GET 比 POST 更不安全，因为参数直接暴露在 URL 中，所以不是用来传递敏感信息的； 
+- 重点区别 
+    - GET 会产生一个 TCP 数据包，而 POST 会产生两个 TCP 数据包。 
+    - 对于 GET 方式的请求，浏览器会把 http header 和 data 一并发送出去，服务器响应 200(返回数据); 
+    - 而对于 POST，浏览器先发送 header，服务器响应 100 continue，浏览器再发送 data，服务器响应 200 ok(返回数据)。
+#### POST 传输的格式？
+- **application/x-www-form-urlencoded**
+  - 最常见的 post 提交数据的格式，原生 form 表单如果不设置 enctype 属性，那默认就会按照 application/x-www-form-urlencoded 格式上传. 正如其名 form-urlencoded ，他会对字段进行转码，提交的数据按照 key1=1&key2=2 这种形式来提交，跟 get 方式提交参数是一样的，只不过放在了 request body 里面。
+  - 优点是，实现简单，兼容性好，多数浏览器工具都默认支持。
+  - 缺点是，没法实现复杂的数据，比如文件二进制流，符号会被编码，比如 [ ] 会被转成%5B 跟%5D，空格会被转成 %20 等，PS:这种编码方式被称为百分比编号，是 URL 编码在特定上下文的统一资源定位符的编码机制。
+- **multipart/form-data**
+  - 这种是一般是用来提交文件、非 ASCII 码数据或者是二进制流数据，提交 excel 文件为例，打开控制台能看到如下的表单数据, 每一个字段都有一个分界线，用来分割不同字段。对比 application/x-www-form-urlencoded 会多了很多分界线，用来传普通的数据会比较浪费待带宽或者流量。
+- **application/json**
+  - 这种格式就是正常的 json 数据，可以传数组，嵌套对象等，适合传递复杂嵌套的数据，特别适合 RESTful 风格的接口。各种工具如 Chrome 开发者工具跟 postman 等都有很好的支持，会以树形结构展示。提交 JS 对象需要用 JSON.stringify 转化。
+  - 其中原生的表单只支持第一种跟第二种提交方式，enctype 属性还支持 text/pain, 不过日常开发比较少用。
+#### 预检(OPTIONS)请求
+在浏览器中通过 http 请求与服务端进行请求时，偶尔会发现某一些请求会被调用两次，一次是符合我们业务需求的接口调用，一次是在我们预料之外的请求，而且这个请求还不会有任何的数据返回，咋一看似乎是哪里出了问题，这个请求便是预检请求(request method 为 OPTIONS)
+
+- 为何会存在 OPTIONS 请求呢？
+  - 可用于检测服务器允许的 http 方法。当发起跨域请求时，由于安全原因，触发一定条件时浏览器会在正式请求之前自动先发起 OPTIONS 请求，即 CORS 预检请求，服务器若接受该跨域请求，浏览器才继续发起正式请求
+
+
+
+- 什么时候会发起 OPTIONS 请求呢？
+  - 一个 CORS 预检请求是用于检查服务器是否支持 CORS 即跨域资源共享，当有必要的时候，浏览器会自动发出一个预检请求；所以在正常情况下，我们不需要自己去发这样的请求
+  - 在跨域的情况下：
+    - 当发送的请求为非简单请求时，这个时候浏览器会自动的帮我们发送一个 OPTIONS 请求，用于检测所请求的目标资源是否支持跨域，当浏览器发送 OPTIONS 请求得到响应之后，会根据 responst header 自动处理，若是目标资源支持跨域则会继续将正常的请求发送，若是不支持跨域则直接控制台报错，提示当前请求跨域了
+    - 若是发送的请求为简单请求时，则不会发送 OPTIONS 请求，浏览器会直接将请求正常发送
+
+
+- 为什么要对非简单跨域请求做预检？
+  - 减少非简单跨域请求对服务器的影响（开始时就提到，服务器有时候不想理睬跨域请求），比如 PUT、DELETE 请求可以直接新建或者修改、删除服务器中的资源。预检请求可以防止该情况发生。
+  - 减少服务器对于是否跨域的计算量
+    - 对于非简单请求的跨域请求，服务器对于是否跨域的计算是在预检请求上，如果预检请求通过之后，正式请求都不用再次计算。而且一次预检请求通过后，之后的每次请求都只会发正式请求。节约了很多服务端的计算量。
+
+
+
+- 为什么不对简单的跨域请求做预检？
+  - 一开始就提到，form 能实现的简单跨域请求，浏览器做不了任何的限制。
+  - 没必要对简单请求做预检。比如，一些 post 请求只是想打个日志，并不需要服务器的响应，但是如果加预检请求，预检请求不通过就做不了这件事。还有一些 GET 请求、HEAD 请求只是想获取资源，并不会修改资源，在不获取响应的时候并不会对服务器造成影响。在这种情况下，加预检请求，只会增加服务器的负担
+
+
+OPTIONS 方法用于获取目的资源所支持的通信方式的选项。在 CORS 中，可以使用 OPTIONS 方法发起一个预检请求，以检测实际请求是否可以被服务器所接受。预检请求报文中的 Access-Control-Request-Method 首部字段告知服务器实际请求所使用的 HTTP 方法；Access-Control-Request-Headers 首部字段告知服务器实际请求所携带的自定义首部字段。服务器基于从预检请求获得的信息来判断，是否接受接下来的实际请求。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922193301.png)
+
+#### CORS 跨域请求[简单请求与复杂请求]
+CORS（cross-origin resource sharing），跨源资源共享（一般俗称『跨域请求』）。
+- 简单请求和预检请求的区分，会看到有很多的条件：
+  - 简单请求的 HTTP 方法只能是 GET、HEAD 或 POST
+  - 简单请求的 HTTP 头只能是
+    - Accept
+      - 请求头用来告知（服务器）客户端可以处理的内容类型
+    - Accept-Language
+      - 请求头允许客户端声明它可以理解的自然语言，以及优先选择的区域方言
+    - Conent-Language
+      - 是一个 entity header（实体消息首部），用来说明访问者希望采用的语言或语言组合，这样的话用户就可以根据自己偏好的语言来定制不同的内容
+    - Content-Type
+      - 实体头部用于指示资源的 MIME 类型, 值是 application/x-www-form-urlencoded, multipart/form-data, 或者 text/plain 之一的（忽略参数）
+    - Last-Event-ID
+    - DPR
+    - Downlink
+    - Save-Data
+    - Viewport-Width
+    - Width
+  - 简单请求的 Content-Type 头只能是 text/plain、multipart/form-data 或 application/x-www-form-urlencoded
+  - 任何一个不满足上述要求的请求，即被认为是复杂请求。一个复杂请求不仅有：包含通信内容的请求，同时也包含预请求。
+
+
+
+- 简单请求
+  - 部分响应头
+    - Access-Control-Allow-Origin（必含）- 不可省略，否则请求按失败处理。该项控制数据的可见范围，如果希望数据对任何人都可见，可以填写"\*"。
+    - Access-Control-Allow-Credentials（可选） – 该项标志着请求当中是否包含 cookies 信息，只有一个可选值：true（必为小写）。如果不包含 cookies，请略去该项，而不是填写 false。这一项与 XmlHttpRequest2 对象当中的 withCredentials 属性应保持一致，即 withCredentials 为 true 时该项也为 true；withCredentials 为 false 时，省略该项不写。反之则导致请求失败。
+    - Cache-Control
+    - Content-Language
+    - Content-Type
+    - Expires
+    - Last-Modified
+
+
+
+- 复杂请求
+  - 比如说你需要发送 PUT、DELETE 等 HTTP 动作，或者发送 Content-Type: application/json 的内容。
+  - 复杂请求表面上看起来和简单请求使用上差不多，但实际上浏览器发送了不止一个请求。其中最先发送的是一种"预请求"，此时作为服务端，也需要返回"预回应"作为响应。预请求实际上是对服务端的一种权限请求，只有当预请求成功返回，实际请求才开始执行。
+  - 响应头
+    - Access-Control-Allow-Origin（必含） – 和简单请求一样的，必须包含一个域。
+    - Access-Control-Allow-Methods（必含） – 这是对预请求当中 Access-Control-Request-Method 的回复，这一回复将是一个以逗号分隔的列表。尽管客户端或许只请求某一方法，但服务端仍然可以返回所有允许的方法，以便客户端将其缓存。
+    - Access-Control-Allow-Headers（当预请求中包含 Access-Control-Request-Headers 时必须包含） – 这是对预请求当中 Access-Control-Request-Headers 的回复，和上面一样是以逗号分隔的列表，可以返回所有支持的头部。这里在实际使用中有遇到，所有支持的头部一时可能不能完全写出来，而又不想在这一层做过多的判断，没关系，事实上通过 request 的 header 可以直接取到 Access-Control-Request-Headers，直接把对应的 value 设置到 Access-Control-Allow-Headers 即可。
+    - Access-Control-Allow-Credentials（可选） – 和简单请求当中作用相同。
+    - Access-Control-Max-Age（可选） – 以秒为单位的缓存时间。预请求的的发送并非免费午餐，允许时应当尽可能缓存。
+  - 一旦预回应如期而至，所请求的权限也都已满足，则实际请求开始发送。
+#### HTTP 常见状态码及其含义
+- `HTTP`状态码：
+  - `1xx`:指示信息，表示请求已接收，继续处理；
+  - `2xx`:成功，表示请求已被成功接收；
+  - `3xx`:重定向，要完成请求必须进行更进一步的操作；
+  - `4xx`:客户端错误，请求有语法错误或请求无法实现；
+  - `5xx`:服务器错误，服务器未能实现合法的请求。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103163311.png)
+
+### 什么是持久连接/长连接
+HTTP1.0协议采用的是"请求-应答"模式，当使用普通模式，每个请求/应答客户与服务器都要新建一个连接，完成之后立即断开连接(http协议为无连接的协议)。
+
+HTTP1.1版本支持长连接，即请求头添加`Connection: Keep-Alive`，使用`Keep-Alive`模式(又称持久连接，连接复用)建立一个TCP连接后使客户端到服务端的连接持续有效，可以发送/接受多个http请求/响应，当出现对服务器的后续请求时，Keep-Alive功能避免了建立或者重新建立连接。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103164306.png)
+
+**长连接优缺点**
+- 优点
+    - 减少CPU及内存的使用，因为不需要经常建立和关闭连接。
+    - 支持管道化的请求及响应模式。
+    - 减少网络堵塞，因为减少了TCP请求。
+    - 减少了后续请求的响应时间，因为不需要等待建立TCP、握手、挥手、关闭TCP的过程
+    - 发生错误时，也可在不关闭连接的情况下进行错误提示。
+- 缺点
+    - 一个长连接建立后，如果一直保持连接，对服务器来说是多么的浪费资源呀，而且长连接时间的长短，直接影响到服务器的并发数。
+    - 还有就是可能造成队头堵塞，造成信息延迟。
+
+
+**如何避免长连接资源浪费？**
+客户端请求头声明：Connection: close，本次通信后就关闭连接。
+
+服务端配置：如Nginx，设置keepalive_timeout设置长连接超时时间，keepalive_requests设置长连接请求次数上限。
+
+系统内核参数设置：
+- net.ipv4.tcp_keepalive_time = 60，连接闲置60秒后，服务端尝试向客户端发送侦测包，判断TCP连接状态，如果没有收到ack反馈就在
+- net.ipv4.tcp_keepalive_intvl = 10，就在10秒后再次尝试发送侦测包，直到收到ack反馈，一共会
+- net.ipv4.tcp_keepalive_probes = 5，一共会尝试5次，要是都没有收到就关闭这个TCP连接了
+### 在交互过程中如果数据传送完了，还不想断开连接怎么办，怎么维持？
+在 HTTP 中响应体的 Connection 字段指定为 keep-alive。
+### 什么是管线化(管道化)
+HTTP1.1在使用长连接的情况下，建立一个连接通道后，连接上消息的传递类似于。
+:::tip
+请求1 -> 响应1 -> 请求2 -> 响应2 -> 请求3 -> 响应3
+:::
+**管理化**连接的消息就变成了类似这样。
+:::tip
+请求1 -> 请求2 -> 请求3 -> 响应1 -> 响应2 -> 响应3
+:::
+**管线化**是在同一个TCP连接里发一个请求后不必等其回来就可以继续发请求出去，这可以减少整体的响应时间，但是服务器还是会按照请求的顺序响应请求，所以如果有许多请求，而前面的请求响应很慢，就产生一个著名的问题**队头堵塞**。
+
+- 管线化的特点：
+    - 管线化机制通过持久连接完成，在HTTP1.1版本才支持
+    - 只有GET请求和HEAD请求才可以进行管线化，而POST有所限制
+    - 初次创建连接时不应启动管线化机制，因为服务器不一定支持HTTP1.1版本的协议
+    - 管线化不会影响响应到来的顺序，如上面的例子所示，响应返回的顺序就是请求的顺序
+    - 要求客户端和服务端都支持管线化，但并不要求服务端也对响应进行管线化处理，只是要求对于管线化的请求不失败即可
+    - 由于上面提到的服务端问题，开户管线化很可能并不会带来大幅度的性能提升，而且很多服务端和代理程序对管线化的支持并不好，因为浏览器(Chrome/Firefox)默认并未开启管线化支持
+### 如何解决 HTTP 的队头阻塞问题
+HTTP1.0协议采用的是请求-应答模式，报文必须是一发一收，就形成了一个先进先出的串行队列，没有轻重缓急的优先级，只有入队的先后顺序，排在最前面的请求最先处理，就导致如果队首的请求耗时过长，后面的请求就只能处于阻塞状态，这就是著名的队头阻塞问题。解决如下：
+
+#### 并发连接
+因为一个域名允许分配多个长连接，就相当于增加了任务队列，不至于一个队列里的任务阻塞了其他全部任务。以前在RFC2616中规定过客户端最多只能并发2个连接，但是现实是很多浏览器不按套路出牌，就是遵守这个标准T_T，所以在RFC7230把这个规定取消掉了，现在的浏览器标准中一个域名并发连接可以有6~8个，记住是6~8个，不是6个(Chrome6个/Firefox8个)
+
+#### 域名分片
+一个域名最多可以并发6~8个，那咱就多来几个域名。
+
+比如a.baidu.com，b.baidu.com，c.baidu.com，多准备几个二级域名，当我们访问baidu.com时，可以让不同的资源从不同的二域名中获取，而它们都指向同一台服务器，这样能够并发更多的长连接了。
+
+而在HTTP2.0下，可以一瞬间加载出来很多资源，因为支持多路复用，可以在一个TCP连接中发送多个请求。
+### 计算机分为哪几层？计算机网络的七个层？
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922213035.png)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922213526.png)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922213617.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210929161835.png)
+
+127.0.0.1 是本地循环地址，如果本地址无法 ping 通，则表明本地机 tcp/ip 协议不能正常工作。
+ping 命令是使用的网络层协议 ICMP。
+### TCP/IP 5层
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103165504.png)
+
+- `应用层`：最高层，提供特定于应用程序的协议，运行在该层的协议有HTTP、FTP、SSH、WebScoket等
+- `传输层`：为两个主机进程通信提供通用的数据传输协议，如TCP、UDP
+- `网络层`：负责寻址和路由功能，将数据包发送到特定的计算机，主要协议是IP协议，路由器就是在这一层
+- `链路层`：负责将二进制数据包和网络信号相互转换，交换机、网卡就是在这一层
+- `物理层`：主要有接收器、发送器、中继器、光纤电缆等
+### HTTP分层工作流程
+网络协议通过分层来明确每一层的工作职责，通过定义明确的接口来协同工作，第一层都可以使用下面各层的功能，而不用担心各层是怎么实现的。就好像我们开发封装组件一样，每一个组件各自负责各自的事，互不干扰，也提高了复用度，如上图文件基本传输过程，也就是`HTTP分层工作流程`：
+
+- 主机A发起请求，数据发送前会被分为许多片段，称为数据包，然后使用http协议将数据包封装，并加上请求头，传给下一层
+- 传输层拿到数据，为每个数据包分配一个端口号，用来确定目标计算机的哪一个应用程序，然后使用TCP协议进行处理，加上TCP头或UDP头，通过TCP协议传给下一层
+- 网络层拿到数据后为每个数据包添加目标计算机的IP地址，并决定传给什么路由或接收的主机，再封装传给下一层
+- 链路层将数据转译成电子信号，进一步封装成数据帧，传给物理层
+- 物理层通过电缆传送给主机B这边的链路层
+- 主机B的链路层拿到数据后，检查每个包中的目标地址并确定将其发送到哪里，如果不是发给自己的就丢弃，然后根据数据确定协议类型，再传给网络层的IP协议模块
+- 网络层接收到后拆开获取IP头，判断首部接收的IP地址匹配，然后根据头部协议类型，转发TCP或UDP等
+- 传输层TCP收到后会计算校验，判断数据的完整性，然后处理数据包顺序接收的逻辑，最后根据端口确定要转发给应用层的哪个程序
+- 最终应用层接到数据之后，根据http协议解析数据
+### 网络通信协议
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922215122.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211109191738.png)
+
+#### TCP/IP 模型的主要协议
+- 应用层：FCP、HTTP、SMTP、DNS
+- 传输层：TCP、UDP
+- 互联网层：IP、ICMP、ARP、RARP
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922215348.png)
+#### HTTPS/SSL/TSL 协议
+- https：http+ssl/tal 加密传输
+  - 一般认为工作在应用层，也有人说是传输层，是因为传输的是加密过的
+- SSL：Secure Sockets Layer 安全套接层
+  - 对 http 传输数据进行加密
+- TSL：Transport Layer Security 传输安全协议
+  - SSL 的继任者，升级版，或者叫标准化版
+
+#### FTP，DNS，TELNET，SMTP/POP3
+- FTP
+  - 默认端口：20
+  - 两个模式
+    - 主动模式 Active Mode: 也叫 Port 模式，Standard 模式： 服务器发起数据传输
+    - 被动模式 Passive Mode: 也叫 PASV 模式，Passive 模式： 服务器被动接收数据传输
+- DNS
+  - 提供域名解析服务，把域名解析成 IP
+  - 默认端口：53
+- SMTP/POP3
+  - 邮件收发协议
+  - SMTP: 发送邮件协议，默认端口是 25
+  - POP3:接收邮件协议， 默认端口 110
+- Teknet
+  - 远程终端控制协议
+  - 默认端口：23
+  - 明文，不安全，已被 SSL 替代
+- TCP/UDP
+  - TCP
+    - 面向连接的可靠的协议<传输之前先建立连接，完成后断开连接>
+    - TCP 三次握手开始：传递数据之前
+      - C->S：听得到吗？
+      - S->C：听到了，听得到吗？
+      - C->S：听到了
+      - 连接建立
+    - TCP 结束连接前，四次挥手
+      - C->S：我话讲完，我不说了
+      - S->C：好，晓得的了
+      - S->C：我话也讲完，要挂了
+      - C->S：好，挂了
+  - UDP（QUIC）
+    - 提供的是非面向连接的、不可靠的数据流传输
+    - UDP 在传输数据前不用在客户和服务器之间建立一个连接，且没有超时重发等机制，不保证数据按顺序传递，故而传输速度很快
+    - Eg. 邮件发送，视频直播，QQ 消息等，只需要知道对方地址，不管对方是否在线接收
+  - TCP/UDP 区别
+    - TCP 是面向连接的服务，先建立连接再传输数据，之后再断开连接。 UDP 是无连接的服务，不需要事先建立连接，直接发送数据；
+    - TCP 保证数据的正确性，UDP 可能丢包 eg.视频直播选标清比高清就是少了数据包。
+    - TCP 传输速度慢，UDP 速度快
+- IP/ICMP
+  - IP 协议
+    - ipv4、ipv6
+    - 网络位主机位前三位
+  - ICMP
+    - ping [-t][-a] [-l] ip ：
+    - -t:不间断连续 ping, 手动结束 ctrl+c <不加-t,默认 ping 三次>
+    - -l: 指定包含字节数<用多少字节去 ping> 默认是 32 字节。
+### IP
+如果是在局域网内都是用MAC地址通信，局域网之外，就得用IP了。MAC就像是身份证，IP就像是住址。所有TCP、UDP、ICMP等数据都是以IP数据报格式进行传输。
+
+如果是在局域网内都是用MAC地址通信，局域网之外，就得用IP了。MAC就像是身份证，IP就像是住址。所有TCP、UDP、ICMP等数据都是以IP数据报格式进行传输。
+
+IP协议本身不支持发往目的地址失败的IP数据包，也没有提供直接的方式获取诊断信息，比如发送途中经过哪些路由器，以及往返时间，而这就由ICMP协议来专门负责。
+
+**ICMP并不为IP网络提供可靠性，只用于反馈各种故障和配置信息，丢包不会触发ICMP**
+:::tip
+我们常用的ping就是用ICMP查询报文。不过ping使用ICMP协议会直接跳过了传输层，所以ping程序是没有端口号的
+:::
+
+- IP协议的特点是：
+    - IP协议是不可靠的传输协议。如果 ICMP协议出现传输异常，IP都会丢弃数据包并可能会响应一个ICMP差错消息给发送端，而任何要求可靠性必须由上层如TCP协议来提供
+    - IP协议是无连接的。就是不维护任何关于后续数据的状态信息，每个数据独立。表现在：可以不按发送顺序接收，不用维护连接状态，免去了维护复制的链路状态信息(TCP会讲到)
+### UDP
+#### UDP的特点
+- 无连接不需要握手和挥手就可以直接发送数据。
+- 不可靠性：就是一个传递数据的搬运工，来一个包就发一个。不会备份，也不关心对方是否正确收到，传输顺序也无法保证。所以就只能由应用层来保证可靠，因为网络层也是不可靠的
+    - 在发送端应用层将数据传给传输层的UDP，它只加一个UDP头标识(UDP协议)，就直接发给网络层了。
+    - 接收端在网络层将数据发给传输层，传输层UDP只去掉IP报文头就传给应用层了。
+    - 其他什么都不会管，不过这也减少开销和发送数据之前的延迟
+- 支持广播：有单播，多播，广播的功能，不只支持一对一传输方式，还支持一对多，多对多的方式
+- 首部开销小：8个字节（源端口号(非必填)、目的端口号、UDP长度(数据报的整个长度)、UDP检查和(检测UDP数据报是否有错或者目的端口找不到对应的进程，各2字节），因为它要求不高而且实现的功能没有那么多，所以首部字段不多，而TCP有20个字节。它的数据是可以为0的，所以它最少可以是8个字节
+- 是面向报文的：适合一次性传输少量数据，因为应用层给UDP多长的报文都会照样发送，即一次发送一个完整的报文，即不合并也不拆分。如果报文太长的话，UDP完整的装进来交给网络层的话，网络层就要分片了，因为传给链路层的话它有一个MTU的要求，所以网络层就要分片，这会给网络层的效率造成影响
+- 无拥塞控制：适合实时应用，因为它会一直以恒定的速度发送数据，即使网络条件不好，也不会对发送速率进行调整。这就导致在网络不好的情况下就有可能丢包，但优点也明显，在某些实时性要求高的场景比如说聊天、在线视频、网络语音电话等使用UDP而不是TCP，比如打微信电话出现偶尔断续不是太大问题。当然拥塞太严重也有一些补救措施比如向前纠错或者重传
+#### UDP 为什么不可靠
+- 传输数据之前不需要先建立连接
+- 不保证消息交付，远程主机的传输层在接收到UDP报文后，不需要确认
+- 不保证将会顺序，不设置包序号、不重排、不会发生队首阻塞
+- 不进行拥塞控制，没有内置反馈机制，不重传、无超时
+### UDP 实现可靠性传输
+1. 简介
+- UDP 不属于连接型协议，因而具有资源消耗小，处理速度快的特点，所以通常音频、视频和普通数据在传送时使用 UDP 较多，因为他们及时偶尔丢失一两个数据，也不会对接受结果产生太大影响。
+- 传输层无法确保数据的可靠传输，只能通过应用层来实现。实现的方式可以参考 TCP 可靠性传输的方式，只是实现不在传输层，实现转移到应用层。
+- 实现确定机制、重传机制、窗口确认机制。
+- 如果你不利用 Linux 协议栈以及上层 socket 机制，自己通过抓包和发包的方式去实现可靠性传输，那么必须通过如下功能：
+  - 发送：包的分片、包确定、包的重发
+  - 接受：包的调序、包的序号确定
+- 目前有如下开源程序利用 UDO 实现了可靠的数据传输，分别是 RUDP、RTP、UDT
+2. RUDP
+   RUDP 提供一组数据服务质量增强机制，如拥塞控制的改进、重发机制及淡化服务器算法等，从而在包丢失和网络拥塞的情况下，RTP 客户机（实时位置）面前呈现的就是一个高质量的 RTP 流。在不干扰协议的实时特性的同时，可靠 UDP 的拥塞控制机制允许 TCP 方式下的流控制行为。
+3. RTP
+   实时传输协议（RTP）为数据提供了具有实时特征的端到端传送服务，如在组播或单播网络服务下的交互式视频音频或模拟数据。应用程序通常在 UDP 上运行 RTP 以便使用其多路节点和校验服务；这两种协议都提供了传输层协议的功能。但是 RTP 可以与其他适合的底层网络或传输协议一起使用。如果底层网络提供组播方式，那么 RTP 可以使用该组播表传输数据到多个目的地。
+   RTP 本身没有提供按时发送机制或其他服务质量（QoS）保证，它依赖于底层服务区实现这一过程。RTP 并不保证传送或防止无序传送，也不确定底层网络的可靠性。RTP 实行有序传送，RTP 中的序列号允许接收方重组发送发的包序列，同时序列号也能用于决定适当的包位置，例如：在视频解码中，就不需要顺序解码。
+4. UDT
+   基于 UDP 的数据传输协议（UDT）是一种互联网数据传输协议。UDT 的主要目的是支持高速广域网上的海量数据传输，而互联网上的标准数据传输协议 TCP 在高带宽长距离网络上性能很差。顾名思义，UDT 建于 UDP 之上，并引入新的拥塞控制和数据可靠性控制机制。UDT 是面向连接的双向的应用层协议。它同时支持可靠的数据流传输和部分可靠的数据报传输。由于 UDT 完全在 UDP 上实现，它也可以应用在除了高速数据传输之外的其他应用领域，例如点到点技术（P2P），防火墙穿透，多媒体数据传输等等。
+
+- UDT 应用层协议
+  - UDT 并不是在瓶颈带宽相对较小的和大量多元短文档流的情况下用来替代 TCP 的。
+  - UDT 主要作为 TCP 的朋友，和 TCP 并存，UDT 分配的带宽不应该超过根据 MAX-MIN 规则的最大最小公平共享原则（备注：最大最小规则允许 UDT 在高 BDP 连接下分配 TCP 不能使用的可用带宽）。
+  - UDT 是双工的，每个 UDT 实体有两个部分：发送和接受。
+    - 发送者根据流量控制和速率控制来发送（和重传）应用程式数据。
+    - 接受者根据数据包和控制包，并根据接收到的包发送控制包。发送和接受程式共享同一个 UDP 端口来发送和接收。
+    - 接受者也负责触发和处理任何的控制事件，包括拥塞控制和可靠性控制和他们的相对机制，例如 RTT 估计、带宽估计、应答和重传。
+  - UDT 总是试着将应用层数据打包成固定的大小，除非数据不够这么大。和 TCP 相似的是，这个固定的包大小叫做 MSS（最大包大小）。由于期望 UDT 用来传输大块数据流，我们假定只能很小的一部分不规则的大小的包在 UDT session 中。MSS 能够通过应用程式来安装，MTU 是其最优值。
+  - UDT 拥塞控制算法将速率控制在窗口（流量控制）合并起来，前者调整包的发送周期，后者限制最大的位被应答的包。在速率控制中使用的参数通过带宽估计技术来更新，它继承来之基于接受的包方法。同时，速率控制周期是估计 RTT 的常量，流控制参数参考与对方的数据到达速度，另外接收端释放的缓冲区的大小。
+### TCP
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103165504.png)
+
+这是我们平时用的最多的协议，特别是前后端TCP给应用程序提供了一种与UDP完全不同的服务TCP是面向连接的可靠的服务，面向连接指TCP的两个应用程序必须在它们可交换数据之前，通过相互联系来建立一个TCP连接TCP提供了一种字节流抽象概念给应用程序：不会自动插入记录标志或者消息边界，如发送端分别发10字节和30字节，接收端可能会以两个20字节的方式读入。
+
+#### TCP的特点
+- 是面向连接的，通信之前双方必须要先建立连接
+- 只支持单播，就是点对点的传输，一条TCP连接只能有两个端点
+- 提供可靠交付的服务，有完整性校验、数据不会丢失，会丢包重传、且会按顺序到达
+- 是面向字节流的。不像UDP那样一个个报文独立传输，而是在不保留报文边界的情况下以字节流方式进行传输
+- 提供拥塞控制，当网络出现拥塞的情况，有流量控制，能够减少传输数据的速度和数量，缓解拥塞，保证稳定
+- 提供全双工通信和可靠通信，指的是发送方和接收方可以同时发送数据也可以同时接收数据。因为两边都会设置有发送缓存和接收缓存
+    - 发送缓存就是发送缓存的队列里面有准备发送的数据和已经发送但是还没有收到来自接收方确认的数据，如果没有收到确认还要重发所以不能扔掉，将可能会被重传，因为TCP需要保证可靠传输
+    - 接收缓存就是按序到达但是还没有被接收应用程序读取的数据和没按序到达的数据，需要顺序排好了，接收方才能逐一接收数据
+#### 为什么说 TCP 是可靠的
+因为接收方收到数据后会发送一个ACK确认应答消息，这样发送方就知道自己的数据被对方接收了，如果一直没有收到ACK一定时间后就会重发。因此就算数据没有发到接收方，或者接收方的ACK数据包丢失也有重传机制，确保双方最终可以通过重传也能正确收到消息。
+
+**重传机制**
+由于TCP的下层网络层可能出现丢失、重复或乱序的情况，TCP协议需要提供可靠数据传输服务。
+
+为保数据传输的正确性，就是在发送一个数据包之后，就会开启一个定时器，若在一定时间内没有收到发送数据的ACK确认报文，就会对该报文进行重传，在达到一定次数还没有成功时放弃并发送一个复位信号
+
+
+**拥塞控制机制**
+- 主要体现在四个方面
+    - 一是慢启动，开始的时候不要发送大量数据，先测试一下网络，然后慢慢由小到大的增加拥塞窗口大小
+    - 二是拥塞避免，一旦判断网络出现拥塞，就将传送设置成出现拥塞时一半的大小，并把拥塞窗口设为1，再重新开始慢启动算法
+    - 三是快速重传，就是接收方在收到一个失序的报文后立即发出重复确认，快重传算法规定发送方只要连续收到三个重复确认就立即重传对方尚未收到的报文段，而不用继续等重传计时器到期
+    - 四是快速恢复，考虑到如果网络出现拥塞的话，就不至于能连续收到好几个重复的确认，所以发送方会认为网络可能没有出现拥塞，这样就不执行慢开始算法，而是执行拥塞避免算法
+
+
+**流量控制**
+就是为了让发送方发送数据的速度不要太快，要让接收方来得及接收。
+
+在接收方缓存中已接受的数据处理不过来时，减小发送方的窗口大小，让接收方有足够的时间来接收数据包。或是接收方比较空闲时，发送方调大窗口大小，以加快传输，合理利用网络资源。
+
+### TCP三次握手
+三次握手是 TCP 连接的建立过程。在握手之前，主动打开连接的客户端结束 CLOSE 阶段，被动打开的服务器也结束 CLOSE 阶段，并进入 LISTEN 阶段。随后进入三次握手阶段：
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103182216.png)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103182253.png)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103174751.png)
+
+① 首先客户端向服务器发送一个 SYN 包，并等待服务器确认，其中：
+- 标志位为 SYN = 1，表示请求建立连接；
+- 序号为 Seq = x（x 一般取随机数）；
+- 随后客户端进入 SYN-SENT 阶段。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103182353.png)
+
+② 服务器接收到客户端发来的 SYN 包后，对该包进行确认后结束 LISTEN 阶段，并返回一段 TCP 报文，其中：
+- 标志位为 SYN = 1 和 ACK = 1，表示确认客户端的报文 Seq 序号有效，服务器能正常接收客户端发送的数据，并同意创建新连接；
+- 序号为 Seq = y；
+- 确认号为 Ack = x + 1，表示收到客户端的序号 Seq 并将其值加 1 作为自己确认号 Ack 的值，随后服务器端进入 SYN-RECV 阶段。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103182629.png)
+
+③ 客户端接收到发送的 SYN + ACK 包后，明确了从客户端到服务器的数据传输是正常的，从而结束 SYN-SENT 阶段。并返回最后一段报文。其中：
+- 标志位为 ACK，表示确认收到服务器端同意连接的信号；
+- 序号为 Seq = x + 1，表示收到服务器端的确认号 Ack，并将其值作为自己的序号值；
+- 确认号为 Ack= y + 1，表示收到服务器端序号 seq，并将其值加 1 作为自己的确认号 Ack 的值。
+- 随后客户端进入 ESTABLISHED。
+
+当服务器端收到来自客户端确认收到服务器数据的报文后，得知从服务器到客户端的数据传输是正常的，从而结束 SYN-RECV 阶段，进入 ESTABLISHED 阶段，从而完成三次握手。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103182731.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103182750.png)
+
+第一次握手：客户端发送网络包，服务端收到了。这样服务端就能得出结论：客户端的发送能力、服务端的接收能力是正常的。
+第二次握手：服务端发包，客户端收到了。这样客户端就能得出结论：服务端的接收、发送能力，客户端的接收、发送能力是正常的。不过此时服务器并不能确认客户端的接收能力是否正常。
+第三次握手：客户端发包，服务端收到了。这样服务端就能得出结论：客户端的接收、发送能力正常，服务器自己的发送、接收能力也正常。
+
+
+
+
+在二十年前的农村，电话没有普及，手机就更不用说了，所以，通信基本靠吼。老张和老王是邻居，这天老张下地了，结果家里有事，热心的邻居老王赶紧跑到村口，开始叫唤老张。
+- 老王：老张唉！我是老王，你能听到吗？
+- 老张一听，是老王的声音：老王老王，我是老张，我能听到，你能听到吗？
+- 老王一听，嗯，没错，是老张：老张，我听到了，我有事要跟你说。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103185017.png)
+
+### TCP三次握手详解
+**这是两台要基于TCP进行通信的主机：**
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103182852.png)
+
+- 主动发起TCP连接建立称为TCP客户(client)。
+- 被动等待TCP连接建立的应用进程称为TCP服务器(server)。
+
+我们可以将TCP建立连接的过程比喻为”握手“，“握手”需要在TCP客户端和服务器之间交换三个TCP报文段。
+
+**最初两端的TCP进程都处于关闭状态。**
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103182216.png)
+
+**一开始，TCP服务器进程首先创建传输控制块，用来存储TCP连接中的一些重要信息。** 例如TCP连接表、指向发送和接收缓存的指针、指向重传队列的指针，当前的发送和接收序号等。之后就准备接受TCP客户进程的连接请求， 此时TCP服务器进程就要进入监听状态等待TCP客户进程的连接请求。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103182253.png)
+
+**TCP客户进程也是首先创建传输控制块，然后再打算建立。** TCP服务器进程是被动等待来自TCP客户端进程的连接请求，因此称为被动打开连接。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103174751.png)
+
+**TCP连接时向TCP服务器进程发送TCP连接请求报文段，并进入同步已发送状态。** 
+- TCP 连接请求报文段首部中的同步位SYN被设置为1，,表明这是一个tcp连接请求报文段。
+- 序号字段seq被设置了一个初始值x作为TCP客户进程所选择的初始序号。
+**由于TCP连接建立是由TCP客户进程主动发起的，因此称为主动打开连接。** 请注意TCP规定SYN被设置为1的报文段不能携带数据但要消耗掉一个序号。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103182353.png)
+
+**TCP服务器进程收到TCP连接请求报文段后，如果同意建立连接，则向TCP客户进程发送TCP连接请求确认报文段，并进入同步已接收状态。** 
+- 该报文段首部中的同步位SYN和确认位ACK 都设置为1，表明这是一个TCP连接请求。
+- 序号字段seq被设置了一个初始值y，作为TCP服务器进程所选择的初始序号。
+- 确认号字段ack的值被设置成了x+1，这是对TCP客户进程所选择的初始序号seq的确认。
+请注意这个报文段也不能携带数据，因为它是SYN被设置为一的报文段但同样要消耗掉一个序号。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103182629.png)
+
+**TCP客户进程收到TCP连接请求确认报文段后，还要向TCP服务器进程发送一个普通的TCP 确认报文段并进入连接已建立状态。** 
+- 该报文段首部中的确认位ACK被设置为1，表明这是一个普通的TCP确认报文段 。
+- 序号字段seq 被设置为x+1，这是因为TCP客户进程发送的第一个TCP报文段的序号为x，并且不携带数据，因此第二个报文段的序号为x +1。
+- 确认号字段ack被设置为y + 1，这是对TCP服务器进程所选择的初始序号的确认。
+
+请注意TCP规定，普通的TCP确认报文段可以携带数据。但如果不携带数据则不消耗序号，在这种情况下所发送的下一个数据报文段的序号仍是x + 1。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103182731.png)
+
+**TCP服务器进程收到该确认报文段后也进入连接已建立状态，现在TCP双方都进入了连接已建立状态，他们可以基于已建立好的TCP连接进行可靠的数据传输了。**
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103182750.png)
+### 是否可以使用“两报文握手”建立连接？
+- 为了防止服务器端开启一些无用的连接增加服务器开销。
+- 防止已失效的连接请求报文段突然又传送到了服务端，因而产生错误。
+
+由于网络传输是有延时的(要通过网络光纤和各种中间代理服务器)，在传输的过程中，比如客户端发起了 SYN=1 的第一次握手。
+如果服务器端就直接创建了这个连接并返回包含 SYN、ACK 和 Seq 等内容的数据包给客户端，这个数据包因为网络传输的原因丢失了，丢失之后客户端就一直没有接收到服务器返回的数据包。
+如果没有第三次握手告诉服务器端客户端收的到服务器端传输的数据的话，服务器端是不知道客户端有没有接收到服务器端返回的信息的。服务端就认为这个连接是可用的，端口就一直开着，等到客户端因超时重新发出请求时，服务器就会重新开启一个端口连接。
+这样一来，就会有很多无效的连接端口白白地开着，导致资源的浪费。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103184110.png)
+
+
+**为什么TCP客户进程最后还要发送一个普通的TCP确认报文段？**
+考虑这样一种情况，TCP客户进程发出一个TCP连接请求报文段，但该报文段在某些网络节点长时间滞留了，这必然会造成该报文段的超时重传。
+
+**假设重传的报文段被TCP服务器进程正常接收，TCP服务器进程给TCP客户进程发送一个TCP连接请求确认报文段，并进入连接已建立状态。**
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103183604.png)
+
+请注意，由于我们改为两报文握手，因此TCP服务器进程发送完TCP连接请求确认报文段后，进入的是连接已建立状态，而不像三报文握手那样进入同步已接收状态，TCP服务器进程并等待TCP客户进程发来针对TCP连接请求确认报文段的普通确认报文段。TCP客户进程收到TCP连接请求确认报文段后进入TCP连接已建立状态，但不会给TCP服务器进程发送针对该报文段的普通确认报文段。
+
+**现在，TCP双方都处于连接已建立状态，他们可以相互传输数据，之后可以通过四报文挥手来释放连接，TCP双方都进入了关闭状态。**
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103183649.png)
+
+**一段时间后，之前滞留在网络中的那个失效的TCP连接请求报文段到达了TCP服务器进程，TCP 服务器进程会误认为这是TCP客户进程又发起了一个新的TCP连接请求，于是给TCP客户进程发送TCP连接请求确认报文段并进入连接已建立状态。**
+
+该报文段到达TCP客户进程，由于TCP客户进程并没有发起新的TCP连接请求，并且处于关闭状态，因此不会理会该报文段。
+
+但TCP服务器进程已进入了连接已建立状态，他认为新的TCP连接已建立好了，并一直等待TCP客户进程发来数据。**这将白白浪费TCP服务器进程所在主机的很多资源。**
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103183735.png)
+
+**综上所述，采用三报文握手，而不是两报文握手来建立TCP连接，是为了防止已失效的连接请求报文段突然又传送到了TCP服务器进程因而导致错误。**
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103183803.png)
+
+#### 两次握手文字总结
+三次握手的主要目的是确认自己和对方的发送和接收都是正常的，从而保证了双方能够进行可靠通信。若采用两次握手，当第二次握手后就建立连接的话，此时客户端知道服务器能够正常接收到自己发送的数据，而服务器并不知道客户端是否能够收到自己发送的数据。
+
+我们知道网络往往是非理想状态的（存在丢包和延迟），当客户端发起创建连接的请求时，如果服务器直接创建了这个连接并返回包含 SYN、ACK 和 Seq 等内容的数据包给客户端，这个数据包因为网络传输的原因丢失了，丢失之后客户端就一直接收不到返回的数据包。由于客户端可能设置了一个超时时间，一段时间后就关闭了连接建立的请求，再重新发起新的请求，而服务器端是不知道的，如果没有第三次握手告诉服务器客户端能否收到服务器传输的数据的话，服务器端的端口就会一直开着，等到客户端因超时重新发出请求时，服务器就会重新开启一个端口连接。长此以往， 这样的端口越来越多，就会造成服务器开销的浪费。
+### 三次握手常见问题
+#### 三次握手的作用
+三次握手的作用也是有好多的，多记住几个，保证不亏。例如：
+1、确认双方的接受能力、发送能力是否正常。
+2、指定自己的初始化序列号，为后面的可靠传送做准备。
+#### （ISN）（JK等）是固定的吗
+三次握手的一个重要功能是客户端和服务端交换ISN(Initial Sequence Number), 以便让对方知道接下来接收数据的时候如何按序列号组装数据。
+
+如果ISN是固定的，攻击者很容易猜出后续的确认号，因此 ISN 是动态生成的。
+#### 什么是半连接队列
+服务器第一次收到客户端的 SYN 之后，就会处于 SYN_RCVD 状态，此时双方还没有完全建立其连接，服务器会把此种状态下请求连接放在一个队列里，我们把这种队列称之为半连接队列。当然还有一个全连接队列，就是已经完成三次握手，建立起连接的就会放在全连接队列中。如果队列满了就有可能会出现丢包现象。
+
+这里在补充一点关于SYN-ACK 重传次数的问题：　服务器发送完SYN－ACK包，如果未收到客户确认包，服务器进行首次重传，等待一段时间仍未收到客户确认包，进行第二次重传，如果重传次数超 过系统规定的最大重传次数，系统将该连接信息从半连接队列中删除。注意，每次重传等待的时间不一定相同，一般会是指数增长，例如间隔时间为 1s, 2s, 4s, 8s, ....
+#### 三次握手过程中可以携带数据吗
+很多人可能会认为三次握手都不能携带数据，其实第三次握手的时候，是可以携带数据的。也就是说，第一次、第二次握手不可以携带数据，而第三次握手是可以携带数据的。
+
+为什么这样呢？大家可以想一个问题，假如第一次握手可以携带数据的话，如果有人要恶意攻击服务器，那他每次都在第一次握手中的 SYN 报文中放入大量的数据，因为攻击者根本就不理服务器的接收、发送能力是否正常，然后疯狂着重复发 SYN 报文的话，这会让服务器花费很多时间、内存空间来接收这些报文。也就是说，第一次握手可以放数据的话，其中一个简单的原因就是会让服务器更加容易受到攻击了
+
+而对于第三次的话，此时客户端已经处于 established 状态，也就是说，对于客户端来说，他已经建立起连接了，并且也已经知道服务器的接收、发送能力是正常的了，所以能携带数据页没啥毛病。
+### TCP四次握手
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103184302.png)
+
+聚散终有时，TCP 断开连接是通过四次挥手方式。双方都可以主动断开连接，断开连接后主机中的「资源」将被释放。
+上图是客户端主动关闭连接 ：
+- 刚开始双方都处于 establised 状态
+- **一次挥手**: 
+    - 客户端打算关闭连接，此时会发送一个 TCP 首部 FIN 标志位被置为 1 的报文，也即 FIN 报文，之后客户端进入 FIN_WAIT_1 状态。
+- **二次挥手**:
+    - 服务端收到该报文后，就向客户端发送 ACK 应答报文，接着服务端进入 CLOSED_WAIT 状态。
+- **三次挥手**:
+    - 客户端收到服务端的 ACK 应答报文后，之后进入 FIN_WAIT_2 状态。等待服务端处理完数据后，也向客户端发送 FIN 报文，之后服务端进入 LAST_ACK 状态。
+- **四次挥手**:
+    - 客户端收到服务端的 FIN 报文后，回一个 ACK 应答报文，之后进入 TIME_WAIT 状态
+    - 服务器收到了 ACK 应答报文后，就进入了 CLOSED 状态，至此服务端已经完成连接的关闭。
+    - 客户端在经过 2MSL 一段时间后，自动进入 CLOSED 状态，至此客户端也完成连接的关闭。
+    - 每个方向都需要一个 FIN 和一个 ACK，因此通常被称为四次挥手。
+
+
+
+假如博主有一个女朋友——只是“假如”，该死的，这不争气的眼泪，怎么止不住地滴在键盘上。
+
+由于博主上班九九六，下班肝博客，导致没有时间陪女朋友，女朋友忍无可忍。
+- 女朋友：臭男人，最近你都不理我，你是不是不爱我了？你是不是外面有别的狗子了？我要和你分手？
+- 沙雕博主一愣，怒火攻心：分手就分手，不陪你闹了，等我把东西收拾收拾。
+
+沙雕博主小心翼翼地装起了自己的青轴机械键盘。
+- 哼，蠢女人，我已经收拾完了，我先滚为敬，再见！
+- 女朋友：滚，滚的远远的，越远越好，我一辈子都不想再见到你。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103185153.png)
+
+### 为什么要挥手四次？
+再来回顾下四次挥手双方发 FIN 包的过程，就能理解为什么需要四次了。
+
+- 关闭连接时，客户端向服务端发送 FIN 时，仅仅表示客户端不再发送数据了但是还能接收数据。
+- 服务器收到客户端的 FIN 报文时，先回一个 ACK 应答报文，而服务端可能还有数据需要处理和发送，等服务端不再发送数据时，才发送 FIN 报文给客户端来表示同意现在关闭连接。
+
+从上面过程可知，服务端通常需要等待完成数据的发送和处理，所以服务端的 ACK 和 FIN 一般都会分开发送，从而比三次握手导致多了一次。
+### 为什么客户端在TIME-WAIT阶段要等2MSL？
+为的是确认服务器端是否收到客户端发出的 ACK 确认报文，当客户端发出最后的 ACK 确认报文时，并不能确定服务器端能够收到该段报文。
+
+所以客户端在发送完 ACK 确认报文之后，会设置一个时长为 2MSL 的计时器。
+
+MSL 指的是 Maximum Segment Lifetime：一段 TCP 报文在传输过程中的最大生命周期。
+
+2MSL 即是服务器端发出为 FIN 报文和客户端发出的 ACK 确认报文所能保持有效的最大时长。
+
+服务器端在 1MSL 内没有收到客户端发出的 ACK 确认报文，就会再次向客户端发出 FIN 报文：
+- 如果客户端在 2MSL 内，再次收到了来自服务器端的 FIN 报文，说明服务器端由于各种原因没有接收到客户端发出的 ACK 确认报文。
+
+客户端再次向服务器端发出 ACK 确认报文，计时器重置，重新开始 2MSL 的计时。
+- 否则客户端在 2MSL 内没有再次收到来自服务器端的 FIN 报文，说明服务器端正常接收了 ACK 确认报文，客户端可以进入 CLOSED 阶段，完成“四次挥手”。
+
+所以，客户端要经历时长为 2SML 的 TIME-WAIT 阶段;这也是为什么客户端比服务器端晚进入 CLOSED 阶段的原因。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220103184803.png)
+### TCP 滑动窗口
+在 TCP 链接中，对于发送端和接收端而言，TCP 需要把发送的数据放到发送缓存区, 将接收的数据放到接收缓存区。而经常会存在发送端发送过多，而接收端无法消化的情况，所以就需要流量控制，就是在通过接收缓存区的大小，控制发送端的发送。如果对方的接收缓存区满了，就不能再继续发送了。而这种流量控制的过程就需要在发送端维护一个发送窗口，在接收端维持一个接收窗口。
+
+TCP 滑动窗口分为两种: 发送窗口和接收窗口。
+
+
+流量控制就是让发送方的发送速率不要太快，让接收方来得及接受。利用滑动窗口机制可以很方便的在 TCP 连接上实现对发送方的流量控制。TCP 的窗口单位是字节，不是报文段，发送方的发送窗口不能超过接收方给出的接收窗口的数值。
+
+发送方通过维持一个发送滑动窗口来确保不会发生由于发送方报文发送太快接收方无法及时处理的问题。此时发送方的报文分为四类， 第一类是已经发送并且得到接收方确认的报文，第二类是已经发送但是没有接收到确认的报文，第三类是发送方还没发送，但是滑动窗口还足够巨大，允许被发送的报文， 第四类是还没发送并且窗口已经被占满，不允许发送的报文。 一般来说，滑动窗口的最左端都是介于第一类跟第二类报文的分界线，最右端是第三类跟第四类报文的分界线。
+
+- 滑动窗口的流量控制可以包括那么几个协议：
+  - a、停等协议。 滑动窗口的大小为 1， 每个发送报文都要等到被确认以后，发送方才继续发送下一个报文。
+  - b、后退 n 步协议。 该协议下，滑动窗口大于 1，发送方可以一直发送报文，但是当接收到接收方发送的三个连续的同一序列号的 ACK 报文时，说明该序列号的报文是已经丢失的，那么此时重发该丢失报文以及该报文以后的报文（包括那些已经发送的）。
+  - c、选择重传。在后退 n 步协议当中，如果某个报文丢失，那么将要重新发送这个丢失报文及以后的所有报文（包括已经发送的），选择重传协议不用做此要求，只要重新发送丢失的报文即可。
+### TCP 拥塞机制
+原因是有可能整个网络环境特别差，容易丢包，那么发送端就应该注意了。
+
+- 主要用三种方法：
+  - 慢启动阈值 + 拥塞避免
+    - 拥塞窗口（cwnd）
+    - 慢启动阈值（ssthresh）
+      - 然后采用一种比较保守的慢启动算法来慢慢适应这个网络，在开始传输的一段时间，发送端和接收端会首先通过三次握手建立连接，确定各自接收窗口大小，然后初始化双方的拥塞窗口，接着每经过一轮 RTT（收发时延），拥塞窗口大小翻倍，直到达到慢启动阈值。
+      - 然后开始进行拥塞避免，拥塞避免具体的做法就是之前每一轮 RTT，拥塞窗口翻倍，现在每一轮就加一个。
+  - 快速重传
+    - 在 TCP 传输过程中，如果发生了丢包，接收端就会发送之前重复 ACK，比如 第 5 个包丢了，6、7 达到，然后接收端会为 5，6，7 都发送第四个包的 ACK，这个时候发送端受到了 3 个重复的 ACK，意识到丢包了，就会马上进行重传，而不用等到 RTO （超时重传的时间）
+    - 选择性重传：报文首部可选性中加入 SACK 属性，通过 left edge 和 right edge 标志那些包到了，然后重传没到的包
+  - 快速恢复
+    - 如果发送端收到了 3 个重复的 ACK，发现了丢包，觉得现在的网络状况已经进入拥塞状态了，那么就会进入快速恢复阶段：
+      - 会将拥塞阈值降低为 拥塞窗口的一半
+      - 然后拥塞窗口大小变为拥塞阈值
+      - 接着 拥塞窗口再进行线性增加，以适应网络状况
+### TCP 为什么可靠
+
+因为 TCP 丢包之后，会做数据校验，然后重传数据。接收方每收到一个数据包就发送一次确认，发送方设置定时器，如果定时没有收到接收确认就重传。有两种，一种是丢多少重传多少，一种是从丢弃的地方重新传送数据，一般是后面一种。并且针对传输的流量，TCP 会做限制，尽量保证网络的最大传输效率，保证接受方稳定接受。
+
+### TCP粘包及处理
+粘包是指为了防止数据量过小导致大量传输，全将多个TCP段合并成一个发送。就是将若干个包数据粘成一个包，从接收缓冲区看，后一包数据的头紧接送前一包数据的尾。因为TCP层传输是流式传输，流，最大的问题是没有边界，没有边界就会造成数据粘在一起。
+
+拆包就是将任务拆分处理了，降低出错率。
+#### 造成粘包的场景
+- 接收方不及时接收缓冲区的包，造成多个包接收
+- 因为TCP默认使用Nagle算法，这个算法本身也可能会导致粘包问题
+- 由于TCP的复用造成粘包。由于TCP连接的复用性，建立一条连接可以供一台主机上的多个进程使用，那么多种不同结构的数据到TCP的流式传输里，边界分割肯定会出现奇葩的问题
+- 数据包过大造成的粘包问题，比如应用进程缓冲区的一条消息内容大小超过了发送缓存区的大小，就可能产生粘包，因为消息已经被分割了，前一部分已经被接收了，但另一部分可能刚放入缓存冲区准备发送，这样就会导致后一部分粘包
+- 流量控制，拥塞控制也可能导致粘包
+:::tip
+Nagle算法，主要做两件事：
+    一是只有上一个分组得到确认，才会发送下一个分组；
+    二是收集多个小分组，数据包大小达到最大段大小(MSS)，在一个确认到来时一起发送。
+
+多个分组拼成一个数据段发出去，如果没有处理好边界问题，在解包的时候就会发生粘包
+:::
+#### 粘包怎么处理
+- 如果是Nagle算法导致的，结合应用场景适当关闭算法就可以了
+- 如果不是
+    - 尾部标记序列。通过特殊标识符表示数据包的边界，比如\n\r\t或一些隐藏字符
+    - 头部标记分步接收。在TCP报文的头部加上表示数据长度。使用带消息头的协议，消息头存储开始标识及消息长度信息，服务商获取消息头的时候解析出消息长度，然后向后读取该长度的内容
+    - 应用层发送数据时定长发送，服务端读取既定长度的内容作为一条完整消息，如果不够长，就在空位上补固定字符
+### UDP为什么不会粘包
+- 因为UDP是面向消息的协议，UDP段都是一条消息，应用程序必须以消息为单位提取数据，不能一次提取任意字节的数据
+- UDP具有保护消息边界，在每个UDP包中有消息头（消息来源地址，端口信息等），这样对于接收端来说容易进行分区处理。传输协议把数据当作一条独立的消息在网上传输，接收方只能接收独立的消息，如果消息内容过大，超过接收方一次所能接受的大小，就会丢失一部分数据，因为就算是丢失，它也不会分两次去接收
+### UDP 和 TCP 的区别及应用场景
+- TCP传送速度慢；UDP速度快
+- TCP协议可靠，有拥塞控制和流量控制；UDP协议不可靠，也没有拥塞控制和流量控制等
+- TCP协议是面向连接，而且需要3次握手；UDP协议采用无连接，不需要握手
+- TCP 的三次握手保证了连接的可靠性; UDP 是无连接的、不可靠的一种数据传输协议，首先不可靠性体现在无连接上，通信都不需要建立连接，对接收到的数据也不发送确认信号，发送端不知道数据是否会正确接收。
+- TCP只能一对一连接；UDP支持广播，一对一，一对多，多对多都可以
+- TCP头部大小最小20个字节；UDP最小8字节
+- UDP 的头部开销比 TCP 的更小，数据传输速率更高，实时性更好。
+- TCP在传输上是面向字节流的；而UDP是面向报文的
+- TCP协议在传送数据段的时候要给段标号；UDP协议不用
+- 每一条 TCP 连接只能是点到点的；UDP 支持一对一，一对多，多对一和多对多的交互通信。
+- TCP 提供可靠的服务，也就是说，通过 TCP 连接传送的数据，无差错，不丢失，不重复，且按序到达；UDP 尽最大努力交付，即不保证可靠交付。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922215218.png)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210922215348.png)
+
+**适用场景**
+TCP适合传输大量数据，以及要求可靠性传输的场景（要对数据确认、重发、排序等），比如登录，传文件等
+UDP适合传输少量数据，以及要求效率高的场景，比如实时应用，即时通讯，聊天视频通话等
+
+### 跨域
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211122224158.png)
+
+#### 同源是什么？
+如果两个 URL 的协议`protocol`、主机名`host`和端口号`port`都相同的话，则这两个 URL 是同源。
+#### 前后端通讯的方式
+- Ajax（同源的通信方式）
+- WebSocket（不受同源策略的限制）
+- CORS（支持跨域通信，也支持同源通信）
+#### 跨域是什么？
+**当协议、域名与端口号中任意一个不相同时，都算作不同域，不同域之间相互请求资源的表现(非同源策略请求)，称作”跨域“**。
+- 造成跨域的几种常见表现
+  - 服务器分开部署（Web 服务器 + 数据请求服务器）
+  - 本地开发（本地预览项目 调取 测试服务器的数据）
+  - 调取第三方平台的接口
+### 跨域的解决方案
+- 修改本地 HOST
+- JSONP
+- CORS(（跨域资源共享 Cross-origin resource sharing）允许浏览器向跨域服务器发出 XMLHttpRequest 请求，从而克服跨域问题，它需要浏览器和服务器的同时支持。 )
+- Proxy
+- Nginx 反向代理
+- Post Message（利用`iframe`标签，实现不同域的关联）
+- Hash
+- WebSocket
+#### JSONP
+**原理**就是通过添加一个`<script>`标签，向服务器请求JSON数据，这样不受同源政策限制。服务器收到请求后，将数据放在一个callback回调函数中传回来。比如axios。
+
+
+不过只支持`GET`请求且`不安全`，**可能遇到XSS攻击，不过它的好处是可以向老浏览器或不支持CORS的网站请求数据**。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210712090223.png)
+
+**手动封装 JSONP**
+`callback`必须是一个全局上下文中的函数（防止不是全局的函数，我们需要把这个函数放在全局上，并且从服务器端接收回信息时，要浏览器执行该函数）
+```js
+// 客户端
+function jsonp(url, callback) {
+  // 把传递的回调函数挂载到全局上 uniqueName变量存储全局的回调函数（确保每次的callback都具有唯一性）
+ let uniqueName = `jsonp${new Date().getTime()}`;
+  // 套了一层 anonymous function
+  // 目的让 返回的callback执行且删除创建的标签
+  window[uniqueName] = data => {
+   // 从服务器获取结果并让浏览器执行callback
+    document.body.removeChild(script);
+    delete window[uniqueName];
+    callback && callback(data);
+  }
+  // 处理URL
+  url += `${url.includes('?')} ? '&' : '?}callback=${uniqueName}'`;
+  // 发送请求
+  let script = document.createElement('script');
+  script.src = url;
+  document.body.appendChild(script);
+}
+
+// 执行第二个参数 callback，获取数据
+jsonp('http://127.0.0.1:1001/list?userName="lsh"', (result) => {
+ console.log(result);
+})
+
+
+// 服务器端
+// Api请求数据
+app.get('/list', (req, res) => {
+  // req.query 问号后面传递的参数信息
+  // 此时的callback 为传递过来的函数名字 (uniqueName)
+ let { callback } = req.query;
+  // 准备返回的数据（字符串）
+  let res = { code: 0, data: [10,20] };
+  let str = `${callback}($(JSON.stringify(res)))`;
+  // 返回给客户端数据
+  res.send(str);
+})
+
+
+// 服务器请求的 url
+Request URL:
+ http://127.0.0.1:1001/list?userName="lsh"&callback=jsonp159876002
+// 服务器返回的函数callback
+ jsonp159876002({"code":0, "data": [10,20]});
+// 客户端接收的数据信息
+{ code: 0, data: Array(2) }
+```
+```js
+<script>
+    let script = document.createElement('script')
+    script.type = 'text/javascript'
+    script.src = 'http://juejin.com/xxx?callback=handleCallback'
+    document.body.appendChild(script)
+    
+    function handleCallback(res){
+        console.log(res)
+    }
+</script>
+
+
+// 服务器返回并立即执行
+handleCallback({ code: 200, msg: 'success', data: [] })
+```
+#### CORS（支持跨域通信的 Ajax
+上文提到，不允许跨域的根本原因是因为`Access-Control-Allow-Origin`已被禁止。那么只要让`服务器端设置允许源`就可以了。
+
+**原理**就是解决掉浏览器的默认安全策略，在服务器端设置允许哪些源请求就可以了。
+
+CORS 通信过程都是浏览器自动完成，需要浏览器(都支持)和服务器都支持，所以关键在只要服务器支持，就可以跨域通信，CORS请求分两类，`简单请求和非简单请求`。
+
+另外CORS请求默认不包含Cookie以及HTTP认证信息，如果需要包含Cookie，需要满足几个条件：
+- 服务器指定了 Access-Control-Allow-Credentials: true
+- 开发者须在请求中打开withCredentials属性: xhr.withCredentials = true
+- Access-Control-Allow-Origin不要设为星号，指定明确的与请求网页一致的域名，这样就不会把其他域名的Cookie上传
+
+
+```js
+// 服务器端
+app.use((req, res, next) => {
+  // * 允许所有源（不安全/不能携带资源凭证）
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Credentials", true);
+  /* res.header("Access-Control-Allow-Headers", "Content-Type,....");
+ res.header("Access-Control-Allow-Methods", "GET,..."); */
+
+  // 试探请求：在CORS跨域请求中，首先浏览器会自己发送一个试探请求，验证是否可以和服务器跨域通信，服务器返回200，则浏览器继续发送真实的请求
+  req.method === "OPTIONS"
+    ? res.send("CURRENT SERVICES SUPPORT CROSS DOMAIN REQUESTS!")
+    : next();
+});
+
+// 客户端
+let xhr = new XMLHttpRequest();
+xhr.open("get", "http://127.0.0.1:1001/list");
+xhr.setRequestHeader("Cookie", "name=jason");
+xhr.withCredentials = true;
+xhr.onreadystatechange = () => {
+  if (xhr.status === 200 && xhr.readyState === 4) {
+    console.log(xhr.responseText);
+  }
+};
+xhr.send();
+
+// CORS【参考资料】http://www.ruanyifeng.com/blog/2016/04/cors.html
+// url（必选），options（可选）
+fetch("/some/url/", {
+  method: "get",
+})
+  .then(function(response) {})
+  .catch(function(err) {
+    // 出错了，等价于 then 的第二个参数，但这样更好用更直观
+  });
+```
+当我们一旦在服务器端设置了允许`任何源`可以请求之后，其实请求是不安全的，并且要求`客户端`不能携带资源凭证（比如上文中的 Cookie 字段），浏览器端会报错。
+
+告诉我们`Cookie`字段是不安全的也不能被设置的，如果允许源为`'*'`的话也是不允许的。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210712091113.png)
+
+正确写法 ✅
+- 设置单一源（安全/也可以携带资源凭证/只能是单一一个源）
+- 也可以动态设置多个源：每一次请求都会走这个中间件，我们首先设置一个白名单，如果当前客户端请求的源在白名单中，我们把`Allow-Origin`动态设置为当前这个源。
+
+```js
+app.use((req, res, next) => {
+  // 也可自定义白名单，检验请求的源是否在白名单里，动态设置
+  /* let safeList = [
+  "http://127.0.0.1:5500",
+  xxx,
+  xxxxx,
+ ]; */
+  res.header("Access-Control-Allow-Origin", "http://127.0.0.1:5500");
+  res.header("Access-Control-Allow-Credentials", true); // 设置是否可携带资源凭证
+
+  /* res.header("Access-Control-Allow-Headers", "Content-Type,....");
+ res.header("Access-Control-Allow-Methods", "GET,..."); */
+
+  // 试探请求：在CORS跨域请求中，首先浏览器会自己发送一个试探请求，验证是否可以和服务器跨域通信，服务器返回200，则浏览器继续发送真实的请求
+  req.method === "OPTIONS"
+    ? res.send("CURRENT SERVICES SUPPORT CROSS DOMAIN REQUESTS!")
+    : next();
+});
+```
+**CORS 的好处**
+- 原理简单，容易配置，允许携带资源凭证
+- 仍可以用 `ajax`作为资源请求的方式
+- 可以动态设置多个源，通过判断，将`Allow-Origin`设置为当前源
+**CORS 的局限性**
+- 只允许某一个源发起请求
+- 如多个源，还需要动态判断
+
+#### Proxy代理
+**Nginx代理跨域**
+配置一个代理服务器向服务器请求，再将数据返回给客户端，实质和CORS跨域原理一样，需要配置请求响应头Access-Control-Allow-Origin等字段。
+```js
+server { 
+    listen 81; server_name www.domain1.com; 
+    location / { 
+        proxy_pass http://xxxx1:8080; // 反向代理 
+        proxy_cookie_domain www.xxxx1.com www.xxxx2.com; // 修改cookie里域名 
+        index index.html index.htm; 
+        // 当用webpack-dev-server等中间件代理接口访问nignx时，此时无浏览器参与，故没有同源限制，下面的跨域配置可不启用 
+        add_header Access-Control-Allow-Origin http://www.xxxx2.com; // 当前端只跨域不带cookie时，可为* 
+        add_header Access-Control-Allow-Credentials true; 
+    } 
+}
+```
+**Node中间件代理跨域**
+在 Vue 中 vue.config.js 中配置
+```js
+module.export = {
+    ...
+    devServer: {
+        proxy: {
+            [ process.env.VUE_APP_BASE_API ]: {
+                target: 'http://xxxx',//代理跨域目标接口
+                ws: true,
+                changeOrigin: true,
+                pathRewrite: {
+                    [ '^' + process.env.VUE_APP_BASE_API ] : ''
+                }
+            }
+        }
+    }
+}
+```
+Node + express
+```js
+const express = require('express')
+const proxy = require('http-proxy-middleware')
+const app = express()
+app.use('/', proxy({ 
+    // 代理跨域目标接口 
+    target: 'http://xxxx:8080', 
+    changeOrigin: true, 
+    // 修改响应头信息，实现跨域并允许带cookie 
+    onProxyRes: function(proxyRes, req, res) { 
+        res.header('Access-Control-Allow-Origin', 'http://xxxx')
+        res.header('Access-Control-Allow-Credentials', 'true')
+    }, 
+    // 修改响应信息中的cookie域名 
+    cookieDomainRewrite: 'www.domain1.com' // 可以为false，表示不修改
+})); 
+app.listen(3000); 
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210712091604.png)
+
+#### postMessage
+postMessage是HTML5标准中的API，它可以给我们解决如下问题：
+- 页面和新打开的窗口间数据传递
+- 多窗口之间数据传递
+- 页面与嵌套的 iframe 之间数据传递
+- 上面三个场景之间的跨域传递
+
+postMessage 接受两个参数，用法如下：
+- 参数一：发送的数据
+- 参数二：你要发送给谁就写谁的地址(协议 + 域名 +端口)，也可以设置为*，表示任意窗口，为/表示与当前窗口同源的窗口
+
+假设现在有两个页面，分别为 A 页面`port=1001`、B 页面`port=1002`，实现页面 A 与页面 B 的页面通信（跨域）
+- 把 B 页面当做 A 的子页面嵌入到 A 页面里，通过`iframe.contentWindow.postMessage`向 B 页面传递某些信息
+- 在 B 页面中通过`window.onmessage`获取 A 页面传递过来的信息`ev.data`(见下代码)
+- 同理在 B 页面中通过`ev.source.postMessage`向 A 页面传递信息
+- 在 A 页面中通过`window.onmessage`获取 B 页面传递的信息
+- 主要利用内置的`postMessage`和`onmessage`传递信息和接收信息
+```JS
+// A 页面
+// 把 B页面当做A的子页面嵌入到A页面里
+<iframe id="iframe" src="http://127.0.0.1:1002/B.html" frameborder="0" style="display: none;"></iframe>
+<script>
+  iframe.onload = function () {
+    iframe.contentWindow.postMessage('珠峰培训', 'http://127.0.0.1:1002/');
+  }
+  //=>监听B传递的信息
+  window.onmessage = function (ev) {
+    console.log(ev.data);
+  }
+</script>
+
+
+
+
+// B页面
+<script>
+  //=>监听A发送过来的信息
+  window.onmessage = function (ev) {
+    // console.log(ev.data);
+    //=>ev.source:A
+    ev.source.postMessage(ev.data + '@@@', '*');
+  }
+</script>
+```
+#### WebSocket
+WebSocket是HTML5标准中的一种通信协议，以ws://(非加密)和wss://(加密)作为协议前缀，该协议不实行同源政策，只要服务器支持就行。
+
+因为WebSocket请求头信息中有Origin字段，表示请求源来自哪个域，服务器可以根据这个字段判断是否允许本次通信，如果在白名单内，就可以通信。
+```js
+// Websocket【参考资料】http://www.ruanyifeng.com/blog/2017/05/websocket.html
+var ws = new WebSocket("wss://echo.websocket.org");
+// 发送消息
+ws.onopen = function(evt) {
+  console.log("Connection open ...");
+  ws.send("Hello WebSockets!");
+};
+// 接收消息
+ws.onmessage = function(evt) {
+  console.log("Received Message: ", evt.data);
+  ws.close();
+};
+// 关闭连接
+ws.onclose = function(evt) {
+  console.log("Connection closed.");
+};
+```
+```js
+// 使用 socket.io 插件
+<script src="https://cdn.bootcss.com/socket.io/2.2.0/socket.io.js"></script> 
+<script> 
+    const socket = io('http://xxxx:8080'); // 连接成功处理 
+    socket.on('connect', function() { 
+        // 监听服务端消息 
+        socket.on('message', function(msg) { 
+            console.log('新消息' + msg); 
+        }); 
+        // 监听服务端关闭 
+        socket.on('disconnect', function() { 
+            console.log('连接关闭'); 
+        })
+    })
+</script>
+```
+### 跨域时 Cookie 要做何处理？
+指的就是对第三方使用 Cookie 的设置，在 Cookie 信息中添加 SameSite 属性。
+```js
+Set-Cookie: widget_session=123456; SameSite=None; Secure
+```
+SameSite 有三个值：
+- strict：严格模式，完全禁止使用Cookie
+- lax：宽松模式，允许部分情况使用Cookie，跨域的都行，a标签跳转，link标签，GET提交的表单
+- none：任何情况下都会发送Cookie，但必须同时设置Secure属性，意思是需要安全上下文，Cookie 只能通过https发送，否则无效
+### CORS 跨域请求[简单请求与复杂请求]
+
+CORS（cross-origin resource sharing），跨源资源共享（一般俗称『跨域请求』）。
+
+- 简单请求和预检请求的区分，会看到有很多的条件：
+  - 简单请求的 HTTP 方法只能是 GET、HEAD 或 POST
+  - 简单请求的 HTTP 头只能是 Accept/Accept-Language/Conent-Language/Content-Type 等
+  - 简单请求的 Content-Type 头只能是 text/plain、multipart/form-data 或 application/x-www-form-urlencoded
+  - 任何一个不满足上述要求的请求，即被认为是复杂请求。一个复杂请求不仅有：包含通信内容的请求，同时也包含预请求。
+
+- 简单请求
+  - 部分响应头
+    - Access-Control-Allow-Origin（必含）- 不可省略，否则请求按失败处理。该项控制数据的可见范围，如果希望数据对任何人都可见，可以填写"\*"。
+    - Access-Control-Allow-Credentials（可选） – 该项标志着请求当中是否包含 cookies 信息，只有一个可选值：true（必为小写）。如果不包含 cookies，请略去该项，而不是填写 false。这一项与 XmlHttpRequest2 对象当中的 withCredentials 属性应保持一致，即 withCredentials 为 true 时该项也为 true；withCredentials 为 false 时，省略该项不写。反之则导致请求失败。
+    - Cache-Control
+    - Content-Language
+    - Content-Type
+    - Expires
+    - Last-Modified
+- 复杂请求
+  - 比如说你需要发送 PUT、DELETE 等 HTTP 动作，或者发送 Content-Type: application/json 的内容。
+  - 复杂请求表面上看起来和简单请求使用上差不多，但实际上浏览器发送了不止一个请求。其中最先发送的是一种"预请求"，此时作为服务端，也需要返回"预回应"作为响应。预请求实际上是对服务端的一种权限请求，只有当预请求成功返回，实际请求才开始执行。
+  - 响应头
+    - Access-Control-Allow-Origin（必含） – 和简单请求一样的，必须包含一个域。
+    - Access-Control-Allow-Methods（必含） – 这是对预请求当中 Access-Control-Request-Method 的回复，这一回复将是一个以逗号分隔的列表。尽管客户端或许只请求某一方法，但服务端仍然可以返回所有允许的方法，以便客户端将其缓存。
+    - Access-Control-Allow-Headers（当预请求中包含 Access-Control-Request-Headers 时必须包含） – 这是对预请求当中 Access-Control-Request-Headers 的回复，和上面一样是以逗号分隔的列表，可以返回所有支持的头部。这里在实际使用中有遇到，所有支持的头部一时可能不能完全写出来，而又不想在这一层做过多的判断，没关系，事实上通过 request 的 header 可以直接取到 Access-Control-Request-Headers，直接把对应的 value 设置到 Access-Control-Allow-Headers 即可。
+    - Access-Control-Allow-Credentials（可选） – 和简单请求当中作用相同。
+    - Access-Control-Max-Age（可选） – 以秒为单位的缓存时间。预请求的的发送并非免费午餐，允许时应当尽可能缓存。
+  - 一旦预回应如期而至，所请求的权限也都已满足，则实际请求开始发送
+### 使用 Access-Control-Allow-Origin 为什么可以解决跨域问题?
+浏览器在发送跨域请求并且包含自定义 header 字段时，浏览器会先向服务器发送 OPTIONS 预检请求（preflight request），探测该请求服务是否允许自定义跨域字段。如果允许，则继续执行 POST、GET 请求，否则返回提示错误。
+
+此时浏览器会向服务器发送预检请求，询问是否支持跨域的自定义 header 字段。设置的 Access-Control-Request-Headers 服务器需要适当的作出应答。
+
+服务器需要对 OPTIONS 请求作出应答，通过设置 header 包含 Access-Control-Request-Headers，并且包含 OPTIONS 请求中的 Access-Control-Request-Headers 对值。
+
+### 使用 Access-Control-Allow-Origin 解决跨域问题的流程是怎样的?
+浏览器会自动进行 CORS 通信，实现 CORS 通信的关键是后端。只要后端实现了 CORS，就实现了跨域。
+
+服务端设置 Access-Control-Allow-Origin 就可以开启 CORS。 该属性表示哪些域名可以访问资源，如果设置通配符则表示所有网站都可以访问资源。
+
+虽然设置 CORS 和前端没什么关系，但是通过这种方式解决跨域问题的话，会在发送请求时出现两种情况，分别为简单请求和复杂请求。
+
+复杂请求的 CORS 请求，会在正式通信之前，增加一次 HTTP 查询请求，称为"预检"请求,该请求是 option 方法的，通过该请求来知道服务端是否允许跨域请求。
+
+此时浏览器会向服务器发送预检请求，询问是否支持跨域的自定义 header 字段。设置的 Access-Control-Request-Headers 服务器需要适当的作出应答。
+
+服务器需要对 OPTIONS 请求作出应答，通过设置 header 包含 Access-Control-Request-Headers，并且包含 OPTIONS 请求中的 Access-Control-Request-Headers 对值。
+
+### 什么叫同源？浏览器为什么要设置同源？同源策略都可以阻挡哪些恶意代码？
+- 什么叫同源
+  - 两个页面地址中的协议，域名，端口号一致，则表示同源
+- 为什么浏览器要使用同源策略
+  - 设置同源策略的主要目的是为了安全，如果没有同源限制，在浏览器中的 cookie 等其他数据可以任意读取，不同域下的 DOM 任意操作，ajax 任意请求其他网站的数据，包括隐私数据。
+- 同源策略都可以阻挡哪些恶意代码
+  - 无法用 js 读取非同源的 Cookie、LocalStorage 和 IndexDB 无法读取。
+  - 无法用 js 获取非同源的 DOM 。
+  - 无法用 js 发送非同源的 AJAX 请求 。
+
+### 怎么实现接口防刷？
+1. ① 通过前端按钮屏蔽（不安全）
+2. ② 前端每次请求都带上 token 与后端进行校验，检验通过后，后端在缓存中更改 token 值并且同请求数据一起返回给前端
+3. ③ 记录指定时间内请求过多的用户的 IP，超过一定次数后直接拉入缓存黑名单，不响应其数据
+
+### web 安全的问题
+- SQL 注入
+  - SQL 注入（英语：SQL injection），也称 SQL 注入或 SQL 注码，是发生于应用程序与数据库层的安全漏洞。
+  - 简而言之，是在输入的字符串之中注入 SQL 指令，在设计不良的程序当中忽略了字符检查，那么这些注入进去的恶意指令就会被数据库服务器误认为是正常的 SQL 指令而运行，因此遭到破坏或是入侵。 - SQL 命令可查询、插入、更新、删除等，命令的串接。而以分号字符为不同命令的区别。（原本的作用是用于 SubQuery 或作为查询、插入、更新、删除……等的条件式） - SQL 命令对于传入的字符串参数是用单引号字符所包起来。（但连续 2 个单引号字符，在 SQL 数据库中，则视为字符串中的一个单引号字符） - SQL 命令中，可以注入注解（连续 2 个减号字符 -- 后的文字为注解，或“/”与“/”所包起来的文字为注解） - 因此，如果在组合 SQL 的命令字符串时，未针对单引号字符作转义处理的话，将导致该字符变量在填入命令字符串时，被恶意窜改原本的 SQL 语法的作用。 - SQL 注入的防范措施 - 在组合 SQL 字符串时，先针对所传入的参数加入其他字符（将单引号字符前加上转义字符） - 使用 SQL 防注入系统。 - 增强 WAF 的防御力。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211117074659.png)
+- 点击劫持
+  - click-jacking，也被称为 UI-覆盖攻击。
+  - 攻击方式就是在某些操作的按钮上加一层透明的 iframe。点击一下， 就入坑了。
+  - 如何防御点击劫持
+    - 使用 HTTP 头防御
+      - 通过配置 nginx 发送 X-Frame-Options 响应头。这个 HTTP 响应头 就是为了防御用 iframe 嵌套的点击劫持攻击。这样浏览器就会阻止嵌入网页的渲染。
+    - 使用 Javascript 防御
+      - 判断顶层视口的域名是不是和本页面的域名一致，如果不一致就让恶意网页自动跳转到我方的网页。
+```js
+if (top.location.hostname !== self.location.hostname) {
+  alert("您正在访问不安全的页面，即将跳转到安全页面！");
+  top.location.href = self.location.href;
+}
+```
+- 中间人攻击
+  - 中间人攻击（Man-in-the-Middle Attack, MITM）是一种由来已久的网络入侵手段.
+  - 如 SMB 会话劫持、DNS 欺骗等攻击都是典型的 MITM 攻击。
+  - 简而言之，所谓的 MITM 攻击就是通过拦截正常的网络通信数据，并进行数据篡改和嗅探来达到攻击的目的，而通信的双方却毫不知情。
+  - 如何防御中间人攻击
+    - 确保当前你所访问的网站使用了 HTTPS
+    - 如果你是一个网站管理员，你应当执行 HSTS 协议
+    - 不要在公共 Wi-Fi 上发送敏感数据
+    - 如果你的网站使用了 SSL，确保你禁用了不安全的 SSL/TLS 协议。
+    - 不要点击恶意链接或电子邮件。
+
+- 钓鱼网站
+- XSS
+- CSRF
+### 防范 xss 应该过滤哪些标签呢?
+最普遍的做法就是转义输入输出的内容，对于引号、尖括号、斜杠进行转义。
+```js
+function escape(str) {
+  str = str.replace(/&/g, "&amp;");
+  str = str.replace(/</g, "&lt;");
+  str = str.replace(/>/g, "&gt;");
+  str = str.replace(/"/g, "&quto;");
+  str = str.replace(/'/g, "&#39;");
+  str = str.replace(/`/g, "&#96;");
+  str = str.replace(/\//g, "&#x2F;");
+  return str;
+}
+```
+但是对于显示富文本来说，显然不能通过上面的办法来转义所有字符，因为这样会把需要的格式也过滤掉。对于这种情况，通常采用白名单过滤的办法，当然也可以通过黑名单过滤，但是考虑到需要过滤的标签和标签属性实在太多，更加推荐使用白名单的方式。
+```js
+const xss = require("xss");
+let html = xss('<h1 id="title">XSS Demo</h1><script>alert("xss");</script>');
+// -> <h1>XSS Demo</h1>&lt;script&gt;alert("xss");&lt;/script&gt;
+console.log(html);
+```
+### XSS 攻击和 CSRF 攻击各自的原理是什么？两者又有什么区别？以及如何防范？
+1、XSS 攻击
+- 概念
+  - XSS（Cross Site Scripting）：跨域脚本攻击。 -原理
+    - 不需要你做任何的登录认证，它会通过合法的操作（比如在 url 中输入、在评论框中输入），向你的页面注入脚本（可能是 js、hmtl 代码块等）。
+    - 防范
+      - 编码；对于用户输入进行编码。
+      - 过滤；移除用户输入和事件相关的属性。(过滤 script、style、iframe 等节点)
+      - 校正；使用 DOM Parse 转换，校正不配对的 DOM 标签。
+      - HttpOnly
+      - CSP
+        - CSP 的实质就是白名单策略，预先设定好哪些资源能被加载执行而哪些不能，为了防止跨域脚本攻击而制定。
+        - 一种是通过 HTTP 头信息的 Content-Security-Policy 的字段。
+          - `Content-Security-Policy: script-src 'self'; font-src 'none'; style-src test.com; img-src * data:`
+        - 另一种是通过网页的标签。
+          - `<meta http-equiv="Content-Security-Policy" content="script-src 'self'; object-src 'none'; style-src cdn.example.org third-party.org; child-src https:">`
+        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211123222515.png)
+    - 分类
+      - 反射型(非持久)：点击链接，执行脚本
+      - 存储型(持久)：恶意输入保存数据库，其他用户访问，执行脚本
+      - 基于 DOM：恶意修改 DOM 结构，基于客户端
+
+2. CSRF 攻击
+- 概念
+  - SRF（Cross-site request forgery）：跨站请求伪造。
+    - 原理
+      - 登录受信任网站 A，并在本地生成 Cookie。（如果用户没有登录网站 A，那么网站 B 在诱导的时候，请求网站 A 的 api 接口时，会提示你登录）
+      - 在不登出 A 的情况下，访问危险网站 B（其实是利用了网站 A 的漏洞）。
+    - 防范
+      - token 验证；
+      - 隐藏令牌；把 token 隐藏在 http 请求的 head 中。
+      - referer 验证；验证页面来源。
+- 两者区别
+  - CSRF：需要用户先登录网站 A，获取 cookie。XSS：不需要登录。
+  - CSRF：是利用网站 A 本身的漏洞，去请求网站 A 的 api。XSS：是向网站 A 注入 JS 代码，然后执行 JS 里的代码，篡改网站 A 的内容。
+### XSS 和 CSRF?
+#### XSS
+- 概述：
+  - XSS（Cross Site Script），指跨站脚本攻击。原本缩写为 CSS，但因为与层叠样式表缩写（CSS）重名要做区分，所以改为 XSS。
+- 攻击方式
+  - 攻击者通过向网站页面注入恶意脚本（一般是 JavaScript），通过恶意脚本对客户端网页进行篡改，达到窃取信息等目的，本质是数据被当作程序执行。
+- XSS 的注入点
+  - HTML 的节点内容或属性，存在读取可输入数据
+  - javascript 代码，存在由后台注入的变量或用户输入的信息
+  - 富文本
+- XSS 危害
+  - 通过 document.cookie 盗取 cookie
+  - 使用 js 或 css 破坏页面正常的结构与样式
+  - 流量劫持（通过访问某段具有 window.location.href 定位到其他页面:`<script>window.location.href="www.baidu.com";</script>`
+  - Dos 攻击：利用合理的客户端请求来占用过多的服务器资源，从而使合法用户无法得到服务器响应
+  - 利用 iframe、frame、XMLHttpRequest 或上述 Flash 等方式，以（被攻击）用户的身份执行一些管理动作，或执行一些一般的如发微博、加好友、发私信等操作
+  - 利用可被攻击的域受到其他域信任的特点，以受信任来源的身份请求一些平时不允许的操作，如进行不当的投票活动
+  - 偷取网站任意数据、用户资料等等
+- XSS 的类型
+  - 反射型
+    - 特点
+      - 发出请求时，XSS 代码出现在 url 中，作为输入提交到服务器端，
+      - 服务器端解析后响应，XSS 代码随响应内容一起传回给浏览器，
+      - 最后浏览器解析执行 XSS 代码。
+    - 触发
+      - 这种攻击方式通常需要攻击者诱使用户点击一个恶意链接，或者提交一个表单，或者进入一个恶意网站时，注入脚本进入被攻击者的网站。
+      - 该方式只会经过服务器，不会经过数据库。
+      - `http://xxx.com/search?keyword="><script>alert('XSS攻击');</script>`
+  - 存储型：
+    - 特点
+      - 提交的代码会存储在服务器端（数据库、内存、文件系统等），
+      - 下次请求时目标页面时不用再提交 XSS 代码。
+    - 触发
+      - 比较常见的场景就是网页的留言板，攻击者在留言板写下包含攻击性的脚本代码，发表之后所有访问该留言的用户，留言内容从服务器解析之后发现有 XSS 代码于是当做正常的 HTML 和 JS 解析执行，就发生了 XSS 攻击。
+      - 该方式会经过服务器，也会经过数据库。
+  - DOM 型
+    - 基于 DOM 的 XSS 攻击是指通过恶意脚本修改页面的 DOM 结构，将攻击脚本写在 URL 中，诱导用户点击该 URL，如果 URL 被解析，那么攻击脚本就会被运行，和前两者 XSS 攻击区别是：取出和执行恶意代码由浏览器端完成，不经过服务端，属于前端 JavaScript 自身的安全漏洞，而其他两种 XSS 都属于服务端的安全漏洞主要在于 DOM 型攻击。
+- 如何防范 XSS
+  - 总体就是不能将用户的输入直接存到服务器，需要对一些数据进行特殊处理
+  - 设置 HttpOnly
+    - HttpOnly 是一个设置 cookie 是否可以被 javasript 脚本读取的属性，浏览器会禁止页面的 Javascript 访问带有 HttpOnly 属性的 Cookie。
+    - 这种方式不是防御 XSS，而是在用户被 XSS 攻击之后，不被获取 Cookie 数据。
+  - CSP 内容安全策略
+    - CSP(content security policy)，是一个额外的安全层，用于检测并削弱某些特定类型的攻击，包括跨站脚本 (XSS) 和数据注入攻击等。
+    - CSP 可以通过 HTTP 头部（Content-Security-Policy）或元素配置页面的内容安全策略，以控制浏览器可以为该页面获取哪些资源。比如一个可以上传文件和显示图片页面，应该允许图片来自任何地方，但限制表单的 action 属性只可以赋值为指定的端点。
+    - 现在主流的浏览器内置了防范 XSS 的措施，开启 CSP，即开启白名单，可阻止白名单以外的资源加载和运行
+  - 输入检查
+    - 对于用户的任何输入要进行编码、解码和过滤：
+      - 编码：不能对用户输入的内容都保持原样，对用户输入的数据进行字符实体编码转义
+      - 解码：原样显示内容的时候必须解码，不然显示不到内容了
+      - 过滤：把输入的一些不合法的东西都过滤掉，从而保证安全性。如移除用户上传的 DOM 属性，如 onerror，移除用户上传的 Style 节点、iframe、script 节点等。
+      - 对用户输入所包含的特殊字符或标签进行编码或过滤，如 <，>，script，防止 XSS 攻击。
+      - 过滤或移除特殊的 html 标签：<script>、<iframe>等。
+      - 过滤 js 事件的标签：onclick、onerror、onfocus 等。
+    ```js
+    function escHTML(str) {
+      if (!str) return "";
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/x27/g, "&#039;")
+        .replace(/x22/g, "&quto;");
+    }
+    ```
+  - 输出检查
+    - 用户的输入会存在问题，服务端的输出也会存在问题。一般来说，除富文本的输出外，在变量输出到 HTML 页面时，可以使用编码或转义的方式来防御 XSS 攻击。
+  - 输入内容长度控制
+    - 对于不受信任的输入，都应该限定一个合理的长度。虽然无法完全防止 XSS 发生，但可以增加 XSS 攻击的难度。
+  - 验证码
+    - 防止脚本冒充用户提交危险操作。
+#### CSRF
+- 概述
+  - CSRF(Cross Site Request Forgery)指的是跨站请求伪造，是一种劫持受信任用户向服务器发送非预期请求的攻击方式。跨域指的是请求来源于其他网站，伪造指的是非用户自身的意愿。
+- 攻击原理
+  - 完成一次 CSRF 攻击，必须满足两个条件
+    - 登录受信任的 A 网站，并在本地生成 cookie
+    - 不登出 A 的情况下，访问 B 网站
+    - 简单点说就是：用户在 A 网站里访问了危险的 B 网站，B 要求去访问 A 网站， 浏览器带着 cookie 去 访问 A
+- 攻击方式
+  - 攻击者诱导受害者进入第三方网站，在第三方网站中，向被攻击网站发送跨站请求。利用受害者在被攻击网站已经获取的注册凭证，绕过后台的用户验证，达到冒充用户对被攻击的网站执行某项操作的目的。
+  - 与 XSS 攻击不同的是：XSS 是攻击者直接对我们的网站 A 进行注入攻击，CSRF 是通过网站 B 对我们的网站 A 进行伪造请求。
+  - 例子：你登录购物网站 A 之后点击一个恶意链接 B，B 请求了网站 A 的下单接口，结果是在网站 A 的帐号生成一个订单。其背后的原理是：网站 B 通过表单、get 请求来伪造网站 A 的请求，这时候请求会带上网站 A 的 cookies，若登录态是保存在 cookies 中，则实现了伪造攻击。
+  - 跨站请求可以用各种方式：图片 URL、超链接、CORS、Form 提交等等。部分请求方式可以直接嵌入在第三方论坛、文章中。
+- CSRF 危害
+  - 用户的登录态被盗用
+  - 冒充用户完成操作或修改数据
+- CSRF 的类型
+  - GET 类型的 CSRF
+    - 这个链接是`www.a.com/blog/del?id=1, id`代表不同的文章。实际上就是发起一个 GET 请求
+    - 无法使用 Ajax 发起 GET 请求。因为 CSRF 请求是跨域的，而 Ajax 有同源策略的限制
+    - 可以通过在恶意网站 B 上静态或者动态创建 img,script 等标签发起 GET 请求。将其 src 属性指向 www.a.com/blog/del?id=1。通过标签的方式发起的请求不受同源策略的限制
+    - 最后欺骗已经登录目标网站 A 的用户访问恶意网站 B，那么就会携带网站 A 源的登录凭证向网站 A 后台发起请求，这样攻击就发生了
+    - CSRF 攻击有以下几个关键点：
+      - 请求是跨域的，可以看出请求是从恶意网站 B 上发出的
+      - 通过 img, script 等标签来发起一个 GET 请求，因为这些标签不受同源策略的限制
+      - 发出的请求是身份认证后的
+  - POST 类型的 CSRF
+    - 假如目标网站 A 上有发表文章的功能，那么我们就可以动态创建 form 标签，然后修改文章的题目。
+  - 链接类型的 CSRF
+    - 链接类型的 CSRF 并不常见，比起其他两种用户打开页面就中招的情况，这种需要用户点击链接才会触发。这种类型通常是在论坛中发布的图片中嵌入恶意链接，或者以广告的形式诱导用户中招，攻击者通常会以比较夸张的词语诱骗用户点击
+    - `<a href="http://test.com/csrf/withdraw.php?amount=1000&for=hacker" taget="_blank"> 重磅消息！！ </a>`
+- 如何防范 CSRF - 验证码 - 由于 CSRF 攻击伪造请求不会经过受攻击的网站，所以我们可以在网站加入验证码，这样必须通过验证码之后才能进行请求，有效的遏制了 CSRF 请求。 - 但是，这种方式不是万能的，并不是每个请求都加验证码，那样用户体验会非常不好，只能在部分请求添加，作为一种辅助的防御手段。 - 验证 Referer - 在 HTTP 协议中，头部有个 Referer 字段，他记录了该 HTTP 请求的来源地址，在服务端设置该字段的检验，通过检查该字段，就可以知道该请求是否合法，不过请求头也容易伪造。 - 简单易行， 不用改变现有代码合逻辑 - 浏览器对 referer 的实现有差别，相当于依赖了第三方来保障的 - 浏览器对 referer 的实现有差别，相当于依赖了第三方来保障的 - 用户可以自己设置发送请求时不提供 referer，那么网站会认为没有 referer 值是 CSRF 攻击，而拒绝用户的访问 - cookie 设置 SameSite - 设置 SameSite：设置 cookie 的 SameSite 值为 strict，这样只有同源网站的请求才会带上 cookie。这样 cookies 就不能被其他域名网站使用，达到了防御的目的。 - 添加 token 验证 - 浏览器请求服务器时，服务器返回一个 token，每个请求都需要同时带上 token 和 cookie 才会被认为是合法请求 - 这是一种相对成熟的解决方案。要抵御 CSRF，关键在于在请求中放入攻击者所不能伪造的信息，并且该信息不存在于 Cookie 之中。在服务端随机生成 token，在 HTTP 请求中以参数的形式加入这个 token，并在服务器端建立一个拦截器来验证这个 token，如果请求中没有 token 或者 token 内容不正确，则认为可能是 CSRF 攻击而拒绝该请求。 - 更换登录态方案 - 因为 CSRF 本质是伪造请求携带了保存在 cookies 中的信息，所以对 session 机制的登录态比较不利，如果更换 JWT（JSON Web Token）方案，其 token 信息一般设置到 HTTP 头部的，所以可以防御 CSRF 攻击。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211127090739.png)
+
+### DOS、 DDOS 攻击原理和防范？
+- DOS
+  - 最基本的 DoS 攻击就是利用合理的客户端请求来占用过多的服务器资源，从而使合法用户无法得到服务器的响应。
+  - 传统的 DoS 攻击一般是采用一对一的方式，当攻击目标的 CPU 速度、内存或者网络带宽等各项性能指标不高的情况下，它的效果是明显的。
+  - 但随着计算机与网络技术的发展，计算机的处理能力显著增加，内存不断增大，同时也出现了千兆级别的网络，这使得 DoS 攻击逐渐失去了效果。
+- DDOS
+  - DDoS(Distributed Denial of Service)即分布式拒绝服务攻击，是目前最为强大、最难以防御的攻击方式之一。
+  - DDoS 攻击手段迁在传统的 DoS 攻击基础之上产生的一类攻击方式，传统的 DoS 攻击一般是采用一对一的方式，当攻击目标的 CPU 速度、内存或者网络带宽等各项性能指标不高的情况下，它的效果是明显的。
+  - DDoS 的原理就非常简单了，它指的是攻击者借助公共网络，将数量庞大的计算机设备联合起来作为攻击平台，对一个或多个目标发动攻击，从而达到瘫痪目标主机的目的。
+- DoS 或 DDoS 攻击可以具体分成两种形式：带宽消耗型以及资源消耗型。它们都是透过大量合法或伪造的请求占用大量网络以及器材资源，以达到瘫痪网络以及系统的目的。
+  - 带宽消耗型攻击
+    - DDoS 带宽消耗攻击可以分为两个不同的层次；洪泛攻击或放大攻击。
+      - 洪泛攻击的特点是利用僵尸程序发送大量流量至受损的受害者系统，目的在于堵塞其宽带。
+      - 放大攻击与其类似，是通过恶意放大流量限制受害者系统的宽带；其特点是利用僵尸程序通过伪造的源 IP(即攻击目标 IP)向某些存在漏洞的服务器发送请求，服务器在处理请求后向伪造的源 IP 发送应答，由于这些服务的特殊性导致应答包比请求包更长，因此使用少量的宽带就能使服务器发送大量的应答到目标主机上。
+      - UDP 洪水攻击（User Datagram Protocol floods）
+        - UDP（用户数据报协议）是一种无连接协议，当数据包通过 UDP 发送时，所有的数据包在发送和接收时不需要进行握手验证。当大量 UDP 数据包发送给受害系统时，可能会导致带宽饱和从而使得合法服务无法请求访问受害系统。遭受 DDoS UDP 洪泛攻击时，UDP 数据包的目的端口可能是随机或指定的端口，受害系统将尝试处理接收到的数据包以确定本地运行的服务。如果没有应用程序在目标端口运行，受害系统将对源 IP 发出 ICMP 数据包，表明“目标端口不可达”。某些情况下，攻击者会伪造源 IP 地址以隐藏自己，这样从受害系统返回的数据包不会直接回到僵尸主机，而是被发送到被伪造地址的主机。有时 UDP 洪泛攻击也可能影响受害系统周围的网络连接，这可能导致受害系统附近的正常系统遇到问题。然而，这取决于网络体系结构和线速
+      - ICMP 洪水攻击（ICMP floods）
+        - ICMP（互联网控制消息协议）洪水攻击是通过向未良好设置的路由器发送广播信息占用系统资源的做法。
+      - 死亡之 Ping（ping of death）
+        - 死亡之 Ping 是产生超过 IP 协议能容忍的数据包数，若系统没有检查机制，就会宕机。
+      - 泪滴攻击
+        - 每个资料要发送前，该数据包都会经过切割，每个小切割都会记录位移的信息，以便重组，但此攻击模式就是捏造位移信息，造成重组时发生问题，造成错误。
+  - 资源消耗型攻击
+    - 协议分析攻击（SYN flood，SYN 洪水）
+      - 传送控制协议（TCP）同步（SYN）攻击。TCP 进程通常包括发送者和接受者之间在数据包发送之前创建的完全信号交换。启动系统发送一个 SYN 请求，接收系统返回一个带有自己 SYN 请求的 ACK（确认）作为交换。发送系统接着传回自己的 ACK 来授权两个系统间的通讯。若接收系统发送了 SYN 数据包，但没接收到 ACK，接受者经过一段时间后会再次发送新的 SYN 数据包。接受系统中的处理器和内存资源将存储该 TCP SYN 的请求直至超时。DDoS TCP SYN 攻击也被称为“资源耗尽攻击”，它利用 TCP 功能将僵尸程序伪装的 TCP SYN 请求发送给受害服务器，从而饱和服务处理器资源并阻止其有效地处理合法请求。它专门利用发送系统和接收系统间的三向信号交换来发送大量欺骗性的原 IP 地址 TCP SYN 数据包给受害系统。最终，大量 TCP SYN 攻击请求反复发送，导致受害系统内存和处理器资源耗尽，致使其无法处理任何合法用户的请求。
+    - LAND 攻击
+      - 这种攻击方式与 SYN floods 类似，不过在 LAND 攻击包中的原地址和目标地址都是攻击对象的 IP。这种攻击会导致被攻击的机器死循环，最终耗尽资源而死机。
+    - CC 攻击（Distributed HTTP flood，分布式 HTTP 洪水攻击）
+      - CC 攻击使用代理服务器向受害服务器发送大量貌似合法的请求（通常为 HTTP GET)。攻击者创造性地使用代理，利用广泛可用的免费代理服务器发动 DDoS 攻击。许多免费代理服务器支持匿名，这使追踪变得非常困难。2004 年，一位匿名为 KiKi 的中国黑客开发了一种用于发送 HTTP 请求的 DDoS 攻击工具以攻击名为“Collapsar”的 NSFOCUS 防火墙，因此该黑客工具被称为“Challenge Collapsar”（挑战黑洞，简称 CC），这类攻击被称作“CC 攻击”。
+    - 僵尸网络攻击
+      - 僵尸网络是指大量被命令与控制（C&C）服务器所控制的互联网主机群。攻击者传播恶意软件并组成自己的僵尸网络。僵尸网络难于检测的原因是，僵尸主机只有在执行特定指令时才会与服务器进行通讯，使得它们隐蔽且不易察觉。僵尸网络根据网络通讯协议的不同分为 IRC、HTTP 或 P2P 类等。
+    - 应用程序级洪水攻击（Application level floods）
+      - 与前面叙说的攻击方式不同，应用程序级洪水攻击主要是针对应用软件层的，也就是高于 OSI 的。它同样是以大量消耗系统资源为目的，通过向 IIS 这样的网络服务程序提出无节制的资源申请来破坏正常的网络服务。
+- DoS 攻击的防范措施
+  - 拒绝服务攻击的防御方式通常为入侵检测，流量过滤和多重验证，旨在堵塞网络带宽的流量将被过滤，而正常的流量可正常通过。
+  - 防火墙
+    - 防火墙可以设置规则，例如允许或拒绝特定通讯协议，端口或 IP 地址。当攻击从少数不正常的 IP 地址发出时，可以简单的使用拒绝规则阻止一切从攻击源 IP 发出的通信。复杂攻击难以用简单规则来阻止，例如 80 端口（网页服务）遭受攻击时不可能拒绝端口所有的通信，因为其同时会阻止合法流量。此外，防火墙可能处于网络架构中过后的位置，路由器可能在恶意流量达到防火墙前即被攻击影响。然而，防火墙能有效地防止用户从启动防火墙后的计算机发起攻击。
+  - 交换机
+    - 大多数交换机有一定的速度限制和访问控制能力。有些交换机提供自动速度限制、流量整形、后期连接、深度包检测和假 IP 过滤功能，可以检测并过滤拒绝服务攻击。例如 SYN 洪水攻击可以通过后期连接加以预防。基于内容的攻击可以利用深度包检测阻止。
+  - 路由器
+    - 和交换机类似，路由器也有一定的速度限制和访问控制能力，而大多数路由器很容易受到攻击影响。
+  - 黑洞引导
+    - 黑洞引导指将所有受攻击计算机的通信全部发送至一个“黑洞”（空接口或不存在的计算机地址）或者有足够能力处理洪流的网络设备商，以避免网络受到较大影响。
+  - 流量清洗
+    - 当流量被送到 DDoS 防护清洗中心时，通过采用抗 DDoS 软件处理，将正常流量和恶意流量区分开。正常的流量则回注回客户网站。这样一来可站点能够保持正常的运作，处理真实用户访问网站带来的合法流量。
+### CDN
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210923075356.png)
+
+#### 简单介绍
+把大量资源集中到单一节点进行分发，恐怕很难有某个机房可以支撑得住这么大的流量。
+
+内容分发网络（Content Dilivery Network）的互联网底层建设(CDN)。内容分发网络（Content Dilivery Network，CDN）是一个专门用来分发内容的分布式应用。
+
+CDN 构建在现有的互联网之上，通过在各地部署数据中心，让不同地域的用户可以就近获取内容。(这里的内容通常指的是文件、图片、视频、声音、应用程序安装包等，它们具有一个显著的特征——无状态，或者说是静态的。)
+
+需要考虑到流量、单点故障、延迟等因素。在离用户更近的地理位置提供资源，可以减少延迟。按照地理位置分散地提供资源，也可以降低中心化带来的服务压力。
+
+技术上全面解决由于网络带宽小、用户访问量大、网点分布不均等原因，提高用户访问网站的响应速度、减少带宽预算分配、改善内容可用性、增强网站安全性
+
+#### 内容分发
+CDN 的工作原理就是将您源站的资源缓存到位于全球各地的 CDN 节点上，用户请求资源时，就近返回节点上缓存的资源，而不需要每个用户的请求都回您的源站获取，避免网络拥塞、缓解源站压力，保证用户访问资源的速度和体验。
+
+CDN 是一个分布式的内容分发网络。当用户请求一个网络资源时，用户请求的是 CDN 提供的资源。和域名系统类似，当用户请求一个资源时，首先会接触到一个类似域名系统中目录的服务，这个服务会告诉用户究竟去哪个 IP 获取这个资源。
+
+事实上，很多大型的应用，会把 DNS 解析作为一种负载均衡的手段。当用户请求一个网址的时候，会从该网站提供的智能 DNS 中获取网站的 IP。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210923072131.png)
+
+- 当用户点击网站页面上的内容 URL，先经过本地 DNS 系统解析，如果本地 DNS 服务器没有相应域名的缓存，则本地 DNS 系统会将域名的解析权交给 CNAME 指向的 CDN 专用 DNS 服务器。
+- CDN 的 DNS 服务器将 CDN 的全局负载均衡设备 IP 地址返回给用户。
+- 用户向 CDN 的全局负载均衡设备发起 URL 访问请求。
+- CDN 全局负载（CDN 的智能 DNS ）均衡设备根据用户 IP 地址，以及用户请求的 URL，选择一台用户所属区域的区域负载均衡设备，并将请求转发到此设备上。
+- 区域负载均衡设备会选择一个最优的缓存服务器节点，并从缓存服务器节点处得到缓存服务器的 IP 地址，最终将得到的 IP 地址返回给全局负载均衡设备：
+  - 根据用户 IP 地址，判断哪一个边缘节点距用户最近；
+  - 根据用户所请求的 URL 中携带的内容名称，判断哪一个边缘节点上有用户所需内容；
+  - 查询各个边缘节点当前的负载情况，判断哪一个边缘节点尚有服务能力。
+- 全局负载均衡设备把服务器的 IP 地址返回给用户。
+- 用户向缓存服务器发起请求，缓存服务器响应用户请求，将用户所需内容传送到用户终端。如果这台缓存服务器上并没有用户想要的内容，而区域均衡设备依然将它分配给了用户，那么这台服务器就要向它的上一级缓存服务器请求内容，直至追溯到网站的源服务器将内容拉到本地。
+
+在上面整个过程当中，CDN 的智能 DNS 还充当了负载均衡的作用。如果一个节点压力过大，则可以将流量导向其他的节点。
+
+#### CDN 组成
+CDN 网络的主要有中心节点和边缘节点。
+- 中心节点
+  - 中心节点包括 CDN 网管中心和全局负载均衡 DNS 重定向解析系统，负责整个 CDN 网络的分发及管理
+- 边缘节点
+  - CDN 边缘节点主要指异地分发节点，由负载均衡设备、高速缓存服务器两部分组成。
+    - 负载均衡设备负责每个节点中各个 Cache 的负载均衡，保证节点的工作效率；同时还负责收集节点与周围环境的信息，保持与全局负载均衡 DNS 的通信，实现整个系统的负载均衡。
+    - 高速缓存服务器（Cache）负责存储客户网站的大量信息，就像一个靠近用户的网站服务器一样响应本地用户的访问请求。通过全局负载均衡 DNS 的控制，用户的请求被透明地指向离他最近的节点，节点中 Cache 服务器就像网站的原始服务器一样，响应终端用户的请求。因其距离用户更近，故其响应时间才更快。
+
+#### 回溯
+CDN 想象成一个分布式的分级缓存，再加上数据库的两层设计。
+在 CDN 的设计当中，CDN 实际上提供的是数据的缓存。而原始数据，则由服务的提供者提供。
+
+用户请求静态资源通常用自己的域名（防止跨域和一些安全问题）。为了让用户请求的是自己的网站，而使用的是 CDN 的服务，这里会使用 CNAME 让自己的域名作为 CDN 域名的一个别名。当请求到 CDN 服务的时候，会首先由 CDN 的 DNS 服务帮助用户选择一个最优的节点，这个 DNS 服务还充当了负载均衡的作用。接下来，用户开始向 CDN 节点请求资源。如果这个时候资源已经过期或者还没有在 CDN 节点上，就会从源站读取数据，这个步骤称为 CDN 的回源。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210923073122.png)
+
+CDN 节点到源站请求资源，重新设置缓存。通常服务提供方在使用 CDN 的时候，会在自己的某个域名发布静态资源，然后将这个域名交给 CDN。
+
+比如源站在 s.example.com 中发布静态资源，然后在 CDN 管理后台配置了这个源站。在使用 CDN 时，服务提供方会使用另一个域名，比如说 b.example.com。然后配置将 b.example.com 用 CNAME 记录指向 CDN 的智能 DNS。
+
+这个时候，如果用户下载 b.example.com/a.jpg，CDN 的智能 DNS 会帮用户选择一个最优的 IP 地址（最优的 CDN 节点）响应这次资源的请求。如果这个 CDN 节点没有 a.jpg，CDN 就会到 s.example.com 源站去下载，缓存到 CDN 节点，然后再返回给用户。
+
+CDN 回源有 3 种情况，
+- 一种是 CDN 节点没有对应资源时主动到源站获取资源；
+- 另一种是缓存失效后，CDN 节点到源站获取资源；
+- 还有一种情况是在 CDN 管理后台或者使用开放接口主动刷新触发回源。
+
+#### CDN 缓存、加速
+- 缓存加速
+  - 通常这个是指一个产品或系统，通过观察用户的请求来提取热门资源，然后将热门资源进行下载并缓存到本地，以便后续的用户能加速获取服务信息。
+- CDN 缓存加速
+  - 总体来说 CDN 是通过缓存的方式，将用户访问的数据缓存于各个节点上，以便于用户在访问相同数据时，能较快的获取数据。
+  - CDN 加速时还有哪些优势
+    - 减轻源站的负担
+      - 通过内容分发技术，将源站数据缓存在各个节点上，可以减少网站带宽的消耗，也就是缓解了服务器的压力同时也可以让用户更快的获取数据。
+    - 提高网站安全性
+      - 随着互联网威胁愈发严峻，网站防御，除了使用高防服务器以外，科学使用高防 CDN，除了能提高用户访问速度以外，还能有效的对网站进行防御保护。
+    - 加速访问
+      - 通过对用户分布区域进行分析，选择适合的节点。可以有效的改善不同地区用户在访问时的访问延迟问题。
+### 缓存
+#### 缓存有哪些好处？
+- 缓解服务器压力，不用每次都去请求某些数据了。
+- 提升性能，打开本地资源肯定会比请求服务器来的快。
+- 减少带宽消耗，当我们使用缓存时，只会产生很小的网络消耗
+
+#### Web 缓存种类
+数据库缓存，CDN 缓存，代理服务器缓存，浏览器缓存。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211013135501.png)
+
+所谓浏览器缓存其实就是指在本地使用的计算机中开辟一个内存区，同时也开辟一个硬盘区作为数据传输的缓冲区，然后用这个缓冲区来暂时保存用户以前访问过的信息。
+
+#### http 缓存
+浏览器缓存(Brower Caching)是浏览器对之前请求过的文件进行缓存，以便下一次访问时重复使用，节省带宽，提高访问速度，降低服务器压力
+http 缓存机制主要在 http 响应头中设定，响应头中相关字段为 Expires、Cache-Control、Last-Modified、Etag。
+- 缓存相关 header
+  - Expires：响应头，代表该资源的过期时间。
+  - Cache-Control：请求/响应头，缓存控制字段，精确控制缓存策略。
+  - If-Modified-Since：请求头，资源最近修改时间，由浏览器告诉服务器。
+  - Last-Modified：响应头，资源最近修改时间，由服务器告诉浏览器。
+  - Etag：响应头，资源标识，由服务器告诉浏览器。
+  - If-None-Match：请求头，缓存资源标识，由浏览器告诉服务器。
+  - If-Modified-Since 和 Last-Modified
+  - Etag 和 If-None-Match
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211013140918.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210924072012.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210924074826.png)
+
+强缓存和协商缓存最大也是最根本的区别是：强缓存命中的话不会发请求到服务器（比如 chrome 中的 200 from memory cache），协商缓存一定会发请求到服务器，通过资源的请求首部字段验证资源是否命中协商缓存，如果协商缓存命中，服务器会将这个请求返回，但是不会返回这个资源的实体，而是通知客户端可以从缓存中加载这个资源（304 not modified）
+
+#### 缓存位置
+查找浏览器缓存时会按顺序查找: Service Worker-->Memory Cache-->Disk Cache-->Push Cache。
+- Service Worker
+  - 是运行在浏览器背后的独立线程，一般可以用来实现缓存功能。
+  - 使用 Service Worker 的话，传输协议必须为 HTTPS。
+  - 因为 Service Worker 中涉及到请求拦截，所以必须使用 HTTPS 协议来保障安全。
+  - Service Worker 的缓存与浏览器其他内建的缓存机制不同，它可以让我们自由控制缓存哪些文件、如何匹配缓存、如何读取缓存，并且缓存是持续性的。
+- Memory Cache
+  - 内存中的缓存，主要包含的是当前中页面中已经抓取到的资源，例如页面上已经下载的样式、脚本、图片等。
+  - 读取内存中的数据肯定比磁盘快，内存缓存虽然读取高效，可是缓存持续性很短，会随着进程的释放而释放。
+  - 一旦我们关闭 Tab 页面，内存中的缓存也就被释放了。
+- Disk Cache
+  - 存储在硬盘中的缓存，读取速度慢点，但是什么都能存储到磁盘中，比之 Memory Cache 胜在容量和存储时效性上。
+  - 在所有浏览器缓存中，Disk Cache 覆盖面基本是最大的。
+  - 它会根据 HTTP Herder 中的字段判断哪些资源需要缓存，哪些资源可以不请求直接使用，哪些资源已经过期需要重新请求。
+  - 并且即使在跨站点的情况下，相同地址的资源一旦被硬盘缓存下来，就不会再次去请求数据。绝大部分的缓存都来自 Disk Cache。
+- Push Cache
+  - Push Cache（推送缓存）是 HTTP/2 中的内容，当以上三种缓存都没有命中时，它才会被使用。
+  - 它只在会话（Session）中存在，一旦会话结束就被释放，并且缓存时间也很短暂，在 Chrome 浏览器中只有 5 分钟左右，同时它也并非严格执行 HTTP 头中的缓存指令。
+
+#### 强缓存
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211104153519.png)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211013140918.png)
+
+- 强缓存命中返回 200 200（from cache）
+不需要发送请求到服务端，直接读取浏览器本地缓存，在 Chrome 的 Network 中显示的 HTTP 状态码是 200 ，在 Chrome 中，强缓存又分为 Disk Cache (存放在硬盘中)和 Memory Cache (存放在内存中)，存放的位置是由浏览器控制的。是否强缓存由 Expires、Cache-Control 和 Pragma 3 个 Header 属性共同来控制。
+- Expires
+  - Expires：Expires 的值是一个 HTTP 日期，在浏览器发起请求时，会根据系统时间和 Expires 的值进行比较，如果系统时间超过了 Expires 的值，缓存失效。由于和系统时间进行比较，所以当系统时间和服务器时间不一致的时候，会有缓存有效期不准的问题。Expires 的优先级在三个 Header 属性中是最低的。
+    - Cache-Control：Cache-Control 是 HTTP/1.1 中新增的属性，在请求头和响应头中都可以使用，常用的属性值如有
+  - max-age：单位是秒，缓存时间计算的方式是距离发起的时间的秒数，超过间隔的秒数缓存失效
+  - no-cache：不使用强缓存，需要与服务器验证缓存是否新鲜。
+  - no-store：禁止使用缓存（包括协商缓存），每次都向服务器请求最新的资源。
+  - private：专用于个人的缓存，中间代理、CDN 等不能缓存此响应
+  - public：响应可以被中间代理、CDN 等缓存
+  - must-revalidate：在缓存过期前可以使用，过期后必须向服务器验证
+  - 浏览器先检查 Cache-Control，如果有，则以 Cache-Control 为准，忽略 Expires。如果没有 Cache-Control，则以 Expires 为准。
+  - Cache-Control 对缓存的控制粒度更细，包括缓存代理服务器的缓存控制。
+- Pragma
+  - Pragma 只有一个属性值，就是 no-cache ，效果和 Cache-Control 中的 no-cache 一致，不使用强缓存，需要与服务器验证缓存是否新鲜，在 3 个头部属性中的优先级最高。
+  - Pragma 和 Cache-Control 同时存在的时候，Pragma 的优先级高于 Cache-Control。
+  - 因为它优先级最高，当存在时一定不会命中强缓存。
+
+#### 协商缓存
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211104153603.png)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211013142135.png)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211013142155.png)
+
+- 协商缓存命中返回 304
+- 请求头 last-modified 的日期与响应头的 last-modified 一致
+- 请求头 if-none-match 的 hash 与响应头的 etag 一致
+  - 这两种情况会返回 Status Code: 304
+    ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211104153626.png)
+    当浏览器的强缓存失效的时候或者请求头中设置了不走强缓存，并且在请求头中设置了 If-Modified-Since 或者 If-None-Match 的时候，会将这两个属性值到服务端去验证是否命中协商缓存，如果命中了协商缓存，会返回 304 状态，加载浏览器缓存，并且响应头会设置 Last-Modified 或者 ETag 属性。
+- ETag/If-None-Match
+  - ETag/If-None-Match 的值是一串 hash 码，代表的是一个资源的标识符，当服务端的文件变化的时候，它的 hash 码会随之改变，通过请求头中的 If-None-Match 和当前文件的 hash 值进行比较，如果相等则表示命中协商缓存。ETag 又有强弱校验之分，如果 hash 码是以 "W/" 开头的一串字符串，说明此时协商缓存的校验是弱校验的，只有服务器上的文件差异（根据 ETag 计算方式来决定）达到能够触发 hash 值后缀变化的时候，才会真正地请求资源，否则返回 304 并加载浏览器缓存。
+  - If-Modified-Since 是一个请求首部字段，并且只能用在 GET 或者 HEAD 请求中。
+  - ETag 优先级比 Last-Modified 高，同时存在时会以 ETag 为准。
+  - 发现有 If-None-Match，则比较 If-None-Match 的 Etag 值，忽略 If-Modified-Since 的比较。
+    ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210924073615.png)
+- Last-Modified/If-Modified-Since
+  - Last-Modified/If-Modified-Since 的值代表的是文件的最后修改时间，第一次请求服务端会把资源的最后修改时间放到 Last-Modified 响应头中，第二次发起请求的时候，请求头会带上上一次响应头中的 Last-Modified 的时间，并放到 If-Modified-Since 请求头属性中，服务端根据文件最后一次修改时间和 If-Modified-Since 的值进行比较，如果相等，返回 304 ，并加载浏览器缓存。
+- ETag/If-None-Match 的出现主要解决了 Last-Modified/If-Modified-Since 所解决不了的问题：
+  - 某些情况下服务器无法获取资源的最后修改时间
+  - 如果文件的修改频率在秒级以下，Last-Modified/If-Modified-Since 会错误地返回 304。Last-Modified 只能精确到秒
+  - 如果文件被修改了，但是内容没有任何变化的时候，Last-Modified/If-Modified-Since 会错误地返回 304。使用 ETag 可以正确缓存
+    不管用 Expires 还是 Cache-Control，他们都只能够控制缓存是否过期，但是在缓存过期之前，浏览器是无法得知服务器上的资源是否变化的。只有当缓存过期后，浏览器才会发请求询问服务器。
+- 我们不让 html 文件缓存，每次访问 html 都去请求服务器。所以浏览器每次都能拿到最新的 html 资源。
+  - html 中 a.js 的版本号。
+  - 以版本号来区分，也可以以 MD5hash 值来区分
+
+```js
+<script src="http://test.com/a.js?version=0.0.2"></script>
+
+<script src="http://test.com/a.【hash值】.js"></script>
+```
+
+#### 缓存场景
+对于大部分的场景都可以使用强缓存配合协商缓存解决，但是在一些特殊的地方可能需要选择特殊的缓存策略。
+
+#### 刷新对于强缓存和协商缓存的影响
+- 当 ctrl+f5 强制刷新网页时，直接从服务器加载，跳过强缓存和协商缓存。
+- 当 f5 刷新网页时，跳过强缓存，但是会检查协商缓存。
+- 浏览器地址栏中写入 URL，回车 浏览器发现缓存中有这个文件了，不用继续请求了，直接去缓存拿。
+
+### DNS 过程
+域名解析就是将域名转换为 IP 地址的过程。（因为想要访问一台服务器，最终是靠 IP 地址访问的，而不是靠域名访问的，他们的之间的映射关系保存在本地缓存和网络上的各种域名解析服务器中）
+
+- 第一步
+  - 客户端计算机发起 DNS 解析请求，将域名发送给同一网段的 DNS 服务器
+- 第二步
+  - 注册在客户端计算机上的 DNS 服务器会优先从缓存中查找该域名对应的 IP 地址，当缓存中的 IP 地址有效时则直接返回给客户端计算机。若失效或不存在时则将该域名发送给根域的 DNS 服务器，开始查询操作。
+- 第三步
+  - 根域服务器拿到需要解析的域名后，开始在记录中查询该域名对应的顶级域的 DNS 服务器信息，查到后将顶级域的 DNS 服务器的 IP 地址回传给客户端委托 DNS 查询的服务器。
+- 第四步
+  - 被委托查询域名信息的 DNS 服务器拿到该域名对应的顶级域的 DNS 服务器的 IP（也就是 .com 域对应的 IP） 地址后 ，继续使用该 IP 地址向顶级域服务器发起解析请求。也就是去 .com 域对应的 DNS 服务器去查询。
+- 第五步
+  - .com 域对应的 DNS 服务器收到解析请求后，开始查询域名下一级域对应的 DNS 服务器信息，查询到这一级域对应的 DNS 服务器信息后，将其对应的 IP 地址回传给客户端就近的 DNS 服务器。
+- 第六步
+  - 整个查询过程就这样一级接一级的查询下去，最终会找到完整域名所对应的服务器 IP 地址。找到后同样会回传给客户端委托查询域名信息的 DNS 服务器，然后该 DNS 服务器会将该 IP 地址发送回客户端计算机，同时将本次的查询结果保存在缓存中，以备下次查询是直接使用（有效期内）。
+## 页面渲染

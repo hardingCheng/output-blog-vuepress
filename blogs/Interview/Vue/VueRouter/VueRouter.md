@@ -4,8 +4,7 @@ date: 2022-01-02
 tags:
   - VueRouter
 categories:
-  - VueRouter 知识点
-  - VueRouter 面经
+  - VueRouter
 ---
 ## VueRouter
 ### VueRouter 路由钩子函数

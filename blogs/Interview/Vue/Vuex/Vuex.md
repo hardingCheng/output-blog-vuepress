@@ -4,8 +4,7 @@ date: 2022-01-02
 tags:
   - Vuex
 categories:
-  - Vuex 知识点
-  - Vuex 面经
+  - Vuex
 ---
 ## Vuex
 ### Vuex理解
