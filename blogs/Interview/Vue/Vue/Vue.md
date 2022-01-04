@@ -2147,6 +2147,7 @@ watch特性：
 1. 具有一定的惰性lazy 第一次页面展示的时候不会执行，只有数据变化的时候才会执行
 2. 参数可以拿到当前值和原始值
 3. 可以侦听多个数据的变化，用一个侦听起承载
+4. 如果要监听多个属性, 以数组的方式传入
 ```js
 setup() {
 	const name = ref('leilei')
@@ -2183,13 +2184,69 @@ watch([() => nameObj.name, () => nameObj.name], ([curName, curEng], [prevName, c
 	immediate: true
 })
 ```
+```vue
+<template>
+  <div>
+      {{name}} <button @click="setName">改变名称</button>
+  </div>
+</template>
+
+<script lang="ts">
+import { defineComponent,ref,watch } from 'vue';
+
+export default defineComponent({
+  name: '',
+  setup() {
+      let name =ref('张三') 
+      let setName = () => {
+          name.value = '李四'
+      }
+      watch(name, (newValue,oldValue)=>{
+        console.log(newValue,oldValue);
+      })
+      return {
+          name,
+          setName,
+      }
+  }
+});
+</script>
+
+<style scoped>
+
+</style>
+```
+```vue
+ {{province}}  {{city}} <button @click="setArea">改变城市</button> <br>
+
+let area = reactive({
+        province: '广东',
+        city: '深圳'
+      }) 
+      let setArea = () => {
+        area.province = '湖南'
+        area.city = '长沙'
+      }
+      // watch引用类型中的一个属性
+      watch(()=>area.province,(newValue,oldValue) => {
+        console.log(newValue,oldValue);
+      })
+      return {
+          name,
+          setName,
+          ...toRefs(area),
+          setArea
+      }
+```
 watchEffect:
+watchEffect可以不用直接指定要监听的数据，回调函数中使用的那些响应式数据就监听那些响应式数据，默认初始时就会执行第一次。
 1. 没有过多的参数 只有一个回调函数
 2. 立即执行，没有惰性，页面的首次加载就会执行。
 3. 自动检测内部代码，代码中有依赖 便会执行
 4. 不需要传递要侦听的内容 会自动感知代码依赖，不需要传递很多参数，只要传递一个回调函数
 5. 不能获取之前数据的值 只能获取当前值
 6. 一些异步的操作放在这里会更加合适
+7. watchEffect的第三个参数, 初始化就立即监听, 和深度监听
 ```js
 watchEffect(() => {
 	console.log(nameObj.name) 
@@ -2206,6 +2263,72 @@ const stop1 = watch([() => nameObj.name, () => nameObj.name], ([curName, curEng]
         stop1()
     }, 5000)
 })
+```
+```vue
+<template>
+  <div>
+    {{ name }} <button @click="setName">改变名称</button> <br />
+    {{ province }} {{ city }} <button @click="setArea">改变城市</button> <br />
+  </div>
+</template>
+
+<script lang="ts">
+import { defineComponent, ref, watch, reactive, toRefs , watchEffect } from "vue";
+
+export default defineComponent({
+  name: "",
+  setup() {
+    let name = ref("张三");
+    let setName = () => {
+      name.value = "李四";
+    };
+    watch(name, (newValue, oldValue) => {
+      console.log(newValue, oldValue);
+    });
+    let area = reactive({
+      province: "广东",
+      city: "深圳",
+    });
+    let setArea = () => {
+      area.province = "湖南";
+      area.city = "长沙";
+    };
+    // watch引用类型中的一个属性
+    // watch(()=>area.province,(newValue,oldValue) => {
+    //   console.log(newValue,oldValue);
+    // })
+
+    // 监听多个属性
+    // watch([() => area.province, () => area.city], (newValue, oldValue) => {
+    //   console.log(newValue, oldValue);
+    // });
+
+    // 立即监听和深度监听
+    // watch([() => area.province, () => area.city], (newValue, oldValue) => {
+    //   console.log(newValue, oldValue);
+    // },{
+    //     immediate: true,
+    //     deep: true
+    //   });
+
+    // watchEffect 用到那个属性就会监听那个属性
+    watchEffect(() => {
+      console.log(area.province,area.city,name.value);
+      
+    })
+
+    return {
+      name,
+      setName,
+      ...toRefs(area),
+      setArea,
+    };
+  },
+});
+</script>
+
+<style scoped>
+</style>
 ```
 共同点`watch` 和 `watchEffect` 会共享以下四种行为：
 1. 停止监听：组件卸载时都会自动停止监听
