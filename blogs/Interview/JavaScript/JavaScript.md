@@ -1736,6 +1736,13 @@ name = "jack"; //执行阶段处理
 
 作用域和作用域的嵌套，就产生了作用域链，另外要记住的一个特性就是作用域链的查找，向外不向内，想想探出头去，而不是看着锅里，就可以了。
 ### 闭包
+- 闭包：函数和其周围的状态（词法环境）的引用捆绑在一起形成闭包。
+    - 可以在另一个作用域中调用一个函数的内部函数并访问到该函数的作用域中的成员
+- 闭包的本质
+    - 函数在执行的时候会放到一个执行栈上当函数执行完毕之后会从执行栈上移除，**但是堆上的作用域成员因为被外部引用不能释放，**因此内部函数依然可以访问外部函数的成员。
+
+
+
 - 闭包是指有权访问另一个函数作用域中的变量的函数。
 - 延长局部变量的生命周期，在某些情况下，希望某些函数内的变量在函数执行后不被销毁。
 - 能够访问其他函数内部变量的函数，被称为 闭包。
@@ -3087,6 +3094,36 @@ Array.prototype.map.call（hdList,function(){
 函数式（Funtional Programming，FP）
 响应式（Reactive Programming，RP）
 函数响应式（Functional Reactive Programming，FRP）
+### 函数式编程
+#### 函数式编程的好处
+- 函数编程可以抛弃this
+- 打包过程中可以更好的利用tree shaking 过滤无用代码
+- 方便测试，方便并行处理
+- 有很多的库可以帮助我们进行函数式开发：lodash,underscroe,ramda
+#### 什么是函数式编程
+函数式编程，FP是编程范式之一，我们常听说的编程范式还有面向过程编程，面向对象编程。
+
+- 面向对象编程的思维方式：把现实世界中的事物抽象成程序世界中的类和对象，通过封装、继承和多态来演示事物事件的联系
+- 函数式编程的思维方式：把现实世界的事物和事物之间的联系抽象到程序世界 （对运算过程进行抽象）
+    - 程序的本质：根据输入通过某种运算获得相应的输出，程序开发过程中会涉及很多有输入和输出的函数
+    - x -> f(联系、映射) -> y,y = f（x）
+    - **函数式编程中的函数指的不是程序中的函数（方法）**，而是数学中的函数即映射关系，例如：`y = sin(x)`,x和y的关系
+    - **相同的输入始终要得到相同的输出（纯函数）**
+    - 函数式编程用来描述数据（函数）之间的映射。
+```js
+// 非函数式
+let num1 = 2;
+let num2 = 3;
+let sum = num1 + num2;
+console.log(sum);
+
+// 函数式
+function add(n1, n2) {
+  return n1 + n2;
+}
+let sum = add(2, 3);
+console.log(sum);
+```
 ### 函数的作用，纯函数是什么，函数的副作用是什么?
 - 函数是"第一等公民"
   - 函数可以像其他数据类型一样操作，如赋值给其他变量、作为函数的入参、作为函数的返回值。
@@ -3107,6 +3144,73 @@ Array.prototype.map.call（hdList,function(){
   - DOM 查询以及浏览器 cookie、localstorage 查询
   - 发送 http 请求
   - 抛出异常，未被当前函数捕获
+### 高阶函数
+#### 可以把函数作为参数传递给另一个函数
+```js
+function forEach(array, fn) {
+  for (let i = 0; i < array.length; i++) {
+    fn(array[i]);
+  }
+}
+
+function filter(array, fn) {
+  let result = [];
+  for (let i = 0; i < array.length; i++) {
+    if (fn(array[i])) {
+      result.push(array[i]);
+    }
+  }
+  return result;
+}
+```
+#### 可以把函数作为另一个函数的返回结果
+```js
+function makeFn() {
+  let msg = "Hello function";
+  return function () {
+    console.log(msg);
+  };
+}
+
+const fn = makeFn();
+fn();
+
+
+
+
+function once(fn) {
+  let done = false;
+  return function () {
+    if (!done) {
+      done = true;
+      return fn.apply(this, arguments);
+    }
+  };
+}
+```
+#### 使用高阶函数的意义
+- 抽象可以帮助我们屏蔽细节，只需要关注与我们的目标
+- 高阶函数是用来抽象通用的问题
+```js
+// 面向过程的方式
+let array = [1, 2, 3, 4];
+for (let i = 0; i < array.length; i++) {
+  console.log(array[i]);
+}
+
+// 面向高阶函数
+let array = [1, 2, 3, 4];
+forEach(
+  (array,
+  (item) => {
+    console.log(item);
+  })
+);
+
+let r = filter(array, (item) => {
+  return item % 2 === 0;
+});
+```
 ### 栈内存和堆内存？
 与GC（垃圾回收机制）有关。为了使程序运行时占用的内存最小。
 

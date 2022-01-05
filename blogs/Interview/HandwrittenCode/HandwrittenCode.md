@@ -1333,6 +1333,7 @@ const selfMap2 = function(callback, context) {
     return [...pre, callback.call(context, cur, index, this)];
   }, []);
 };
+```
 ### 手写数组随机排序
 ```js
 // 利用数组自带的sort方法
