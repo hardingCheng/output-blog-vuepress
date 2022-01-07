@@ -761,12 +761,20 @@ String.prototype.trim = function() {
 };
 ```
 ### 手写 compose 函数组合函数
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220106141045.png)
+
+- 函数组合
+    - 函数组合可以让我们把细粒度的函数重新组合生成一个新的函数
+    - 如果一个函数要经过多个函数才能处理得到最终值，这个时候可以把中间过程的函数合并成一个函数
+    - 函数就像数据管道，函数组合就是把这些管道连接起来，让数据穿过多个管道形成最终结果
+    - 函数组合默认是从右到左执行
 ```js
 const compose = (..args) => {
     return function(value){
+        // 从右往左
         return args.reverse().reduce(function (acc,fn){
             return fn(acc)
-        //acc的初始值
+        //acc的初始值，第一次调用的时候
         },value)
     }
 }
@@ -785,8 +793,35 @@ const compose = (...fns) => {
   })
 }
 ```
-### 手写柯里化函数
+```js
+// 调试组合函数
+const _ = require("lodash");
 
+const trace = _.curry((tag, v) => {
+  console.log(tag, v);
+  return v;
+});
+
+const spilt = _.curry((sep, str) => _.split(str, sep));
+const join = _.curry((sep, array) => _.join(array, sep));
+const map = _.curry((fn, array) => _.map(array, fn));
+
+const f = _.flowRight(
+  join("-"),
+  trace("map 之后"),
+  map(_.toLower),
+  trace("split 之后"),
+  spilt(" ")
+);
+```
+### 手写柯里化函数
+- 柯里化
+    - 当一个函数有多个参数的时候先传递一部分参数调用它（这部分参数以后永远不变）
+    - 然后返回一个新的函数接收剩余的参数，返回结果
+    - 柯里化可以让我们给一个函数传递较少的参数得到一个已经记住了某些固定参数的新函数
+    - 这是一种对函数参数的“缓存”
+    - 让函数边的更灵活，让函数的粒度更小
+    - 可以把多元函数转换成一元函数，可以组合使用函数产生更强大的功能
 ```js
 // 柯里化后的函数
 let curried = _.curry(getSum);
@@ -1239,6 +1274,29 @@ const mySetTimeout = (fn, time) => {
 // mySetTimeout(()=>{
 //   console.log(1);
 // },1000)
+```
+### 手写获取数据类型
+```js
+function getType(value) {
+  if (value === null) {
+    return value + ""
+  }
+  if (typeof value === "object") {
+    // 数组、对象、null 用 typeof 都是 object，所以需要处理下 以 {} 为例
+    let valueClass = Object.prototype.toString.call(value) // 转成这样 [object, Object]
+    let type = valueClass.split(" ")[1].split("") // 变成这样 ["O", "b", "j", "e", "c", "t", "]"]
+    type.pop() // 再变成这样 ["O", "b", "j", "e", "c", "t"]
+    return type.join("").toLowerCase() // object
+  } else {
+    return typeof value;
+  }
+}
+console.log( getType(1) ) // number
+console.log( getType("1") ) // string
+console.log( getType(null) ) // null
+console.log( getType(undefined) ) // undefined 
+console.log( getType({}) ) // object
+console.log( getType(function(){}) ) // function 
 ```
 ## 手写代码部分 2
 ### 手写 reduce 实现 map

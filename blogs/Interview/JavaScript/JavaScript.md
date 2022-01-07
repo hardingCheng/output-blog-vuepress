@@ -363,7 +363,7 @@ console.log(typeof data); // "object"
 - 所谓的变量提升（变量提升），是指在 JS 代码执行中， JavaScript 引擎（V8）把变量的声明部分和函数的声明部分提升到代码开头的行为，变量提升后，会给变量设置默认值 undefined，给函数赋值函数体。
 - 在 JS 的变量提升中，提升的只是变量的声明，所以对于 var a = 1，一般把它拆分成 var a 和 a = 1。只提升 var a，a = 1 不变。
 - 有多个同名变量声明时，函数声明会覆盖其他的声明。如果有多个同名函数声明，则是由最后的一个函数声明覆盖之前所有的声明。
-### js 声明变量的方式
+### JS声明变量的方式
 JavaScript 中可以通过 var、let、const、function、import、class 这几种方式来声明变量。
 1. var
 ```js
@@ -431,6 +431,8 @@ typeof Person; // "function"
 Person === Person.prototype.constructor; // true
 ```
 ### var、let、const有什么区别
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220106080405.png)
+
 - 三者的区别
   - 区别 1
     - var 定义的变量，没有块的概念，可以跨块访问, 不能跨函数访问。
@@ -790,6 +792,51 @@ console.log(auto instanceof Object);
 Student.prototype.constructor === Student;
 //  true
 ```
+#### 其他
+```js
+// constructor  判断是否是该类型直接继承者
+let A = function(){}
+let B = new A()
+A.constructor === Object // false
+A.constructor === Function // true
+B.constructor === Function // false
+B.constructor === A // true
+
+// 判断数组
+console.log(Array.isArray([])) // true
+// 判断数字
+function isNumber(num) {
+  let reg = /^[0-9]+.?[0-9]*$/
+  if (reg.test(num)) {
+    return true
+  }
+  return false
+}
+
+//封装获取数据类型
+function getType(obj){
+    let type = typeof obj
+    if(type !== 'object'){
+        return type
+    }
+    return Object.prototype.toString.call(obj)
+}
+
+// 含隐式类型转换 继续往下看
+
+// 判断数字
+function isNumber(num) {  
+    return num === +num
+}
+// 判断字符串
+function isString(str) {  
+    return str === str+""
+}
+// 判断布尔值
+function isBoolean(bool) {  
+    return bool === !!bool
+}
+```
 ### JS类型转换
 - JS 中类型转换只有三种情况，分别是： 
     - 转换为布尔值（调用 Boolean()方法） 
@@ -813,7 +860,7 @@ undefined == false // false
 - ToString，ToNumber，ToBoolean，ToPrimitive
   - 比如数字、字符串、布尔型、数组、对象之间的相互转换。
 
-- ToString
+- **ToString**
   - 这里所说的 ToString 可不是对象的 toString 方法，而是指其他类型的值转换为字符串类型的操作。
   - 讨论 null、undefined、布尔型、数字、数组、普通对象转换为字符串的规则。
     - null：转为"null"
@@ -822,6 +869,9 @@ undefined == false // false
     - 数字类型：转为数字的字符串形式，如 10 转为"10"， 1e21 转为"1e+21"
     - 数组：转为字符串是将所有元素按照","连接起来，相当于调用数组的 Array.prototype.join()方法，如[1, 2, 3]转为"1,2,3"，空数组[]转为空字符串，数组中的 null 或 undefined，会被当做空字符串处理
     - 普通对象：转为字符串相当于直接使用 Object.prototype.toString()，返回"[object Object]"
+        - 先调用 toString 方法，如果 toString 方法返回的是原始类型的值，则对该值使用 String 方法，不再继续
+        - 如果 toString 方法返回的是复合类型的值，再调用 valueOf 方法，如果 valueOf 方法返回的是原始类型的值，则对该值使用 String 方法，不再继续
+        - 如果 valueOf 方法返回的是复合类型的值，则报错
 ```js
 String(null); // 'null'
 String(undefined); // 'undefined'
@@ -833,8 +883,16 @@ String([]); // ''
 String([null]); // ''
 String([1, undefined, 3]); // '1,,3'
 String({}); // '[object Objecr]'
+
+
+let b = {b:1}
+console.log(String(b)) // "[object Object]"
+// 原理
+b.toString() // "[object Object]"
+// b.valueOf() 由于返回的不是复合类型所以没有调valueOf()
+String("[object Object]") // "[object Object]"
 ```
-- ToNumber
+- **ToNumber**
   - ToNumber 指其他类型转换为数字类型的操作。
     - null： 转为 0
     - undefined：转为 NaN
@@ -842,6 +900,9 @@ String({}); // '[object Objecr]'
     - 布尔型：true 和 false 被转为 1 和 0
     - 数组：数组首先会被转为原始类型，也就是 ToPrimitive，然后在根据转换后的原始类型按照上面的规则处理，关于 ToPrimitive，会在下文中讲到
     - 对象：同数组的处理
+        - 先调用对象自身的 valueOf 方法，如果该方法返回原始类型的值(数值、字符串和布尔值)，则直接对该值使用 Number 方法，不再继续
+        - 如果 valueOf 方法返回复合类型的值，再调用对象自身的 toString 方法，如果 toString 方法返回原始类型的值，则对该值使用 Number 方法，不再继续
+        - 如果 toString 方法返回的还是复合类型的值，则报错
 ```js
 Number(null); // 0
 Number(undefined); // NaN
@@ -853,8 +914,16 @@ Number(false); // 0
 Number([]); // 0
 Number(["1"]); // 1
 Number({}); // NaN
+
+
+let a = {a:1}
+console.log(Number(a)) // NaN
+// 原理
+a.valueOf() // {a:1}
+a.toString() // "[object Object]"
+Number("[object Object]") // NaN
 ```
-- ToBoolean
+- **ToBoolean**
   - ToBoolean 指其他类型转换为布尔类型的操作。
   - js 中的假值只有 false、null、undefined、空字符、0 和 NaN，其它值转为布尔型都为 true。
 ```js
@@ -867,7 +936,7 @@ Boolean([]); // true
 Boolean({}); // true
 Boolean(Infinity); // true
 ```
-- ToPrimitive
+- **ToPrimitive**
   - ToPrimitive 指对象类型类型（如：对象、数组）转换为原始类型的操作。
   - 当对象类型需要被转为原始类型时，它会先查找对象的 valueOf 方法，如果 valueOf 方法返回原始类型的值，则 ToPrimitive 的结果就是这个值
   - 如果 valueOf 不存在或者 valueOf 方法返回的不是原始类型的值，就会尝试调用对象的 toString 方法，也就是会遵循对象的 ToString 规则，然后使用 toString 的返回值作为 ToPrimitive 的结果。
@@ -952,7 +1021,7 @@ Boolean 类型转换规则表：
 ```
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211228100310.png)
 
-运算符：
+**运算符：**
 加号运算符：当加号运算符作为一元运算符运算值时，它会将该值转换为 Number 类型。
 
 当加号运算符作为二元运算符操作值时，它会根据两边值类型进行数据类型隐式转换。
@@ -1067,7 +1136,7 @@ true - 1            // 0
 ```
 
 
-相等运算符：
+**相等运算符：**
 相等运算符 == 会对操作值进行隐式转换后进行比较：
 - 如果其中一个操作值为布尔值，则在比较之前先将其转换为数值
 - 如果其中一个操作值为字符串，另一个操作值为数值，则通过 Number() 函数将字符串转换为数值
@@ -1087,7 +1156,7 @@ nul == null; // true
 ```
 
 
-关系运算符:
+**关系运算符:**
 关系运算符：会把其他数据类型转换成 Number 之后再比较关系（除了 Date 类型对象）:
 - 如果两个操作值都是数值，则进行 数值 比较
 - 如果两个操作值都是字符串，则比较字符串对应的 ASCII 字符编码值
@@ -1732,6 +1801,8 @@ name = "jack"; //执行阶段处理
 3. 块级作用域：块级作用域相当于是只在这块代码块中生效，如果它被大括号 {} 所包围，那么大括号中就是一段代码块，代码块中使用 let 和 const 声明的变量也被称为局部变量
 作用：作用域最大的用处就是隔离变量，不同作用域下同名变量不会有冲突。
 #### 作用域链
+在当前作用域中无法找到某个变量时，引擎就会在外层嵌套的作用域中继续查找，直到找到该变量，或抵达最外层的全局作用域为止，如果还是没有找到就报错。
+
 作用域链参考链接一般情况下，变量到 创建该变量 的函数的作用域中取值。但是如果在当前作用域中没有查到，就会向上级作用域去查，直到查到全局作用域，这么一个查找过程形成的链条就叫做作用域链。
 
 作用域和作用域的嵌套，就产生了作用域链，另外要记住的一个特性就是作用域链的查找，向外不向内，想想探出头去，而不是看着锅里，就可以了。
@@ -1740,6 +1811,10 @@ name = "jack"; //执行阶段处理
     - 可以在另一个作用域中调用一个函数的内部函数并访问到该函数的作用域中的成员
 - 闭包的本质
     - 函数在执行的时候会放到一个执行栈上当函数执行完毕之后会从执行栈上移除，**但是堆上的作用域成员因为被外部引用不能释放，**因此内部函数依然可以访问外部函数的成员。
+- 缺点
+    - 内部函数引用的变量会在内存中，不会立刻销毁;
+    - 因为内部函数有权访问外部函数，所以外部函数执行完了也不会被垃圾回收，而占用内存;
+    - 如果闭包用得太多会导致性能降低
 
 
 
@@ -1895,11 +1970,14 @@ function curry(fn) {
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211203202603.png)
 
 `this`是在执行的时候确定的。不执行，你就不知道在哪里。**this 永远指向的是最后调用它的对象，也就是看它执行的时候是谁调用的**，**当 this 碰到 return 时**。如果返回值是一个对象，那么 this 指向的就是那个返回的对象，如果返回值不是一个对象那么 this 还是指向函数的实例。
+
 1. 作为普通函数执行时，`this`指向`window`。
 2. 当函数作为对象的方法被调用时，`this`就会指向`该对象`。
 3. 构造器调用，`this`指向`返回的这个实例化对象`。
 4. 箭头函数中没有`this`绑定，必须通过查找作用域链来决定其值。如果箭头函数被非箭头函数包含，则`this`绑定的是最近一层非箭头函数的`this`，否则`this`的值则被设置为全局对象。而箭头函数的`this`是上层普通函数的`this`或者是全局对象（浏览器中是`window`）
 5. 基于 Function.prototype 上的 `apply 、 call 和 bind`调用模式，这三个方法都可以显示的指定调用函数的 this 指向。`apply`接收参数的是数组，`call`接受参数列表，`` bind`方法通过传入一个对象，返回一个` this `绑定了传入对象的新函数。这个函数的`this`指向除了使用`new `时会被改变，其他情况下都不会改变。若为空默认是指向全局对象 window。
+6. 全局作用域、自执行函数、定时器传进的非箭头函数的 this 都指向 window
+7. 严格模式(use strict)下的 this 指向 undefined
 
 #### 终极秘籍
 1. 如果一个函数中有 this，但是它没有被上一级的对象所调用，那么 this 指向的就是 window，这里需要说明的是在 js 的严格版中 this 指向的不是 window，但是我们这里不探讨严格版的问题，你想了解可以自行上网查找。
@@ -2062,6 +2140,27 @@ JS 中的`__proto__`入场了，它存在于普通对象和函数对象中，它
 - p.__proto__
 - p.constructor.prototype
 - Object.getPrototypeOf(p)
+### 原型污染
+原型污染是指攻击者通过某种手段修改js的原型。
+```js
+Object.prototype.toString = function () {alert('原生方法被改写，已完成原型污染')};
+```
+#### 怎么解决原型污染
+1. 用`Object.freeze(obj)`冻结对象，然后就不能被修改属性，变成不可扩展的对象
+```js
+Object.freeze(Object.prototype)
+Object.prototype.toString = 'hello'
+console.log(Object.prototype.toString) // ƒ toString() { [native code] }
+```
+2. 不采用字面量形式，用`Object.create(null)`创建一个没有原型的新对象，这样不管对原型做什么扩展都不会生效
+```js
+const obj = Object.create(null)
+console.log(obj.__proto__) // => undefined
+```
+3. 用 Map 数据类型，代替Object类型
+Map 对象保存键/值对的集合。任何值（对象或者原始值）都可以作为一个键或一个值。所以用 Map 数据结构，不会对 Object 原型污染。
+
+
 ### Function、Object、null 等等的关系和鸡蛋问题
 原型链的尽头指向`null`，那么 `Function.prototype`、`Object.prototype`、`null`、`Function.prototype.__proto__`、`Object.prototype..__proto__`、`function`、`object` 之间的关系是什么。
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211014094614.png)
@@ -2552,16 +2651,154 @@ Reflect.ownKeys(myClass.prototype);
 ```
 ### ES6知识点
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210921221425.png)
+####  let 和 const
+```js
+// let 声明的成员只会在所声明的块中生效 -------------------------------------------
+if (true) {
+  var foo = "zce";
+  let foo = "zce";
+  console.log(foo);
+}
 
+// let 在 for 循环中的表现 ---------------------------------------------------
+for (var i = 0; i < 3; i++) {
+  for (var i = 0; i < 3; i++) {
+    console.log(i);
+  }
+  console.log("内层结束 i = " + i);
+}
+
+for (var i = 0; i < 3; i++) {
+  for (let i = 0; i < 3; i++) {
+    console.log(i);
+  }
+  console.log("内层结束 i = " + i);
+}
+
+// let 应用场景：循环绑定事件，事件处理函数中获取正确索引 -----------------------------------------------------
+var elements = [{}, {}, {}];
+for (var i = 0; i < elements.length; i++) {
+  elements[i].onclick = function () {
+    console.log(i);
+  };
+}
+elements[2].onclick();
+
+var elements = [{}, {}, {}];
+for (var i = 0; i < elements.length; i++) {
+  elements[i].onclick = (function (i) {
+    return function () {
+      console.log(i);
+    };
+  })(i);
+}
+elements[0].onclick();
+
+var elements = [{}, {}, {}];
+for (let i = 0; i < elements.length; i++) {
+  elements[i].onclick = function () {
+    console.log(i);
+  };
+}
+elements[0].onclick();
+
+// for 循环会产生两层作用域 ----------------------------------
+
+for (let i = 0; i < 3; i++) {
+  let i = "foo";
+  console.log(i);
+}
+
+let i = 0;
+
+if (i < 3) {
+  let i = "foo";
+  console.log(i);
+}
+
+// i++
+
+if (i < 3) {
+  let i = "foo";
+  console.log(i);
+}
+
+// i++
+
+if (i < 3) {
+  let i = "foo";
+  console.log(i);
+}
+
+// i++
+
+// let 修复了变量声明提升现象 --------------------------------------------
+
+console.log(foo);
+var foo = "zce";
+
+console.log(foo);
+let foo = "zce";
+```
 #### Set 数据结构
-概念：set 是 ES6 新增的数据结构。集合的概念是一组无序且唯一（即不重复）的项组成。set 数据结构使用了与有限集合相同的数学概念，应用在计算机的数据结构中，与数组类似，但成员都是唯一的，没有重复的值。
+概念：Set 是 ES6 新增的数据结构。集合的概念是一组无序且唯一（即不重复）的项组成。set 数据结构使用了与有限集合相同的数学概念，应用在计算机的数据结构中，与数组类似，但成员都是唯一的，没有重复的值。
 
 特点：key 和 value 相同，没有重复的 value。只有健值，没有健名，有点类似数组。
+
+Set 和 Map 都是强引用(下面有说明)，都可以遍历，比如 `for of` / `forEach`
+
+允许存储任何类型的唯一值，只有键值(key)没有键名，常用方法 add、size、has、delete等等，看下用法.
+```js
+const set1 = new Set()
+set1.add(1)
+const set2 = new Set([1,2,3])
+set2.add('hardincheng')
+console.log(set1) // { 1 }
+
+console.log(set2) // { 1, 2, 3, '沐华' }
+console.log(set2.size) // 4
+console.log(set2.has('hardincheng')) // true
+set2.delete('hardincheng')
+console.log(set2) // { 1, 2, 3 }
+
+// 用 Set 去重
+
+const set3 = new Set([1, 2, 1, 1, 3, 2])
+const arr = [...set3]
+console.log(set3) // { 1, 2, 3 }
+console.log(arr) // [1, 2, 3]
+
+// 引用类型指针不一样，无法去重
+const set4 = new Set([1, { name: 'hardincheng' }, 1, 2, { name: 'hardincheng' }])
+console.log(set4) // { 1, { name: '沐华' }, 2, { name: '沐华' } }
+
+// 引用类型指针一样，就可以去重
+const obj = { name: '沐华' }
+const set5 = new Set([1, obj, 1, 2, obj])
+console.log(set5) // { 1, { name: '沐华' }, 2 }
+```
 #### WeakSet
+WeakSet 和 WeakMap 都是弱引用，对 `GC` 更加友好，**都不能遍历**。
+
+就默认创建了一个强引用的对象，只有手动将 obj = null，在没有引用的情况下它才会被垃圾回收机制进行回收，如果是弱引用对象，垃圾回收机制会自动帮我们回收，某些情况下性能更有优势，比如用来保存 DOM 节点，不容易造成内存泄漏。
+
 WeakSet 对象允许你将弱引用对象储存在一个集合中。
 WeakSet 与 Set 的区别：
 - WeakSet 只能储存对象引用，不能存放值，而 Set 对象都可以
 - WeakSet 对象中储存的对象值都是被弱引用的，即垃圾回收机制不考虑 WeakSet 对该对象的应用，如果没有其他的变量或属性引用这个对象值，则这个对象将会被垃圾回收掉（不考虑该对象还存在于 WeakSet 中），所以，WeakSet 对象里有多少个成员元素，取决于垃圾回收机制有没有运行，运行前后成员个数可能不一致，遍历结束之后，有的成员可能取不到了（被垃圾回收了），WeakSet 对象是无法被遍历的（ES6 规定 WeakSet 不可遍历），也没有办法拿到它包含的所有元素。
+
+成员只能是对象或数组，方法只有 add、has、delete，看下用法。
+```js
+const ws1 = new WeakSet()
+let obj = { name: '沐华' }
+ws1.add(obj)
+ws1.add(function(){})
+console.log(ws1) // { function(){}, { name: 'hardincheng' } }
+console.log(ws1.has(obj)) // true
+
+ws1.delete(obj)
+console.log(ws1.has(obj)) // false
+```
 #### Map 数据结构
 Map 是一种叫做字典的数据结构,Map 和对象最大的不同应该就是键可以是任意类型。
 Map 原生提供三个遍历器生成函数和一个遍历方法。
@@ -2570,11 +2807,60 @@ Map 原生提供三个遍历器生成函数和一个遍历方法。
 - entries()：返回所有成员的遍历器。
 - forEach()：遍历 Map 的所有成员。
   需要特别注意的是，Map 的遍历顺序就是插入顺序。
+  
+是键值对的集合；常用方法 set、get、size、has、delete等等，看下用法。
+```js
+const map1 = new Map()
+map1.set(0, 1)
+map1.set(true, 2)
+map1.set(function(){}, 3)
+const map2 = new Map([ [0, 1], [true, 2], [{ name: 'hardincheng' }, 3] ])
+console.log(map1) // {0 => 1, true => 2, function(){} => 3}
+console.log(map2) // {0 => 1, true => 2, {…} => 3}
+
+console.log(map1.size) // 3
+console.log(map1.get(true)) // 2
+console.log(map1.has(true)) // true
+map1.delete(true)
+console.log(map1) // {0 => 1, function(){} => 3}
+```
 #### WeakMap
+WeakSet 和 WeakMap 都是弱引用，对 `GC` 更加友好，**都不能遍历**。
+
+就默认创建了一个强引用的对象，只有手动将 obj = null，在没有引用的情况下它才会被垃圾回收机制进行回收，如果是弱引用对象，垃圾回收机制会自动帮我们回收，某些情况下性能更有优势，比如用来保存 DOM 节点，不容易造成内存泄漏。
+
 WeakMap 对象是一组键值对的集合，其中的键是弱引用对象，而值可以是任意。
 注意，WeakMap 弱引用的只是键名，而不是键值。键值依然是正常引用。
 
 WeakMap 中，每个键对自己所引用对象的引用都是弱引用，在没有其他引用和该键引用同一对象，这个对象将会被垃圾回收（相应的 key 则变成无效的），所以，WeakMap 的 key 是不可枚举的。
+
+键值对集合，只能用对象作为 key（null 除外），value 可以是任意的。方法只有 get、set、has、delete，看下用法。
+```js
+const wm1 = new WeakMap()
+
+const o1 = { name: 'hardingcheng' },
+      o2 = function(){},
+      o3 = window
+
+wm1.set(o1, 1) // { { name: 'hardingcheng' } : 1 } 这样的键值对
+wm1.set(o2, undefined)
+wm1.set(o1, o3); // value可以是任意值,包括一个对象或一个函数
+wm1.set(wm1, wm2); // 键和值可以是任意对象,甚至另外一个WeakMap对象
+
+wm1.get(o1); // 1 获取键值
+
+wm1.has(o1); // true  有这个键名
+wm1.has(o2); // true 即使值是undefined
+
+wm1.delete(o1);
+wm1.has(o1);   // false
+
+```
+#### Map 和 Object 不同点
+- Object 的键只支持 String 或者 Symbols 两种类型，Map 的键可以是任意值，包括函数、对象、基本类型
+- Map 中的键值是有序的，Object 中的键不是
+- Map 在频繁增删键值对的场景下有性能优势
+- 用 size 属性直接获取一个Map的键值对个数，Object 的键值对个数不能直接获取
 ### 可迭代接口怎么实现的？
 集合对象（数组、Set/Map 集合）和字符串都是可迭代对象，这些对象都有默认的迭代器和 Symbol.iterator 属性。
 迭代器的本身是一个对象，这个对象有 next( ) 方法返回结果对象，这个结果对象有下一个返回值 value、迭代完成布尔值 done。
@@ -3128,22 +3414,45 @@ console.log(sum);
 - 函数是"第一等公民"
   - 函数可以像其他数据类型一样操作，如赋值给其他变量、作为函数的入参、作为函数的返回值。
 - 纯函数
+  - **相同的输入永远得到相同的输出**，而且没有任何可观察的副作用。
+      - 纯函数就类似数学中的函数（用来描述输入和输出之间的关系），`y = f(x)`
   - 如果函数的调用参数相同, 则永远返回相同的结果. 它不依赖于程序执行期间函数 外部任何状态或数据的变化,只依赖于传入的参数。
   - 纯函数不会产生任何可观察的副作用, 例如: 网络请求, 输入/输出设备, 或数据突变(mutation)等。
   - **无状态**：函数的输出仅取决于输入，而不依赖外部状态；
+      - 函数式编程不会保留计算中间的结果，所有变量是不可变的（无状态的）
   - **无副作用**：不会造成超出其作用域的变化，即不修改 函数参数 或 全局变量 等。函数依赖外部状态就无法保证相同的输出，就会带来副作用。
   - **可缓存性**正是因为函数式声明的无状态特点，即：**相同输入总能得到相同的输出**。所以我们可以提前缓存函数的执行结果，实现更多功能。例如：优化斐波拉契数列的递归解法。
   - **可移植性/自文档化**纯函数的依赖很明确，更易于观察和理解，配合类型签名可以使程序更加简单易读。
   - **可测试性**纯函数让测试更加简单，只需简单地给函数一个输入，然后断言输出就可以了。
   - **并行处理**在多线程环境下并行操作共享的内存数据很可能会出现意外情况。纯函数（封闭的环境）不需要访问共享的内存数据，所以在并行环境下可以任意运行纯函数（Web Worker 可以开启新的线程)。
+  - 我们可以把一个函数的执行结果交给另一个函数去处理。
+```js
+// 可缓存
+function memoize(fn) {
+  let cache = {};
+  return function () {
+    let key = JSON.stringify(arguments);
+    cache[key] = cache[key] || fn.apply(fn, arguments);
+    return cache[key];
+  };
+}
+```
+
+
+
 - 函数副作用
+  - 副作用让一个函数变的不纯，纯函数的根据相同的输入返回相同的输出，如果函数依赖于外部状态就无法保证输出相同，就会带来副作用。
+  - 所有的外部交互都有可能代理副作用，副作用也使得方法通用性下降不适合扩展和可重用性，同时副作用会给程序中带来安全隐患给程序带来不确定性，但是副作用不可能完全禁止，尽可能控制它们在可控范围内发生。
   - 函数的副作用是指**在调用函数时，除了返回函数值外还产生了额外的影响**。
+  - 配置文件
+  - 数据库
   - 更改全局变量
   - 处理用户输入
   - 屏幕打印或打印 log 日志
   - DOM 查询以及浏览器 cookie、localstorage 查询
   - 发送 http 请求
   - 抛出异常，未被当前函数捕获
+
 ### 高阶函数
 #### 可以把函数作为参数传递给另一个函数
 ```js
@@ -3217,6 +3526,303 @@ let r = filter(array, (item) => {
 当一个方法执行时，每个方法都会建立自己的内存栈，在这个方法内定义的变量将会被逐个放入这块栈内存里，当方法执行结束，这个方法的内存栈也会被销毁。因此，所有在方法中定义的变量都存放在栈内存中。
 
 当在程序创建一个对象时，这个对象将被保存到运行时数据区中，以便反复利用（因为对象的创建成本通常较大），这个运行时数据区就是堆内存。堆内存中的对象不会随方法的结束而销毁，即使方法调用结束后，只要这个对象还可能被另一个变量所引用，则这个对象就不会被销毁；只有当一个对象没有被任何变量引用它时，系统的垃圾回收机制才会回收它。
+### 函子
+- 容器：包含值和值的边形关系（这个变形关系就是函数）
+- 函子：是一个特殊的容器，通过一个普通的对象来实现，该对象具有map方法，map方法可以运行一个函数对值进行处理（变形关系）
+#### Functor函子
+```js
+// 一个容器，包裹一个值
+class Container {
+  // of 静态方法，可以省略new关键字创建对象
+  static of(value) {
+    return new Container(value);
+  }
+
+  constructor(value) {
+    this._value = value;
+  }
+
+  // map方法，传入变形关系，将容器的每一个值映射到另一个容器
+  map(fn) {
+    return Container.of(fn(this._value));
+  }
+}
+
+// 测试
+Container.of(3)
+  .map((x) => x + 2)
+  .map((x) => x * x);
+```
+- 总结
+    - 函数式编程的运算不直接操作值，而是由函子完成
+    - 函子就是一个实现了map契约的对象
+    - 我们可以把函子现象一个盒子，这个盒子里封装了一个值
+    - 想要处理盒子中的值，我们需要给盒子的map方法传递一个处理值的函数（纯函数），由这个函数来对值进行处理
+    - 最终map方法返回一个包含新值的盒子（函子）
+- 在 Functor 中如果我们传入 null 或 undeﬁned
+```js
+// 值如果不小心传入了空值（副作用）
+Container.of(null).map((x) => x.toUpperCase());
+// TypeError: Cannot read properties of null (reading 'toUpperCase')
+```
+#### MayBe函子
+- 我们在编程的过程中可能会遇到很多错误，需要对这些错误做相应的处理
+- MayBe函子的作用就是可以对外部的空值情况做处理（控制副作用在允许的范围）
+```js
+// 一个容器，包裹一个值
+class MayBe {
+  // of 静态方法，可以省略new关键字创建对象
+  static of(value) {
+    return new MayBe(value);
+  }
+
+  constructor(value) {
+    this._value = value;
+  }
+
+  // 如果对空值变形的话直接返回 值为null的函子
+  map(fn) {
+    return this.isNothig() ? MayBe.of(null) : MayBe.of(fn(this._value));
+  }
+  isNothig() {
+    return this._value === null || this._value === undefined;
+  }
+}
+```
+- 在 MayBe 函子中，我们很难确认是哪一步产生的空值问题。
+```js
+MayBe.of("hello world")
+  .map((x) => x.toUpperCase())
+  .map((x) => null)
+  .map((x) => x.split(" "));
+// => MayBe { _value: null }
+```
+#### Either 函子
+- Either 两者中的任何一个，类似于 if...else...的处理
+- 异常会让函数变的不纯，Either 函子可以用来做异常处理
+```js
+// Either 函子
+class Left {
+  static of (value) {
+    return new Left(value)
+  }
+  constructor (value) {
+    this._value = value
+  }
+  map (fn) {
+    return this
+  }
+}
+
+class Right {
+  static of (value) {
+    return new Right(value)
+  }
+  constructor (value) {
+    this._value = value
+  }
+  map (fn) {
+    return Right.of(fn(this._value))
+  }
+}
+// let r1 = Right.of(12).map(x => x + 2)
+// let r2 = Left.of(12).map(x => x + 2)
+// console.log(r1)
+// console.log(r2)
+
+function parseJSON (str) {
+  try {
+    return Right.of(JSON.parse(str))
+  } catch (e) {
+    return Left.of({ error: e.message })
+  }
+}
+
+// let r = parseJSON('{ name: zs }')
+// console.log(r)
+
+let r = parseJSON('{ "name": "zs" }')
+          .map(x => x.name.toUpperCase())
+console.log(r)
+```
+#### IO 函子
+- IO 函子中的 _value 是一个函数，这里是把函数作为值来处理
+- IO 函子可以把不纯的动作存储到 _value 中，延迟执行这个不纯的操作(惰性执行)，包装当前的操作纯
+- 把不纯的操作交给调用者来处理
+```js
+// IO 函子
+const fp = require("lodash/fp");
+
+class IO {
+  static of(value) {
+    return new IO(function () {
+      return value;
+    });
+  }
+
+  constructor(fn) {
+    this._value = fn;
+  }
+
+  map(fn) {
+    return new IO(fp.flowRight(fn, this._value));
+  }
+}
+
+// 调用
+let r = IO.of(process).map((p) => p.execPath);
+// console.log(r)
+console.log(r._value());
+```
+#### Task 异步执行
+- 异步任务的实现过于复杂，我们使用 folktale 中的 Task 来演示
+- folktale 一个标准的函数式编程库
+    - 和 lodash、ramda 不同的是，他没有提供很多功能函数
+    - 只提供了一些函数式处理的操作，例如：compose、curry 等，一些函子 Task、Either、MayBe 等
+```js
+// folktale 中的 compose、curry
+const { compose, curry } = require('folktale/core/lambda')
+const { toUpper, first } = require('lodash/fp')
+// let f = curry(2, (x, y) => {
+//   return x + y
+// })
+
+// console.log(f(1, 2))
+// console.log(f(1)(2))
+
+
+let f = compose(toUpper, first)
+console.log(f(['one', 'two'])
+```
+- Task 异步执行
+    - folktale(2.3.2) 2.x 中的 Task 和 1.0 中的 Task 区别很大，1.0 中的用法更接近我们现在演示的函子
+```js
+// Task 处理异步任务
+const fs = require('fs')
+const { task } = require('folktale/concurrency/task')
+const { split, find } = require('lodash/fp')
+
+function readFile (filename) {
+  return task(resolver => {
+    fs.readFile(filename, 'utf-8', (err, data) => {
+      if (err) resolver.reject(err)
+
+      resolver.resolve(data)
+    })
+  })
+}
+
+readFile('package.json')
+  .map(split('\n'))
+  .map(find(x => x.includes('version')))
+  .run()
+  .listen({
+    onRejected: err => {
+      console.log(err)
+    },
+    onResolved: value => {
+      console.log(value)
+    }
+  })
+```
+#### Pointed 函子
+- Pointed 函子是实现了 of 静态方法的函子
+- of 方法是为了避免使用 new 来创建对象，更深层的含义是 of 方法用来把值放到上下文 Context（把值放到容器中，使用 map 来处理值）
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220106202105.png)
+#### Monad(单子)
+```js
+// IO 函子的问题
+const fs = require("fs");
+const fp = require("lodash/fp");
+
+class IO {
+  // 产生副作用的延迟执行
+  static of(value) {
+    return new IO(function () {
+      return value;
+    });
+  }
+
+  constructor(fn) {
+    this._value = fn;
+  }
+
+  map(fn) {
+    return new IO(fp.flowRight(fn, this._value));
+  }
+}
+
+let readFile = function (filename) {
+  return new IO(function () {
+    return fs.readFileSync(filename, "utf-8");
+  });
+};
+
+let print = function (x) {
+  return new IO(function () {
+    console.log(x);
+    return x;
+  });
+};
+
+let cat = fp.flowRight(print, readFile);
+// IO(IO(x))
+// 产生嵌套问题
+let r = cat("package.json")._value()._value();
+console.log(r);
+```
+- Monad 函子是可以变扁的 Pointed 函子，IO(IO(x))
+- 一个函子如果具有 join 和 of 两个方法并遵守一些定律就是一个 Monad
+```js
+// IO Monad
+const fs = require("fs");
+const fp = require("lodash/fp");
+
+class IO {
+  static of(value) {
+    return new IO(function () {
+      return value;
+    });
+  }
+
+  constructor(fn) {
+    this._value = fn;
+  }
+
+  map(fn) {
+    return new IO(fp.flowRight(fn, this._value));
+  }
+
+  join() {
+    return this._value();
+  }
+
+  flatMap(fn) {
+    return this.map(fn).join();
+  }
+}
+
+let readFile = function (filename) {
+  return new IO(function () {
+    return fs.readFileSync(filename, "utf-8");
+  });
+};
+
+let print = function (x) {
+  return new IO(function () {
+    console.log(x);
+    return x;
+  });
+};
+
+let r = readFile("package.json")
+  // .map(x => x.toUpperCase())
+  .map(fp.toUpper)
+  .flatMap(print)
+  .join();
+
+console.log(r);
+```
 ### JS垃圾回收机制
 每隔一段时间， JS 的垃圾收集器都会对变量进行“巡逻”，就和保安巡逻园区一样，让不相干的人赶紧走。当一个变量不被需要了以后，它就会把这个变量所占用的内存空间所释放，这个过程就叫做垃圾回收。
 
@@ -3266,6 +3872,48 @@ function changeName() {
 changeName();
 ```
 在函数执行完毕之后，函数的声明周期结束，那么现在，从 Window 对象 出发， obj1 和 obj2 都会被垃圾收集器标记为不可抵达，这样子的情况下，互相引用的情况也会迎刃而解。
+### 垃圾回收2
+V8实现了GC算法，采用了分代式垃圾回收机制，所以V8将堆内存分为`新生代`(副垃圾回收器)和`老生代`(主垃圾回收器)两个部分。
+#### 新生代
+新生代中通常只支持1~8M的容量，所以主要**存放生存时间较短的对象**。
+新生代中使用`Scavenge GC`算法，将新生代空间分为两个区域：对象区域和空闲区域。如图：
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220106092129.png)
+
+顾名思义，就是说这两块空间只使用一个，另一个是空闲的。工作流程是这样的:
+- 将新分配的对象存入对象区域中，当对象区域存满了，就会启动GC算法
+- 对对象区域内的垃圾做标记，标记完成之后将对象区域中还存活的对象复制到空闲区域中，已经不用的对象就销毁。这个过程不会留下内存碎片
+- 复制完成后，再将对象区域和空闲互换。既回收了垃圾也能让新生代中这两块区域无限重复使用下去
+
+正因为新生代中空间不大，所以就容易出现被塞满的情况，所以
+- **经历过两次垃圾回收依然还存活的对象会被移到老生代空间中**
+- **如果空闲空间对象的占比超过25%，为了不影响内存分配，就会将对象转移到老生代空间**
+#### 老生代
+老生代特点就是**占用空间大**，所以**主要存放存活时间长的对象**。
+
+老生代中使用`标记清除算法`和`标记压缩算法`。因为如果也采用`Scavenge GC`算法的话，复制大对象就比较花时间了。
+
+**标记清除：**
+在以下情况下会先启动标记清除算法：
+- 某一个空间没有分块的时候
+- 对象太多超过空间容量一定限制的时候
+- 空间不能保证新生代中的对象转移到老生代中的时候
+标记清除的流程是这样的：
+- 从根部(js的全局对象)出发，遍历堆中所有对象，然后标记存活的对象
+- 标记完成后，销毁没有被标记的对象
+由于垃圾回收阶段，会暂停JS脚本执行，等垃圾回收完毕后再恢复JS执行，这种行为称为`全停顿(stop-the-world)`。
+比如堆中数据超过1G，那一次完整的垃圾回收可能需要1秒以上，这期间是会暂停JS线程执行的，这就导致页面性能和响应能力下降
+
+
+**增量标记：**
+所以在2011年，V8从 stop-the-world 标记切换到`增量标记`。使用增量标记算法，GC 可以将回收任务分解成很多小任务，穿插在JS任务中间执行，这样避免了应用出现卡顿的情况。
+
+
+**并发标记：**
+然后在2018年，GC 技术又有重大突破，就是`并发标记`。**让 GC 扫描和标记对象时，允许JS同时运行**。
+
+
+**标记压缩：**
+清除后会造成堆内存出现内存碎片的情况，当碎片超过一定限制后会启动`标记压缩算法`，将存活的对象向堆中的一端移动，到所有对象移动完成，就清理掉不需要的内存。
 ### 内存泄漏
 该释放的内存垃圾没有被释放，依然霸占着原有的内存不松手，造成系统内存的浪费，导致性能恶化，系统崩溃等严重后果，这就是所谓的内存泄漏。那当不再用到的对象内存，没有及时被回收时，我们叫它 内存泄漏（Memory leak）。
 ### 哪些可能造成内存泄漏？
@@ -3501,7 +4149,117 @@ obj = null;
 
 频繁 GC 同这个名字，就是 GC 执行的特别频繁，一般出现在频繁使用大的临时变量导致新生代空间被装满的速度极快，而每次新生代装满时就会触发 GC，频繁 GC 同样会导致页面卡顿，想要避免的话就不要搞太多的临时变量，因为临时变量不用了就会被回收，这和我们内存泄漏中说避免使用全局变量冲突，其实，只要把握好其中的度，不太过分就 OK。
 ### Promise
+Promise 中只有涉及到`状态变更`s后才需要被执行的回调才算是`微任务`，比如说 `then、 catch 、finally` ，其他所有的代码执行都是`宏任务`（同步执行）。
 
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220107100540.png)
+
+1. 链式调用中，只有前一个 then 的回调执行完毕后，跟着的 then 中的回调才会被加入至微任务队列。
+```js
+Promise.resolve()
+  .then(() => {
+    console.log("then1");
+    Promise.resolve().then(() => {
+      console.log("then1-1");
+    });
+  })
+  .then(() => {
+    console.log("then2");
+  });
+// then1
+// then1-1
+// then2
+```
+2.  Promise resolve 后，跟着的 then 中的回调会马上进入微任务队列。同一个 Promise 的每个链式调用的开端会首先依次进入微任务队列。
+```js
+let p = Promise.resolve();
+
+p.then(() => {
+  console.log("then1");
+  Promise.resolve().then(() => {
+    console.log("then1-1");
+  });
+}).then(() => {
+  console.log("then1-2");
+});
+
+p.then(() => {
+  console.log("then2");
+}); 
+
+// then1
+// then1-1
+// then2
+// then3
+```
+```js
+Promise.resolve()
+  .then(() => {
+    console.log("then1");
+    Promise.resolve()
+      .then(() => {
+        console.log("then1-1");
+        return 1;
+      })
+      .then(() => {
+        console.log("then1-2");
+      });
+  })
+  .then(() => {
+    console.log("then2");
+  })
+  .then(() => {
+    console.log("then3");
+  })
+  .then(() => {
+    console.log("then4");
+  });
+
+// then1
+// then1-1
+// then2
+// then1-2
+// then3
+// then4
+
+
+// 第一次 resolve 后第一个 then 的回调进入微任务队列并执行，打印 then1
+// 第二次 resolve 后内部第一个 then 的回调进入微任务队列，此时外部第一个 then 的回调全部执行完毕，需要将外部的第二个 then 回调也插入微任务队列。
+// 执行微任务，打印 then1-1 和 then2，然后分别再将之后 then 中的回调插入微任务队列
+// 执行微任务，打印 then1-2 和 then3 ，之后的内容就不一一说明了
+```
+```js
+Promise.resolve()
+  .then(() => {
+    console.log("then1");
+    Promise.resolve()
+      .then(() => {
+        console.log("then1-1");
+        return Promise.resolve(); // 返回这个会产生2次微任务
+        // 当 Promise resolve 了一个 Promise 时，会产生一个 Promise Jobs 中的一种，也就是微任务。
+        // 并且该 Jobs 还会调用一次 then 函数来 resolve Promise，这也就又生成了一次微任务。
+      })
+      .then(() => {
+        console.log("then1-2");
+      });
+  })
+  .then(() => {
+    console.log("then2");
+  })
+  .then(() => {
+    console.log("then3");
+  })
+  .then(() => {
+    console.log("then4");
+  });
+
+
+// then1
+// then1-1
+// then2
+// then3
+// then4
+// then1-2
+```
 #### Promise 初介绍
 在传统的异步编程中，如果异步之间存在依赖关系，我们就需要通过层层嵌套回调来满足这种依赖，如果嵌套层数过多，可读性和可维护性都变得很差，产生所谓“回调地狱”，而 Promise 将回调嵌套改为链式调用，增加可读性和可维护性。
 - 回调地狱
@@ -3525,6 +4283,7 @@ new Promise(请求1)
   .catch(处理异常(异常信息));
 ```
 - Promise 的写法更为直观，并且能够在外层捕获异步函数的异常信息。
+  - Promise 构造函数是同步执行的，then 方法是异步执行的(微任务)
   - Promise 对象的 then 方法会返回一个全新的 Promise 对象
   - 后面的 then 方法就是在为上ー个 then 返回的 Promise 注册回调
   - 前面 then 方法中回调函数的返回值会作为后面 then 方法回调的参数
@@ -3928,6 +4687,11 @@ function resolvePromise(promise2, x, resolve, reject) {
 - 概念：
   - Promise 是异步编程的一种解决方案，主要是为了解决"回调地狱"问题，有三种状态（pending/fulfilled/rejected)，对象状态不受外界影响，一旦状态改变就不会变化。
   - async/await 也是异步编程的一种解决方案，基于 Promise 实现的，返回的是一个 Promise 对象。
+      - async/await 是 ES7 引入的重大改进的地方，可以在不阻塞主线程的情况下，使用同步代码实现异步访问资源的能力，让我们的代码逻辑更清晰
+      - async/await 本质上就是 Promise，只不过她可以在不阻塞主线程的情况下，使用同步代码实现异步访问。
+      - async：就是异步执行和隐式返回Promise
+      - await：返回的就是一个Promise对象
+      - 缺点是 await 会阻塞代码，要是她之后的异步代码不依赖她的结果，也还是要等她完成，失去了并发性，这时候就建议用 Promise.all
 - 区别：
   - promise.then 属于微任务，会放到相应宏任务的微任务队列里，等宏任务里面的同步代码执行完再执行；
   - async 函数返回一个 Promise 对象，可以使用 then 方法添加回调函数。async 函数表示函数里面可能会有异步方法，await 后面跟一个表达式。当 async 函数执行的时候，一旦遇到 await 就会先返回，遇到 await 会立即执行表达式，然后把表达式后面的代码放到微任务队列里，等到异步操作完成，再接着执行函数体内后面的语句。
@@ -4549,9 +5313,27 @@ JS 如果执行时间过长就会阻塞页面。
     - Async/Await
 ### EventLoop即事件循环
 Event Loop 即事件循环，是指浏览器或 Node 的一种解决 javaScript 单线程运行时不会阻塞的一种机制，也就是我们经常使用异步的原理。
+
+事件循环：一句话概括就是入栈到出栈的循环。即：一个宏任务，所有微任务，渲染，一个宏任务，所有微任务，渲染.....
+
+**循环过程：**
+1. 所有同步任务都在主线程上依次执行，形成一个执行栈(调用栈)，异步任务处理完后则放入一个任务队列。
+2. 当执行栈中任务执行完，再去检查微任务队列里的微任务是否为空，有就执行，如果执行微任务过程中又遇到微任务，就添加到微任务队列末尾继续执行，把微任务全部执行完。
+3. 微任务执行完后，再到任务队列检查宏任务是否为空，有就取出最先进入队列的宏任务压入执行栈中执行其同步代码。
+4. 然后回到第2步执行该宏任务中的微任务，如此反复，直到宏任务也执行完，如此循环。
+
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210926210917.png)
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211022171914.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220106093619.png)
+
+**同步和异步**
+我们知道了浏览器页面是由任务队列和事件循环系统来驱动的，但是队列要一个一个执行，如果某个任务(http请求)是个耗时任务，那浏览器总不能一直卡着，所以为了防止主线程阻塞，JavaScript 又分为同步任务和异步任务。
+*同步任务*：就是任务一个一个执行，如果某个任务执行时间过长，后面的就只能一直等下去。
+*异步任务*：就是进程在执行某个任务时，该任务需要等一段时间才能返回，这时候就把这个任务放到专门处理异步任务的模块，然后继续往下执行，不会因为这个任务而阻塞。
+也就是说，除了任务队列，还有一个专门处理需要延迟执行的模块(延迟哈希表)。常见的异步任务：定时器、ajax、事件绑定、回调函数、async await、promise。
+
 
 **Event Loop 是 javascript 的执行机制：**
 - 最简单的 JS 运行机制：
@@ -4570,9 +5352,17 @@ Event Loop 即事件循环，是指浏览器或 Node 的一种解决 javaScript 
 **宏任务和微任务**:
 **主线程任务——>微任务——>宏任务**（如果宏任务里还有微任就继续执行宏任务里的微任务，如果宏任务中的微任务中还有宏任务就在依次进行）
 **主线程任务——>微任务——>宏任务——>宏任务里的微任务——>宏任务里的微任务中的宏任务——>直到任务全部完成**
+有微任务队列，自然就有宏任务队列，任务队列中的每一个任务则都称为宏任务，在当前宏任务执行过程中，如果有新的微任务产生，就添加到微任务队列中。
+**当前宏任务里的微任务全部执行完，才会执行下一个宏任务**。
+- macrotask（又称之为宏任务），可以理解是每次执行栈执行的代码就是一个宏任务（包括每次从事件队列中获取一个事件回调并放到执行栈中执行） 
+    - 每一个 task 会从头到尾将这个任务执行完毕，不会执行其它 
+    - 浏览器为了能够使得 JS 内部 task 与 DOM 任务能够有序的执行，会在一个 task 执行结束后，在下一个 task 执行开始前，对页面进行重新渲染
+- microtask（又称为微任务），可以理解是在当前 task 执行结束后立即执行的任务 
+    - 也就是说，在当前 task 任务后，下一个 task 之前，在渲染之前 
+    - 所以它的响应速度相比 setTimeout（setTimeout 是 task）会更快，因为无需等渲染 
+    - 微任务会全部执行，而宏任务会一个一个来执行 
+    - 也就是说，在某一个 macrotask 执行完后，就会将在它执行期间产生的所有 microtask 都执行完毕（在渲染前）
 
-- macrotask（又称之为宏任务），可以理解是每次执行栈执行的代码就是一个宏任务（包括每次从事件队列中获取一个事件回调并放到执行栈中执行） - 每一个 task 会从头到尾将这个任务执行完毕，不会执行其它 - 浏览器为了能够使得 JS 内部 task 与 DOM 任务能够有序的执行，会在一个 task 执行结束后，在下一个 task 执行开始前，对页面进行重新渲染
-- microtask（又称为微任务），可以理解是在当前 task 执行结束后立即执行的任务 - 也就是说，在当前 task 任务后，下一个 task 之前，在渲染之前 - 所以它的响应速度相比 setTimeout（setTimeout 是 task）会更快，因为无需等渲染 - 微任务会全部执行，而宏任务会一个一个来执行 - 也就是说，在某一个 macrotask 执行完后，就会将在它执行期间产生的所有 microtask 都执行完毕（在渲染前）
 - 浏览器中的任务源(task):
   - 宏任务(macrotask)：
     - 宿主环境提供的，比如浏览器
@@ -4590,6 +5380,7 @@ Event Loop 即事件循环，是指浏览器或 Node 的一种解决 javaScript 
     - Node 中 fs 可以进行异步 I/O 操作
   - 微任务(microtask)：
     - Promise（async/await
+        -  promise回调
     - queueMicrotask
     - mutationObserver(浏览器提供)
     - process.nexTick（Node 独有的）
@@ -4640,6 +5431,108 @@ console.log('10');
 执行栈在执行完同步任务后，查看执行栈是否为空，如果执行栈为空，就会去检查微任务(microTask)队列是否为空，如果为空的话，就执行 macrotask（宏任务），否则就一次性执行完所有微任务。
 
 每次单个宏任务执行完毕后，检查微任务(microTask)队列是否为空，如果不为空的话，会按照先入先出的规则全部执行完微任务(microTask)后，设置微任务(microTask)队列为 null，然后再执行宏任务，如此循环。
+#### 练习
+```js
+<script>
+    setTimeout(function () {
+        console.log('setTimeout')
+    }, 0)
+    new Promise(function (resolve) {
+        console.log('promise1')
+        for( let i = 0; i < 1000; i++ ) {
+            i === 999 && resolve()
+        }
+        console.log('promise2')
+    }).then(function ()  {
+        console.log('promise3')
+    })
+    console.log('script')
+</script>
+
+// script 是宏任务，先执行它里面的微任务
+// 遇到宏任务setTimeout放到异步处理模块(延迟哈希表)
+// 继续执行promise，打印promise1
+// 遇到循环，执行，遇到回调 resolve()，上面说了回调属于微任务，放到微任务队列
+// 继续执行，打印 promise2
+// 继续执行，打印 script
+// 执行栈的任务执行完了，去微任务列队里拿
+// 有一个 then 回调，执行，打印 promise3
+// 微任务都执行完了，去任务队列拿下一个宏任务
+// 执行 setTimeout，打印 setTimeout
+```
+```js
+async function fun() {
+    console.log(1)
+    let a = await 2
+    console.log(a)
+    console.log(3)
+}
+console.log(4)
+fun()
+console.log(5)
+
+
+function fun(){
+    return new Promise(() => {
+        console.log(1)
+        Promise.resolve(2).then( a => {
+            console.log(a)
+            console.log(3)
+        })
+    })
+}
+console.log(4)
+fun()
+console.log(5)
+// 4 1 5 2 3
+// 上面说了，回调是微任务，所以直接扔到微任务队列等着，这题里自然就是最后执行，是不是好理解一点了
+```
+```js
+function bar () {
+    console.log(2)
+}
+async function fun() {
+    console.log(1)
+    await bar()
+    console.log(3)
+}
+console.log(4)
+fun()
+console.log(5)
+
+// 4 1 2 5 3
+// 因为await的意思就是等，等await后面的执行完。所以"await bar()"，是从右向左执行，执行完bar()，然后遇到await，返回一个微任务(哪怕这任务里没东西)，放到微任务队列让出主线程。
+// 上面说了 async/await 就是把异步以同步的形式实现，同步就是一步一步一行一行来嘛，await在微任务队列里都没回来，那在await下面的自然不能执行，导致 3 最后打印
+```
+```js
+async function async1() {
+  console.log("async1 start");
+  await async2();
+  console.log("async1 end");
+}
+
+async function async2() {
+  console.log("async2");
+}
+
+console.log("script start");
+
+setTimeout(function () {
+  console.log("setTimeout");
+}, 0);
+
+async1();
+
+new Promise(function (resolve) {
+  console.log("promise1");
+  resolve();
+}).then(function () {
+  console.log("promise2");
+});
+
+console.log("script end");
+// script start -> async1 start -> async2 -> promise1 -> script end -> async1 end -> promise2 -> setTimeout
+```
 ### DOM 渲染的时机
 - JS 是单线程的，而且和 DOM 渲染共用一个线程
 - JS 执行的时候，得留一-些时机供 DOM 渲染
