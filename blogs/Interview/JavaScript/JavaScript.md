@@ -2651,7 +2651,7 @@ Reflect.ownKeys(myClass.prototype);
 ```
 ### ES6知识点
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210921221425.png)
-####  let 和 const
+#### let 和 const
 ```js
 // let 声明的成员只会在所声明的块中生效 -------------------------------------------
 if (true) {
@@ -2739,6 +2739,556 @@ var foo = "zce";
 
 console.log(foo);
 let foo = "zce";
+```
+```js
+const name = "zce";
+// 恒量声明过后不允许重新赋值
+// TypeError: Assignment to constant variable.
+name = "jack";
+
+// 恒量要求声明同时赋值
+// SyntaxError: Missing initializer in const declaration
+const name
+name = 'zce'
+
+// 恒量只是要求内层指向不允许被修改
+const obj = {}
+// 对于数据成员的修改是没有问题的
+obj.name = 'zce'
+
+obj = {}s
+```
+#### 数组解构
+```js
+// 数组的解构
+
+const arr = [100, 200, 300];
+
+// const foo = arr[0]
+// const bar = arr[1]
+// const baz = arr[2]
+// console.log(foo, bar, baz)
+
+const [foo, bar, baz] = arr;
+console.log(foo, bar, baz);
+
+const [, , baz] = arr;
+console.log(baz);
+
+// 最后一个才可以使用这样...rest
+const [foo, ...rest] = arr;
+console.log(rest);
+
+const [foo, bar, baz, more] = arr;
+console.log(more); //undefined
+
+// 默认值
+const [foo, bar, baz = 123, more = "default value"] = arr;
+console.log(bar, more);
+
+const path = "/foo/bar/baz";
+// const tmp = path.split('/')
+// const rootdir = tmp[1]
+
+const [, rootdir] = path.split("/");
+console.log(rootdir);
+```
+#### 对象解构
+```js
+// 对象的解构
+const obj = { name: "zce", age: 18 };
+
+const { name } = obj;
+console.log(name);
+
+// const name = 'tom'
+const { name: objName } = obj;
+console.log(objName);
+
+// const name = 'tom'
+const { name: objName = "jack" } = obj;
+console.log(objName);
+
+const { log } = console;
+log("foo");
+log("bar");
+log("123");
+```
+#### 模板字符串
+```js
+// 模板字符串
+
+// 反引号包裹
+const str = `hello es2015, this is a string`;
+
+// 允许换行
+const str = `hello es2015,
+this is a \`string\``;
+console.log(str);
+
+const name = "tom";
+// 可以通过 ${} 插入表达式，表达式的执行结果将会输出到对应位置
+const msg = `hey, ${name} --- ${1 + 2} ---- ${Math.random()}`;
+console.log(msg);
+```
+#### 带标签的模板字符串
+```js
+// 带标签的模板字符串
+
+// 模板字符串的标签就是一个特殊的函数，
+// 使用这个标签就是调用这个函数
+// const str = console.log`hello world`
+
+const name = "tom";
+const gender = false;
+
+// 定义的标签函数
+function myTagFunc(strings, name, gender) {
+  // console.log(strings, name, gender)
+  // return '123'
+  const sex = gender ? "man" : "woman";
+  return strings[0] + name + strings[1] + sex + strings[2];
+}
+// 使用标签函数
+const result = myTagFunc`hey, ${name} is a ${gender}.`;
+
+console.log(result);
+```
+#### 字符串扩展方法
+```js
+// 字符串的扩展方法
+
+const message = "Error: foo is not defined.";
+
+console.log(
+  message.startsWith("Error"),
+  message.endsWith("."),
+  message.includes("foo")
+);
+```
+#### 函数参数的默认值
+```js
+// 函数参数的默认值
+
+function foo(enable) {
+  // 短路运算很多情况下是不适合判断默认参数的，例如 0 '' false null
+  // enable = enable || true
+  enable = enable === undefined ? true : enable;
+  console.log("foo invoked - enable: ");
+  console.log(enable);
+}
+
+// 默认参数一定是在形参列表的最后
+function foo(enable = true) {
+  console.log("foo invoked - enable: ");
+  console.log(enable);
+}
+
+foo(false);
+```
+#### 剩余参数（rest）
+```js
+// 剩余参数
+
+function foo() {
+  console.log(arguments);
+}
+
+function foo(first, ...args) {
+  console.log(args);
+}
+
+foo(1, 2, 3, 4);
+```
+#### 展开数组（spread）
+```js
+// 展开数组参数
+
+const arr = ['foo', 'bar', 'baz']
+
+// console.log(
+//   arr[0],
+//   arr[1],
+//   arr[2],
+// )
+console.log.apply(console, arr)
+
+console.log(...arr)
+```
+#### 箭头函数
+```js
+// 箭头函数
+
+// function inc (number) {
+//   return number + 1
+// }
+
+// 最简方式
+// const inc = n => n + 1
+
+// 完整参数列表，函数体多条语句，返回值仍需 return
+const inc = (n, m) => {
+  console.log("inc invoked");
+  return n + 1;
+};
+
+console.log(inc(100));
+
+const arr = [1, 2, 3, 4, 5, 6, 7];
+
+// arr.filter(function (item) {
+//   return item % 2
+// })
+
+// 常用场景，回调函数
+arr.filter((i) => i % 2);
+```
+#### 箭头函数与 this
+```js
+// 箭头函数与 this
+// 箭头函数不会改变 this 指向
+
+const person = {
+  name: "tom",
+  // sayHi: function () {
+  //   console.log(`hi, my name is ${this.name}`)
+  // }
+  sayHi: () => {
+    // undefined
+    console.log(`hi, my name is ${this.name}`);
+  },
+  sayHiAsync: function () {
+    setTimeout(function () {
+      // undefined
+      console.log(this.name);
+    }, 1000);
+
+    // const _this = this
+    // setTimeout(function () {
+    //   console.log(_this.name)
+    // }, 1000)
+
+    console.log(this);
+    setTimeout(() => {
+      // console.log(this.name)
+      console.log(this);
+    }, 1000);
+  },
+};
+
+person.sayHiAsync();
+```
+#### 对象字面量增强
+```js// 对象字面量
+
+const bar = "345";
+
+const obj = {
+  foo: 123,
+  // bar: bar
+  // 属性名与变量名相同，可以省略 : bar
+  bar,
+  // method1: function () {
+  //   console.log('method111')
+  // }
+  // 方法可以省略 : function
+  method1() {
+    console.log("method111");
+    // 这种方法就是普通的函数，同样影响 this 指向。
+    console.log(this);
+  },
+  // Math.random(): 123 // 不允许
+  // 通过 [] 让表达式的结果作为属性名
+  [bar]: 123,
+};
+
+// obj[Math.random()] = 123
+
+console.log(obj);
+obj.method1();
+```
+#### 对象扩展方法（Object.assign）
+将多个源对象中的属性复制到一个目标对象中。相同属性会发生覆盖。
+```js
+// Object.assign 方法
+
+const source1 = {
+  a: 123,
+  b: 123,
+};
+
+const source2 = {
+  b: 789,
+  d: 789,
+};
+
+const target = {
+  a: 456,
+  c: 456,
+};
+
+const result = Object.assign(target, source1, source2);
+
+console.log(target);
+console.log(result === target);
+
+// 应用场景
+
+function func(obj) {
+  // obj.name = 'func obj'
+  // console.log(obj)
+
+  // 复制一个对象，不产生副作用
+  const funcObj = Object.assign({}, obj);
+  funcObj.name = "func obj";
+  console.log(funcObj);
+}
+
+const obj = { name: "global obj" };
+
+func(obj);
+console.log(obj);
+```
+#### 对象扩展方法（Object.is）
+判断两个值是否相等。
+```js
+// Object.is
+console.log(
+  // 0 == false              // => true
+  // 0 === false             // => false
+  // +0 === -0               // => true
+  // NaN === NaN             // => false
+  // Object.is(+0, -0)       // => false
+  // Object.is(NaN, NaN)     // => true
+)
+```
+#### Proxy
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220109142050.png)
+
+```js
+// Proxy 对象
+// 代理  =   门卫
+
+const person = {
+  name: "zce",
+  age: 20,
+};
+
+const personProxy = new Proxy(person, {
+  // 监视属性读取
+  get(target, property) {
+    return property in target ? target[property] : "default";
+    // console.log(target, property)
+    // return 100
+  },
+  // 监视属性设置
+  set(target, property, value) {
+    if (property === "age") {
+      if (!Number.isInteger(value)) {
+        throw new TypeError(`${value} is not an int`);
+      }
+    }
+
+    target[property] = value;
+    // console.log(target, property, value)
+  },
+});
+personProxy.age = 100;
+personProxy.gender = true;
+console.log(personProxy.name);
+console.log(personProxy.xxx);
+
+// Proxy 对比 Object.defineProperty()
+// 优势1：Proxy 可以监视读写以外的操作 --------------------------
+const person = {
+  name: "zce",
+  age: 20,
+};
+const personProxy = new Proxy(person, {
+  deleteProperty(target, property) {
+    console.log("delete", property);
+    delete target[property];
+  },
+});
+delete personProxy.age;
+console.log(person);
+
+// 优势2：Proxy 可以很方便的监视数组操作 --------------------------
+const list = [];
+const listProxy = new Proxy(list, {
+  set(target, property, value) {
+    console.log("set", property, value);
+    target[property] = value;
+    return true; // 表示设置成功
+  },
+});
+listProxy.push(100);
+listProxy.push(100);
+
+// 优势3：Proxy 不需要侵入对象 --------------------------
+const person = {};
+
+Object.defineProperty(person, "name", {
+  get() {
+    console.log("name 被访问");
+    return person._name;
+  },
+  set(value) {
+    console.log("name 被设置");
+    person._name = value;
+  },
+});
+Object.defineProperty(person, "age", {
+  get() {
+    console.log("age 被访问");
+    return person._age;
+  },
+  set(value) {
+    console.log("age 被设置");
+    person._age = value;
+  },
+});
+
+person.name = "jack";
+
+console.log(person.name);
+
+// Proxy 方式更为合理
+const person2 = {
+  name: "zce",
+  age: 20,
+};
+
+const personProxy = new Proxy(person2, {
+  get(target, property) {
+    console.log("get", property);
+    return target[property];
+  },
+  set(target, property, value) {
+    console.log("set", property, value);
+    target[property] = value;
+  },
+});
+
+personProxy.name = "jack";
+
+console.log(personProxy.name);
+```
+#### Reflect
+Reflect么内部封装了一系列对对象的底层操作。统一操作对象的API。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220109143643.png)
+
+```js
+// Reflect 对象
+
+const obj = {
+  foo: "123",
+  bar: "456",
+};
+
+const proxy = new Proxy(obj, {
+  get(target, property) {
+    console.log("watch logic~");
+    // 默认就是这种逻辑
+    return Reflect.get(target, property);
+  },
+});
+
+console.log(proxy.foo);
+
+const obj = {
+  name: "zce",
+  age: 18,
+};
+
+console.log("name" in obj);
+console.log(delete obj["age"]);
+console.log(Object.keys(obj));
+// -------下面这种多舒服
+console.log(Reflect.has(obj, "name"));
+console.log(Reflect.deleteProperty(obj, "age"));
+console.log(Reflect.ownKeys(obj));
+```
+#### Promise
+解决了传统异步编程中回调函数嵌套过深的问题 。
+#### class类
+```js
+// class 关键词
+
+// ES5
+function Person(name) {
+  this.name = name;
+}
+
+Person.prototype.say = function () {
+  console.log(`hi, my name is ${this.name}`);
+};
+
+// ES6
+class Person {
+  constructor(name) {
+    this.name = name;
+  }
+
+  say() {
+    console.log(`hi, my name is ${this.name}`);
+  }
+}
+
+const p = new Person("tom");
+p.say();
+```
+```js
+// 静态方法
+// static 方法
+
+class Person {
+  constructor (name) {
+    this.name = name
+  }
+
+  say () {
+    console.log(`hi, my name is ${this.name}`)
+  }
+
+  static create (name) {
+    return new Person(name)
+  }
+}
+
+const tom = Person.create('tom')
+tom.say()
+
+```
+```js
+// 继承
+// extends 继承
+
+class Person {
+  constructor (name) {
+    this.name = name
+  }
+
+  say () {
+    console.log(`hi, my name is ${this.name}`)
+  }
+}
+
+class Student extends Person {
+  constructor (name, number) {
+    super(name) // 父类构造函数
+    this.number = number
+  }
+
+  hello () {
+    super.say() // 调用父类成员
+    console.log(`my school number is ${this.number}`)
+  }
+}
+
+const s = new Student('jack', '100')
+s.hello()
+
 ```
 #### Set 数据结构
 概念：Set 是 ES6 新增的数据结构。集合的概念是一组无序且唯一（即不重复）的项组成。set 数据结构使用了与有限集合相同的数学概念，应用在计算机的数据结构中，与数组类似，但成员都是唯一的，没有重复的值。
@@ -2861,6 +3411,443 @@ wm1.has(o1);   // false
 - Map 中的键值是有序的，Object 中的键不是
 - Map 在频繁增删键值对的场景下有性能优势
 - 用 size 属性直接获取一个Map的键值对个数，Object 的键值对个数不能直接获取
+#### Symbol
+```js
+// Symbol 数据类型
+
+// 场景1：扩展对象，属性名冲突问题
+
+// shared.js ====================================
+// const cache = {}
+// a.js =========================================
+// cache['a_foo'] = Math.random()
+// b.js =========================================
+// cache['b_foo'] = '123'
+// console.log(cache)
+// =========================================================
+
+// const s = Symbol()
+// console.log(s)
+// console.log(typeof s)
+
+// 两个 Symbol 永远不会相等
+
+// console.log(
+//   Symbol() === Symbol()
+// )
+
+// Symbol 描述文本
+console.log(Symbol("foo"));
+console.log(Symbol("bar"));
+console.log(Symbol("baz"));
+
+// 使用 Symbol 为对象添加用不重复的键
+const obj = {};
+obj[Symbol()] = "123";
+obj[Symbol()] = "456";
+console.log(obj);
+
+// 也可以在计算属性名中使用
+const obj = {
+  [Symbol()]: 123,
+};
+console.log(obj);
+
+// =========================================================
+
+// 案例2：Symbol 模拟实现私有成员
+
+// a.js ======================================
+const name = Symbol();
+const person = {
+  [name]: "zce",
+  say() {
+    console.log(this[name]);
+  },
+};
+// 只对外暴露 person
+// b.js =======================================
+// 由于无法创建出一样的 Symbol 值，
+// 所以无法直接访问到 person 中的「私有」成员
+// person[Symbol()]
+person.say();
+```
+```js
+// Symbol 补充
+
+console.log(Symbol() === Symbol(), Symbol("foo") === Symbol("foo"));
+
+// Symbol 全局注册表 ----------------------------------------------------
+const s1 = Symbol.for("foo");
+const s2 = Symbol.for("foo");
+console.log(s1 === s2);
+
+console.log(Symbol.for(true) === Symbol.for("true"));
+
+// 内置 Symbol 常量 ---------------------------------------------------
+
+console.log(Symbol.iterator);
+console.log(Symbol.hasInstance);
+
+const obj = {
+  [Symbol.toStringTag]: "XObject",
+};
+console.log(obj.toString());
+
+// Symbol 属性名获取 ---------------------------------------------------
+
+const obj = {
+  [Symbol()]: "symbol value",
+  foo: "normal value",
+};
+
+for (var key in obj) {
+  console.log(key);
+}
+console.log(Object.keys(obj));
+console.log(JSON.stringify(obj));
+
+console.log(Object.getOwnPropertySymbols(obj));
+```
+#### for...of...
+```js
+// for...of 循环
+
+const arr = [100, 200, 300, 400];
+
+for (const item of arr) {
+  console.log(item);
+}
+
+// for...of 循环可以替代 数组对象的 forEach 方法
+arr.forEach((item) => {
+  console.log(item);
+});
+
+for (const item of arr) {
+  console.log(item);
+  if (item > 100) {
+    break;
+  }
+}
+
+// forEach 无法跳出循环，必须使用 some 或者 every 方法
+arr.forEach(); // 不能跳出循环
+arr.some();
+arr.every();
+
+// 遍历 Set 与遍历数组相同
+const s = new Set(["foo", "bar"]);
+for (const item of s) {
+  console.log(item);
+}
+
+// 遍历 Map 可以配合数组结构语法，直接获取键值
+const m = new Map();
+m.set("foo", "123");
+m.set("bar", "345");
+for (const [key, value] of m) {
+  console.log(key, value);
+}
+
+// 普通对象不能被直接 for...of 遍历
+const obj = { foo: 123, bar: 456 };
+for (const item of obj) {
+  console.log(item);
+}
+```
+#### 可迭代接口（迭代器（Iterator））
+```js
+// 迭代器（Iterator）
+
+const set = new Set(["foo", "bar", "baz"]);
+
+const iterator = set[Symbol.iterator]();
+
+console.log(iterator.next());
+console.log(iterator.next());
+console.log(iterator.next());
+console.log(iterator.next());
+console.log(iterator.next());
+
+while (true) {
+  const current = iterator.next();
+  if (current.done) {
+    break; // 迭代已经结束了，没必要继续了
+  }
+  console.log(current.value);
+} 
+```
+```js
+// 实现可迭代接口（Iterable）
+
+const obj = {
+  [Symbol.iterator]: function () {
+    return {
+      next: function () {
+        return {
+          value: "zce",
+          done: true,
+        };
+      },
+    };
+  },
+};
+
+const obj = {
+  store: ["foo", "bar", "baz"],
+
+  [Symbol.iterator]: function () {
+    let index = 0;
+    const self = this;
+
+    return {
+      next: function () {
+        const result = {
+          value: self.store[index],
+          done: index >= self.store.length,
+        };
+        index++;
+        return result;
+      },
+    };
+  },
+};
+
+for (const item of obj) {
+  console.log("循环体", item);
+}
+```
+```js
+// 迭代器设计模式
+
+// 场景：你我协同开发一个任务清单应用
+
+// 我的代码 ===============================
+const todos = {
+  life: ['吃饭', '睡觉', '打豆豆'],
+  learn: ['语文', '数学', '外语'],
+  work: ['喝茶'],
+
+  // 提供统一遍历访问接口
+  each: function (callback) {
+    const all = [].concat(this.life, this.learn, this.work)
+    for (const item of all) {
+      callback(item)
+    }
+  },
+
+  // 提供迭代器（ES2015 统一遍历访问接口）
+  [Symbol.iterator]: function () {
+    const all = [...this.life, ...this.learn, ...this.work]
+    let index = 0
+    return {
+      next: function () {
+        return {
+          value: all[index],
+          done: index++ >= all.length
+        }
+      }
+    }
+  }
+}
+
+// 你的代码 ===============================
+
+// for (const item of todos.life) {
+//   console.log(item)
+// }
+// for (const item of todos.learn) {
+//   console.log(item)
+// }
+// for (const item of todos.work) {
+//   console.log(item)
+// }
+
+todos.each(function (item) {
+  console.log(item)
+})
+
+console.log('-------------------------------')
+
+for (const item of todos) {
+  console.log(item)
+}
+```
+#### Generator 函数
+```js
+// Generator 函数
+
+function* foo() {
+  console.log("zce");
+  return 100;
+}
+
+const result = foo();
+console.log(result.next());
+
+function* foo() {
+  console.log("1111");
+  // 作为next的返回值
+  yield 100;
+  console.log("2222");
+  yield 200;
+  console.log("3333");
+  yield 300;
+}
+
+const generator = foo();
+
+console.log(generator.next()); // 第一次调用，函数体开始执行，遇到第一个 yield 暂停
+console.log(generator.next()); // 第二次调用，从暂停位置继续，直到遇到下一个 yield 再次暂停
+console.log(generator.next()); // 。。。
+console.log(generator.next()); // 第四次调用，已经没有需要执行的内容了，所以直接得到 undefined
+```
+```js
+// Generator 应用
+
+// 案例1：发号器
+function* createIdMaker() {
+  let id = 1;
+  while (true) {
+    yield id++;
+  }
+}
+
+const idMaker = createIdMaker();
+
+console.log(idMaker.next().value);
+console.log(idMaker.next().value);
+console.log(idMaker.next().value);
+console.log(idMaker.next().value);
+
+// 案例2：使用 Generator 函数实现 iterator 方法
+const todos = {
+  life: ["吃饭", "睡觉", "打豆豆"],
+  learn: ["语文", "数学", "外语"],
+  work: ["喝茶"],
+  [Symbol.iterator]: function* () {
+    const all = [...this.life, ...this.learn, ...this.work];
+    for (const item of all) {
+      yield item;
+    }
+  },
+};
+
+for (const item of todos) {
+  console.log(item);
+}
+```
+### ES2016
+```js
+// ECMAScript 2016
+
+// Array.prototype.includes -----------------------------------
+
+// const arr = ['foo', 1, NaN, false]
+
+// 找到返回元素下标
+console.log(arr.indexOf("foo"));
+// 找不到返回 -1
+console.log(arr.indexOf("bar"));
+// 无法找到数组中的 NaN
+console.log(arr.indexOf(NaN));
+
+// 直接返回是否存在指定元素
+console.log(arr.includes("foo"));
+// 能够查找 NaN
+console.log(arr.includes(NaN));
+
+// 指数运算符 ---------------------------------------------------
+console.log(Math.pow(2, 10));
+console.log(2 ** 10);
+
+```
+### ES2017
+```js
+// ECMAScript 2017
+
+const obj = {
+  foo: "value1",
+  bar: "value2",
+};
+
+// Object.values -----------------------------------------------------------
+console.log(Object.values(obj));
+// Object.entries ----------------------------------------------------------
+console.log(Object.entries(obj));
+for (const [key, value] of Object.entries(obj)) {
+  console.log(key, value);
+}
+
+console.log(new Map(Object.entries(obj)));
+
+// Object.getOwnPropertyDescriptors ----------------------------------------
+const p1 = {
+  firstName: "Lei",
+  lastName: "Wang",
+  get fullName() {
+    return this.firstName + " " + this.lastName;
+  },
+};
+
+console.log(p1.fullName);
+
+const p2 = Object.assign({}, p1);
+p2.firstName = "zce";
+console.log(p2);
+
+const descriptors = Object.getOwnPropertyDescriptors(p1);
+console.log(descriptors);
+const p2 = Object.defineProperties({}, descriptors);
+p2.firstName = "zce";
+console.log(p2.fullName);
+
+// String.prototype.padStart / String.prototype.padEnd  --------------------
+const books = {
+  html: 5,
+  css: 16,
+  javascript: 128,
+};
+
+for (const [name, count] of Object.entries(books)) {
+  console.log(name, count);
+}
+
+for (const [name, count] of Object.entries(books)) {
+  console.log(`${name.padEnd(16, "-")}|${count.toString().padStart(3, "0")}`);
+}
+
+// 在函数参数中添加尾逗号  -----------------------------------------------------
+function foo (
+  bar,
+  baz,
+) {
+}
+
+const arr = [
+  100,
+  200,
+  300,
+]
+const arr = [
+  100,
+  200,
+  300,
+  400,
+]
+const arr = [
+  100,
+  200,
+  300
+]
+const arr = [
+  100,
+  200,
+  300,
+  400
+]
+```
 ### 可迭代接口怎么实现的？
 集合对象（数组、Set/Map 集合）和字符串都是可迭代对象，这些对象都有默认的迭代器和 Symbol.iterator 属性。
 迭代器的本身是一个对象，这个对象有 next( ) 方法返回结果对象，这个结果对象有下一个返回值 value、迭代完成布尔值 done。
