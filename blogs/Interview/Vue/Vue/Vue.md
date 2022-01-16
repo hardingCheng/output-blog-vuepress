@@ -5013,3 +5013,619 @@ SSR 是 Server Side Render 简称，叫服务端渲染。
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211113164555.png)
 
 
+## 课程学习
+### Vue响应式原理准备
+#### 目标
+- 模拟一个最小版本的Vue
+- 响应式原理在面试的常问问题
+- 学习别人优秀经验，转换成自己的经验
+- 实际项目中出问题的原理层面的解决
+    - 给Vue实例新增一个成员是否是响应式的？
+    - 给属性重新赋值成对象，是否是响应式的？
+- 为学习源码做铺垫
+#### 准备工作
+- 数据驱动
+- 响应式的核心原理
+- 发布订阅模式和观察者模式
+#### 数据驱动
+- 数据响应式、双向绑定、数据驱动
+- 数据响应式
+    - 数据模型仅仅是普通的JS对象，而当我们修改数据时，视图会进行更新，避免了繁琐的DOM操作，提高开发效率。
+- 双向绑定
+    - 数据改变，视图改变；视图改变，数据也随之改变。
+    - 我们可以使用v-model在表单元素上创建双向数据绑定。
+- 数据驱动是Vue最独特的特性之一
+    - 开发过程中仅需要关注数据本身，不需要关心数据是如何渲染到视图
+#### 数据响应式核心原理-Vue2
+- Vue2.x深入响应式原理
+- `Object.defineProperty`
+- 浏览器兼容IE8以上
+
+```js
+// 模拟vue中的data选项
+let data = {
+  msg: "hello",
+};
+
+// 模拟Vue的实例
+let vm = {};
+
+// 数据劫持：当访问或者设置vm中的成员的时候，做一些干预操作
+Object.defineProperty(vm, "msg", {
+  // 可枚举（可遍历）
+  enumerable: true,
+  // 可配置（可以使用delete删除，可以通过defineProperty重新定义）
+  configurable: true,
+  // 当获取值的时候执行
+  get() {
+    console.log("get: ", data.msg);
+    return data.msg;
+  },
+  // 当设置值的时候执行
+  set(newValue) {
+    console.log("set: ", newValue);
+    if (newValue === data.msg) {
+      return;
+    }
+    data.msg = newValue;
+    // 数据更改，更新 DOM 的值
+    document.querySelector("#app").textContent = data.msg;
+  },
+});
+
+// 测试
+vm.msg = 'Hello World' 
+console.log(vm.msg)
+```
+- 如果有一个对象中多个属性需要转换 getter/setter 如何处理？
+```js
+// 模拟 Vue 中的 data 选项
+let data = {
+  msg: "hello",
+  count: 10,
+};
+
+// 模拟 Vue 的实例
+let vm = {};
+
+proxyData(data);
+
+function proxyData(data) {
+  // 遍历 data 对象的所有属性
+  Object.keys(data).forEach((key) => {
+    // 把 data 中的属性，转换成 vm 的 setter/setter
+    Object.defineProperty(vm, key, {
+      enumerable: true,
+      configurable: true,
+      get() {
+        console.log("get: ", key, data[key]);
+        return data[key];
+      },
+      set(newValue) {
+        console.log("set: ", key, newValue);
+        if (newValue === data[key]) {
+          return;
+        }
+        data[key] = newValue;
+        // 数据更改，更新 DOM 的值
+        document.querySelector("#app").textContent = data[key];
+      },
+    });
+  });
+}
+
+// 测试
+vm.msg = "Hello World";
+console.log(vm.msg);
+```
+#### 数据响应式核心原理-Vue3
+- Proxy
+- 直接监听对象，而非属性
+- ES6中新增，IE不支持，性能由浏览器优化
+```js
+// 模拟 Vue 中的 data 选项
+let data = {
+  msg: "hello",
+  count: 0,
+};
+// 模拟 Vue 实例
+// 返回一个新的代理对象
+let vm = new Proxy(data, {
+  // 当访问 vm 的成员会执行
+  get(target, key) {
+    console.log("get, key: ", key, target[key]);
+    return target[key];
+  }, 
+  // 当设置 vm 的成员会执行
+  set(target, key, newValue) {
+    console.log("set, key: ", key, newValue);
+    if (target[key] === newValue) {
+      return;
+    }
+    target[key] = newValue;
+    document.querySelector("#app").textContent = target[key];
+  },
+});
+// 测试
+vm.msg = "Hello World";
+console.log(vm.msg);
+```
+#### 发布订阅模式（EventEmitter）
+- 发布/订阅模式
+    - 订阅者  家长
+    - 发布者  老师
+    - 信号中心  班级
+- 存在一个"信号中心"，某个任务执行完成，就向信号中心"发布"（publish）一个信号，其他任务可以向信号中心"订阅"（subscribe）这个信号，从而知道什么时候自己可以开始执行。这就叫做"**发布/订阅模式"（publish-subscribe pattern）**
+
+- Vue的自定义事件
+```js
+let vm = new Vue();
+vm.$on("dataChange", () => {
+  console.log("dataChange");
+});
+vm.$on("dataChange", () => {
+  console.log("dataChange1");
+});
+vm.$emit("dataChange");
+```
+- 兄弟组件通信过程
+```js
+// eventBus.js 
+// 事件中心
+let eventHub = new Vue()
+
+
+// ComponentA.vue
+// 发布者
+addTodo: function () { 
+ // 发布消息(事件)
+ eventHub.$emit('add-todo', { text: this.newTodoText }) 
+ this.newTodoText = ''
+}
+// ComponentB.vue 
+// 订阅者
+created: function () { 
+ // 订阅消息(事件)
+ eventHub.$on('add-todo', this.addTodo) 
+}
+```
+- 模拟Vue自定义事件的实现
+```js
+// 事件触发器
+class EventEmitter {
+  constructor() {
+    // { eventType: [ handler1, handler2 ] }
+    this.subs = Object.create(null);
+  }
+  // 订阅通知
+  // 注册事件
+  $on(eventType, handler) {
+    this.subs[eventType] = this.subs[eventType] || [];
+    this.subs[eventType].push(handler);
+  }
+  // 发布通知
+  // 触发事件
+  $emit(eventType) {
+    if (this.subs[eventType]) {
+      this.subs[eventType].forEach((handler) => {
+        handler();
+      });
+    }
+  }
+}
+// 测试
+var bus = new EventEmitter();
+// 注册事件
+bus.$on("click", function () {
+  console.log("click");
+});
+bus.$on("click", function () {
+  console.log("click1");
+});
+// 触发事件
+bus.$emit("click");
+```
+#### 观察者模式
+- 没有发布订阅模式的事件中心。
+- 观察者（订阅者）--Watcher
+    - update()：当事件发生时，具体要做的事情
+- 目标（发布者）--Dep
+    - subs数组：存储所有的观察者
+    - addSub()：添加观察者
+    - notify()：当事件发生，调用所有观察者的update（）方法
+- 没有事件中心
+```js
+// 目标(发布者)
+// Dependency
+class Dep {
+  constructor() {
+    // 存储所有的观察者
+    this.subs = [];
+  }
+  // 添加观察者
+  addSub(sub) {
+    if (sub && sub.update) {
+      this.subs.push(sub);
+    }
+  }
+  // 通知所有观察者
+  notify() {
+    this.subs.forEach((sub) => {
+      sub.update();
+    });
+  }
+}
+// 观察者(订阅者)
+class Watcher {
+  // 发布者执行，发布者通知
+  update() {
+    console.log("update");
+  }
+}
+// 测试
+let dep = new Dep();
+let watcher = new Watcher();
+dep.addSub(watcher);
+dep.notify();
+```
+#### 总结
+- **观察者模式**是由具体目标调度，比如当事件触发，Dep就会去调用观察者的方法，所以观察者模式的订阅者与发布者之间是存在依赖的。
+- **发布/订阅模式**由统一调度中心（隔离发布者和订阅者，减少依赖）调用，因此发布者和调用者不需要知道对方的存在。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220116144535.png)
+
+### Vue响应式原理模拟
+#### 整体分析
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220116144835.png)
+- Vue
+    - 把data中的成员注入到Vue实例，并且把data中的成员转成getter/setter
+- Observer
+    - 能够对数据对象的所有属性进行监听，如有变动可拿到最新值并通知Dep
+- Compiler
+    - 解析每个元素中的指令/插值表达式，并且替换成相关数据
+- Dep
+    - 添加观察者（watcher），当数据变化通知所有观察者
+- Watcher
+    - 数据变化更新视图
+#### Vue
+- 功能
+    - 负责接收初始化的参数(选项)
+    - 负责把 data 中的属性注入到 Vue 实例，转换成 getter/setter
+    - 负责调用 observer 监听 data 中所有属性的变化
+    - 负责调用 compiler 解析指令/插值表达式
+- 结构
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220116145554.png)
+```js
+class Vue {
+  constructor(options) {
+    // 1. 保存选项的数据
+    this.$options = options || {};
+    this.$data = options.data || {};
+    const el = options.el;
+    this.$el = typeof options.el === "string" ? document.querySelector(el) : el;
+    // 2. 负责把  data(getter/setter) 注入到  Vue 实例
+    this._proxyData(this.$data);
+    // 3. 负责调用  Observer 实现数据劫持
+    new Observer(this.$data);
+    // 4. 负责调用  Compiler 解析指令/插值表达式等
+    new Compiler(this);
+  }
+  _proxyData(data) {
+    // 遍历  data 的所有属性
+    Object.keys(data).forEach((key) => {
+      // this指向Vue的实例
+      Object.defineProperty(this, key, {
+        get() {
+          return data[key];
+        },
+        set(newValue) {
+          if (data[key] === newValue) {
+            return;
+          }
+          data[key] = newValue;
+        },
+      });
+    });
+  }
+}
+```
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app">
+      <h1>插值表达式</h1>
+      <h3>{{msg}}</h3>
+      <h3>{{count}}</h3>
+      <h1>v-text</h1>
+      <div v-text="msg"></div>
+      <h1>v-model</h1>
+      <input type="text" v-model="msg" />
+      <input type="text" v-model="count" />
+    </div>
+    <script src="./js/compiler.js"></script>
+    <script src="./js/observer.js"></script>
+    <script src="./js/vue.js"></script>
+    <script>
+      let vm = new Vue({
+        el: "#app",
+        data: {
+          msg: "Hello Vue",
+          count: 100,
+        },
+      });
+    </script>
+  </body>
+</html>
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220116151638.png)
+#### Observer
+- 功能
+    - 负责把 data 选项中的属性转换成响应式数据
+    - data 中的某个属性也是对象，把该属性转换成响应式数据 
+    - 数据变化发送通知
+- 结构
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220116151720.png)
+```js
+// 负责数据劫持
+// 把    $data 中的成员转换成    getter/setter
+class Observer {
+  constructor(data) {
+    this.walk(data);
+  }
+  // 1. 判断数据是否是对象，如果不是对象返回
+  // 2. 如果是对象，遍历对象的所有属性，设置为getter/setter
+  walk(data) {
+    if (!data || typeof data !== "object") {
+      return;
+    }
+    // 遍历 data 的所有成员
+    Object.keys(data).forEach((key) => {
+      this.defineReactive(data, key, data[key]);
+    });
+  }
+  // 定义响应式成员
+  // 所有属性变为getter和setter
+  defineReactive(data, key, val) {
+    const that = this;
+    // 创建  dep 对象收集依赖
+    const dep = new Dep();
+    // 如果 val 是对象，继续设置它下面的成员为响应式数据
+    this.walk(val);
+    Object.defineProperty(data, key, {
+      configurable: true,
+      enumerable: true,
+      get() {
+        // get 的过程中收集依赖
+        Dep.target && dep.addSub(Dep.target);
+        // 防止死递归
+        return val;
+      },
+      // set方法一个新的作用域
+      set(newValue) {
+        if (newValue === val) {
+          return;
+        }
+        // 如果 newValue 是对象，设置 newValue 的成员为响应式
+        // 此处会有this指向问题
+        that.walk(newValue);
+        val = newValue;
+        // 发送通知
+        // 当数据变化之后，发送通知
+        dep.notify();
+      },
+    });
+  }
+}
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220116153316.png)
+#### Compiler
+- 功能
+    - 负责编译模板，解析指令/插值表达式
+    - 负责页面的首次渲染
+    - 当数据变化后重新渲染视图
+- 结构
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220116154448.png)
+```js
+class Compiler {
+  constructor(vm) {
+    this.vm = vm;
+    this.el = vm.$el;
+    // 编译模板
+    this.compile(this.el);
+  }
+  // 编译模板
+  // 处理文本节点和元素节点
+  compile(el) {
+    const nodes = el.childNodes;
+    Array.from(nodes).forEach((node) => {
+      // 判断是文本节点还是元素节点
+      if (this.isTextNode(node)) {
+        this.compileText(node);
+      } else if (this.isElementNode(node)) {
+        this.compileElement(node);
+      }
+      if (node.childNodes && node.childNodes.length) {
+        // 如果当前节点中还有子节点，递归编译
+        this.compile(node);
+      }
+    });
+  }
+  // 判断是否是文本节点
+  isTextNode(node) {
+    // 文本节点
+    return node.nodeType === 3;
+  }
+  // 判断是否是属性节点
+  isElementNode(node) {
+    // 元素节点
+    return node.nodeType === 1;
+  }
+  // 判断是否是以    v- 开头的指令
+  isDirective(attrName) {
+    return attrName.startsWith("v-");
+  }
+  // 编译文本节点
+  // 处理插值表达式
+  compileText(node) {
+    const reg = /\{\{(.+)\}\}/; // 获取文本节点的内容
+    const value = node.textContent;
+    if (reg.test(value)) {
+      // 插值表达式中的值就是我们要的属性名称
+      const key = RegExp.$1.trim(); // 把插值表达式替换成具体的值
+      node.textContent = value.replace(reg, this.vm[key]);
+
+      // 创建watcher对象，当数据改变更新视图
+      new Watcher(this.vm, key, (newValue) => {
+        node.textContent = newValue;
+      });
+    }
+  }
+  // 编译属性节点
+  compileElement(node) {
+    // 遍历元素节点中的所有属性，找到指令
+    Array.from(node.attributes).forEach((attr) => {
+      // 获取元素属性的名称
+      let attrName = attr.name;
+      // 判断当前的属性名称是否是指令
+      if (this.isDirective(attrName)) {
+        // attrName 的形式    v-text  v-model
+        // 截取属性的名称，获取    text model
+        attrName = attrName.substr(2);
+        // 获取属性的名称，属性的名称就是我们数据对象的属性    v-text="name"，获取的是name;
+        const key = attr.value;
+        // 处理不同的指令
+        this.update(node, key, attrName);
+      }
+    });
+  }
+  // 创建 Watcher
+  // 负责更新 DOM
+  update(node, key, dir) {
+    // node 节点，key 数据的属性名称，dir 指令的后半部分
+    const updaterFn = this[dir + "Updater"];
+    // 因为在 textUpdater等中要使用 this
+    // 没有使用this调用，this不是我们需要的，我们改变this =  Compiler
+    updaterFn && updaterFn.call(this, node, this.vm[key], key);
+  }
+  // v-text 指令的更新方法
+  textUpdater(node, value, key) {
+    node.textContent = value;
+    // 每一个指令中创建一个    watcher，观察数据的变化
+    new Watcher(this.vm, key, (newValue) => {
+      node.textContent = newValue;
+    });
+  }
+  // v-model 指令的更新方法
+  modelUpdater(node, value, key) {
+    node.value = value;
+    // 每一个指令中创建一个    watcher，观察数据的变化
+    new Watcher(this.vm, key, (newValue) => {
+      node.value = newValue;
+    });
+
+    // 监听视图的变化
+    // 双向绑定
+    node.addEventListener("input", () => {
+      this.vm[key] = node.value;
+    });
+  }
+}
+```
+#### Dep(Dependency)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220116171642.png)
+- 功能
+    - 收集依赖，添加观察者(watcher)
+    - 通知所有观察者
+- 结构
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220116171753.png)
+```js
+class Dep {
+  constructor() {
+    // 存储所有的观察者
+    this.subs = [];
+  }
+  // 添加观察者
+  addSub(sub) {
+    if (sub && sub.update) {
+      this.subs.push(sub);
+    }
+  }
+  // 通知所有观察者
+  notify() {
+    this.subs.forEach((sub) => {
+      sub.update();
+    });
+  }
+}
+```
+#### Watcher
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220116172112.png)
+
+- 功能
+    - 当数据变化触发依赖，dep 通知所有的 Watcher 实例更新视图
+    - 自身实例化的时候往 dep 对象中添加自己
+- 结构
+    -  ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220116172321.png)
+```js
+class Watcher {
+  constructor(vm, key, cb) {
+    this.vm = vm;
+    // data 中的属性名称
+    this.key = key;
+    // 当数据变化的时候，调用 cb 更新视图
+    this.cb = cb;
+    // 在Dep 的静态属性上记录当前 watcher 对象，
+    // 当访问数据的时候把 watcher 添加到 dep 的 subs 中
+    Dep.target = this;
+    // 触发一次getter，让dep 为当前key 记录watcher
+    // vm[key]已经是访问属性了，在getter中就会触发依赖收集
+    this.oldValue = vm[key];
+    // 清空target
+    Dep.target = null;
+  }
+  // 当数据发生变化的时候更新视图
+  update() {
+    const newValue = this.vm[this.key];
+    if (this.oldValue === newValue) {
+      return;
+    }
+    this.cb(newValue);
+  }
+}
+```
+#### 总结
+- 给属性重新赋值成对象，是否是响应式的？
+    - 是的，会重新判断
+- 给 Vue 实例新增一个成员是否是响应式的？
+    - 不是的，初始化的时候，就已经响应式做好了，在vm上添加新的就不是响应式的
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220116181044.png)
+- Vue
+    - 记录传入的选项，设置 $data/$el
+    - 把 data 的成员注入到 Vue 实例
+    - 负责调用 Observer 实现数据响应式处理（数据劫持）
+    - 负责调用 Compiler 编译指令/插值表达式等
+- Observer
+    - 数据劫持
+        - 负责把 data 中的成员转换成 getter/setter
+        - 负责把多层属性转换成 getter/setter
+        - 如果给属性赋值为新对象，把新对象的成员设置为 getter/setter
+    - 添加 Dep 和 Watcher 的依赖关系
+    - 数据变化发送通知
+- Compiler
+    - 负责编译模板，解析指令/插值表达式
+    - 负责页面的首次渲染过程
+    - 当数据变化后重新渲染
+- Dep
+    - 收集依赖，添加订阅者(watcher)
+    - 通知所有订阅者
+- Watcher
+    - 自身实例化的时候往dep对象中添加自己
+    - 当数据变化dep通知所有的 Watcher 实例更新视图

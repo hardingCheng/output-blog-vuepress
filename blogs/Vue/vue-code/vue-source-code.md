@@ -424,6 +424,6 @@ export function initMixin(Vue: Class<Component>) {
 ```
 ### 首次渲染
 - Vue 初始化完毕，开始真正的执行
-- 调用 new Vue() 之前，已经初始化完毕
+- 调用 new Vue() 之前，已经初始化完毕，一些方法，实例成员，静态成员
 - 通过调试代码，记录首次渲染过程
 ### Vue.js源码剖析-响应式原理
