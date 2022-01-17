@@ -5499,11 +5499,27 @@ class Compiler {
         // 截取属性的名称，获取    text model
         attrName = attrName.substr(2);
         // 获取属性的名称，属性的名称就是我们数据对象的属性    v-text="name"，获取的是name;
+        // v-on:click="handler"  --> handler
+        // @click="handler"
         const key = attr.value;
         // 处理不同的指令
         this.update(node, key, attrName);
+        // 判断是否是处理事件的指令
+        if (this.isEventDirective(attrName)) {
+          this.eventHandler(node, this.vm, attrName, key);
+        }
       }
     });
+  }
+  // 判断是否是处理事件的指令
+  isEventDirective(attrName) {
+    return attrName.indexOf("on") === 0;
+  }
+  eventHandler(node, vm, attrName, fnName) {
+    // on:click   on:input
+    let eventType = attrName.substr(attrName.indexOf(":") + 1);
+    let fn = this.vm.$options.methods && this.vm.$options.methods[fnName];
+    fn && node.addEventListener(eventType, fn.bind(this.vm));
   }
   // 创建 Watcher
   // 负责更新 DOM
@@ -5525,7 +5541,7 @@ class Compiler {
   // v-model 指令的更新方法
   modelUpdater(node, value, key) {
     node.value = value;
-    // 每一个指令中创建一个    watcher，观察数据的变化
+    // 每一个指令中创建一个 watcher，观察数据的变化
     new Watcher(this.vm, key, (newValue) => {
       node.value = newValue;
     });
@@ -5629,3 +5645,735 @@ class Watcher {
 - Watcher
     - 自身实例化的时候往dep对象中添加自己
     - 当数据变化dep通知所有的 Watcher 实例更新视图
+### Virtual DOM 的实现原理(Diff)
+#### 目标
+- 了解什么是虚拟 DOM，以及虚拟 DOM 的作用
+- Snabbdom 的基本使用
+- Snabbdom 的源码解析
+#### 什么是 Virtual DOM
+- Virtual DOM(虚拟DOM)，是由普通的JS对象描述DOM对象。
+- 真是DOM
+    -  ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220116183942.png)
+- 虚拟DOM
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220116184019.png)
+
+- 虚拟DOM可以维护程序的状态，跟踪上一次的状态
+- 通过比较前后两次状态差异更新真实DOM
+- 维护视图和状态的关系
+- 复杂视图情况下提升渲染性能
+- 跨平台
+    - 浏览器平台渲染DOM
+    - 服务端渲染 SSR(Nuxt.js/Next.js)
+    - 原生应用(Weex/React Native)
+    - 小程序(mpvue/uni-app)等
+#### 为什么要使用虚拟DOM
+当然是前端优化方面，避免频繁操作DOM，频繁操作DOM会可能让浏览器回流和重绘，性能也会非常低，还有就是手动操作 DOM 还是比较麻烦的，要考虑浏览器兼容性问题，当前jQuery等库简化了 DOM操作，但是项目复杂了，DOM操作还是会变得复杂，数据操作也变得复杂
+并不是所有情况使用虚拟DOM 都提高性能，是针对在复杂的的项目使用。如果简单的操作，使用虚拟DOM,要创建虚拟DOM对象等等一系列操作，还不如普通的DOM 操作
+虚拟DOM 可以实现跨平台渲染，服务器渲染 、小程序、原生应用都使用了虚拟DOM
+使用虚拟DOM改变了当前的状态不需要立即的去更新DOM 而且更新的内容进行更新，对于没有改变的内容不做任何操作，通过前后两次差异进行比较
+虚拟 DOM 可以维护程序的状态，跟踪上一次的状态
+
+#### 虚拟DOM库
+- Snabbdom
+    - Vue.js 2.x 内部使用的虚拟 DOM 就是改造的 Snabbdom
+    - 大约 200 SLOC (single line of code)
+    - 通过模块可扩展
+    - 源码使用 TypeScript 开发
+    -  最快的 Virtual DOM 之一
+- virtual-dom
+#### Snabbdom源码 = Vue的虚拟DOM源码
+- Snabbdom 的核心
+    - init() 设置模块，创建 patch() 函数
+    - 使用 h() 函数创建 JavaScript 对象(VNode)描述真实 DOM
+    - patch() 比较新旧两个 Vnode
+    - 把变化的内容更新到真实 DOM 树
+#### h函数介绍
+- 作用：创建VNode
+    -  h 函数，主要作用是创建 虚拟节点
+- Vue中的h函数
+
+在 snabbdom 我们也使用了多次的 h 函数，主要作用是创建 虚拟节点。
+snabbdom 使用 TS 编写, 所以 h 函数中做了 方法重载 使用起来灵活。
+下面是 snabbdom 中 h 函数，可以看出 参数的有好几种方式。
+```ts
+export declare function h(sel: string): VNode;
+export declare function h(sel: string, data: VNodeData): VNode;
+export declare function h(sel: string, children: VNodeChildren): VNode;
+export declare function h(sel: string, data: VNodeData, children: VNodeChildren): VNode;
+```
+
+#### VNode
+在写 h 函数之前 先实现 vnode 函数，vnode 函数要在 h 中使用， 其实这个 vnode 函数实现功能非常简单 在 TS 里面规定了很多类型，不过我这里和之后都是 用 JS 去写。
+描述真实的DOM。
+```html
+<div class="container">
+  <p>哈哈</p>
+  <ul class="list">
+    <li>1</li>
+    <li>2</li>
+  </ul>
+</div>
+```
+```js
+{ 
+  // 选择器
+  "sel": "div",
+  // 数据
+  "data": {
+    "class": { "container": true }
+  },
+  // DOM
+  "elm": undefined,
+  // 和 Vue :key 一样是一种优化
+  "key": undefined,
+  // 子节点
+  "children": [
+    {
+      "elm": undefined,
+      "key": undefined,
+      "sel": "p",
+      "data": { "text": "哈哈" }
+    },
+    {
+      "elm": undefined,
+      "key": undefined,
+      "sel": "ul",
+      "data": {
+        "class": { "list": true }
+      },
+      "children": [
+        {
+          "elm": undefined,
+          "key": undefined,
+          "sel": "li",
+          "data": {
+            "text": "1"
+          },
+          "children": undefined
+        },
+        {
+          "elm": undefined,
+          "key": undefined,
+          "sel": "li",
+          "data": {
+            "text": "1"
+          },
+          "children": undefined
+        }
+      ]
+    }
+  ]
+}
+```
+```js
+// vnode.js
+/**
+ * 把传入的 参数 作为 对象返回
+ * @param {string} sel 选择器
+ * @param {object} data 数据
+ * @param {array} children 子节点
+ * @param {string} text 文本
+ * @param {dom} elm DOM
+ * @returns object
+ */
+export function vnode(sel, data, children, text, elm) {
+    const key = data === undefined ? undefined : data.key;
+    return { sel, data, children, text, elm, key };
+}
+```
+#### init函数
+在 snabbdom 中我们 通过 init() 返回了一个 patch 函数，通过 patch 进行吧比较两个 虚拟 DOM 然后添加的 真实的 DOM 树上，中间比较就是我们等下要说的 diff。
+```js
+// init.ts
+
+.....
+return function patch(oldVnode, vnode) {
+        let i, elm, parent;
+        const insertedVnodeQueue = [];
+        for (i = 0; i < cbs.pre.length; ++i)
+            cbs.pre[i]();
+        if (isElement(api, oldVnode)) {
+            oldVnode = emptyNodeAt(oldVnode);
+        }
+        else if (isDocumentFragment(api, oldVnode)) {
+            oldVnode = emptyDocumentFragmentAt(oldVnode);
+        }
+        if (sameVnode(oldVnode, vnode)) {
+            patchVnode(oldVnode, vnode, insertedVnodeQueue);
+        }
+        else {
+            elm = oldVnode.elm;
+            parent = api.parentNode(elm);
+            createElm(vnode, insertedVnodeQueue);
+            if (parent !== null) {
+                api.insertBefore(parent, vnode.elm, api.nextSibling(elm));
+                removeVnodes(parent, [oldVnode], 0, 0);
+            }
+        }
+        for (i = 0; i < insertedVnodeQueue.length; ++i) {
+            insertedVnodeQueue[i].data.hook.insert(insertedVnodeQueue[i]);
+        }
+        for (i = 0; i < cbs.post.length; ++i)
+            cbs.post[i]();
+        return vnode;
+    };
+```
+
+#### Diff算法
+对比两颗树上所有的节点，传统的方式使用依次比较两棵树的每一个节点，这样的时间复杂度是 O(n^3)。
+
+比如：当前有三个节点，比较完树上的每一个节点需要的时间是 O(n^3)。其中 n 是节点个数。
+
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220117124938.png)
+
+- patch(oldVnode, newVnode)
+- 打补丁，把新节点中变化的内容渲染到真实 DOM，最后返回新节点作为下一次处理的旧节点
+- 对比新旧 VNode 是否相同节点(节点的 key 和 sel 相同)
+- 如果不是相同节点，删除之前的内容，重新渲染
+- 如果是相同节点，再判断新的 VNode 是否有 text，如果有并且和 oldVnode 的 text 不同，直接更新文本内容
+- 如果新的 VNode 有 children，判断子节点是否有变化
+- diff 过程只进行同层级比较，时间复杂度 O(n)
+#### patch函数
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220117131401.png)
+- patch(oldVnode, newVnode)
+- 把新节点中变化的内容渲染到真实 DOM，最后返回新节点作为下一次处理的旧节点
+- 对比新旧 VNode 是否相同节点(节点的 key 和 sel 相同)
+- 如果不是相同节点，删除之前的内容，重新渲染
+- 如果是相同节点，再判断新的 VNode 是否有 text，如果有并且和 oldVnode 的 text 不同，直接更新文本内容
+- 如果新的 VNode 有 children，判断子节点是否有变化
+
+- **功能：**
+  - 传入新旧 VNode，对比差异，把差异渲染到 DOM
+  - 返回新的 VNode，作为下一次 patch() 的 oldVnode
+- **执行过程：**
+  - 首先执行**模块**中的**钩子**函数 `pre`
+  - 如果 oldVnode 和 vnode 相同（key 和 sel 相同）
+    - 调用 patchVnode()，找节点的差异并更新 DOM
+  - 如果 oldVnode 是 DOM 元素
+    - 把 DOM 元素转换成 oldVnode
+    - 调用 createElm() 把 vnode 转换为真实 DOM，记录到 vnode.elm
+    - 把刚创建的 DOM 元素插入到 parent 中
+    - 移除老节点
+    - 触发**用户**设置的 `create ` **钩子**函数
+```ts
+export function init(modules, domApi, options) { {
+    return patch (oldVNode, vnode) {
+      ……
+      return vnode
+    }
+}
+```
+```ts
+  return function patch(oldVnode, vnode) {
+    let i, elm, parent;
+    // 保存新插入节点的队列，为了触发钩子函数
+    const insertedVnodeQueue = [];
+    // 执行模块的 pre 钩子函数
+    for (i = 0; i < cbs.pre.length; ++i) cbs.pre[i]();
+  
+    // 如果 oldVnode 不是 VNode，创建 VNode 并设置 elm 
+    // 1.判断oldVnode 是否为虚拟 DOM 这里判断是否有 sel
+    if (!isVnode(oldVnode)) {
+      // 把 DOM 元素转换成空的 VNode
+      // 转为虚拟DOM
+      oldVnode = emptyNodeAt(oldVnode);
+    }
+    // 判断 oldVnode 和 newVnode 是否为同一虚拟节点
+    // 如果新旧节点是相同节点(key 和 sel 相同)
+    if (sameVnode(oldVnode, vnode)) {
+      // 找节点的差异并更新 DOM
+      patchVnode(oldVnode, vnode, insertedVnodeQueue);
+    } else {
+      // 如果新旧节点不同，vnode 创建对应的 DOM
+      // 获取当前的 DOM 元素
+      elm = oldVnode.elm!;
+      parent = api.parentNode(elm);
+      // 触发 init/create 钩子函数,创建 DOM
+      createElm(vnode, insertedVnodeQueue);
+  
+      if (parent !== null) {
+        // 如果父节点不为空，把 vnode 对应的 DOM 插入到文档中
+        api.insertBefore(parent, vnode.elm!, api.nextSibling(elm));
+        // 移除老节点
+        removeVnodes(parent, [oldVnode], 0, 0);
+      }
+    }
+    // 执行用户设置的 insert 钩子函数
+    for (i = 0; i < insertedVnodeQueue.length; ++i) {
+      insertedVnodeQueue[i].data!.hook!.insert!(insertedVnodeQueue[i]);
+    }
+    // 执行模块的 post 钩子函数
+    for (i = 0; i < cbs.post.length; ++i) cbs.post[i]();
+    // 返回 vnode
+    return vnode;
+  };
+  
+  /**
+ * 转为 虚拟 DOM
+ * @param {DOM} elm DOM节点
+ * @returns {object}
+ */
+function emptyNodeAt(elm) {
+  // 把 sel 和 elm 传入 vnode 并返回
+  // 这里主要选择器给转小写返回vnode
+  // 这里功能做的简陋，没有去解析 # .
+  // data 也可以传 ID 和 class
+  return vnode(elm.tagName.toLowerCase(), undefined, undefined, undefined, elm)
+}
+```
+#### patch-createElm
+- VNode节点转换为真实DOM
+- 把DOM元素存储到VNode的elm属性中
+```ts
+   function createElm(vnode, insertedVnodeQueue) {
+    // 执行用户设置的init钩子函数
+    let i;
+    // h函数的第二个参数
+    // data存储钩子函数和真实DOM需要的属性
+    let data = vnode.data;
+    if (data !== undefined) {
+      const init = data.hook?.init;
+      if (isDef(init)) {
+        init(vnode);
+        data = vnode.data;
+      }
+    }
+    const children = vnode.children;
+    // 选择器
+    const sel = vnode.sel;
+    // 把VNode转换成真实 DOM 对象（没有渲染到页面）
+    // sel === "!"创建注释节点
+    if (sel === "!") {
+      if (isUndef(vnode.text)) {
+        vnode.text = "";
+      }
+      vnode.elm = api.createComment(vnode.text!);
+    // sel !== undefined 创建真实DOM
+    } else if (sel !== undefined) {
+      // 解析选择器
+      // Parse selector
+      const hashIdx = sel.indexOf("#");
+      const dotIdx = sel.indexOf(".", hashIdx);
+      const hash = hashIdx > 0 ? hashIdx : sel.length;
+      const dot = dotIdx > 0 ? dotIdx : sel.length;
+      const tag =
+        hashIdx !== -1 || dotIdx !== -1
+          ? sel.slice(0, Math.min(hash, dot))
+          : sel;
+      const elm = (vnode.elm =
+        isDef(data) && isDef((i = data.ns))
+          ? api.createElementNS(i, tag, data)
+          : api.createElement(tag, data));
+      if (hash < dot) elm.setAttribute("id", sel.slice(hash + 1, dot));
+      if (dotIdx > 0)
+        elm.setAttribute("class", sel.slice(dot + 1).replace(/\./g, " "));
+      for (i = 0; i < cbs.create.length; ++i) cbs.create[i](emptyNode, vnode);
+      if (is.array(children)) {
+        for (i = 0; i < children.length; ++i) {
+          const ch = children[i];
+          if (ch != null) {
+            // 如果children是数组,就递归插入
+            // createElm 就是使用了递归的方式去创建子节点
+            api.appendChild(elm, createElm(ch as VNode, insertedVnodeQueue));
+          }
+        }
+      } else if (is.primitive(vnode.text)) {
+        api.appendChild(elm, api.createTextNode(vnode.text));
+      }
+      const hook = vnode.data!.hook;
+      if (isDef(hook)) {
+        hook.create?.(emptyNode, vnode);
+        if (hook.insert) {
+          insertedVnodeQueue.push(vnode);
+        }
+      }
+    // 片段节点
+    } else if (options?.experimental?.fragments && vnode.children) {
+      const children = vnode.children;
+      vnode.elm = (
+        api.createDocumentFragment ?? documentFragmentIsNotSupported
+      )();
+      for (i = 0; i < cbs.create.length; ++i) cbs.create[i](emptyNode, vnode);
+      for (i = 0; i < children.length; ++i) {
+        const ch = children[i];
+        if (ch != null) {
+          api.appendChild(
+            vnode.elm,
+            createElm(ch as VNode, insertedVnodeQueue)
+          );
+        }
+      }
+    } else {
+      // 选择器为空，创建文本节点
+      vnode.elm = api.createTextNode(vnode.text!);
+    }
+    // 返回创建的真实DOM
+    return vnode.elm;
+  }
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220117101444.png)
+
+#### patch-removeVnodes 和 addVnodes
+```ts
+  function removeVnodes(
+    parentElm: Node,
+    vnodes: VNode[],
+    startIdx: number,
+    endIdx: number
+  ): void {
+    for (; startIdx <= endIdx; ++startIdx) {
+      let listeners: number;
+      let rm: () => void;
+      const ch = vnodes[startIdx];
+      // 是否为文本节点
+      if (ch != null) {
+        // DOM元素
+        if (isDef(ch.sel)) {
+          invokeDestroyHook(ch);
+          // 防止重复删除dom元素
+          listeners = cbs.remove.length + 1;
+          rm = createRmCb(ch.elm!, listeners);
+          for (let i = 0; i < cbs.remove.length; ++i) cbs.remove[i](ch, rm);
+          const removeHook = ch?.data?.hook?.remove;
+          if (isDef(removeHook)) {
+            removeHook(ch, rm);
+          } else {
+            rm();
+          }
+        } else {
+          // Text node
+          api.removeChild(parentElm, ch.elm!);
+        }
+      }
+    }
+  }
+  
+  // 删除DOM之前执行的
+  function invokeDestroyHook(vnode: VNode) {
+    const data = vnode.data;
+    if (data !== undefined) {
+      data?.hook?.destroy?.(vnode);
+      for (let i = 0; i < cbs.destroy.length; ++i) cbs.destroy[i](vnode);
+      if (vnode.children !== undefined) {
+        for (let j = 0; j < vnode.children.length; ++j) {
+          const child = vnode.children[j];
+          if (child != null && typeof child !== "string") {
+            invokeDestroyHook(child);
+          }
+        }
+      }
+    }
+  }
+  
+  
+  
+  function createRmCb(childElm: Node, listeners: number) {
+    // 高阶函数  缓存参数
+    return function rmCb() {
+      if (--listeners === 0) {
+        const parent = api.parentNode(childElm) as Node;
+        api.removeChild(parent, childElm);
+      }
+    };
+  }
+```
+```ts
+  function addVnodes(
+    parentElm: Node,
+    before: Node | null,
+    vnodes: VNode[],
+    startIdx: number,
+    endIdx: number,
+    // 存储具有insert钩子函数的节点
+    insertedVnodeQueue: VNodeQueue
+  ) {
+    for (; startIdx <= endIdx; ++startIdx) {
+      const ch = vnodes[startIdx];
+      if (ch != null) {
+        api.insertBefore(parentElm, createElm(ch, insertedVnodeQueue), before);
+      }
+    }
+  }
+```
+#### patch-patchVnode
+使用虚拟DOM算法的损耗计算： 总损耗 = 虚拟DOM增删改+（与Diff算法效率有关）真实DOM差异增删改+（较少的节点）排版与重绘
+
+直接操作真实DOM的损耗计算： 总损耗 = 真实DOM完全增删改+（可能较多的节点）排版与重绘
+
+- **功能：**
+  - patchVnode(oldVnode, vnode, insertedVnodeQueue)
+  - 对比 oldVnode 和 vnode 的差异，把差异渲染到 DOM 
+- **执行过程：**
+  - 首先执行**用户**设置的 **prepatch** **钩子**函数
+  - 执行 create 钩子函数
+    - 首先执行**模块**的 **create** **钩子**函数
+    - 然后执行**用户**设置的 **create** **钩子**函数
+  - 如果 **vnode.text** 未定义
+    - 如果 `oldVnode.children` 和 `vnode.children` 都有值
+      - 调用 `updateChildren()`
+      - 使用 diff 算法对比子节点，更新子节点
+    - 如果 `vnode.children` 有值，`oldVnode.children` 无值
+      - 清空 DOM 元素
+      - 调用 `addVnodes()`，批量添加子节点
+    - 如果 `oldVnode.children` 有值，`vnode.children` 无值
+      - 调用 `removeVnodes()`，批量移除子节点
+    - 如果 **oldVnode.text** 有值
+      - 清空 DOM 元素的内容
+  - 如果设置了 `vnode.text` 并且和和 `oldVnode.text` 不等
+    - 如果老节点有子节点，全部移除
+    - 设置 DOM 元素的 `textContent` 为 `vnode.text`
+  - 最后执行用户**设置的** **postpatch** **钩子**函数
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220117103151.png)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220117120328.png)
+```ts
+// 判断节点是否向相等
+// patch关键的一步就是sameVnode方法判断是否为同一类型节点
+
+/**
+ * 判断两个虚拟节点是否是同一节点
+ * @param {vnode} vnode1 虚拟节点1
+ * @param {vnode} vnode2 虚拟节点2
+ * @returns boolean
+ */
+function sameVnode(vnode1: VNode, vnode2: VNode): boolean {
+  const isSameKey = vnode1.key === vnode2.key;
+  const isSameIs = vnode1.data?.is === vnode2.data?.is;
+  const isSameSel = vnode1.sel === vnode2.sel;
+
+  return isSameSel && isSameKey && isSameIs;
+}
+
+// 找到对应的真实DOM，称为el
+// 判断newVnode和oldVnode是否指向同一个对象，如果是，那么直接return
+// 如果他们都有文本节点并且不相等，那么将el的文本节点设置为newVnode的文本节点。
+// 如果oldVnode有子节点而newVnode没有，则删除el的子节点
+// 如果oldVnode没有子节点而newVnode有，则将newVnode的子节点真实化之后添加到el
+// 如果两者都有子节点，则执行updateChildren函数比较子节点，这一步很重要
+function patchVnode(oldVnode, vnode, insertedVnodeQueue) {
+    // 第一个过成功：触发prepatch和update钩子函数
+    const hook = vnode.data?.hook;
+    hook?.prepatch?.(oldVnode, vnode);
+    const elm = (vnode.elm = oldVnode.elm)!;
+    const oldCh = oldVnode.children as VNode[];
+    const ch = vnode.children as VNode[];
+    // 相等直接返回
+    if (oldVnode === vnode) return;
+    if (vnode.data !== undefined) {
+      for (let i = 0; i < cbs.update.length; ++i)
+        cbs.update[i](oldVnode, vnode);
+      vnode.data.hook?.update?.(oldVnode, vnode);
+    }
+    // 第二个过程，真正对比新旧vnode差异的地方
+    // 判断newVnode上有没有text
+    // 这里为啥不考虑 oldVnode呢，因为 newVnode有text说明就没children
+    if (isUndef(vnode.text)) {
+      // 新旧节点是否都具有子节点
+      if (isDef(oldCh) && isDef(ch)) {
+        // updateChildren对比新旧节点的子节点，然后更新DOM
+        if (oldCh !== ch) updateChildren(elm, oldCh, ch, insertedVnodeQueue);
+      // 如果新节点有子节点
+      } else if (isDef(ch)) {
+        // 看老节点是否有text节点
+        if (isDef(oldVnode.text)) api.setTextContent(elm, "");
+        addVnodes(elm, null, ch, 0, ch.length - 1, insertedVnodeQueue);
+        // 老节点有子节点
+      } else if (isDef(oldCh)) {
+        removeVnodes(elm, oldCh, 0, oldCh.length - 1);
+        // 老节点有text节点
+      } else if (isDef(oldVnode.text)) {
+        api.setTextContent(elm, "");
+      }
+    // 新旧节点的text值不相等
+    } else if (oldVnode.text !== vnode.text) {
+      // 老结点是否具有子节点
+      if (isDef(oldCh)) {
+        removeVnodes(elm, oldCh, 0, oldCh.length - 1);
+      }
+      api.setTextContent(elm, vnode.text!);
+    }
+    // 第三个过程：触发postpatch钩子函数
+    hook?.postpatch?.(oldVnode, vnode);
+  }
+```
+#### patch-patchVnode-updateChildren
+Diff算法。DOM会产生重绘重排，性能差。
+- **功能：**
+  - diff 算法的核心，对比新旧节点的 children，更新 DOM
+- **执行过程：**
+  - 要对比两棵树的差异，我们可以取第一棵树的每一个节点依次和第二课树的每一个节点比较，但是这样的时间复杂度为 O(n^3)
+  - 在DOM 操作的时候我们很少很少会把一个父节点移动/更新到某一个子节点
+  - 因此只需要找**同级别**的子**节点**依次**比较**，然后再找下一级别的节点比较，这样算法的时间复杂度为 O(n)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220117105157.png)
+
+新旧虚拟DOM对比的时候，Diff算法比较只会在同层级进行, 不会跨层级比较。 所以Diff算法是:深度优先算法。 时间复杂度:O(n)。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220117105257.png)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220117120236.png)
+就是首尾指针法，新的子节点集合和旧的子节点集合，各有首尾两个指针。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220117105331.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220117105710.png)
+- 在对开始和结束节点比较的时候，总共有四种情况（相同节点）
+    - oldStartVnode / newStartVnode (旧开始节点 / 新开始节点)
+        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220117105744.png)
+        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220117121057.png)
+        - 重用旧节点DOM
+    - oldEndVnode / newEndVnode (旧结束节点 / 新结束节点)
+        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220117110045.png)
+    - oldStartVnode / newEndVnode (旧开始节点 / 新结束节点)
+        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220117110209.png)
+        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220117120942.png)
+    - oldEndVnode / newStartVnode (旧结束节点 / 新开始节点)
+        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220117110134.png)
+- 非上述四种情况
+    - 遍历新节点，使用 newStartNode 的 key 在老节点数组中找相同节点
+    - 如果没有找到，说明 newStartNode 是新节点
+        - 创建新节点对应的 DOM 元素，插入到 DOM 树中
+    - 如果找到了
+        - 判断新节点和找到的老节点的 sel 选择器是否相同
+        - 如果不相同，说明节点被修改了
+            - 重新创建对应的 DOM 元素，插入到 DOM 树中
+        - 如果相同，把 elmToMove 对应的 DOM 元素，移动到左边
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220117110429.png)
+- 循环结束
+    - 当老节点的所有子节点先遍历完 (oldStartIdx > oldEndIdx)，循环结束
+        - 如果老节点的数组先遍历完(oldStartIdx > oldEndIdx)
+            - 说明新节点有剩余，把剩余节点批量插入到右边
+            - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220117110744.png)
+    - 新节点的所有子节点先遍历完 (newStartIdx > newEndIdx)，循环结束
+        - 如果新节点的数组先遍历完(newStartIdx > newEndIdx)
+            - 说明老节点有剩余，把剩余节点批量删除
+            - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220117110907.png)
+```ts
+function updateChildren(parentElm,oldCh,newCh,insertedVnodeQueue) {
+    let oldStartIdx = 0;
+    let newStartIdx = 0;
+    let oldEndIdx = oldCh.length - 1;
+    let oldStartVnode = oldCh[0];
+    let oldEndVnode = oldCh[oldEndIdx];
+    let newEndIdx = newCh.length - 1;
+    let newStartVnode = newCh[0];
+    let newEndVnode = newCh[newEndIdx];
+    let oldKeyToIdx: KeyToIndexMap | undefined;
+    let idxInOld: number;
+    let elmToMove: VNode;
+    let before: any;
+    // 同级别节点比较
+    while (oldStartIdx <= oldEndIdx && newStartIdx <= newEndIdx) {
+      if (oldStartVnode == null) {
+        oldStartVnode = oldCh[++oldStartIdx]; // Vnode might have been moved left
+      } else if (oldEndVnode == null) {
+        oldEndVnode = oldCh[--oldEndIdx];
+      } else if (newStartVnode == null) {
+        newStartVnode = newCh[++newStartIdx];
+      } else if (newEndVnode == null) {
+        newEndVnode = newCh[--newEndIdx];
+      // 开始比较开始和结束的四种情况
+      } else if (sameVnode(oldStartVnode, newStartVnode)) {
+        patchVnode(oldStartVnode, newStartVnode, insertedVnodeQueue);
+        oldStartVnode = oldCh[++oldStartIdx];
+        newStartVnode = newCh[++newStartIdx];
+      } else if (sameVnode(oldEndVnode, newEndVnode)) {
+        patchVnode(oldEndVnode, newEndVnode, insertedVnodeQueue);
+        oldEndVnode = oldCh[--oldEndIdx];
+        newEndVnode = newCh[--newEndIdx];
+      } else if (sameVnode(oldStartVnode, newEndVnode)) {
+        // Vnode moved right
+        patchVnode(oldStartVnode, newEndVnode, insertedVnodeQueue);
+        api.insertBefore(
+          parentElm,
+          oldStartVnode.elm!,
+          api.nextSibling(oldEndVnode.elm!)
+        );
+        oldStartVnode = oldCh[++oldStartIdx];
+        newEndVnode = newCh[--newEndIdx];
+      } else if (sameVnode(oldEndVnode, newStartVnode)) {
+        // Vnode moved left
+        patchVnode(oldEndVnode, newStartVnode, insertedVnodeQueue);
+        api.insertBefore(parentElm, oldEndVnode.elm!, oldStartVnode.elm!);
+        oldEndVnode = oldCh[--oldEndIdx];
+        newStartVnode = newCh[++newStartIdx];
+      } else {
+        // 开始和结尾比较结束
+        if (oldKeyToIdx === undefined) {
+          oldKeyToIdx = createKeyToOldIdx(oldCh, oldStartIdx, oldEndIdx);
+        }
+        idxInOld = oldKeyToIdx[newStartVnode.key as string];
+        if (isUndef(idxInOld)) {
+          // New element
+          api.insertBefore(
+            parentElm,
+            createElm(newStartVnode, insertedVnodeQueue),
+            oldStartVnode.elm!
+          );
+        } else {
+          elmToMove = oldCh[idxInOld];
+          if (elmToMove.sel !== newStartVnode.sel) {
+            api.insertBefore(
+              parentElm,
+              createElm(newStartVnode, insertedVnodeQueue),
+              oldStartVnode.elm!
+            );
+          } else {
+            patchVnode(elmToMove, newStartVnode, insertedVnodeQueue);
+            oldCh[idxInOld] = undefined as any;
+            api.insertBefore(parentElm, elmToMove.elm!, oldStartVnode.elm!);
+          }
+        }
+        newStartVnode = newCh[++newStartIdx];
+      }
+    }
+    // 循环结束的收尾工作
+    if (newStartIdx <= newEndIdx) {
+      // 老节点数组遍历完，新节点数组有剩余
+      before = newCh[newEndIdx + 1] == null ? null : newCh[newEndIdx + 1].elm;
+      addVnodes(
+        parentElm,
+        before,
+        newCh,
+        newStartIdx,
+        newEndIdx,
+        insertedVnodeQueue
+      );
+    }
+    // 新结束数组遍历完，旧节点有剩余
+    if (oldStartIdx <= oldEndIdx) {
+      removeVnodes(parentElm, oldCh, oldStartIdx, oldEndIdx);
+    }
+  }
+  
+  function createKeyToOldIdx(children, beginIdx, endIdx) {
+    var _a;
+    // map为缓存，这样就不用每次都遍历老对象
+    const map = {};
+    // 从oldStartIdx到oldEndIdx进行遍历
+    for (let i = beginIdx; i <= endIdx; ++i) {
+        // 拿个每个子对象 的 key
+        const key = (_a = children[i]) === null || _a === void 0 ? void 0 : _a.key;
+         // 如果 key 不为 undefined 添加到缓存中
+        if (key !== undefined) {
+            map[key] = i;
+        }
+    }
+    return map;
+}
+```
+#### 节点设计key的好处
+key 特殊 attribute 主要用做 Vue 的虚拟 DOM 算法的提示，以在比对新旧节点组时辨识 VNodes。如果不使用 key，Vue 会使用一种算法来最小化元素的移动并且尽可能尝试就地修改/复用相同类型元素。而使用 key 时，它会基于 key 的顺序变化重新排列元素，并且 key 不再存在的元素将始终被移除/销毁。有相同父元素的子元素必须有唯一的 key。重复的 key 会造成渲染错误。
+
+- vue使用的虚拟dom，不直接操作dom元素，在操作虚拟dom的时候又使用了diff算法。diff算法的实现基于两个假设： 两个相同的组件产生类似的DOM结构，不同的组件产生不同的DOM结构。
+- 同一层级的一组节点，他们可以通过唯一的id进行区分。基于以上这两点假设，使得虚拟DOM的Diff算法的复杂度从O(n^3)降到了O(n)。
+
+
+为什么v-for不建议使用index做key?
+使用v-for更新已渲染的元素列表时,默认用就地复用策略;列表数据修改的时候,他会根据key值去判断某个值是否修改,如果修改,则重新渲染这一项,否则复用之前的元素。如果用index做key，下标发生改变时可能就会出现一些问题。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220117121230.png)
+
+在进行子节点的 diff算法 过程中，会进行 旧首节点和新首节点的sameNode对比，这一步命中了逻辑，因为现在新旧两次首部节点 的 key 都是 0了，同理，key为1和2的也是命中了逻辑，导致相同key的节点会去进行patchVnode更新文本，而原本就有的c节点，却因为之前没有key为4的节点，而被当做了新节点，所以很搞笑，使用index做key，最后新增的居然是本来就已有的c节点。所以前三个都进行patchVnode更新文本，最后一个进行了新增，那就解释了为什么所有li标签都更新了。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220117121339.png)
+
+用了id来当做key就实现了我们的理想效果呢，因为这么做的话，a，b，c节点的key就会是永远不变的，更新前后key都是一样的，并且又由于a，b，c节点的内容本来就没变，所以就算是进行了patchVnode，也不会执行里面复杂的更新操作，节省了性能，而林三心节点，由于更新前没有他的key所对应的节点，所以他被当做新的节点，增加到真实DOM上去了。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220117121416.png)
