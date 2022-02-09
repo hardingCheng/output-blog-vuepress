@@ -271,11 +271,14 @@ import install from "./intall";
 import createMatcher from "./create-matcher";
 import HashHistory from "./history/hash";
 import HTML5History from "./history/html5";
+const inBrowser = typeof window !== "undefined";
+
 export default class VueRouter {
   constructor(options) {
     // 记录所有的路由规则
     this._routes = options.routes || [];
     // createMatcher 返回 match 匹配的方法 和 addRoutes 动态添加路由的方法
+    // 创建路由matcher对象，传入routes路由配置列表及VueRouter实例，主要负责url匹配
     this.matcher = createMatcher(this._routes);
     // 增加一个属性，记录所有 beforeEach 注册的钩子函数
     this.beforeHooks = []
@@ -283,7 +286,9 @@ export default class VueRouter {
     beforeEach (fn) {
       this.beforeHooks.push(fn)
     }
-    const mode = (this.mode = options.mode || "hash");
+    let mode = options.mode || "hash";
+   
+    this.mode = mode;
 
     switch (mode) {
       case "hash":
@@ -293,7 +298,9 @@ export default class VueRouter {
         this.history = new HTML5History(this);
         break;
       default:
-        throw new Error("mode error");
+        if (process.env.NODE_ENV !== "production") {
+          throw new Error(`[vue-router] invalid mode: ${mode}`);
+        }
     }
   }
 
@@ -315,6 +322,7 @@ export default class VueRouter {
   // install 中调用 init()
 }
 VueRouter.install = install;
+
 ```
 ### install方法
 - 注册 VueRouter 插件，并给 Vue 根实例，以及每一个子组件对象设置 _routerRoot ，让子组件可以获取到根实例，以及根实例中存储的 _router 对象
@@ -325,9 +333,14 @@ import Link from "./components/link";
 import View from "./components/view";
 export let _Vue = null;
 export default function install(Vue) {
+  // 第一就是通过它防止插件多次注册安装，因为插件安装方法 install 里我们给此方法添加了一个 installed 属性，当此属性存在且为 true 且 _Vue 已被赋值为构造函数 Vue 时 return，代表已经注册过该插件，无需重复注册。
+  // 第二个作用就是构造函数 Vue 上面挂载了很多实用 API 可供我们在 VueRouter 类里使用，当然也可以通过引入 Vue 来使用它的 API，但是一旦引入包使用，打包的时候也会将整个 Vue 打包进去，即然 install 里会把这个构造函数作为参数传过来，恰巧我们写 router 配置文件时，安装插件（Vue.use）是写在初始化 VueRouter 实例前面的，也就是 install 执行较早，这个时候我们把构造函数参数赋值给一个变量在 VueRouter 类里使用简直完美
   if (install.installed && _Vue === Vue) return;
   install.installed = true;
   _Vue = Vue;
+  // 全局注册混入，每个 Vue 实例都会被影响
+  // 首先写一个mixin，全局注册混入，让每个 Vue 实例都会被影响。混入里写一个 beforeCreate 钩子，因为此生命周期 options最早挂载完成。又因全局混入，所以beforeCreate钩子里我们写了一个通过组件实例中的this.options 最早挂载完成。又因全局混入，所以 beforeCreate 钩子里我们写了一个通过组件实例中的 this.options最早挂载完成。
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
   _Vue.mixin({
     // 根实例，以及所有的组件增加router属性
     beforeCreate() {
@@ -335,32 +348,35 @@ export default function install(Vue) {
       // 判断当前是否是 Vue 的根实例
       // 初始化的时候有传new Vues
       if (this.$options.router) {
+        // 在 Vue 根实例添加 _router 属性（ VueRouter 实例）
         this._router = this.$options.router;
         // 根实例记录自己，目的是在子组件中通过 _routerRoot 获取到 _router 对象
         this._routerRoot = this;
         // 初始化router对象
         this._router.init(this);
+        this._route = {};
         // 可以根据current变化   更改视图
         Vue.util.defineReactive(this, "_route", this._router.history.current);
       } else {
         // 给子组件设置 routerRoot，让子组件能够通过 routerRoot 找到 _router 对象
-        this._routerRoot = this.$parent && this.$parent._routerRoot;
+        // 为每个组件实例定义_routerRoot，回溯查找_routerRoot
+        this._routerRoot = (this.$parent && this.$parent._routerRoot) || this
       }
     },
+    Object.defineProperty(Vue.prototype, "$router", {
+      get() {
+        return this._routerRoot._router;
+      },
+    });
+    Object.defineProperty(Vue.prototype, '$route', {
+      get() {
+        return this._routerRoot._route;
+      }
+    });
   });
   _Vue.component(Link.name, Link);
   _Vue.component(View.name, View);
-  Object.defineProperty(Vue.prototype, "$route", {
-    get() {
-      return this._routerRoot._route;
-    },
-  });
 
-  Object.defineProperty(Vue.prototype, "$router", {
-    get() {
-      return this._routerRoot._router;
-    },
-  });
 }
 ```
 - 挂载 install
@@ -388,13 +404,21 @@ export default {
   name: "RouterLink",
   props: {
     to: {
-      type: String,
-      required: true,
+      type: [String, Object],
+      require: true,
     },
   },
   // template: `<a :href="{{ '#' + this.to}}"><slot name="default"></slot></a>`
   render(h) {
-    return h("a", { attrs: { href: "#" + this.to } }, [this.$slots.default]);
+    ender(h) {
+      const href = typeof this.to === 'string' ? this.to : this.to.path
+      const router = this.$router
+      let data = {
+        attrs: {
+          href: router.mode === "hash" ? "#" + href : href
+        }
+      };
+      return h("a", data, [this.$slots.default])
   },
 };
 
@@ -634,3 +658,4 @@ export default {
   },
 };
 ```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220117194413.png)

@@ -13,18 +13,22 @@ categories:
 ### 响应式原理
 **vue2.0缺陷，如果数据层级过多，则会出现大量的递归，造成内存性能损耗。**
 
-数据响应式就是拦截数据的访问与更新，在其发生这些操作的时候可以让我们知晓。所以，数据响应式是用来服务双向数据绑定的。
+数据响应式就是**拦截数据的访问与更新**，在其 发生这些操作的时候可以让我们知晓。所以，**数据响应式是用来服务双向数据绑定的。**
 
-`Vue`初始化时会用 `Object.defineProperty()`给 `data` 中每一个属性添加` getter` 和 `setter`，同时创建 `dep` 和 `watcher` 进行依赖收集与派发更新，最后通过 `diff` 算法对比新老 `vnode` 差异，通过 `patch` 即时更新 DOM。
+`Vue`初始化时会用 `Object.defineProperty()`给 `data` 中每一个属性添加` getter` 和 `setter`
+
 
 具体来说：
 1. `vue` 初始化阶段`(beforeCreate 之后 create 之前)`两个钩子之间执行的，遍历 `data/props`，调用 `Object.defineProperty` 给每个属性加上 `getter、setter`。
-2. 同时实例化一个 `Dep`，`Dep` 可以理解为一个消息中心。数据的变更最终是要通知到 `Watcher` 的，`Dep` 中收集了这些数据要通知的 `Watcher`。当 `getter` 触发时，当前的 `Watcher（Dep.target）` 会被加入 `dep` 中；当 `setter` 触发时，`dep` 会调用 `notify` 方法，通知其收集的所有 `Watcher`。`Dep` 就是一个消息中心，代码也很简单，目的就是收集 `Watcher`，当数据变更时，调用所有 `Watcher` 的 `update` 方法。
+
+
+有双向绑定的东西：
+2. 同时实例化一个 `Dep`，`Dep` 可以理解为一个消息中心。数据的变更最终是要通知到 `Watcher` 的，`Dep` 中收集了这些数据要通知的 `Watcher`。当 `getter` 触发时，当前的 `Watcher（Dep.target）` 会被加入 `dep` 中；当 `setter` 触发时，`dep` 会调用 `notify` 方法，通知其收集的所有`Watcher`。`Dep` 就是一个消息中心，代码也很简单，目的就是收集 `Watcher`，当数据变更时，调用所有 `Watcher` 的 `update` 方法。
 3. `Watcher` 是一个观察者，数据变化时会调用其 `update` 方法，更新对应视图。在组件 `mount` 的时候，会实例化一个 `Watcher`，每个组件对应一个 `Watcher`。因此 Vue 每次更新都是以`组件`为单位，`diff`算法也是以组件为单位进行对比，`这也是组件必须只有一个根元素的原因`。
 4. `Watcher` 实例化之后，会修改 `Dep.target`，将其指向自己。接着组件挂载，模板渲染，`data` 中的值被读取，触发其 `getter`，`Dep` 收集当前的 `Watcher`，形成闭环。
 
 
-整个响应式的过程总结下来就是：
+整个双向绑定（包含响应式）的过程总结下来就是：
 在 `data` 初始化时，将其属性转换成 `getter` 和 `setter`，同时实例化一个 `Dep`。视图渲染时， `getter` 触发，`Dep` 会收集 `Watcher`；在 `setter` 触发时，`Dep` 会通知其收集的 `Watcher` 更新视图。`Wathcer` 在组件挂载时实例化，`Watcher` 与组件一一对应。
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211230101621.png)
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211007094007.png)
@@ -280,6 +284,126 @@ Vue.extend = function (extendOptions: Object): Function {
 2. 编译模板，创建 Watcher，并将 Dep.target 标识为当前 Watcher。
 3. 编译模板时，如果使用到了 Data 中的数据，就会触发 Data 的 get 方法，然后调用 Dep.addSub 将 Watcher 搜集起来。
 4. 数据更新时，会触发 Data 的 set 方法，然后调用 Dep.notify 通知所有使用到该 Data 的 Watcher 去更新 DOM。
+### 如何实现数组响应式的？
+**无法检测通过索引改变数组的操作。**
+对于对象而言，每一次的数据变更都会对对象的属性进行一次枚举，一般对象本身的属性数量有限，所以对于遍历枚举等方式产生的性能损耗可以忽略不计，但是对于数组而言呢？数组包含的元素量是可能达到成千上万，假设对于每一次数组元素的更新都触发了枚举/遍历，其带来的性能损耗将与获得的用户体验不成正比，故vue无法检测数组的变动。
+
+
+无法检测通过索引改变数组的操作。即`vm.items[indexOfItem] = newValue`
+Vue对数组的7个变异方法（push、pop、shift、unshift、splice、sort、reverse）实现了响应式。这里就不做测试了。我们测试一下通过索引改变数组的操作，能不能被监听到。遍历数组，用Object.defineProperty对每一项进行监测。
+```js
+function defineReactive(data, key, value) {
+	 Object.defineProperty(data, key, {
+		 enumerable: true,
+		 configurable: true,
+		 get: function defineGet() {
+			 console.log(`get key: ${key} value: ${value}`)
+			 return value
+		 },
+		 set: function defineSet(newVal) {
+			 console.log(`set key: ${key} value: ${newVal}`)
+			 value = newVal
+		 }
+	 })
+}
+ 
+function observe(data) {
+	Object.keys(data).forEach(function(key) {
+		defineReactive(data, key, data[key])
+	})
+}
+ 
+let arr = [1, 2, 3]
+observe(arr)
+```
+```js
+...
+// 取出 Array的原型prototype 存储在 arrayProto变量中，
+const arrayProto = Array.prototype
+// 在这个原型基础之上create一个新的对象 arrayMethods
+export const arrayMethods = Object.create(arrayProto)
+
+const methodsToPatch = [
+  'push',
+  'pop',
+  'shift',
+  'unshift',
+  'splice',
+  'sort',
+  'reverse'
+]
+
+/**
+ * Intercept mutating methods and emit events
+ */
+ // 接下来遍历数组这7个方法，在这些方法原有功能的基础上，额外添加了通知 更新(ob.dep.notify())的操作
+methodsToPatch.forEach(function (method) {
+  // cache original method  存储原本的方法
+  const original = arrayProto[method]
+  // def为引入的方法，作用是通知更新
+  def(arrayMethods, method, function mutator (...args) {
+    // 先是正常调用当前方法
+    const result = original.apply(this, args)
+    const ob = this.__ob__
+    let inserted
+    switch (method) {
+      case 'push':
+      case 'unshift':
+        inserted = args
+        break
+      case 'splice':
+        inserted = args.slice(2)
+        break
+    }
+    // 给新增的属性添加监听依赖
+    if (inserted) ob.observeArray(inserted)
+    // notify change
+    // 最后 dep.notify() 通知更新
+    ob.dep.notify()
+    return result
+  })
+})
+```
+#### 解决方案
+1. ​this.$set(array, index, data)
+```js
+//这是个深度的修改，某些情况下可能导致你不希望的结果，因此最好还是慎用
+this.dataArr = this.originArr
+this.$set(this.dataArr, 0, {data: '修改第一个元素'})
+console.log(this.dataArr)        
+console.log(this.originArr)  //同样的 源数组也会被修改 在某些情况下会导致你不希望的结果 
+```
+2. splice
+```js
+//因为splice会被监听有响应式，而splice又可以做到增删改。
+```
+3. 利用临时变量进行中转
+```js
+let tempArr = [...this.targetArr]
+tempArr[0] = {data: 'test'}
+this.targetArr = tempArr
+```
+### 如何实现对象新增属性响应式的？
+无法检测数组/对象的新增？Vue检测数据的变动是通过Object.defineProperty实现的，所以无法监听数组的添加操作是可以理解的，因为是在构造函数中就已经为所有属性做了这个检测绑定操作。
+
+#### 解决方案
+1. this.$set(obj, key ,value) - 可实现增、改
+2. watch时添加deep：true深度监听，只能监听到属性值的变化，新增、删除属性无法监听
+```js
+this.$watch('blog', this.getCatalog, {
+    deep: true
+    // immediate: true // 是否第一次触发
+  });
+```
+3. watch时直接监听某个key
+```js
+watch: {
+  'obj.name'(curVal, oldVal) {
+    // TODO
+  }
+}
+```
+
 ### watch原理
 `computed`和`watch`内部都是利用了`watcher`，`user watcher`的过程如下：
 1. Vue 在`initWatch`过程中，创建`Watcher`，并设置标志位 `user` 为`true`，并判断用户是否设置了`immediate`为`true`，如果是，立即执行回调；
@@ -321,12 +445,16 @@ function createComputedGetter (key) {
 通俗来讲，既能用 computed 实现又可以用 watch 监听来实现的功能，推荐用 computed， 重点在于 `computed 的缓存功能` computed 计算属性是用来`声明式`的描述一个值依赖了其它的值，当所依赖的值或者变量 改变时，计算属性也会跟着改变； watch 监听的是已经在 data 中定义的变量，当该变量变化时，会触发 watch 中的方法。
 
 - watch 属性监听 是一个对象，键是需要观察的属性，值是对应回调函数，主要用来监听某些特定数据的变化，从而进行某些具体的业务逻辑操作,监听属性的变化，需要在数据变化时执行异步或开销较大的操作时使用
+    - watch基本使用的时候是浅监听  (deep:true)
+    - watch监听引用类型，拿不到oldVal
+        - 因为指针相同，此时已经指向了新的val
 - computed 计算属性 属性的结果会被缓存，当 computed 中的函数所依赖的属性没有发生改变的时候，那么调用当前函数的时候结果会从缓存中读取。除非依赖的响应式属性变化时才会重新计算，主要当做属性来使用 computed 中的函数必须用 return 返回最终的结果 computed 更高效，优先使用。data 不改变，computed 不更新。
-- 使用场景 computed：当一个属性受多个属性影响的时候使用，例：购物车商品结算功能 watch：当一条数据影响多条数据的时候使用，例：搜索数据。
+    - 使用场景 computed：当一个属性受多个属性影响的时候使用，例：购物车商品结算功能 watch：当一条数据影响多条数据的时候使用，例：搜索数据。
+    - computed有缓存，data不变则不会重新计算
 ### 双向绑定的实现原理
 双向数据绑定就是视图层或者数据层中的一方发生变化，相对应的另一层也会发生变化。数据响应式就是拦截数据的访问与更新，在其发生这些操作的时候可以让我们知晓。所以，数据响应式是用来服务双向数据绑定的。
 
-- Vue采用的是数据**数据劫持加发布者**-**订阅者模式**的方式。
+- Vue采用的是**数据劫持加发布者**-**订阅者模式**的方式。
 - 通过`Object.defineProperty()`来劫持各个属性的`setter`和`getter`。在数据变动时发布消息给订阅者，触发响应的监听回调。
 - 每个`vue`属性都是通过`Object.defineProperty(obj, prop, descriptor)`实现数据劫持(`data` 和 `props` 各个属性的 `getter` 和 `setter`，`getter` 做依赖收集，`setter` 派发更新。
 )，为每个属性分配一个订阅者集合的管理数组`dep`；
@@ -934,125 +1062,6 @@ export default{
     - Vuex
     - $attrs / $listeners
     - $root
-### 如何实现数组响应式的？
-**无法检测通过索引改变数组的操作。**
-对于对象而言，每一次的数据变更都会对对象的属性进行一次枚举，一般对象本身的属性数量有限，所以对于遍历枚举等方式产生的性能损耗可以忽略不计，但是对于数组而言呢？数组包含的元素量是可能达到成千上万，假设对于每一次数组元素的更新都触发了枚举/遍历，其带来的性能损耗将与获得的用户体验不成正比，故vue无法检测数组的变动。
-
-
-无法检测通过索引改变数组的操作。即`vm.items[indexOfItem] = newValue`
-Vue对数组的7个变异方法（push、pop、shift、unshift、splice、sort、reverse）实现了响应式。这里就不做测试了。我们测试一下通过索引改变数组的操作，能不能被监听到。遍历数组，用Object.defineProperty对每一项进行监测。
-```js
-function defineReactive(data, key, value) {
-	 Object.defineProperty(data, key, {
-		 enumerable: true,
-		 configurable: true,
-		 get: function defineGet() {
-			 console.log(`get key: ${key} value: ${value}`)
-			 return value
-		 },
-		 set: function defineSet(newVal) {
-			 console.log(`set key: ${key} value: ${newVal}`)
-			 value = newVal
-		 }
-	 })
-}
- 
-function observe(data) {
-	Object.keys(data).forEach(function(key) {
-		defineReactive(data, key, data[key])
-	})
-}
- 
-let arr = [1, 2, 3]
-observe(arr)
-```
-```js
-...
-// 取出 Array的原型prototype 存储在 arrayProto变量中，
-const arrayProto = Array.prototype
-// 在这个原型基础之上create一个新的对象 arrayMethods
-export const arrayMethods = Object.create(arrayProto)
-
-const methodsToPatch = [
-  'push',
-  'pop',
-  'shift',
-  'unshift',
-  'splice',
-  'sort',
-  'reverse'
-]
-
-/**
- * Intercept mutating methods and emit events
- */
- // 接下来遍历数组这7个方法，在这些方法原有功能的基础上，额外添加了通知 更新(ob.dep.notify())的操作
-methodsToPatch.forEach(function (method) {
-  // cache original method  存储原本的方法
-  const original = arrayProto[method]
-  // def为引入的方法，作用是通知更新
-  def(arrayMethods, method, function mutator (...args) {
-    // 先是正常调用当前方法
-    const result = original.apply(this, args)
-    const ob = this.__ob__
-    let inserted
-    switch (method) {
-      case 'push':
-      case 'unshift':
-        inserted = args
-        break
-      case 'splice':
-        inserted = args.slice(2)
-        break
-    }
-    // 给新增的属性添加监听依赖
-    if (inserted) ob.observeArray(inserted)
-    // notify change
-    // 最后 dep.notify() 通知更新
-    ob.dep.notify()
-    return result
-  })
-})
-```
-#### 解决方案
-1. ​this.$set(array, index, data)
-```js
-//这是个深度的修改，某些情况下可能导致你不希望的结果，因此最好还是慎用
-this.dataArr = this.originArr
-this.$set(this.dataArr, 0, {data: '修改第一个元素'})
-console.log(this.dataArr)        
-console.log(this.originArr)  //同样的 源数组也会被修改 在某些情况下会导致你不希望的结果 
-```
-2. splice
-```js
-//因为splice会被监听有响应式，而splice又可以做到增删改。
-```
-3. 利用临时变量进行中转
-```js
-let tempArr = [...this.targetArr]
-tempArr[0] = {data: 'test'}
-this.targetArr = tempArr
-```
-### 如何实现对象新增属性响应式的？
-无法检测数组/对象的新增？Vue检测数据的变动是通过Object.defineProperty实现的，所以无法监听数组的添加操作是可以理解的，因为是在构造函数中就已经为所有属性做了这个检测绑定操作。
-
-#### 解决方案
-1. this.$set(obj, key ,value) - 可实现增、改
-2. watch时添加deep：true深度监听，只能监听到属性值的变化，新增、删除属性无法监听
-```js
-this.$watch('blog', this.getCatalog, {
-    deep: true
-    // immediate: true // 是否第一次触发
-  });
-```
-3. watch时直接监听某个key
-```js
-watch: {
-  'obj.name'(curVal, oldVal) {
-    // TODO
-  }
-}
-```
 ### Vue模版编译原理
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220102102431.png)
 
@@ -1069,6 +1078,9 @@ watch: {
 - render 函数 => vNode 虚拟dom => 真实 dom
 - template 模板 => Ast 抽象语法树 => render => vNode 虚拟dom => 真实 dom
 - 转换为 render 函数过程 ：(parse) 生成 ast => (optimize) 优化ast => (generate) 生成 render 函数
+#### Vue模板
+- 模板不是html,有指令、插值、JS表达式、能实现判断、循环
+- 模板一定是转换为某种JS代码，即为模板编译。
 #### Vue 的版本
 很多人使用 Vue 的时候，都是直接通过 vue-cli 生成的模板代码，并不知道 Vue 其实提供了两个构建版本。
 - vue.js： 完整版本，包含了模板编译的能力；
@@ -1869,11 +1881,13 @@ Vue实例从创建到销毁的过程，就是Vue实例的生命周期。这个�
 - 父组件更新过程：父 beforeUpdate -> 父 updated
 - 销毁过程： 父 beforeDestroy->子 beforeDestroy->子 destroyed->父 destroyed
 ### nextTick 实现原理
+Vue是异步渲染的。data改变之后，DOM不会立刻去渲染，不会立即就能就能拿到更新后的DOM，来进行操作。$nextTick会在DOM之后被触发，以获取最新的DOM节点。
+
 nextTick 就是创建一个异步任务，那么它自然要等到同步任务执行完成后才执行。
 
 nextTick 是 Vue 提供的一个全局 API,是在下次 DOM 更新循环结束之后执行延迟回调，在修改数据之后使用$nextTick，则可以在回调中获取更新后的 DOM；
 
-在下次 DOM 更新循环结束之后执行延迟回调，在修改数据之后立即使用 nextTick 来获取更新后的 DOM。 nextTick 主要使用了宏任务和微任务。 根据执行环境分别尝试采用 Promise、MutationObserver、setImmediate，如果以上都不行则采用 setTimeout 定义了一个异步方法，多次调用 nextTick 会将方法存入队列中，通过这个异步方法清空当前队列。
+在下次 DOM 更新循环结束之后执行延迟回调，在修改数据之后立即使用 nextTick 来获取更新后的 DOM。 nextTick 主要使用了宏任务和微任务。 根据执行环境分别尝试采用 Promise、MutationObserver、setImmediate，如果以上都不行则采用 setTimeout 定义了一个异步方法，多次调用 nextTick 会将方法存入队列中（页面渲染会将data的修改做整合，多次data修改只会渲染一次），通过这个异步方法清空当前队列。
 #### nextTick 用法
 ```vue
 <template>
@@ -2021,13 +2035,48 @@ export function nextTick (cb?: Function, ctx?: Object) {
 this.$nextTick().then(()=>{ ... })
 ```
 ### Diff算法
+Diff算法vdom中国最核心，最关键的部分。
 
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220123202409.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220123202646.png)
+
+- h函数
+    -vnode函数
+- patch
+    - patchVnode
+        - addVnodes，removeVnodes
+        - updateChildren
+### Diff的key重要性
+Vue 中使用虚拟 dom 且根据 diff 算法进行新旧 DOM 对比，从而更新真实 dom ，key 是虚拟 DOM 对象的唯一标识, 在 diff 算法中 key 起着极其重要的作用。
+
+key 在 diff 算法中的角色。key 的特殊 attribute 主要用在 Vue 的虚拟 DOM 算法，在新旧 nodes 对比时辨识 VNodes。如果不使用 key，Vue 会使用一种最大限度减少动态元素并且尽可能的尝试就地修改/复用相同类型元素的算法。而使用 key 时，它会基于 key 的变化重新排列元素顺序，并且会移除 key 不存在的元素。
+
+- key的作用主要是为了高效的更新虚拟dom，其原理是vue在patch过程中通过key可以精准判断两个节点是否是同一个，从而避免频繁更新不同元素，使得整个patch过程更加高效，减少dom操作量，提高性能。
+    - key会用在虚拟DOM算法（diff算法）中，用来辨别新旧节点。
+    - 不带key的时候会最大限度减少元素的变动，尽可能用相同元素。（就地复用）
+    - 带key的时候，会基于相同的key来进行排列。（相同的复用）
+    - 带key还能触发过渡效果，以及触发组件的生命周期
+- 不带key的速度是更快的。原因有如下：在上述例子中，不带key的省略了销毁和创建dom的开销，只需要替换文本节点就ok了，而带key的却需要进行patch流程，而且需要把能复用的那部分元素找出来，将不能复用的消除，并且重新创建新的dom元素。
+- 
+
+
+
+另外，若不设置key还可能在列表更新时候引发一些隐藏的bug。
+
+vue中在使用相同标签名元素的过渡切换时，也会使用到key属性，其目的也是为了让vue可以区分它们，否则vue只会替换其内部属性而不会触发过渡效果。
+#### 不能用index做key
+影响性能：当用index作为key的时候，删除节点后面的所有节点都会导致重新渲染，因为index变化了，可以也就变化了。
 ## Vue3.x
+### Composition API和React Hooks对比
+- 前者setup只会被调用一次，而后者函数会被多次调用
+- 前者无需useMemo useCallback，因为setup只调用一次
+- 前者无需考虑调用顺序，而后者需要保证hooks的顺序一致
+- 前者reactive + ref 比后者useState,要难理解
 ### 响应式原理
 Vue3.x 改用 Proxy 替代 Object.defineProperty。因为 Proxy 可以直接监听对象和数组的变化，并且有多达 13 种拦截方法。并且作为新标准将受到浏览器厂商重点持续的性能优化。
 
-Proxy 只会代理对象的第一层。
-判断当前 Reflect.get 的返回值是否为 Object，如果是则再通过 reactive 方法做代理， 这样就实现了深度观测。
+Proxy 只会代理对象的第一层。判断当前 Reflect.get 的返回值是否为 Object，如果是则再通过 reactive 方法做代理， 这样就实现了深度观测。
 
 监测数组的时候可能触发多次 get/set，那么如何防止触发多次呢？
 我们可以判断 key 是否为当前被代理对象 target 自身属性，也可以判断旧值与新值是否相等，只有满足以上两个条件之一时，才有可能执行 trigger。
@@ -2121,6 +2170,40 @@ function ref(value) {
   return res;
 }
 ```
+### 如何理解 ref toRef 和 toRefs
+#### ref
+- 生成值类型的响应式数据
+- 可用于模板和reactive
+- 通过.value修改值
+#### toRef
+- 针对一个响应式（reactive封装）的prop
+- toRef如果用于普通对象（非响应式对象），产出的结果不具备响应式
+- 创建一个ref，具有响应式
+- 两者保持引用关系
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220206161500.png)
+#### toRefs
+- 将响应式对象（reactive封装）转换为普通对象
+- 对象的每个prop都是对应的ref
+- 两者保持引用关系
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220206162135.png)
+#### 为什么使用ref
+- 返回值类型，会丢失响应式
+- 如在setup,computed,合成函数，都有可能返回值类型
+- Vue如不定义ref,用户将自造ref,反而混乱
+#### 为何需要.value
+- ref是一个对象（不丢失响应式），value存储值
+- 通过.value属性的get和set实现响应式
+- 用于模板、reactive时，不需要.value，其他情况都需要
+#### 为何需要toRef和toRefs
+- 不丢失响应式的情况下，把对象数据分散、扩散
+- 针对的是响应式对象（reactive封装的）非普通对象
+- 不创造响应式，而是延续响应式
+#### 使用场景
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220206162608.png)
+
+- 用reactive做对象的响应式，用ref做值类型的响应式
+- setup中返回toRefs(state)，或者toRef(state,'xxxx')
+- 合成函数返回响应式对象时，使用toRefs
 ### Vue3 的computed原理
 1. `computed` 内部用`effect`函数包裹传入的函数`getter`，并执行`getter`，拿到`value`；
 2. 内部`effect`中调用了`trigger`，这样computed依赖的值变化的时候，会触发此`effect`函数执行，也就能够触发依赖`computed`的`effect`函数也得到执行；
@@ -3890,18 +3973,83 @@ export default defineComponent({
         - Vue.js 3.0 做到了，它通过编译阶段对静态模板的分析，编译生成了 Block tree。Block tree 是一个将模版基于动态节点指令切割的嵌套区块，每个区块内部的节点结构是固定的，而且每个区块只需要以一个 Array 来追踪自身包含的动态节点。
         - 借助 Block tree，Vue.js 将 vnode 更新性能由与模版整体大小相关提升为与动态内容的数量相关，这是一个非常大的性能突破。
         - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220102161822.png)
+### Vue3.0为什么比Vue2快
+- Proxy响应式
+- PatchFlag
+    - 编译模板时，动态节点做标记
+    - 标记，分为不同的类型，如TEXT PROPS
+    - diff算法时，可以区分静态节点，以及不同类型的动态节点
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220208095354.png)
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220208095536.png)
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220208095720.png)
+- hoistStatic
+    - 将静态节点的定义，提升到父作用域，缓存起来
+    - 多个相邻的静态节点，会被合并起来
+    - 典型的拿空间换时间的优化策略
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220208100440.png)
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220208104911.png)
+- cacheHandle
+    - 缓存事件
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220208111833.png)
+- SSR优化
+    - 静态节点直接输出，绕过vdom
+    - 动态节点，还是需要动态的渲染
+- tree-shaking
+    - 编译时，根据不同的情况，引入不同的API
 ### Diff算法
-
+### Vue3 升级了那些重要的功能
+- createApp
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220207095249.png)
+- emits属性
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220207102705.png)
+- 生命周期
+- 多事件
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220207102745.png)
+- Fragment
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220207102805.png)
+- 移除.sync
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220207102921.png)
+- 异步组件的写法
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220207102941.png)
+- 移除filter
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220207103040.png)
+- Teleport
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220207103132.png)
+- Suspense
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220207103238.png)
+- Composition API
+    - reactive
+    - ref
+    - readonly
+    - watch和watchEffect
+    - setup
+    - 生命周期钩子函数
+### setup中如何获取组件实例
+- 在setup和其他Composition API中没有this
+- 可通过getCurrentInstance获取当前实例
+- 若使用Options API可照常使用this
 ## Vue2.x和Vue3.x对比
+### Vue3比Vue2有什么优势？
+- 性能更好
+- 体积更小
+- 刚好的ts支持
+- 更好的代码组织
+- 更好的逻辑抽离
+- 更多新功能
+### Composition API带来了什么？
+- 更好的代码组织
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220206154758.png)
+- 更好的逻辑复用
+- 更好的类型推导
 ### Vue2和Vue3的响应式
-Vue2 数据响应式是通过 Object.defineProperty() 劫持各个属性 getter 和 setter，在数据变化时发布消息给订阅者，触发相应的监听回调，而这之间存在几个问题:
-- 初始化时需要遍历对象所有 key，如果对象层次较深，性能不好
-- 通知更新过程需要维护大量 dep 实例和 watcher 实例，额外占用内存较多
-- Object.defineProperty 无法监听到数组元素的变化，只能通过劫持重写数方法
-- 动态新增，删除对象属性无法拦截，只能用特定 set/delete API 代替
-- 不支持 Map、Set 等数据结构
+- Vue2 数据响应式是通过 Object.defineProperty() 劫持各个属性 getter 和 setter，在数据变化时发布消息给订阅者，触发相应的监听回调，而这之间存在几个问题:
+    - 初始化时需要遍历对象所有 key，如果对象层次较深，性能不好
+    - 通知更新过程需要维护大量 dep 实例和 watcher 实例，额外占用内存较多
+    - Object.defineProperty 无法监听到数组元素的变化，只能通过劫持重写数方法
+    - 动态新增，删除对象属性无法拦截，只能用特定 set/delete API 代替
+    - 不支持 Map、Set 等数据结构
 
-而在 Vue3 中为了解决这些问题，使用原生的 proxy 代替，支持监听对象和数组的变化，并且多达13种拦截方法，动态属性增删都可以拦截，新增数据结构全部支持，对象嵌套属性只代理第一层，运行时递归，用到才代理，也不需要维护特别多的依赖关系，性能取得很大进步。
+- 而在 Vue3 中为了解决这些问题，使用原生的 proxy 代替，支持监听对象和数组的变化，并且多达13种拦截方法，动态属性增删都可以拦截，新增数据结构全部支持，对象嵌套属性只代理第一层，运行时递归，用到才代理，也不需要维护特别多的依赖关系，性能取得很大进步。
 
 
 
@@ -3919,8 +4067,9 @@ Object.defineProperty(data, 'count', {
 })
 ```
 - 存在问题：
-    - 新增属性、删除属性, 界面不会更新。
+    - 新增属性、删除属性, 界面不会更新。（Vue.set Vue.delete）
     - 直接通过下标修改数组, 界面不会自动更新。
+    - 深度监听，需要递归到底，一次性计算量大。
 #### Vue3.0的响应式
 - 实现原理:
     - 通过Proxy（代理）: 拦截对象中任意属性的变化, 包括：属性值的读写、属性的添加、属性的删除等。
@@ -4044,6 +4193,16 @@ export const enum PatchFlags {Ⅰ
 - 由于编译阶段的优化，除了能更快的生成虚拟 DOM 以外，还使得 Diff 时可以跳过"永远不会变化的节点"，Diff 优化如下
     - Vue2 是全量 Diff，Vue3 是静态标记 + 非全量 Diff
     - 使用最长递增子序列优化了对比流程
+### 模板编译
+- 模板编译为render函数，执行render函数返回vnode
+- 基于vnode在执行patch和diff
+- 使用webpack vue-loader，会在开发环境下编译模板
+#### vue组件可用render代替template
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220205112013.png)
+
+- with语法
+- 模板到render函数，再到vnode，再到渲染和更新
+- vue组件可以用render代替template
 ## Vue通性问题
 ### Vue的数据为什么频繁变化但只会更新一次
 - 检测到数据变化
@@ -4479,6 +4638,9 @@ MVVM 的优点：
 3. 独立开发。开发人员可以专注于业务逻辑和数据的开发(ViewModel)，设计人员可以专注于页面设计。
 4. 可测试。
 ### Vue的MVVM 实现原理
+数据驱动视图。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220119205449.png)
+
 Vue 作为 MVVM 模式的实现库的2种技术。
 - 模板解析（实现初始化显示）
     - 解析大括号表达式
@@ -4506,11 +4668,13 @@ Vue 作为 MVVM 模式的实现库的2种技术。
 
 1. 开发的时候需要什么就加什么。我们可以通过添加组件系统、客户端路由、大规模状态管理来构建一个完整的框架。更重要的是，这些功能相互独立你可以在核心功能的基础上任意选用其他的部件，不一定要全部整合在一起。可以看到，所说的“渐进式”。 
 2. 没有多做职责之外的事，侵入性看似没有 Angular 那么强，比如说，Angular，它两个版本都是强主张的，如果你用它，必须接受以下东西：必须使用它的模块机制- 必须使用它的依赖注入等
-### Vue三要素
+### Vue三要素      
 **响应式**: 例如如何监听数据变化,其中的实现方法就是我们提到的双向绑定。
 **模板引擎**: 如何解析模板。
 **渲染**: Vue如何将监听到的数据变化和解析后的HTML进行渲染。 
 ### Vue虚拟DOM的理解
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220123193138.png)
+
 由于在浏览器中操作 DOM 是很昂贵的。频繁的操作 DOM，会产生一定的性能问题。这就是虚拟 Dom 的产生原因。Vue2 的 Virtual DOM 借鉴了开源库 snabbdom 的实现。Virtual DOM 本质就是用一个原生的 JS 对象去描述一个 DOM 节点，是对真实 DOM 的一层抽象。
 
 1. 什么是 VDOM
@@ -4521,6 +4685,9 @@ Virtual DOM 用 JS 模拟 DOM 结构用。JavaScript 对象结构表示 DOM 树�
 2. 为何要用 VDOM？
 DOM 操作非常非常“昂贵”，将 DOM 对比操作放在 JS 层，提高效率。DOM 结构的对比，放在 JS 层来做。
 
+- 用JS模拟DOM结构（vnode）
+- 新旧vnode对比，得出最小的更新范围，最后更新DOM
+- 数据驱动视图的模式下，有效控制DOM操作
 3. VDOM核心函数有哪些？
 - 核心函数：
   - h('标签名', {...属性名...}, [...子元素...])
@@ -4530,7 +4697,11 @@ DOM 操作非常非常“昂贵”，将 DOM 对比操作放在 JS 层，提高�
 ### 为什么要有虚拟DOM节点，直接操作DOM节点的问题在哪里
 虚拟 DOM：对复杂的 DOM 结构提供便捷的工具，最小化的进行 DOM 操作。虚拟 DOM 不会进行重绘和回流，在虚拟 DOM 中进行频繁修改，然后一次性比较并修改真实 DOM 中需要修改的部分，最后在真实 DOM 中进行重绘和回流，减少 DOM 节点重绘和回流的损耗。
 
-真实 DOM 的重绘和回流效率相当低，虚拟 DOM 有效地降低了大面积的对真实 DOM 进行重绘和回流，因为通过比较差异，只渲染局部。
+虚拟 DOM 的重绘和回流效率相当低，虚拟 DOM 有效地降低了大面积的对真实 DOM 进行重绘和回流，因为通过比较差异，只渲染局部。
+
+真实DOM操作非常耗费性能。
+以前用JQuery，可以自行控制DOM操作的时机，手动调整
+Vue和React是数据驱动视图，如何有效控制DOM操作 
 ### 虚拟 DOM 有什么优缺点
 - 优点：
   - 保证性能下限： 框架的虚拟 DOM 需要适配任何上层 API 可能产生的操作，它的一些 DOM 操作的实现必须是普适的，所以它的性能并不是最优的；但是比起粗暴的 DOM 操作性能要好很多，因此框架的虚拟 DOM 至少可以保证在你不需要手动优化的情况下，依然可以提供还不错的性能，即保证性能的下限；
@@ -4636,9 +4807,12 @@ div{
 </child>
 ```
 ### v-model 原理？
+- input元素的value = this.name
+- 绑定input事件this.name = $event.target.value
+- data更新触发re-render
 #### v-model 原理
 v-model 实际上时语法糖，下面就是语法糖的构造过程。而 v-model 自定义指令下包裹的语法是 input 的 value 属性、input 事件，整个过程是：
-```js
+```js 
 // input属性绑定——inputV变量，也就是将值传给input；
 // input事件，该事件在input的值inputV改变时触发，事件触发时给inputV重新赋值，所赋的值是$event.target.value，也就是当前触发input事件对象的dom的value值，也就是该input的值。
 // 这就完成了v-model的数据双向绑定。
@@ -4795,6 +4969,20 @@ Vue 中有个动态组件的概念，它能够帮助开发者更好的实现组�
   // 需要展示组件的位置:
    <router-view />
 ```
+### 组件 渲染/更新 过程
+- 初次渲染过程
+    - 解析模板为render函数（或在开发环境已完成，vue-loader）
+    - 触发响应式，监听data属性getter setter
+    - 执行render函数，生成vnode,patch(ele,vnode)
+- 更新过程
+    - 修改data,触发setter（此前在getter中已被监听）
+    - 重新执行render函数，生成newVnode
+    - patch(vnode,newVnode)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220205115628.png)
+- 异步渲染
+    - $nextTick
+    - 汇总data的修改，一次性更新视图
+    - 减少DOM操作次数，提高性能
 ### Vue初始化页面闪动问题如何解决？
 出现该问题是因为在 Vue 代码尚未被解析之前，尚无法控制页面中 DOM 的显示，所以会看见模板字符串等代码。 
 
@@ -4812,21 +5000,25 @@ Vue 中有个动态组件的概念，它能够帮助开发者更好的实现组�
 //或者组件用 template 包裹起来
 <template></template>
 ```
+
 ### v-if 和 v-show 的区别
 v-show 和 v-if 都是用来显示隐藏元素，v-if还有一个v-else配合使用，两者达到的效果都一样，性能方面去有很大的区别。
 
 - v-show
+  - v-show通过CSS display控制显示和隐藏
   - 而 v-show 有更高的初始渲染开销。
   - v-show 不管条件是真还是假，第一次渲染的时候都会编译出来，也就是标签都会添加到 DOM 中。
   - 之后切换的时候，通过 display: none;样式来显示隐藏元素。可以说只是改变 css 的样式，几乎不会影响什么性能。
   - 如果需要非常频繁地切换，则使用 v-show 较好；
 
 - v-if
-  - v-if 有更高的切换开销
+  - v-if组件真正的渲染和销毁，而不是显示和隐藏
+  - v-if 有更高的切换开销 
   - 在首次渲染的时候，如果条件为假，什么也不操作，页面当作没有这些元素。
   - 当条件为真的时候，开始局部编译，动态的向 DOM 元素里面添加元素。当条件从真变为假的时候，开始局部编译（编译会被缓存起来），卸载这些元素，也就是删除。
   - 如果在运行时条件很少改变，则使用 v-if 较好。
 
+- 频繁切换显示状态用v-show，否则用v-if
 - 性能方面
   - v-if 绝对是更消耗性能的，因为 v-if 在显示隐藏过程中有 DOM 的添加和删除，v-show 就简单多了，只是操作 css。
 - 闪烁问题
@@ -4858,6 +5050,8 @@ v-show 和 v-if 都是用来显示隐藏元素，v-if还有一个v-else配合使
   </script>
 ```
 ### keep-alive实现原理
+- 缓存组件
+- 频繁切换，不需要重复渲染
 `keep-alive` 是 `Vue` 内置的一个组件，可以实现组件缓存，当组件切换时不会对当前组件进行卸载。
 
 - 常用的两个属性 include/exclude，允许组件有条件的进行缓存。
@@ -4954,6 +5148,13 @@ export default {
 - 这种场景建议使用 computed，先对数据进行过滤
 #### Vue3.0
 - 同样不建议在同一元素使用v-for和v-if，但是v-if优先级比v-for高，意味着v-if将没有权限访问v-for里的变量。
+### computed有何特点
+- 缓存，data不变不会重新计算
+- 提高性能
+### 何时需要使用beforeDestory
+- 解绑自定义事件 event.$off
+- 清除定时器
+- 解绑自定义的DOM事件，如window scroll等
 ### Vue 项目中 key 的作用
 **key的作用主要是为了高效的更新虚拟DOM**。
 
@@ -5011,8 +5212,18 @@ SSR 是 Server Side Render 简称，叫服务端渲染。
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211113165452.png)
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211113164555.png)
-
-
+### ???minxin
+- 多个组件有相同的逻辑，抽离出来
+- mixin并不是完美的解决方案，会有一些问题
+    - 混入，相同的属性，地方会自动混合合并
+    - 变量来源不明确，不利于阅读
+    - 对个mixin可能会造成命名冲突
+    - mixin和组件可能出现多对多的关系，复杂度较高
+- Vue3 提出的Composition API皆在解决这些问题
+### 总结
+- 响应式：监听data属性getter setter
+- 模板编译：模板到render函数，再到vnode
+- vdom：patch(ele,vnode)和patch(vnode,newVnode)
 ## 课程学习
 ### Vue响应式原理准备
 #### 目标
@@ -5690,6 +5901,7 @@ class Watcher {
 #### h函数介绍
 - 作用：创建VNode
     -  h 函数，主要作用是创建 虚拟节点
+    -  真是dom转化为虚拟节点的{}
 - Vue中的h函数
 
 在 snabbdom 我们也使用了多次的 h 函数，主要作用是创建 虚拟节点。
@@ -6377,3 +6589,9 @@ key 特殊 attribute 主要用做 Vue 的虚拟 DOM 算法的提示，以在比
 用了id来当做key就实现了我们的理想效果呢，因为这么做的话，a，b，c节点的key就会是永远不变的，更新前后key都是一样的，并且又由于a，b，c节点的内容本来就没变，所以就算是进行了patchVnode，也不会执行里面复杂的更新操作，节省了性能，而林三心节点，由于更新前没有他的key所对应的节点，所以他被当做新的节点，增加到真实DOM上去了。
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220117121416.png)
+
+<iframeVideo ihtml="https://output66.oss-cn-beijing.aliyuncs.com/vedio/diff%E5%8A%A8%E7%94%BB/1-5%E7%A7%8D%E6%83%85%E5%86%B5.mp4"></iframeVideo >
+<iframeVideo ihtml="https://output66.oss-cn-beijing.aliyuncs.com/vedio/diff%E5%8A%A8%E7%94%BB/2-%E6%97%A0key.mp4"></iframeVideo >
+<iframeVideo ihtml="https://output66.oss-cn-beijing.aliyuncs.com/vedio/diff%E5%8A%A8%E7%94%BB/3-%E6%9C%89key.mp4"></iframeVideo >
+<iframeVideo ihtml="https://output66.oss-cn-beijing.aliyuncs.com/vedio/diff%E5%8A%A8%E7%94%BB/4-%E5%88%A0%E9%99%A4%E8%8A%82%E7%82%B9.mp4"></iframeVideo >
+<iframeVideo ihtml="https://output66.oss-cn-beijing.aliyuncs.com/vedio/diff%E5%8A%A8%E7%94%BB/5-%E6%96%B0%E5%A2%9E%E8%8A%82%E7%82%B9.mp4"></iframeVideo >
