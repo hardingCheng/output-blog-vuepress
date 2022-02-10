@@ -2007,6 +2007,156 @@ function curry(fn) {
 - 三者都可以传参，但是 apply 是数组，而 call 是参数列表，且 apply 和 call 是一次性传入参数，而 bind 可以分为多次传入。
 - bind 是返回绑定 this 之后的函数，便于稍后调用；apply 、call 则是立即执行 。
 - bind()会返回一个新的函数，如果这个返回的新的函数作为构造函数创建一个新的对象，那么此时 this 不再指向传入给 bind 的第一个参数，而是指向用 new 创建的实例
+### this的绑定规则
+- 默认绑定
+    - 默认绑定通常是指函数独立调用，不涉及其他绑定规则。非严格模式下，this指向window，严格模式下，this指向undefined。
+    - 在普通函数内部的this
+    - let/const定义的变量存在暂时性死区，而且不会挂载到window对象上，因此print中是无法获取到a和b的。
+    - 自执行函数只要执行到就会运行，并且只会运行一次，this指向window。
+    - 函数仍然是独立运行的，函数中的this依旧指向window对象。
+    - 匿名函数为默认绑定
+- 隐式绑定
+    - 函数的调用是在某个对象上触发的，即调用位置存在上下文对象，通俗点说就是 **XXX.func()** 这种调用模式。
+    - 此时func的this指向XXX，但如果存在链式调用，例如XXX.YYY.ZZZ.func，记住一个原则：this永远指向最后调用它的那个对象。
+    - 隐式绑定可是个调皮的东西，一不小心它就会发生绑定的丢失。一般会有两种常见的丢失：
+        - 使用另一个变量作为函数别名，之后使用别名执行函数
+            - `var foo = obj.foo;` 上面将obj.foo赋值给foo，就是将foo也指向了obj.foo所指向的堆内存，此后再执行foo，相当于直接执行的堆内存的函数，与obj无关，foo为默认绑定。笼统的记，只要fn前面什么都没有，肯定不是隐式绑定。
+            - `var obj2 = { a: 3, foo: obj.foo }` obj2.foo指向了obj.foo的堆内存，此后执行与obj无关(除非使用call/apply改变this指向)
+        - 将函数作为参数传递时会被隐式赋值
+            - `doFoo(obj.foo)`obj.foo作为实参，在预编译时将其值赋值给形参fn，是将obj.foo指向的地址赋给了fn，此后fn执行不会与obj产生任何关系。fn为默认绑定。
+            - 只要涉及形参了，就只是传递了一个地址，和原来的没有关系了。
+        - 隐式绑定丢失之后，this的指向会启用默认绑定。
+- 显式(硬)绑定
+    - 显式绑定比较好理解，就是通过call()、apply()、bind()等方法，强行改变this指向。
+    - call()和apply()函数会立即执行
+    - bind()函数会返回新函数，不会立即执行函数
+    - call()和apply()的区别在于call接受若干个参数，apply接受数组。
+- new绑定
+    - 创建一个空的简单JavaScript对象（即{}）；
+    - 为步骤1新创建的对象添加属性__proto__，将该属性链接至构造函数的原型对象 ；
+    - 将步骤1新创建的对象作为this的上下文 ；
+    - 如果该函数没有返回对象，则返回this。
+    - 通过new来调用构造函数，会生成一个新对象，并且把这个新对象绑定为调用函数的this。
+```js
+
+function Foo(){
+    getName = function(){ console.log(1); };
+    return this;
+}
+Foo.getName = function(){ console.log(2); };
+Foo.prototype.getName = function(){ console.log(3); };
+var getName = function(){ console.log(4); };
+function getName(){ console.log(5) };
+
+Foo.getName();         
+getName();        
+Foo().getName();
+getName();        
+new Foo.getName();
+new Foo().getName();
+new new Foo().getName();
+```
+```js
+
+GO = {
+    Foo: fn(Foo),
+    getName: function getName(){ console.log(5) };
+}
+```
+- Foo.getName(): 执行Foo上的getName方法，打印2
+- getName(): 执行GO中的getName方法，打印4
+- Foo().getName() -> Foo()执行 -> Foo().getName()
+```js
+// 修改全局GO的getName为function(){ console.log(1); }
+getName = function(){ console.log(1) }
+// Foo为默认绑定，this -> window
+// return window
+return this
+```
+- Foo().getName(): 执行window.getName()，打印1
+- getName(): 执行GO中的getName，打印1
+分析后面三个打印结果之前，先补充一些运算符优先级方面的知识(图源：MDN) 
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220210095048.png)
+从上图可以看到，部分优先级如下：new(带参数列表) = 成员访问 = 函数调用 > new(不带参数列表)。
+
+- new Foo.getName()
+    - 首先从左往右看：new Foo属于不带参数列表的new(优先级19)，Foo.getName属于成员访问(优先级20)，getName()属于函数调用(优先级20)，同样优先级遵循从左往右执行。
+    - Foo.getName执行，获取到Foo上的getName属性
+    - 此时原表达式变为new (Foo.getName)()，new (Foo.getName)()为带参数列表(优先级20)，(Foo.getName)()属于函数调用(优先级20)，从左往右执行
+    - new (Foo.getName)()执行，打印2，并返回一个以Foo.getName()为构造函数的实例
+    - 可见在成员访问之后，执行的是带参数列表格式的new操作。
+- new Foo().getName()
+    - 同步骤4一样分析，先执行new Foo()，返回一个以Foo为构造函数的实例
+    - Foo的实例对象上没有getName方法，沿原型链查找到Foo.prototype.getName方法，打印3
+- new new Foo().getName()
+    - 从左往右分析: 第一个new不带参数列表(优先级19)，new Foo()带参数列表(优先级20)，剩下的成员访问和函数调用优先级都是20
+    - new Foo()执行，返回一个以Foo为构造函数的实例
+    - 在执行成员访问，Foo实例对象在Foo.prototype查找到getName属性
+    - 执行new (new Foo().getName)()，返回一个以 Foo.prototype.getName()为构造函数的实例，打印3
+- new Foo.getName() 与 new new Foo().getName()区别：
+    - new Foo.getName()的构造函数是Foo.getName
+    - new new Foo().getName()的构造函数为Foo.prototype.getName
+
+
+
+- ES6新增箭头函数绑定
+    - 箭头函数没有自己的this，它的this指向外层作用域的this，且指向函数定义时的this而非执行时。
+    - this指向外层作用域的this: 箭头函数没有this绑定，但它可以通过作用域链查到外层作用域的this
+    - 指向函数定义时的this而非执行时: JavaScript是静态作用域，就是函数定义之后，作用域就定死了，跟它执行时的地方无关。更详细的介绍见JavaScript之静态作用域与动态作用域。
+- 箭头函数扩展
+    - 箭头函数没有this，它的this是通过作用域链查到外层作用域的this，且指向函数定义时的this而非执行时。
+    - 不可以用作构造函数，不能使用new命令，否则会报错
+    - 箭头函数没有arguments对象，如果要用，使用rest参数代替
+    - 不可以使用yield命令，因此箭头函数不能用作Generator函数。
+    - 不能用call/apply/bind修改this指向，但可以通过修改外层作用域的this来间接修改。
+    - 箭头函数没有prototype属性。
+
+```js
+var x = 10;
+var foo = {
+   x : 20,
+   bar : function(){
+       var x = 30;
+       console.log(this.x)
+    
+   }
+};
+foo.bar();
+(foo.bar)();
+(foo.bar = foo.bar)();
+(foo.bar, foo.bar)();
+```
+- foo.bar(): 隐式绑定，打印20
+- (foo.bar)(): 上面提到过运算符优先级的知识，成员访问与函数调用优先级相同，默认从左到右，因此括号可有可无，隐式绑定，打印20
+- (foo.bar = foo.bar)()：隐式绑定丢失，给foo.bar起别名，虽然名字没变，但是foo.bar上已经跟foo无关了，默认绑定，打印10
+- (foo.bar, foo.bar)(): 隐式绑定丢失，起函数别名，将逗号表达式的值(第二个foo.bar)赋值给新变量，之后执行新变量所指向的函数，默认绑定，打印10。
+```js
+var length = 10;
+function fn() {
+    console.log(this.length);
+}
+ 
+var obj = {
+  length: 5,
+  method: function(fn) {
+    fn();
+    arguments[0]();
+  }
+};
+ 
+obj.method(fn, 1);
+```
+- fn(): 默认绑定，打印10
+- fn函数this指向arguments，打印2
+
+
+- 总结
+    - 默认绑定: 非严格模式下this指向全局对象，严格模式下this会绑定到undefined
+    - 隐式绑定: 满足XXX.fn()格式，fn的this指向XXX。如果存在链式调用，this永远指向最后调用它的那个对象
+    - 隐式绑定丢失：起函数别名，通过别名运行；函数作为参数会造成隐式绑定丢失。
+    - 显示绑定: 通过call/apply/bind修改this指向
+    - new绑定: 通过new来调用构造函数，会生成一个新对象，并且把这个新对象绑定为调用函数的this。
+    - 箭头函数绑定: 箭头函数没有this，它的this是通过作用域链查到外层作用域的this，且指向函数定义时的this而非执行时
 ### this的五种情况
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211203202603.png)
 

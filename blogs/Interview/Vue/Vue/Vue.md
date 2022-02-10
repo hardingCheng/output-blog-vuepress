@@ -8,6 +8,8 @@ categories:
 ---
 ## Vue2.x
 ### data 为什么是一个函数？
+data之所以是一个函数，是因为一个组件可能会多处调用，而每一次调用就会执行data函数并返回新的数据对象，这样，可以避免多处调用之间的数据污染。
+
 1. 一个组件被复用多次的话，也就会创建多个实例。本质上，这些实例用的都是同一个构造函数。 
 2. 如果 data 是对象的话，对象属于引用类型，会影响到所有的实例。所以为了保证组件不同的实例之间 data 不冲突，data 必须是一个函数。
 ### 响应式原理
@@ -383,6 +385,8 @@ let tempArr = [...this.targetArr]
 tempArr[0] = {data: 'test'}
 this.targetArr = tempArr
 ```
+### 为什么只对对象劫持，而要对数组进行方法重写？
+因为对象最多也就几十个属性，拦截起来数量不多，但是数组可能会有几百几千项，拦截起来非常耗性能，所以直接重写数组原型上的方法，是比较节省性能的方案。
 ### 如何实现对象新增属性响应式的？
 无法检测数组/对象的新增？Vue检测数据的变动是通过Object.defineProperty实现的，所以无法监听数组的添加操作是可以理解的，因为是在构造函数中就已经为所有属性做了这个检测绑定操作。
 
@@ -403,7 +407,15 @@ watch: {
   }
 }
 ```
-
+### Vue.mixin的使用场景和原理?
+- Vue的mixin的作用就是抽离公共的业务逻辑，原理类似对象的继承，当组件初始化的时候，会调用mergeOptions方法进行合并，采用策略模式针对不同的属性进行合并。 如果混入的数据和本身组件的数据有冲突，采用本身的数据为准。
+- 缺点：命名冲突、数据来源不清晰
+### Vue.set方法是如何实现的？
+- vue给对象和数组本身都增加了dep属性
+- 当给对象新增不存在的属性的时候，就会触发对象依赖的watcher去更新
+- 当修改数组索引的时候，就调用数组本身的splice方法去更新数组
+### Vue.use是干什么的？
+Vue.use是用来使用插件的。我们可以在插件中扩展全局组件、指令、原型方法等。 会调用install方法将Vue的构建函数默认传入，在插件中可以使用vue，无需依赖vue库。
 ### watch原理
 `computed`和`watch`内部都是利用了`watcher`，`user watcher`的过程如下：
 1. Vue 在`initWatch`过程中，创建`Watcher`，并设置标志位 `user` 为`true`，并判断用户是否设置了`immediate`为`true`，如果是，立即执行回调；
@@ -1880,6 +1892,16 @@ Vue实例从创建到销毁的过程，就是Vue实例的生命周期。这个�
 - 子组件更新过程：父 beforeUpdate->子 beforeUpdate->子 updated->父 updated
 - 父组件更新过程：父 beforeUpdate -> 父 updated
 - 销毁过程： 父 beforeDestroy->子 beforeDestroy->子 destroyed->父 destroyed
+### nextTick的用处？
+修改了三个变量，那问题来了，是每修改一次，DOM就更新一次吗？不是的，Vue采用的是异步更新的策略，通俗点说就是，同一事件循环内多次修改，会统一进行一次视图更新，这样才能节省性能嘛。
+
+Vue是异步更新，所以数据一更新，视图却还没更新，所以拿到的还是上一次的旧视图数据，那么想要拿到最新视图数据怎么办呢？
+```js
+this.name = '林三心'
+this.$nextTick(() => {
+    console.log(this.$refs.testDiv.innerHTML) // 林三心
+})
+```
 ### nextTick 实现原理
 Vue是异步渲染的。data改变之后，DOM不会立刻去渲染，不会立即就能就能拿到更新后的DOM，来进行操作。$nextTick会在DOM之后被触发，以获取最新的DOM节点。
 
@@ -2035,8 +2057,17 @@ export function nextTick (cb?: Function, ctx?: Object) {
 this.$nextTick().then(()=>{ ... })
 ```
 ### Diff算法
-Diff算法vdom中国最核心，最关键的部分。
+Vue的diff算法是平级比较，不考虑跨级比较的情况。内部采用深度递归的方式+双指针方式比较
+- 先比较两个节点是不是相同节点
+- 相同节点比较属性，复用老节点
+- 先比较儿子节点，考虑老节点和新节点儿子的情况
+- 优化比较：头头、尾尾、头尾、尾头
+- 比对查找，进行复用
 
+
+
+
+Diff算法vdom中国最核心，最关键的部分。
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220123202409.png)
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220123202646.png)
@@ -2047,6 +2078,12 @@ Diff算法vdom中国最核心，最关键的部分。
     - patchVnode
         - addVnodes，removeVnodes
         - updateChildren
+### 既然vue通过数据劫持可以精准的探测数据变化，为什么还要进行diff检测差异？
+- 响应式数据变化，Vue确实可以在数据变化的时候，响应式系统可以立刻得知。但是如何每个属性都添加watcher的话，性能会非常的差。
+- 粒度过细，会导致更新不精准
+
+- 所以采用watcher + Diff算法来检测差异。
+
 ### Diff的key重要性
 Vue 中使用虚拟 dom 且根据 diff 算法进行新旧 DOM 对比，从而更新真实 dom ，key 是虚拟 DOM 对象的唯一标识, 在 diff 算法中 key 起着极其重要的作用。
 
@@ -2065,15 +2102,138 @@ key 在 diff 算法中的角色。key 的特殊 attribute 主要用在 Vue 的�
 另外，若不设置key还可能在列表更新时候引发一些隐藏的bug。
 
 vue中在使用相同标签名元素的过渡切换时，也会使用到key属性，其目的也是为了让vue可以区分它们，否则vue只会替换其内部属性而不会触发过渡效果。
+
+
+- Vue在patch过程中，通过key可以判断两个虚拟节点是否是相同节点
+- 没有key会导致更新的时候出问题
+- 尽量不要采用索引作为key
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220210145211.png)
 #### 不能用index做key
 影响性能：当用index作为key的时候，删除节点后面的所有节点都会导致重新渲染，因为index变化了，可以也就变化了。
 ## Vue3.x
+### Setup
+setup函数是一个新的组件选项。作为在组件内使用Composition Api的入口点。下面我们分为4个方面来讲解它。
+- 调用时机
+- this指向
+- 函数参数
+- 返回值
+
+#### 调用时机
+创建组件实例，然后初始化props，紧接着就调用setup函数。 从生命周期的角度来看，它会在beforeCreate之前执行。也就是创建组件先执行setup、beforeCreate、create。
+```vue
+<template>
+  <div>蛙人</div>
+</template>
+<script>
+export default {
+  name: 'App',
+  setup() {
+    console.log("hey 蛙人")
+  }
+}
+</script>
+```
+#### this指向
+由于不能在setup函数中使用data、methods，为了避免使用Vue出错，所以把setup函数中this修改为了undefined。
+```js
+<template>
+  <div>蛙人</div>
+</template>
+<script>
+export default {
+  name: 'App',
+  setup() {
+    console.log(this); // undefined
+  }
+}
+</script>
+```
+#### 函数参数
+- props
+    - 注意一点，props数据不能使用解构，否则响应式数据失效
+- context
+    - 该参数提供一个上下文对象，从原来的2.x中选择性的暴露了一些属性。
+        - 上面，attrs和slots都是内部组件实例上对应项的代理，可以确保在更新后仍然还是最新的值。所以这里可以使用解构语法。
+        - attrs
+        - slots
+        - emit
+```js
+<template>
+  <div>蛙人</div>
+</template>
+<script>
+export default {
+  name: 'App',
+  props: {
+      title: {
+          type: String
+      }
+  },
+  setup({ title }) {
+    console.log(title) // 这里响应式数据将失效
+  }
+}
+</script>
+```
+```js
+<template>
+  <div>蛙人</div>
+</template>
+<script>
+export default {
+  name: 'App',
+  props: {
+      title: {
+          type: String
+      }
+  },
+  setup(props, { attrs, slots, emit } ) {
+    console.log(attrs) 
+  }
+}
+</script>
+```
+#### 返回值
+可以将setup函数返回值渲染到页面上。但前提是，setup返回值必须是一个对象，否则返回其它值则渲染无效。
+```js
+<template>
+  <div>蛙人</div>
+</template>
+<script>
+export default {
+  name: 'App',
+  props: {
+      title: {
+          type: String
+      }
+  },
+  setup() {
+    const name = "蛙人"
+    return {
+       name
+    }
+  }
+}
+</script>
+```
 ### Composition API和React Hooks对比
 - 前者setup只会被调用一次，而后者函数会被多次调用
 - 前者无需useMemo useCallback，因为setup只调用一次
 - 前者无需考虑调用顺序，而后者需要保证hooks的顺序一致
 - 前者reactive + ref 比后者useState,要难理解
-### 响应式原理
+### 响应式原理以及响应式的变化
+- defineProperty API 的局限性最大原因是它只能针对单例属性做监听。
+- Vue2.x中的响应式实现正是基于defineProperty中的descriptor，对 data 中的属性做了遍历 + 递归，为每个属性设置了 getter、setter。这也就是为什么 Vue 只能对 data 中预定义过的属性做出响应的原因，在Vue中使用下标的方式直接修改属性的值或者添加一个预先不存在的对象属性是无法做到setter监听的，这是defineProperty的局限性。
+- Proxy API的监听是针对一个对象的，那么对这个对象的所有操作会进入监听操作， 这就完全可以代理所有属性，将会带来很大的性能提升和更优的代码。
+- Proxy 可以理解成，在目标对象之前架设一层“拦截”，外界对该对象的访问，都必须先通过这层拦截，因此提供了一种机制，可以对外界的访问进行过滤和改写。
+- 响应式是惰性的
+- 在 Vue.js 2.x 中，对于一个深层属性嵌套的对象，要劫持它内部深层次的变化，就需要递归遍历这个对象，执行 Object.defineProperty 把每一层对象数据都变成响应式的，这无疑会有很大的性能消耗。在 Vue.js 3.0 中，使用 Proxy API 并不能监听到对象内部深层次的属性变化，因此它的处理方式是在 getter 中去递归响应式，这样的好处是真正访问到的内部属性才会变成响应式，简单的可以说是按需实现响应式，减少性能消耗。
+
+
+
+
+
 Vue3.x 改用 Proxy 替代 Object.defineProperty。因为 Proxy 可以直接监听对象和数组的变化，并且有多达 13 种拦截方法。并且作为新标准将受到浏览器厂商重点持续的性能优化。
 
 Proxy 只会代理对象的第一层。判断当前 Reflect.get 的返回值是否为 Object，如果是则再通过 reactive 方法做代理， 这样就实现了深度观测。
@@ -2418,7 +2578,50 @@ export default defineComponent({
 2. 清除副作用：onInvalidate 会作为回调的第三个参数传入
 3. 副作用刷新时机：响应式系统会缓存副作用函数，并异步刷新，避免同一个 tick 中多个状态改变导致的重复调用
 4. 监听器调试：开发模式下可以用 onTrack 和 onTrigger 进行调试
-### .sync 和 v-model 的区别
+### .sync 和 v-model 的区别(组件v-model支持参数)
+```vue
+<template>
+  {{title}} 
+  <Input v-model:title="title" />
+</template>
+
+<script>
+import Input from "./components/Input"
+export default {
+  name: 'App',
+  components: {
+    Input,
+  },
+  data() {
+    return {
+      title: "蛙人",
+    }
+  },
+}
+</script>
+```
+```vue
+<template>
+  <div class="Input">
+      <input type="text" @input="first" :value="title">
+  </div>
+</template>
+<script>
+export default {
+ name: 'Input',
+  props: {
+    title: {
+        default: () => "蛙人"
+    }
+  },
+  methods: {
+      first(e) {
+          this.$emit("update:title", e.target.value)
+      },
+  },
+}
+</script>
+```
 #### v-model 的作用
 双向绑定实现,单向数据流。
 #### .sync 作用
@@ -2449,6 +2652,61 @@ $emit('update:属性名',要修改的值)
     - v-model： @input + value
     - :num.sync: @update:num 
     - v-model 只能用一次；.sync 可以有多个。
+### 组件支持多个v-model
+在Vue3.x中支持在单个组件上可以创建多个v-model绑定。
+```vue
+<template>
+  {{title}}
+  {{name}}
+
+  <Input v-model:title="title" v-model:name="name"/>
+</template>
+
+<script>
+import Input from "./components/Input"
+export default {
+  name: 'App',
+  components: {
+    Input,
+  },
+  data() {
+    return {
+      title: "蛙人",
+      name: "www"
+    }
+  },
+}
+</script>
+```
+```vue
+<template>
+  <div class="Input">
+      <input type="text" @input="first" :value="title">
+      <input type="text" @input="last" :value="name">
+  </div>
+</template>
+<script>
+export default {
+ name: 'Input',
+  props: {
+    title: {
+        default: () => "蛙人"
+    },
+    name: {
+        default: () => "前端娱乐圈"
+    }
+  },
+  methods: {
+      first(e) {
+          this.$emit("update:title", e.target.value)
+      },
+      last(e) {
+          this.$emit("update:name", e.target.value)
+      }
+  }
+}
+</script>
+```
 ### Vue 设置自定义指令？
 因为 vue 有了常用的内置指令(v-model、v-bind 和 v-on 等)，但是在项目需求你会有多个地方使用到同一个功能。
 #### Vue2.0 的自定义指令
@@ -2739,6 +2997,22 @@ Watcher.prototype.update = function () {
 2. 实现一个指令解析器Compile，对每个元素节点的指令进行扫描和解析，根据指令模板替换数据，以及绑定相应的更新函数
 3. 实现一个Watcher，作为连接Observer和Compile的桥梁，能够订阅并收到每个属性变动的通知，执行指令绑定的相应回调函数，从而更新视图
 4. mvvm入口函数，整合以上三者
+### 谈谈对组件的理解
+- 组件化开发能大幅提高应用开发效率、测试性、复用性
+- 常用的组件化技术：属性、自定义事件、插槽
+- 降低更新范围，值重新渲染变化的组件
+- 高内聚、低耦合、单向数据流
+### 请描述组件的渲染流程
+产生组件虚拟节点 -> 创建组件的真实节点 -> 插入到页面
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220210145959.png)
+### 请描述组件的更新流程
+属性更新会触发patchVnode方法，组件的虚拟节点会调用prepatch钩子，然后更新属性，更新组件。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220210150209.png)
+### 函数组件的优势和原理
+- 函数式组件的特性：无状态、无生命周期、无this。因此性能会高一点。
+- 正常的一个组件是一个类继承了Vue。
+- 函数式组件，就是一个普通的函数。
 ### 组件间传值的方法有哪些?
 #### props
 ```vue
@@ -3756,6 +4030,258 @@ export function flushPostFlushCbs(seen?: CountMap) {
   }
 }
 ```
+### Reactive
+该方法接收一个参数{}创建一个响应式对象。跟Vue2.x的Vue.observable一样。如果该参数不是对象的话，也可以渲染到模板上，但不是响应式的数据。
+```vue
+<template>
+  <div class="test">
+    姓名:  {{ name.value }}
+    {{ test() }}
+  </div>
+</template>
+
+<script>
+import { reactive } from "vue"
+export default {
+ name: 'test',
+  data() {
+    return {
+
+    }
+  },
+  setup() {
+    let name = reactive({value: "蛙人"})
+    function test() {
+        name.value = "abc"; // 该方法测试响应式数据，可以看到执行完该方法视图也会发生改变
+    }
+    return {
+        name,
+        test
+    }
+  }
+}
+</script>
+```
+### Ref
+该方法接收一个参数，可以是单个值，也可以是一个对象，并且都是响应式的数据。当传入一个对象时{}，内部将调用reactive方法进行转换为响应式数据。返回值里面带有.value属性取值，当使用模板渲染的时候可省去.value。
+```vue
+<template>
+  <div class="test">
+    姓名:  {{ name }}
+    {{ test() }}
+  </div>
+</template>
+
+<script>
+import { ref } from "vue"
+export default {
+ name: 'test',
+  data() {
+    return {
+
+    }
+  },
+  setup() {
+
+    let name = ref("蛙人")
+    function test() {
+        name.value = "abc"; // 只是渲染模板可以省略.value，但是在逻辑中还得写哦
+    }
+    return {
+        name,
+        test
+    }
+  }
+}
+</script>
+```
+### Computed
+该方法可以传入一个函数，默认该函数就是getter，不管getter返回值为一个ref响应式数据还是一个普通变量，数据都是只读不能改变。
+```js
+<script>
+import { ref, computed } from "vue"
+export default {
+ name: 'test',
+ setup() {
+    let name = ref("蛙人")
+    let test = computed(() => name.value);
+    test.value = "123" // 修改无效，只能只读
+  }
+}
+</script>
+```
+传入一个对象set和get函数方法，这样就可以修改啦。
+```js
+<script>
+import { ref, computed } from "vue"
+export default {
+ name: 'test',
+ setup() {
+    let name = ref("蛙人")
+    let test = computed({
+        get() {
+            return name.value;
+        },
+        set(val) {
+            return name.value = val;
+        }
+    });
+    test.value = "123" 
+  }
+}
+</script>
+```
+### Readonly
+该方法接收传入一个对象，默认是只读功能，是深层对象只读，不管嵌套多少层的属性都是只读状态。
+```js
+<script>
+import { readonly } from "vue"
+export default {
+ name: 'test',
+  setup() {
+    let obj = {
+        name: "蛙人",
+        sex: "male",
+        prodution: {
+            proName: "音响"
+        }
+    }
+    let only = readonly(obj)
+    only.name = "前端娱乐圈" // 修改无效
+    only.prodution.proName = "欢迎关注" // 修改无效
+    console.log(only) 
+  }
+}
+</script>
+```
+### 移除过滤器filters
+在Vue3.x中移除过滤器，不在支持。建议使用computed去替代。贴一个官网例子。
+```js
+<template>
+  <h1>Bank Account Balance</h1>
+  <p>{{ accountInUSD }}</p>
+</template>
+
+<script>
+  export default {
+    props: {
+      accountBalance: {
+        type: Number,
+        required: true
+      }
+    },
+    computed: {
+      accountInUSD() {
+        return '$' + this.accountBalance
+      }
+    }
+  }
+</script>
+```
+### 自定义v-model修饰符
+Vue3.x中，添加了可以自定义修饰符，如Api提供的内置方法.trim，新特性我们也可以自定义啦。下面就来演示一下写一个转换字符串大写的修饰符。
+```js
+<template>
+  <Input v-model:str.capitalize="modelModifiers"/>
+</template>
+<script>
+import Input from "./components/Input"
+export default {
+  name: 'App',
+  components: {
+    Input
+  }
+}
+</script>
+```
+```js
+<template>
+  <div class="Input">
+    <input type="text" @input="send">
+  </div>
+</template>
+
+<script>
+export default {
+ name: 'Input',
+  props: {
+      str: String,
+      strModifiers: {
+          default: () => ({})
+      }
+  },
+  methods: {
+      send(e) {
+          let value = e.target.value
+          if (this.strModifiers.capitalize) { // capitalize 这里的值就是修饰符
+            value = value.toUpperCase()
+            console.log(value)
+          }
+          this.$emit("update:str", value)
+      }
+  }
+}
+</script>
+```
+### 废弃on，off，once实例方法
+Vue3.x中 $on，$off 和 $once 实例方法已被移除，应用实例不再实现事件触发接口。
+```js
+<script>
+	created() {
+        console.log(this.$on, this.$once, this.$off) // undefined undefined undefined
+	}
+</script>
+```
+### 自定义指令更改
+在Vue3.x中自定义指定写法稍有更改，看下列。
+- bind --> beforeMount 指令绑定到元素后发生。只发生一次
+- inserted --> mounted  元素插入到父DOM后发生
+- beforeUpdate: Vue3.x新添加的，这是在元素更新之前调用，
+- componentUpdated --> updated
+- beforeUnmount : Vue3.x新添加的，将在卸载元素前调用
+- unbind --> unmounted
+```js
+import { createApp } from 'vue'
+import App from './App.vue'
+
+let main = createApp(App)
+main.directive("custom", {
+    beforeMount(el, attr) {
+        console.log(el, attr)
+    },
+    updated() {
+        console.log("updated")
+    },
+    unmounted() {
+        console.log("移除")
+    }
+})
+main.mount('#app')
+```
+```js
+<template>
+  <p v-custom v-if="show"></p>
+</template>
+<script>
+export default {
+  name: 'App',
+  data() {
+    return {
+      show: true
+    }
+  },
+  created() {
+    setTimeout(() => {
+      this.show = true;
+    }, 5000)
+      
+    setTimeout(() => {
+      this.show = false
+    }, 3000)
+  }
+}
+</script>
+```
 ### Vue3.0 有哪些新特性
 - **Composition API**
     - Vue2 中 OptionsAPI
@@ -4028,6 +4554,23 @@ export default defineComponent({
 - 在setup和其他Composition API中没有this
 - 可通过getCurrentInstance获取当前实例
 - 若使用Options API可照常使用this
+### Vue3.0 编译做了哪些优化？（底层，源码）
+#### 生成 Block tree
+- Vue.js 2.x 的数据更新并触发重新渲染的粒度是组件级的，单个组件内部 需要遍历该组件的整个 vnode 树。 在2.0里，渲染效率的快慢与组件大小成正相关：组件越大，渲染效率越慢。并且，对于一些静态节点，又无数据更新，这些遍历都是性能浪费。 
+- Vue.js 3.0 做到了通过编译阶段对静态模板的分析，编译生成了 Block tree。
+Block tree 是一个将模版基于动态节点指令切割的嵌套区块，每个 区块内部的节点结构是固定的，每个区块只需要追踪自身包含的动态节点。
+所以，在3.0里，渲染效率不再与模板大小成正相关，而是与模板中动态节点的数量成正相关。
+#### slot 编译优化
+- Vue.js 2.x 中，如果有一个组件传入了slot，那么每次父组件更新的时候，会强制使子组件update，造成性能的浪费。 
+- Vue.js 3.0 优化了slot的生成，使得非动态slot中属性的更新只会触发子组件的更新。 动态slot指的是在slot上面使用v-if，v-for，动态slot名字等会导致slot产生运行时动态变化但是又无法被子组件track的操作。 
+#### diff算法优化
+### Vue3.0是如何变得更快的？（底层，源码）
+####  diff方法优化
+Vue2.x 中的虚拟dom是进行全量的对比。 Vue3.0 中新增了静态标记（PatchFlag）：在与上次虚拟结点进行对比的时候，值对比带有patch flag的节点，并且可以通过flag 的信息得知当前节点要对比的具体内容化。
+#### hoistStatic 静态提升
+Vue2.x : 无论元素是否参与更新，每次都会重新创建。 Vue3.0 : 对不参与更新的元素，只会被创建一次，之后会在每次渲染时候被不停的复用。
+#### cacheHandlers 事件侦听器缓存
+默认情况下onClick会被视为动态绑定，所以每次都会去追踪它的变化但是因为是同一个函数，所以没有追踪变化，直接缓存起来复用即可。
 ## Vue2.x和Vue3.x对比
 ### Vue3比Vue2有什么优势？
 - 性能更好
@@ -4204,6 +4747,46 @@ export const enum PatchFlags {Ⅰ
 - 模板到render函数，再到vnode，再到渲染和更新
 - vue组件可以用render代替template
 ## Vue通性问题
+### provide和inject是响应式的吗？
+```js
+// 祖先组件
+provide(){
+    return {
+   // keyName: { name: this.name }, // value 是对象才能实现响应式，也就是引用类型
+      keyName: this.changeValue // 通过函数的方式也可以[注意，这里是把函数作为value，而不是this.changeValue()]
+   // keyName: 'test' value 如果是基本类型，就无法实现响应式
+    }
+  },
+data(){
+  return {
+	name:'张三'
+}
+  },
+  methods: {
+  	changeValue(){
+  		this.name = '改变后的名字-李四'
+  	}
+  }  
+  
+  // 后代组件
+  inject:['keyName']
+  create(){
+	console.log(this.keyName) // 改变后的名字-李四
+}
+```
+### Vue的修饰符呢？
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220210162604.png)
+### Vue的内部指令呢？
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220210162655.png)
+### vue中使用了哪些设计模式？
+- 单例模式：new多次，只有一个实例
+- 工场模式：传入参数就可以创建实例（虚拟节点的创建）
+- 发布订阅模式：eventBus
+- 观察者模式：watch和dep
+- 代理模式：_data属性、proxy、防抖、节流
+- 中介者模式：vuex
+- 策略模式
+- 外观模式
 ### Vue的数据为什么频繁变化但只会更新一次
 - 检测到数据变化
 - 开启一个队列
@@ -4638,6 +5221,10 @@ MVVM 的优点：
 3. 独立开发。开发人员可以专注于业务逻辑和数据的开发(ViewModel)，设计人员可以专注于页面设计。
 4. 可测试。
 ### Vue的MVVM 实现原理
+- VM：也就是View-Model，做了两件事达到了数据的双向绑定 一是将【模型】转化成【视图】，即将后端传递的数据转化成所看到的页面。实现的方式是：数据绑定。二是将【视图】转化成【模型】，即将所看到的页面转化成后端的数据。实现的方式是：DOM 事件监听。
+- 思想：实现了 View 和 Model 的自动同步，也就是当 Model 的属性改变时，我们不用再自己手动操作 Dom 元素，来改变 View 的显示，而是改变属性后该属性对应 View 层显示会自动改变（对应Vue数据驱动的思想）
+
+
 数据驱动视图。
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220119205449.png)
 
@@ -5151,10 +5738,20 @@ export default {
 ### computed有何特点
 - 缓存，data不变不会重新计算
 - 提高性能
+### computed和watch有何区别？
+- 1.computed是依赖已有的变量来计算一个目标变量，大多数情况都是多个变量凑在一起计算出一个变量，并且computed具有缓存机制，依赖值不变的情况下其会直接读取缓存进行复用，computed不能进行异步操作
+- 2.watch是监听某一个变量的变化，并执行相应的回调函数，通常是一个变量的变化决定多个变量的变化，watch可以进行异步操作
+- 3.简单记就是：一般情况下computed是多对一，watch是一对多
 ### 何时需要使用beforeDestory
 - 解绑自定义事件 event.$off
 - 清除定时器
 - 解绑自定义的DOM事件，如window scroll等
+### 如何设置动态class，动态style？
+- 动态class对象：`<div :class="{ 'is-active': true, 'red': isRed }"></div>`
+- 动态class数组：`<div :class="['is-active', isRed ? 'red' : '' ]"></div>`
+- 动态style对象：`<div :style="{ color: textColor, fontSize: '18px' }"></div>`
+- 动态style数组：`<div :style="[{ color: textColor, fontSize: '18px' }, { fontWeight: '300' }]"></div>`
+
 ### Vue 项目中 key 的作用
 **key的作用主要是为了高效的更新虚拟DOM**。
 

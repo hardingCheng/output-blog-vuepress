@@ -8,6 +8,9 @@ categories:
 ---
 ## VueRouter
 ### VueRouter 路由钩子函数
+- 全局守卫
+- 路由守卫
+- 组件守卫
 ```js
 路由的钩子函数总结有 6 个
 
@@ -117,6 +120,27 @@ query 传参的话可以使用 path 也可以使用 name 引入路由，不过�
 - vue-router 使用 diff 算法，实现按需加载，减少 dom 操作
 - vue-router 是路由跳转或同一个页面跳转；location.href 是不同页面间跳转；
 - vue-router 是异步加载 this.\$nextTick(()=>{获取 url})；location.href 是同步加载
+### 相同的路由组件如何重新渲染？
+开发人员经常遇到的情况是，多个路由解析为同一个Vue组件。问题是，Vue出于性能原因，默认情况下共享组件将不会重新渲染，如果你尝试在使用相同组件的路由之间进行切换，则不会发生任何变化。
+```js
+const routes = [
+  {
+    path: "/a",
+    component: MyComponent
+  },
+  {
+    path: "/b",
+    component: MyComponent
+  },
+];
+```
+如果依然想重新渲染，怎么办呢？可以使用key。
+```js
+<template>
+    <router-view :key="$route.path"></router-view>
+</template>
+```
+
 ## 手写VueRouter
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220117134742.png)
 

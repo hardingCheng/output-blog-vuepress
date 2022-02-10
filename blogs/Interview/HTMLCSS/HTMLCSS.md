@@ -185,6 +185,1005 @@ div {
 }
 ```
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211129215847.png)
+### DIV 拖拽？
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211122221738.png)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211122221809.png)
+
+```js
+    drag () {
+      // 拖拽功能(主要是触发三个事件：onmousedown\onmousemove\onmouseup)
+      var drag = document.getElementById('drag')
+
+      // 点击某物体时，用drag对象即可，move和up是全局区域，也就是整个文档通用，应该使用document对象而不是drag对象(否则，采用drag对象时物体只能往右方或下方移动)
+      drag.onmousedown = function (e) {
+        var e = e || window.event // 兼容ie浏览器
+        var diffX = e.clientX - drag.offsetLeft // 鼠标点击物体那一刻相对于物体左侧边框的距离=点击时的位置相对于浏览器最左边的距离-物体左边框相对于浏览器最左边的距离
+        var diffY = e.clientY - drag.offsetTop
+
+        /* 低版本ie bug:物体被拖出浏览器可是窗口外部时，还会出现滚动条，
+                解决方法是采用ie浏览器独有的2个方法setCapture()\releaseCapture(),这两个方法，
+                可以让鼠标滑动到浏览器外部也可以捕获到事件，而我们的bug就是当鼠标移出浏览器的时候，
+                限制超过的功能就失效了。用这个方法，即可解决这个问题。注：这两个方法用于onmousedown和onmouseup中 */
+        if (typeof drag.setCapture !== 'undefined') {
+          drag.setCapture()
+        }
+
+        document.onmousemove = function (e) {
+          var e = e || window.event // 兼容ie浏览器
+          var left = e.clientX - diffX
+          var top = e.clientY - diffY
+
+          // 控制拖拽物体的范围只能在浏览器视窗内，不允许出现滚动条
+          if (left < 0) {
+            left = 0
+          } else if (left > window.innerWidth - drag.offsetWidth) {
+            left = window.innerWidth - drag.offsetWidth
+          }
+          if (top < 0) {
+            top = 0
+          } else if (top > window.innerHeight - drag.offsetHeight) {
+            top = window.innerHeight - drag.offsetHeight
+          }
+
+          // 移动时重新得到物体的距离，解决拖动时出现晃动的现象
+          drag.style.left = left + 'px'
+          drag.style.top = top + 'px'
+        }
+        document.onmouseup = function (e) { // 当鼠标弹起来的时候不再移动
+          console.log('this', this)
+          this.onmousemove = null
+          this.onmouseup = null // 预防鼠标弹起来后还会循环（即预防鼠标放上去的时候还会移动）
+
+          // 修复低版本ie bug
+          if (typeof drag.releaseCapture !== 'undefined') {
+            drag.releaseCapture()
+          }
+        }
+      }
+    }
+```
+
+- 我们要确定怎样实现偏移效果，这里无非就两种：
+  - 一种是利用绝对定位，拖拽时调整 top 和 left 值，但是这种方案依赖父组件的定位方式
+  - 另一种是利用 transform，拖拽时调整元素的偏移向量，这种方案不依赖父组件的定位方式
+- 确定怎么计算偏移向量，这里我们监听 mouse 事件来实现：
+  - 监听元素的 mousedown 事件，记录元素初始偏移位置；
+  - 监听文档的 mousemove 事件，根据鼠标位移向量修改元素的偏移位置；
+  - 监听文档的 mouseup 事件，重置数据。
+
+### 线性渐变?
+
+线性渐变`linear-gradient()` 第一个参数: 可不写, 默认值为`to bottom`(即 180%), 用来指定渐变的方向, 可是是具体的角度值, 也可以直接指定方位`to left`/ `to right`/`to top`/ `to bottom`。
+
+为实现渐变, 还需要至少定义两个颜色结点, 每个颜色节点可由两个参数组成, [颜色值 位置值, 颜色值 位置值, ...], 其中颜色值为必填项, 位置值可为长度, 也可以是百分比, 非必填项。
+
+如: `linear-gradient(red 30%, blue 80%);` 表示: 容器顶部 30%的区域被填充为红色实色, 容器中间 50%的高度区域被填充为从红色到蓝色的渐变色, 容器底部 20%区域被填充为蓝色实色。
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>线性渐变实验一</title>
+    <style>
+      div {
+        margin: 50px 20px;
+        width: 180px;
+        height: 100px;
+        float: left;
+        text-align: center;
+        line-height: 100px;
+        color: white;
+      }
+      .gradient_1 {
+        background: linear-gradient(red, blue);
+      }
+      .gradient_2 {
+        background: linear-gradient(to top, red, blue);
+      }
+      .gradient_3 {
+        background: linear-gradient(to right, red, blue);
+      }
+      .gradient_4 {
+        background: linear-gradient(to left, red, blue);
+        /* 只写一个right表示起始位置是右边，也就是从右到左 */
+        /* background: -webkit-linear-gradient(right, red, blue); */
+        /* background: -moz-linear-gradient(right, red, blue); */
+        /* background: -o-linear-gradient(right, red, blue); */
+      }
+      .gradient_5 {
+        background: linear-gradient(to right bottom, red, blue);
+      }
+      .gradient_6 {
+        background: linear-gradient(to left top, red, blue);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="gradient_1">
+      从上到下
+    </div>
+    <div class="gradient_2">
+      从下到上
+    </div>
+    <div class="gradient_3">
+      从左到右
+    </div>
+    <div class="gradient_4">
+      从右到左
+    </div>
+    <div class="gradient_5">
+      从左上角到右下角
+    </div>
+    <div class="gradient_6">
+      从右下角到左上角
+    </div>
+  </body>
+</html>
+```
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211121222414.png)
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>线性渐变实验二</title>
+    <style>
+      div {
+        margin: 50px 20px;
+        width: 200px;
+        height: 100px;
+        float: left;
+        text-align: center;
+        line-height: 100px;
+        color: white;
+      }
+      .gradient_1 {
+        background: linear-gradient(0deg, red, blue);
+      }
+      .gradient_2 {
+        background: linear-gradient(45deg, red, blue);
+      }
+      .gradient_3 {
+        background: linear-gradient(90deg, red, blue);
+      }
+      .gradient_4 {
+        background: linear-gradient(135deg, red, blue);
+      }
+      .gradient_5 {
+        background: linear-gradient(180deg, red, blue);
+      }
+      .gradient_6 {
+        background: linear-gradient(225deg, red, blue);
+      }
+      .gradient_7 {
+        background: linear-gradient(270deg, red, blue);
+      }
+      .gradient_8 {
+        background: linear-gradient(315deg, red, blue);
+      }
+      .gradient_9 {
+        background: linear-gradient(360deg, red, blue);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="gradient_1">
+      0edeg
+    </div>
+    <div class="gradient_2">
+      45deg
+    </div>
+    <div class="gradient_3">
+      90deg
+    </div>
+    <div class="gradient_4">
+      135deg
+    </div>
+    <div class="gradient_5">
+      180deg
+    </div>
+    <div class="gradient_6">
+      225deg
+    </div>
+    <div class="gradient_7">
+      270deg
+    </div>
+    <div class="gradient_8">
+      315deg
+    </div>
+    <div class="gradient_9">
+      360deg
+    </div>
+  </body>
+</html>
+```
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211121222443.png)
+已经实现了简单的条纹效果, 接下来实现简单的条纹背景, 这里需要借助 background-size 来控制每一块条纹背景的大小, 并且 background-repeat 应该设置为 repeat。
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>线性渐变实验三</title>
+    <style>
+      div {
+        margin: 50px 20px;
+        width: 180px;
+        height: 180px;
+        float: left;
+        text-align: center;
+        line-height: 180px;
+        color: white;
+      }
+      .gradient_1 {
+        background: linear-gradient(red 20%, blue 80%);
+        /* 渐变填充区域为容器中间40%的高度区域, 其他区域填充的颜色为实色。 */
+      }
+      .gradient_2 {
+        background: linear-gradient(red 50%, blue 50%);
+      }
+      .gradient_3 {
+        background: linear-gradient(red 33%, blue 33%, blue 66%, green 66%);
+      }
+      .gradient_4 {
+        background: linear-gradient(red 40%, blue 0);
+        /* CSS图像(第三版)规范: 如果某个色标的位置值比整个列表中在它之前的色标的位置值都要小, 则该色标的位置值会被设置为它前面所有色标位置值的最大值。 */
+      }
+      .gradient_5 {
+        background: linear-gradient(red 50%, blue 0);
+        background-size: 100% 40px;
+      }
+      .gradient_6 {
+        background: linear-gradient(45deg, red 50%, blue 0);
+      }
+      .gradient_7 {
+        background: linear-gradient(45deg, red 50%, blue 0);
+        background-size: 50px 50px;
+      }
+      .gradient_8 {
+        background: linear-gradient(
+          45deg,
+          red 25%,
+          blue 0,
+          blue 50%,
+          red 0,
+          red 75%,
+          blue 0
+        );
+      }
+      .gradient_9 {
+        background: linear-gradient(
+          45deg,
+          red 25%,
+          blue 0,
+          blue 50%,
+          red 0,
+          red 75%,
+          blue 0
+        );
+        background-size: 50px 50px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="gradient_1">
+      有渐变颜色
+    </div>
+    <div class="gradient_2">
+      颜色分明
+    </div>
+    <div class="gradient_3">
+      三种颜色
+    </div>
+    <div class="gradient_4">
+      占比不一样
+    </div>
+    <div class="gradient_5">
+      条纹1
+    </div>
+    <div class="gradient_6">
+      条纹2
+    </div>
+    <div class="gradient_7">
+      条纹3
+    </div>
+    <div class="gradient_8">
+      条纹4
+    </div>
+    <div class="gradient_9">
+      条纹5
+    </div>
+  </body>
+</html>
+```
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211121222644.png)
+边框缺角。
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>线性渐变实验三</title>
+    <style>
+      div {
+        margin: 50px 20px;
+        width: 180px;
+        height: 180px;
+        float: left;
+        text-align: center;
+        line-height: 180px;
+        color: white;
+      }
+      .gradient_1 {
+        background: linear-gradient(-125deg, #fff 15px, #58a 0);
+      }
+      .gradient_2 {
+        background: linear-gradient(125deg, #fff 15px, #58a 0), linear-gradient(-125deg, #fff
+              15px, #58a 0);
+        background-size: 50% 100%;
+        background-position: left, right;
+        background-repeat: no-repeat;
+      }
+      .gradient_3 {
+        background: linear-gradient(125deg, #fff 15px, #58a 0), linear-gradient(
+            -125deg,
+            #fff 15px,
+            #58a 0
+          ), linear-gradient(45deg, #58a 15px, #58a 0), linear-gradient(-45deg, #fff
+              15px, #58a 0);
+        background-size: 50% 50%;
+        background-position: top left, top right, bottom left, bottom right;
+        background-repeat: no-repeat;
+      }
+
+      .gradient_4 {
+        background: linear-gradient(125deg, #fff 15px, #58a 0), linear-gradient(
+            -125deg,
+            #fff 15px,
+            #58a 0
+          ), linear-gradient(45deg, #fff 15px, #58a 0), linear-gradient(-45deg, #fff
+              15px, #58a 0);
+        background-size: 50% 50%;
+        background-position: top left, top right, bottom left, bottom right;
+        background-repeat: no-repeat;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="gradient_1">
+      缺一个角
+    </div>
+    <div class="gradient_2">
+      缺两个角
+    </div>
+    <div class="gradient_3">
+      缺三个角
+    </div>
+    <div class="gradient_4">
+      缺四个角
+    </div>
+  </body>
+</html>
+```
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211121222735.png)
+
+### CSS3 有哪些新特性？
+
+- 新特性
+
+  - 新增各种 CSS 选择器 （: not(.input)：所有 class 不是“input”的节点）
+  - 圆角 （border-radius:8px）
+  - 多列布局 （column）
+  - 阴影和反射 （Shadow\Reflect）
+  - 文字特效 （text-shadow）
+  - 线性渐变 （gradient）
+  - 旋转，缩放,定位,倾斜 （transform）
+  - 动画 （Animation）
+  - 多背景，背景裁剪
+  - 颜色
+    - rgba()函数
+    - hsl()及 hsla()函数
+    - opacity 属性，用于设置透明度
+  - 弹性布局 flex
+  - 盒子模型: box-sizing
+
+- 新增伪类 - 伪元素
+  - p:first-of-type 选择属于其父元素的首个 元素的每个 元素。
+  - p:last-of-type 选择属于其父元素的最后 元素的每个 元素。
+  - p:only-of-type 选择属于其父元素唯一的 元素的每个元素。
+  - p:only-child 选择属于其父元素的唯一子元素的每个 元素。
+  - p:nth-child(2) 选择属于其父元素的第二个子元素的每个 元素。
+  - :enabled 已启用的表单元素。
+  - :disabled 已禁用的表单元素。
+  - :checked 单选框或复选框被选中。
+  - ::before 在元素之前添加内容。
+  - ::after 在元素之后添加内容,也可以用来做清除浮动。
+  - ::first-line 添加一行特殊样式到首行。
+  - ::first-letter 添加一个特殊的样式到文本的首字母。
+  - 伪类语法一个：，它是为了弥补 css 常规类选择器的不足
+  - 伪元素语法两个：，它是凭空创建的一个虚拟容器生成的元素
+
+### CSS3 动画性能比较好？
+
+#### JS 动画
+
+JS 动画是逐帧动画，在时间帧上绘制内容，一帧一帧的，所以他的可再造性很高，几乎可以完成任何你想要的动画形式。但是由于逐帧动画的内容不一样，会增加制作的负担，占用比较大的资源空间。
+
+- 缺点：
+  - (1)JavaScript 在浏览器的主线程中运行，而主线程中还有其它需要运行的 JavaScript 脚本、样式计算、布局、绘制任务等,对其干扰导致线程可能出现阻塞，从而造成丢帧的情况。
+  - (2)代码的复杂度高于 CSS 动画
+- 优点：
+  - (1)JavaScript 动画控制能力很强, 可以在动画播放过程中对动画进行控制：开始、暂停、回放、终止、取消都是可以做到的。
+  - (2)动画效果比 css3 动画丰富,有些动画效果，比如曲线运动,冲击闪烁,视差滚动效果，只有 JavaScript 动画才能完成
+  - (3)CSS3 有兼容性问题，而 JS 大多时候没有兼容性问题
+
+#### CSS 动画
+
+CSS3 动画也被称为补间动画，原因是只需要添加关键帧的位置，其他的未定义的帧会被自动生成。
+
+因为我们只设置了几个关键帧的位置，所以在进行动画控制的时候比较困难，不能再半路暂停动画，或者在动画过程中添加一些其他操作，都不大容易。
+
+- 缺点：
+  - (1)运行过程控制较弱,无法附加事件绑定回调函数。CSS 动画只能暂停,不能在动画中寻找一个特定的时间点，不能在半路反转动画，不能变换时间尺度，不能在特定的位置添加回调函数或是绑定回放事件,无进度报告。
+  - (2)代码冗长。想用 CSS 实现稍微复杂一点动画,最后 CSS 代码都会变得非常笨重。
+- 优点：
+  - (1)浏览器可以对动画进行优化。
+  - (2)代码相对简单,性能调优方向固定
+  - (3)对于帧速表现不好的低版本浏览器，CSS3 可以做到自然降级，而 JS 则需要撰写额外代码
+
+#### CSS 动画流畅的原因
+
+从实现动画的复杂度来看，CSS 动画大多数都是补间动画，而 JS 动画是逐帧动画。当然这里我们不谈论实现的效果
+
+渲染线程分为 main thread(主线程)和 compositor thread(合成器线程)。
+
+如果 CSS 动画只是改变 transform 和 opacity，这时整个 CSS 动画得以在 compositor thread 完成（而 JS 动画则会在 main thread 执行，然后触发 compositor 进行下一步操作）。
+
+在 JS 执行一些昂贵的任务时，main thread 繁忙，CSS 动画由于使用了 compositor thread 可以保持流畅。
+
+#### CSS 动画比 JS 流畅的前提
+
+- JS 在执行一些昂贵的任务
+- 同时 CSS 动画不触发 layout 或 paint，在 CSS 动画或 JS 动画触发了 paint 或 layout 时，需要 main thread 进行 Layer 树的重计算，这时 CSS 动画或 JS 动画都会阻塞后续操作。
+- 只有如下属性的修改才符合“仅触发 Composite，不触发 layout 或 paint”：
+  - backface-visibility
+  - opacity
+  - transfrom
+  - perspective-origin
+  - perspective
+- 所以只有用上了 3D 加速或修改 opacity 时，css3 动画的优势才会体现出来。
+
+### min-width、max-width、width 的包含(优先级关系)关系?
+
+min-width 和 max-width 分别限制了元素的最小宽度和最大宽度，当浏览器缩小导致元素宽度小于 min-width 时，元素的 width 就会被 min-width 的值取代.
+
+如果 min-width 和 max-width 的权重比 width 要大，即时在 width 后面加了!important 也是如此。如果 min-width 的值比 max-width 大，那么元素的最终宽度会取 min-width 的值。
+
+
+### 哪些 CSS 属性是不被 IE 兼容的?
+
+- border-radius
+- background-size
+- @font-face
+- transform
+- transition
+- animation
+### 实现瀑布流的方法？
+
+#### 什么是瀑布流布局
+
+瀑布流又称瀑布流式布局，是一种比较流行的页面布局方式，专业的英文名称为[Masonry Layouts]。与传统的分页显示不同，视觉表现为参差不齐的多栏布局。
+
+#### 瀑布流布局的优点
+
+- 节省空间，外表美观，更有艺术性。
+- 对于触屏设备非常友好，通过向上滑动浏览
+- 用户浏览时的观赏和思维不容易被打断，留存更容易。
+
+#### 瀑布流布局的缺点
+
+- 用户无法了解内容总长度，对内容没有宏观掌控。
+- 用户无法了解现在所处的具体位置，不知道离终点还有多远。
+- 回溯时不容易定位到之前看到的内容。
+- 容易造成页面加载的负荷。
+- 容易造成用户浏览的疲劳，没有短暂的休息时间。
+
+#### 瀑布流布局适用场景
+
+- 内容以图片为主的时候。图片占用空间比较大，并且大脑理解的速度相比理解文字要快，短时间内可以扫过的内容很多，所以如果用分页显示的话用户务必会频繁的翻页，影响沉浸式的体验，而瀑布流可以解决这个问题。
+- 信息与信息之间相对独立时。如果信息关联性强，用户务必会进行大量的回溯操作去查看之前或者之后的信息，相反，如果信息相对独立的话，可以使用瀑布流，让用户同时接受来自不同地方的信息。
+- 信息与搜索匹配比较模糊时。瀑布流给人的直观印象，就是同时显示的信息与用户搜索的匹配度大致一样，而分页显示的直观印象则是越靠上的信息被认为与用户的搜索越匹配。因此，当信息与搜索匹配度没有明显区分度时，可以采用瀑布流。
+- 用户目的性不强的时候。如果用户有特定需要查找的信息，分页查找定位更方便，而当目的性较弱的时候，瀑布流可以增加用户停留的时间和意想不到的收获。
+
+#### 瀑布流布局前端技术方案
+
+- css
+- 1.1 multi-column 多栏布局
+  - multi-column 实现瀑布流主要依赖以下几个属性：
+    - column-count: 设置共有几列
+    - column-width: 设置每列宽度，列数由总宽度与每列宽度计算得出
+    - column-gap: 设置列与列之间的间距
+  - column-count 和 column-width 都可以用来定义分栏的数目，而且并没有明确的优先级之分。优先级的计算取决与具体的场景。
+  - 计算 column-count 和 column-width 转换后具体的列数，哪个小就用哪个。
+  - 我们希望的是每个元素都是独立的，前后不断开，此时我们需要使用 break-inside 来实现。
+    - break-inside: auto | avoid
+      - auto: 元素可以中断
+      - avoid: 元素不能中断
+  - 但由于 multi-column 布局中子元素的排列顺序是先从上往下再从左至右，所以这种方式仅适用于数据固定不变的情况，对于滚动加载更多等可动态添加数据的情况就并不适用了。
+
+```css
+.masonry {
+  column-count: 3;
+  column-gap: 10px;
+}
+.masonry .item {
+  border: 1px solid #999;
+  margin-bottom: 10px;
+  break-inside: avoid;
+}
+.masonry .item img {
+  width: 100%;
+}
+```
+
+- grid 布局实现瀑布流
+  - 网格布局（Grid）是最强大的 CSS 布局方案。
+  - 它将网页划分成一个个网格，可以任意组合不同的网格，做出各种各样的布局。以前，只能通过复杂的 CSS 框架达到的效果，现在浏览器内置了。
+
+```css
+.wrap-waterfall--grid img {
+  vertical-align: top;
+  width: 100px;
+}
+.wrap-waterfall--grid .list {
+  display: grid;
+  grid-gap: 10px;
+  /* 可以看到，网格大小，占据位置是需要提前设定的 */
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: minmax(50px, auto);
+}
+```
+
+- Flexbox 实现瀑布流
+  - flex 布局默认情况下是水平排列，可以修改为垂直排列并且允许换行达到纵向瀑布流的效果。
+  - 局限性：必须用固定高度使内容换行，填充比较难以控制；不固定高度的话要结合 js 才能实现
+
+```html
+<template>
+  <div class="masonry">
+    <div class="colmun">
+      <img class="item" :src="i.img" :key="i.id" v-for="i in data1" />
+    </div>
+    <div class="colmun">
+      <img class="item" :src="i.img" :key="i.id" v-for="i in data2" />
+    </div>
+    <div class="colmun">
+      <img class="item" :src="i.img" :key="i.id" v-for="i in data3" />
+    </div>
+  </div>
+</template>
+
+<script>
+  import data from "./data.json";
+
+  export default {
+    data() {
+      let data1 = [], //第一列
+        data2 = [], //第二列
+        data3 = [], //第三列
+        i = 0;
+
+      while (i < data.length) {
+        data1.push(data[i++]);
+        if (i < data.length) {
+          data2.push(data[i++]);
+        }
+        if (i < data.length) {
+          data3.push(data[i++]);
+        }
+      }
+      return {
+        //第一列
+        data1,
+        //第二列
+        data2,
+        //第三列
+        data3,
+      };
+    },
+  };
+</script>
+
+<style lang="scss" scoped>
+  .masonry {
+    display: flex;
+    flex-direction: row;
+    .colmun {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      padding: 0 2px;
+      .item {
+        margin-bottom: 5px;
+        width: 100%;
+      }
+    }
+  }
+</style>
+```
+
+- grid-template-rows: masonry
+  - 看了以上的各种 css 方案，都有各自的弊端，实际使用场景一般也不会通过纯 css 做瀑布流布局。
+  - CSS 新属性 grid-template-rows: masonry 轻松实现瀑布流布局，一行代码即可搞定。
+  - 看了 caniuse，兼容性感人。
+
+* js
+* 原生 js
+  - 确定每行放几张图片， 每行的个数（column）=页面宽度（pageWidth）/（图片盒子宽度+图片间距）
+  - 确定一行多少个之后首先需要将第一行排列好 （绝对定位的方式，使用 js 排列好）
+  - 找出每一行的最小高度，排列完每一张图片之后更新最小高度
+
+- 第三方库
+- 第三方库
+  - vue-waterfall
+  - @egjs/vue-infinitegrid，
+
+### 伪类与伪元素列举一下？
+
+#### 伪类
+
+##### 条件伪类
+
+- `:lang()`：基于元素语言来匹配页面元素；
+- `:dir()`：匹配特定文字书写方向的元素；
+- `:has()`：匹配包含指定元素的元素；
+- `:is()`：匹配指定选择器列表里的元素
+- `:not()`：用来匹配不符合一组选择器的元素（只能写一中选择符）；
+
+##### 行为伪类
+
+- `:active`：鼠标激活的元素；
+- `:hover`： 鼠标悬浮的元素；
+- `::selection`：鼠标选中的元素；
+
+##### 状态伪类
+
+- `:target`：当前锚点的元素；
+- `:link`：未访问的链接元素；
+- `:visited`：已访问的链接元素；
+- `:focus`：输入聚焦的表单元素；
+- `:required`：输入必填的表单元素；
+- `:valid`：输入合法的表单元素；
+- `:invalid`：输入非法的表单元素；
+- `:in-range`：输入范围以内的表单元素；
+- `:out-of-range`：输入范围以外的表单元素；
+- `:checked`：选项选中的表单元素；
+- `:optional`：选项可选的表单元素；
+- `:enabled`：事件启用的表单元素；
+- `:disabled`：事件禁用的表单元素；
+- `:read-only`：只读的表单元素；
+- `:read-write`：可读可写的表单元素；
+- `:blank`：输入为空的表单元素；
+- `:current()`：浏览中的元素；
+- `:past()`：已浏览的元素；
+- `:future()`：未浏览的元素；
+  推荐的顺序：link-visited-focus-hover-active
+
+##### 结构伪类
+
+- `:root`：文档的根元素；
+- `:empty`：无子元素的元素(没有任何子元素，甚至连文本节点都没有)；
+- `:first-letter`：元素的首字母；
+- `:first-line`：元素的首行；
+- `:nth-child(n)`：元素中指定顺序索引的元素；
+- `:nth-last-child(n)`：元素中指定逆序索引的元素；；
+- `:nth-of-type(n)`：标签中指定顺序索引的标签；
+- `:nth-last-of-type(n)`：标签中指定逆序索引的标签；
+- `:first-of-type` ：标签中为首的标签（选择一个元素中某种元素的第一个，同一个父元素的元素是一组，从这样的一组元素中选择某种元素的第一个）；
+- `:last-of-type`：标签中为尾标签（选择一个元素中某种元素的最后一个，同一个父元素的元素是一组，从这样的一组元素中选择某种元素的最后一个）；
+- `:only-of-type`：父元素仅有该标签的标签（匹配同胞中唯一的那种元素）；
+- `:first-child`：元素中为首的元素（选择一个元素中的第一个子元素）；
+- `:last-child` ：元素中为尾的元素（选择一个元素中的最后一个子元素）；
+- `:only-child`：父元素仅有该元素的元素（选择的元素是另一个元素的唯一子元素，只匹配完全没有同胞的元素）；
+
+#### 伪元素
+
+- `::before`：在元素前插入内容；
+- `::after`：在元素后插入内容；
+- `::first-letter:`选择伪元素用于装饰任何`非行内元素`的首字母。只能应用到块级元素。
+- `::first-line:`装饰`非行内元素`的首行文本。只能应用到块级元素。
+
+#### 伪类和伪元素有什么区别
+
+区分伪元素和伪类，记住两点：
+
+1. 伪类表示被选择元素的某种状态，例如:hover
+2. 伪元素表示的是被选择元素的某个部分，这个部分看起来像一个独立的元素，但是是"假元素"，只存在于 css 中，所以叫"伪"的元素，例如:before 和:after
+3. 核心区别在于，是否创造了“新的元素”
+
+### CSS 动画属性有哪些?
+
+transition、animation 和 transform 是 CSS3 中三个制作动画的重要属性。
+
+#### transition
+
+transition 允许 css 的属性值在一定的时间区间内平滑地过渡。这种效果可以在鼠标单击、获得焦点、被点击或对元素任何改变中触发，并圆滑地以动画效果改变 CSS 的属性值。
+
+```css
+transition ：transition-property || transition-duration || transition-timing-function || transition-delay;
+```
+
+- transition 主要包含四个属性值：
+  - 执行变换的属性：transition-property，
+    - `transition-property: none || all || property;`
+    - transition-property 是用来指定当元素其中一个属性改变时执行 transition 效果。
+    - none: 没有属性会获得过渡效果；
+    - all: 所有属性都将获得过渡效果,也是其默认值；
+    - property: 定义应用过渡效果的 CSS 属性名称列表，列表以逗号分隔。
+  - 变换延续的时间：transition-duration，
+    - `transition-duration: time;`
+    - transition-duration 是用来指定元素 转换过程的持续时间，取值 time 为数值，单位为 s（秒）或者 ms(毫秒)，其默认值是 0，也就是变换时是即时的。
+  - 在延续时间段，变换的速率变化：transition-timing-function，
+    - `transition-timing-function: linear || ease || ease-in || ease-out || ease-in-out || cubic-bezier(n,n,n,n);`
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211115220429.png)
+  - 变换延迟时间：transition-delay。
+    - transition-delay: time;
+    - transition-delay 是用来指定一个动画开始执行的时间，也就是说当改变元素属性值后多长时间开始执行 transition 效果，其取值 time 为数值，单位为 s（秒）或者 ms(毫秒)， 默认大小是"0"，也就是变换立即执行，没有延迟。
+- 注意事项
+  - 不是所有的 CSS 属性都支持 transition
+  - transition 需要明确知道，开始状态和结束状态的具体数值，才能计算出中间状态。比如，height 从 0px 变化到 100px，transition 可以算出中间状态。但是，transition 没法算出 0px 到 auto 的中间状态，也就是说，如果开始或结束的设置是 height: auto，那么就不会产生动画效果。
+  - transition 需要事件触发，所以没法在网页加载时自动发生。
+  - transition 是一次性的，不能重复发生，除非一再触发。
+
+```html
+<div class="one"></div>
+
+.one { width: 100px; height: 100px; margin: 200px auto; background-color:
+#cd4a48; -webkit-transition: width, height 2s ease; -moz-transition: width,
+height 2s ease; -ms-transition: width, height 2s ease; -o-transition: width,
+height 2s ease; transition: width, height 2s ease; } .one:hover { width: 300px;
+height: 300px; }
+```
+
+#### animation
+
+不同于 transition 只能定义首尾两个状态，animation 可以定义任意多的关键帧，因而能实现更复杂的动画效果。
+
+```css
+animation: animation-name || animation-duration || animation-timing-function ||
+  animation-delay ||animation-iteration-count || animation-direction;
+```
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211115220651.png)
+
+- 其他属性
+  - 除了上述主要用到的六个属性外，还要额外介绍两个属性。
+  - animation-fill-mode
+    - 动画结束以后，会立即从结束状态跳回到起始状态。如果想让动画保持在结束状态，需要使用 animation-fill-mode 属性。
+    - `animation-fill-mode: none || backwards || both`
+      - none：默认值，回到动画没开始时的状态。
+      - forwards：当动画完成后，保持最后一个属性值（在最后一个关键帧中定义）。
+      - backwards：在 animation-delay 所指定的一段时间内，在动画显示之前，应用开始属性值（在第一个关键帧中定义）。
+      - both: 根据 animation-direction 轮流应用 forwards 和 backwards 规则。
+  - animation-play-state
+    - 有时，动画播放过程中，会突然停止。这时，默认行为是跳回到动画的开始状态。
+    - 如果想让动画保持突然终止时的状态，就要使用 animation-play-state 属性。
+    - `animation-play-state:running || paused`
+    - animation-play-state 主要是用来控制元素动画的播放状态。其主要有两个值，running 和 paused 其中 running 为默认值。通过 paused 将正在播放的动画停下了，通过 running 将暂停的动画重新播放，这个属性目前很少内核支持。
+
+* keyframe
+  - 在介绍 animation 具体使用之前，要先介绍 keyframe。
+  - @keyframes 让开发者通过指定动画中特定时间点必须展现的关键帧样式（或者说停留点）来控制 CSS 动画的中间环节。这让开发者能够控制动画中的更多细节而不是全部让浏览器自动处理。
+  - 要使用关键帧, 先创建一个带名称的@keyframes 规则，以便后续使用 animation-name 这个属性来调用指定的@keyframes. 每个@keyframes 规则包含多个关键帧，也就是一段样式块语句，每个关键帧有一个百分比值作为名称，代表在动画进行中，在哪个阶段触发这个帧所包含的样式。
+  - `@keyframes animationname {keyframes-selector {css-styles;}}`
+  - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211115220746.png)
+
+```html
+<div class="one"></div>
+
+.one { width: 100px; height: 100px; margin: 200px auto; background-color:
+#cd4a48; position: relative; animation: moveHover 5s ease-in-out 0.2s; }
+@keyframes moveHover { 0% { top: 0px; left: 0px; background: #cd4a48; } 50% {
+top: 200px; left: 200px; background:#A48992; } 100% { top: 350px; left:350px;
+background: #FFB89A; } }
+```
+
+#### transform
+
+transform 就是变形，主要包括旋转 rotate、扭曲 skew、缩放 scale 和移动 translate 以及矩阵变形 matrix。
+
+```css
+transform: none || transform-functions;
+```
+
+none:表示不进么变换；transform-function 表示一个或多个变换函数，以空格分开；换句话说就是我们同时对一个元素进行 transform 的多种属性操作，例如 rotate、scale、translate 三种。
+
+- translate
+  ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211115221107.png)
+- scale
+  ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211115221126.png)
+- rotate
+  ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211115221144.png)
+- skew
+  ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211115221205.png)
+- transform-origin
+  - 以上变化的默认参照点是元素的中心点，不过可以通过 transform-origin 设置元素的参照点。
+  - `transform-origin: X || Y || Z`
+  - 其中 X，Y，Z 对应三维坐标，X，Y，Z 的值可以是 em，px。此外，X，Y 可以是百分值，其中 X 也可以是字符参数值 left，center，right。Y 和 X 一样除了百分值外还可以设置字符值 top，center，bottom。
+
+### css 的块元素和行内元素，有哪些，区别，转换
+
+- 块级元素：会自动占据一定矩形空间，可以通过设置高度、宽度、内外边距等属性，来调整的这个矩形的样子。
+- 行内元素：则没有自己的独立空间，它是依附于其他块级元素存在的，因此，对行内元素设置高度、宽度、内外边距等属性，都是无效的。
+
+- 常见的块级元素和行内元素
+
+  - 块级元素：div、p、h1-h6、hr、ul、ol
+  - 行内元素：a、b、i、u、em、input、select、img、label、br
+
+- CSS 块元素与行内元素的转换：
+  - 块转行内：display:block;
+  - 行内转块：display:inline;
+
+### css 的三种引入方式及优先级
+
+1. 行内样式
+   `<p style="color:#F00; "></p>`
+   缺点：HTML 页面不纯净，文件体积大，不利于蜘蛛爬行，后期维护不方便。
+
+2. 内嵌样式
+   内嵌样式就是将 CSS 代码写在`<head></head>`之间，并且用`<style></style>`进行声明。
+   优缺点：页面使用公共 CSS 代码，也是每个页面都要定义的，如果一个网站有很多页面，每个文件都会变大，后期维护难度也大，如果文件很少，CSS 代码也不多，这种样式还是很不错的。
+
+3. 外部样式
+   链接样式（推荐）： 链接样式是使用频率最高，最实用的样式，只需要在`<head></head>`之间加上`<link…/>`就可以了。
+   优缺点：实现了页面框架代码与表现 CSS 代码的完全分离，使得前期制作和后期维护都十分方便
+
+导入样式（不建议使用）： 导入样式和链接样式比较相似，采用@import 样式导入 CSS 样式表，在 HTML 初始化时，会被导入到 HTML 或者 CSS 文件中，成为文件的一部分，类似第二种内嵌样式。
+链接式和导入式的区别：
+
+<link>
+1、属于 XHTML
+2、优先加载 CSS 文件到页面
+@import
+1、属于 CSS2.1
+2、先加载 HTML 结构在加载 CSS 文件。
+
+四种 CSS 引入方式的优先级： 1.就近原则 2.理论上：行内>内嵌>链接>导入 3.实际上：内嵌、链接、导入在同一个文件头部，谁离相应的代码近，谁的优先级高（页面多种方式使用 css 样式引入）
+
+### line-height 单位的区别
+
+1.normal
+2.inherit
+3.number
+4.number + px/em/rem/……
+5.% 同 number+px/em/rem 单位效果一样，后代元素会直接继承父元素的 line-height 计算结果值
+
+- normal 同 number 效果一样，会在每个后代元素下重新计算出实际值，系数约 1.2
+
+- %同 number+px/em/rem 单位效果一样，后代元素会直接继承父元素的 line-height 计算结果值
+
+- 当一个元素是使用带单位的值声明的，那么它的后代元素会继承其父元素 line-height 计算结果值:行高属性是用类似 px、em、rem 等单位来声明时，它的值会先被计算，然后计算后的值会传到任何继承它的后代元素。
+
+- 当一个元素是使用不带单位的数字，声明的值会被继承，也就是说这个值会在子元素中用来与子元素本身的 font-size 重新计算子元素的 line-height。
+
+- 所以我们通常想要的效果是使用不带单位的 line-height,我们可以在父元素上设定一个无单位数字 line-height,其子元素会默认继承。如果想在子元素上有额外的样式，则在子元素上写 line-height 覆盖即可。
+  ### 移除 inline-block 间隙
+
+1. 移除空格
+   元素间的间隙出现的原因是元素标签之间的空格，把空格去掉间隙自然就会消失。
+
+```html
+<div class="demo">
+  <span>我是一个span</span><span>我是一个span</span><span>我是一个span</span
+  ><span>我是一个span</span>
+</div>
+
+<div class="demo">
+  <span>我是一个span </span><span>我是一个span </span><span>我是一个span </span
+  ><span>我是一个span</span>
+</div>
+
+<div class="demo">
+  <span>我是一个span</span
+  ><!-- 
+        --><span>我是一个span</span
+  ><!-- 
+        --><span>我是一个span</span
+  ><!-- 
+        --><span>我是一个span</span>
+</div>
+```
+
+2.取消标签闭合
+
+```html
+<div class="demo">
+        <span>我是一个span
+        <span>我是一个span
+        <span>我是一个span
+        <span>我是一个span</span>
+    </div>
+.demo span{
+     background:#ddd;
+     display: inline-block;
+}
+```
+
+2.使用 margin 负值
+
+```css
+.parent .child + .child {
+  margin-left: -2px;
+}
+```
+
+3.使用 font-size:0
+在父容器上使用 font-size:0;可以消除间隙，可以这样写:
+
+```html
+// html
+<div class="third">
+  <div class="first-div"></div>
+  <div class="second-div"></div>
+  <div class="third-div"></div>
+</div>
+
+// css .third { font-size: 0; // 这里 } .first-div, .second-div, .third-div {
+display: inline-block; // 这里 height: 100px; margin: 0; } .first-div,
+.third-div { background: pink; width: 50px; } .second-div { background: red;
+width: calc(100% - 100px); }
+```
+
+4.letter-spacing 和/line-height
+
+```html
+// html
+<div class="third">
+  <div class="first-div"></div>
+  <div class="second-div"></div>
+  <div class="third-div"></div>
+</div>
+<div class="third">
+  <div class="first-div"></div>
+  <div class="second-div"></div>
+  <div class="third-div"></div>
+</div>
+
+// css .third { letter-spacing: -15px; // 在chrome下测试这个值只要 <= -5
+line-height: 13px; // 在chrome下测试这个值只要 <= 13 } .first-div, .second-div,
+.third-div { display: inline-block; height: 100px; } .first-div, .third-div {
+background: pink; width: 50px; } .second-div { background: red; width: calc(100%
+- 100px); }
+```
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106101630.png)
+5.word-spacing
+最优解在这，设置父元素，display:table 和 word-spacing
+
+```css
+.parent {
+  display: table;
+  word-spacing: -1em; /*兼容其他浏览器，题主还未验证*/
+}
+```
 
 ### 标准模型，IE模型的区别 (CSS盒模型)
 
@@ -223,6 +1222,65 @@ dom.currentStyle.width/height  //渲染以后的 IE
 window.getComputedStyle(dom).width/height  //所有浏览器都支持
 dom.getBoundingClientRect().width/height //计算一个元素的绝对位置
 ```
+### 清除浮动
+
+BFC 清除浮动
+
+```css
+.parent {
+  overflow: hidden;
+}
+```
+
+clear 清除浮动
+
+```css
+.clearfix {
+  zoom: 1;
+}
+.clearfix::after {
+  content: "";
+  display: block;
+  clear: both;
+}
+```
+
+### .position 有几种，分别描述？
+
+- static（静态定位）
+  - 对象遵循标准文档流中，top, right, bottom, left 等属性失效。
+- relative（相对定位）
+  - 对象遵循标准文档流中，依赖 top, right, bottom, left 等属性相对于该对象在标准文档流中的位置进行偏移，同时可通过 z-index 定义层叠关系。
+- absolute（绝对定位）
+  - 对象脱离标准文档流，使用 top, right, bottom, left 等属性进行绝对定位 同时可通过 z-index 定义层叠关系。
+  - 相对于 static 定位以外的第一个父元素进行绝对定位
+- fixed（固定定位）
+  - 对象脱离标准文档流，使用 top, right, bottom, left 等属性进行绝对定位,同时可通过 z-index 定义层叠关系。
+  - fixed 元素总是相对于 body 定位的
+- sticky（粘性定位元素）
+  - 可以说是相对定位 relative 和固定定位 fixed 的结合
+  - 元素固定的相对偏移是相对于离它最近的具有滚动框的祖先元素，如果祖先元素都不可以滚动，那么是相对于 viewport 来计算元素的偏移量。
+  - 在目标区域以内，它的行为就像 position:relative;在滑动过程中，某个元素距离其父元素的距离达到 sticky 粘性定位的要求时(比如 top：100px)；position:sticky 这时的效果相当于 fixed 定位，固定到适当位置。
+
+### z-index
+
+- z-index 的取值
+  - auto（自动，默认值）
+  - 整数（正整数/负整数/0）
+    - 数值越大，元素也就越靠近观察者；而数值越小，元素看起来也就越远。
+  - inherit（继承）
+
+一共可以有 7 种层叠等级。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211009152205.png)
+
+- 背景和边框 —— 形成层叠上下文的元素的背景和边框，也是层叠上下文中的最低等级。
+- 负 z-index 值 —— 层叠上下文内有着 负 z-index 值 的子元素。
+- 块级盒 —— 文档流中非行内非定位子元素。
+- 浮动盒 —— 非定位浮动元素。
+- 行内盒 —— 文档流中行内级别非定位子元素。
+- z-index: 0 —— 定位元素，这些元素将形成了新的层叠上下文。
+- 正 z-index 值 —— 定位元素。 层叠上下文中的最高等级。
+
 ### 防止高度塌陷，4中方案
 #### 方案1
 - 为`父元素`设置`overflow:hidden`属性。
@@ -679,6 +1737,13 @@ dom.getBoundingClientRect().width/height //计算一个元素的绝对位置
 
 给外部盒子的after伪元素设置clear属性，再隐藏它
 这其实是对空盒子方案的改进，一种纯CSS的解决方案，不用引入冗余元素。
+
+### 浮动元素的特性 
+- 只会影响后面的元素
+- 文本不会被浮动元素覆盖
+- 具备内联盒子特性：宽度由内容决定
+- 具备块级盒子特性：支持所有样式
+- 浮动放不下，会自动换行，父容器放不下，自动换行
 
 ### 让一个元素水平垂直居中，到底有多少种方案？
 
@@ -1206,15 +2271,6 @@ dom.getBoundingClientRect().width/height //计算一个元素的绝对位置
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220209100253.png)
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220209100305.png)
 
-
-
-### 浮动元素的特性 
-- 只会影响后面的元素
-- 文本不会被浮动元素覆盖
-- 具备内联盒子特性：宽度由内容决定
-- 具备块级盒子特性：支持所有样式
-- 浮动放不下，会自动换行，父容器放不下，自动换行
-
 ### Flex
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211009164716.png)
 #### Flex 属性
@@ -1323,5 +2379,1431 @@ flex 属性是 flex-grow, flex-shrink 和 flex-basis 的简写，默认值为 0 
   - 定义在分配多余空间之前，项目占据的主轴空间（main size），浏览器根据此属性计算主轴是否有多余空间
   - 默认值为 auto，即 项目原本大小；设置后项目将占据固定空间。
 
+### Grid
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211009164716.png)
+lex 布局虽然强大，但是只能是一维布局，如果要进行二维布局，那么我们还需要使用 grid。
+
+grid 布局又称为“网格布局”，可以实现二维布局方式，和之前的 表格 table 布局差不多，然而，这是使用 CSS 控制的，不是使用 HTML 控制的，同时还可以依赖于媒体查询根据不同的上下文得新定义布局。和 table 布局不同的是，grid 布局不需要在 HTML 中使用特定的标签布局，所有的布局都是在 CSS 中完成的，你可以随意定义你的 grid 网格。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211015141127.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211015144548.png)
+
+#### 使用 grid 布局
+
+使用 grid 布局很简单，通过 display 属性设置属性值为 grid 或 inline-grid 或者是 subgrid（该元素父元素为网格，继承父元素的行和列的大小） 就可以了。
+
+网格容器中的所有子元素就会自动变成网格项目（grid item），然后设置列（grid-template-columns）和 行（grid-template-rows）的大小，设置`grid-template-columns`有多少个参数生成的 grid 列表就有多少个列。如果没有设置 grid-template-columns，那么默认只有一列，宽度为父元素的 100%。
+
+**注：当元素设置了网格布局，column、float、clear、vertical-align 属性无效。**
+
+```html
+<div class="grid-container">
+  <div class="item item1">1</div>
+  <div class="item item2">2</div>
+  <div class="item item3">3</div>
+  <div class="item item4">4</div>
+  <div class="item item5">5</div>
+  <div class="item item6">6</div>
+</div>
+
+.grid-container{ padding: 20px; display: grid; grid-template-rows: 50px 100px
+60px 80px; grid-template-columns: 50px 1fr 1fr 2fr; background: pink; } .item{
+border: 2px solid palegoldenrod; color: #fff; }
+```
+
+- css fr 单位是一个自适应单位，fr 单位被用于在一系列长度值中分配剩余空间，如果多个已指定了多个部分，则剩下的空间根据各自的数字按比例分配。
+- fr 是基于网格容器可用空间来计算的（flex 也是一样），所以我们可以和其他单位混合使用，如果需要的话
+
+#### 行或列最小和最大尺寸
+
+`minmax()`函数来创建行或列的最小或最大尺寸，第一个参数定义网格轨道的最小值，第二个参数定义网格轨道的最大值。可以接受任何长度值，也接受 auto 值。auto 值允许网格轨道基于内容的尺寸拉伸或挤压。
+
+```css
+.grid-container {
+  padding: 20px;
+  display: grid;
+  grid-template-rows: minmax(100px, 200px) minmax(50px, 200px);
+  grid-template-columns: 1fr 1fr 2fr;
+  background: pink;
+  height: 300px;
+}
+```
+
+遇到的问题：
+
+- 将第一行的高度设置为`minmax(100px,200px)`，第二行的高度设置为`minmax(50px,200px)`，容器总高度设置为`300px`，这时每一列的高度要怎么算呢？
+- 判断总高度是小于第一列高度的最大值和第二列高度的最大值之和的，如果大于最大值之和，那么第一列和第二列的高度都为设置的最大值，如果是小于最小值之和的话，那么第一列和第二列的高度都为设置的最小值。
+- 总高度是小于第一列高度的最大值和第二列高度的最大值之和
+  - 总高度 `300px` - 第一列最小高度 `100px` - 第二列最小高度 `50px` = `150px`
+  - 第一列高度：第一列最小高度 `100px + 150px/2 = 175px`;
+  - 第二列高度：第一列最小高度 `50px + 150px/2 = 125px`;
+
+#### 重复行或者列
+
+`repeat()` 属性可以创建重复的网格轨道。这个适用于创建相等尺寸的网格项目和多个网格项目。
+`repeat()` 也接受两个参数：第一个参数定义网格轨道应该重复的次数，第二个参数定义每个轨道的尺寸。
+
+```css
+.grid-container {
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(2, 100px);
+  grid-template-rows: repeat(3, 100px);
+  background: pink;
+}
+```
+
+#### 间距
+
+- grid-column-gap：创建列与列之间的距离。
+- grid-row-gap：行与行之间的距离。
+- grid-gap 是 grid-row-gap 和 grid-column-gap 两个属性的缩写。
+
+```css
+.grid-container {
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(2, 100px);
+  grid-template-rows: repeat(3, 100px);
+  grid-column-gap: 50px;
+  grid-row-gap: 15px;
+  background: pink;
+}
+```
+
+#### 通过网格线定位 grid item
+
+我们可以通过表格线行或者列来定位 grid item。
+
+```html
+<div class="grid-container">
+  <div class="item item1">1</div>
+  <div class="item item2">2</div>
+  <div class="item item3">3</div>
+  <div class="item item4">4</div>
+  <div class="item item5">5</div>
+  <div class="item item6">6</div>
+</div>
+
+.grid-container{ padding: 20px; display: grid; grid-template-columns:
+repeat(2,100px); grid-template-rows: repeat(3,100px); grid-column-gap: 50px;
+grid-row-gap: 15px; background: pink; } .item{ border: 2px solid palegoldenrod;
+color: #fff; text-align: center; font-size: 20px; } .item1{ grid-row-start: 2;
+grid-row-end: 3; grid-column-start: 2; grid-column-end: 3; background: #fffa90;
+color: #000; }
+```
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211015143416.png)
+
+- `grid-row` 是 `grid-row-start` 和 `grid-row-end` 的简写。`grid-column` 是 `grid-column-start` 和 `grid-column-end` 的简写。
+  - 只提供一个值，指定了 `grid-row-start` 和 `grid-column-start` 的值。
+  - 提供两个值，第一个值是 `grid-row-start` 或者 `grid-column-start` 的值，第二个值是 `grid-row-end` 或者 `grid-column-end` 的值，两者之间必须要用`/`隔开。
+  ```css
+  grid-row: 2;
+  grid-column: 3 / 4;
+  ```
+  - 四个值可以用 `grid-area` 缩写，分别对应 `grid-row-start`、`grid-column-start`、`grid-row-end`、`grid-column-end`：
+  ```css
+  grid-area: 2 / 2 / 3 / 3;
+  ```
+
+#### 合并单元行与合并单元列
+
+这个就和`excel`中的合并单元行/列是相同的（这个需要设置在`grid item`中）
+
+```css
+grid-column-start: 1;
+grid-column-end: 3;
+grid-row-start: 2;
+grid-row-end: 4;
+```
+
+也可以使用`grid-row`和`grid-column`简写的形式，关键词`span`后面紧随数字，表示合并多少个列或行，`/` 前面是从第几行`/`列开始。
+
+```css
+grid-row: 2 / span 3;
+grid-column: span 2;
+```
+
+```css
+.grid-container {
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(4, 100px);
+  grid-template-rows: repeat(3, 100px);
+  grid-column-gap: 50px;
+  grid-row-gap: 15px;
+  background: pink;
+}
+.item {
+  border: 2px solid palegoldenrod;
+  color: #fff;
+  text-align: center;
+  font-size: 20px;
+}
+.item1 {
+  grid-column-start: 1;
+  grid-column-end: 3;
+  grid-row-start: 2;
+  grid-row-end: 4;
+}
+```
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211015144225.png)
+
+#### 自定义网格线名称
+
+在`grid`中，是可以自定义网格线的名称的，然后使用定义好的网格线来进行布局，`[col1-start]` 网格线名称一定要使用 `[]` 括住。
+
+```html
+<div class="grid-container">
+  <div class="item a">a</div>
+  <div class="item b">b</div>
+  <div class="item c">c</div>
+  <div class="item d">d</div>
+  <div class="item e">e</div>
+  <div class="item f">f</div>
+  <div class="item g">g</div>
+  <div class="item h">h</div>
+  <div class="item i">i</div>
+  <div class="item j">j</div>
+</div>
+
+.grid-container{ text-align: center; height: 400px; padding: 100px; display:
+grid; grid-column-gap: 5px; grid-row-gap: 5px; background: pink;
+grid-template-columns: [col1-start] 100px [col1-end] 5px [col2-start] 100px
+[col2-end] 5px [col3-start] 100px [col3-end] 5px [col4-start] 100px [col4-end];
+grid-template-rows: [row1-start] auto [row1-end] 5px [row2-start] auto
+[row2-end] 5px [row3-start] auto [row3-end] 5px [row4-start] auto [row4-end] 5px
+[row5-start] auto [row5-end]; } .a { grid-column: col1-start / col3-end;
+grid-row: row1-start; background: #ffffff;} .b { grid-column: col4-start /
+col4-end; grid-row: row1-start / row5-end; background: orange; } .c {
+grid-column: col1-start; grid-row: row2-start; background: #ffffff;} .d {
+grid-column: col2-start; grid-row: row2-start; background: #ffffff;} .e {
+grid-column: col3-start; grid-row: row2-start; background: #ffffff;} .f {
+grid-column: col1-start / col2-end; grid-row: row3-start; background: #ffffff;}
+.g { grid-column: col3-start; grid-row: row3-start; background: #ffffff;} .h {
+grid-column: col1-start; grid-row: row4-start; background: #ffffff;} .i {
+grid-column: col2-start / col3-end; grid-row: row4-start; background: #ffffff;}
+.j { grid-column: col1-start / col3-end; grid-row: row5-start; background:
+#ffffff;}
+```
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211015144801.png)
+
+#### 通过网格区域命名和定位网格项目
+
+- 什么是网格区域：
+  - 网格区域(grid-area)是一个逻辑空间，主要用来放置一个或多个网格单元格（Grid Cell）。他是由四条网格线(Grid line)，网格区域每边一条，四边相交组织的网格轨道(Grid Track)。简单点理解，网格区域是有四条网格线交织组成的网格空间，这个空间中可能是一个网格单元格，也可能是多个网格单元格。
+- 定义网格区域
+
+  - 在 CSS Grid Layout 中定义网格区域有两种方式，一种是通过网格线来定义，另一种是通过 grid-template-areas 来定义。接下来看看两种定义网格区域的方法在具体使用过程中有何不同。
+
+- 网格线定义网格区域
+  - 使用网格线定义网格区域的方法非常的简单，首先依赖于`grid-template-columns`和`grid-template-rows`显式定义网格线，甚至是由浏览器隐式创建网格线，然后通过`grid-area`属性通过取网格线，组成网格线交织区域，那么这个区域就是所讲的网格区域。在使用`grid-area`属性调用网格线，其遵循的规则是`grid-area: row-start/ column-start / row-end / column-end`。
+- `grid-template-areas`定义网格区域
+
+  - 除了使用网格线的交组来定义网格区域之外，在 CSS Grid Layout 中还可以通过`grid-template-areas`属性来定义网格区域的名称，然后需要放在对应网格区域的元素，可以通过`grid-area`属性来指定。而且重复区域可以使用同一个名称来实现跨区域。另外对于空的轨道区域，可以使用点号 . 来代表
+
+  ```html
+  <div class="grid-container">
+    <div class="header ">header</div>
+    <div class="content ">content</div>
+    <div class="sidebar ">sidebar</div>
+    <div class="footer ">footer</div>
+  </div>
+
+  .grid-container{ text-align: center; padding: 20px; display: grid;
+  grid-column-gap: 5px; grid-row-gap: 5px; background: pink;
+  grid-template-areas: "header header header header header" "sidebar content
+  content content content" "footer footer footer footer footer";
+  grid-template-rows: 50px 150px 50px; grid-template-columns: 200px 200px 200px;
+  } .header { grid-area:header; background: #fff} .content { grid-area: content;
+  background: #fffa90} .sidebar { grid-area: sidebar; background: #5bc0de}
+  .footer { grid-area: footer; background: #ffff00}
+  ```
+
+  ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211015145529.png)
+  在不设置高度的情况下（父容器和 grid-template-rows 的值，或者 grid-template-rows 设置为 auto 时，slider 和 content 的高度是一致的，并且会根据其内的高度自适应）
+  ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211015145708.png)
+
+### 常见布局的方案
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211009164716.png)
+
+#### 单列布局
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210929065711.png)
+
+- header,content 和 footer 等宽的单列布局
+  - 对于第一种，先通过对 header,content,footer 统一设置 width：1000px;或者 max-width：1000px(这两者的区别是当屏幕小于 1000px 时，前者会出现滚动条，后者则不会，显示出实际宽度);然后设置 margin:auto 实现居中即可得到。
+- header 与 footer 等宽,content 略窄的单列布局
+  - header、footer 的内容宽度不设置，块级元素充满整个屏幕，但 header、content 和 footer 的内容区设置同一个 width，并通过 margin:auto 实现居中。
+
+```html
+<div class="header"></div>
+<div class="content"></div>
+<div class="footer"></div>
+
+.header{ margin:0 auto; max-width: 960px; height:100px; background-color: blue;
+} .content{ margin: 0 auto; max-width: 960px; height: 400px; background-color:
+aquamarine; } .footer{ margin: 0 auto; max-width: 960px; height: 100px;
+background-color: aqua; }
+```
+
+```html
+<div class="header">
+  <div class="nav"></div>
+</div>
+<div class="content"></div>
+<div class="footer"></div>
+
+.header{ margin:0 auto; max-width: 960px; height:100px; background-color: blue;
+} .nav{ margin: 0 auto; max-width: 800px; background-color: darkgray; height:
+50px; } .content{ margin: 0 auto; max-width: 800px; height: 400px;
+background-color: aquamarine; } .footer{ margin: 0 auto; max-width: 960px;
+height: 100px; background-color: aqua; }
+```
+
+#### 两列自适应布局
+
+两列自适应布局是指一列由内容撑开，另一列撑满剩余宽度的布局方式。
+
+- float+overflow:hidden
+  - 如果是普通的两列布局，浮动+普通元素的 margin 便可以实现，但如果是自适应的两列布局，利用 float+overflow:hidden 便可以实现，这种办法主要通过 overflow 触发 BFC,而 BFC 不会重叠浮动元素。
+  - 使用 overflow 属性来触发 bfc，来阻止浮动造成的文字环绕效果。
+  - 注意点:如果侧边栏在右边时，注意渲染顺序。即在 HTML 中，先写侧边栏后写主内容
+- Flex 布局
+  - Flex 布局，也叫弹性盒子布局，区区简单几行代码就可以实现各种页面的的布局。
+- grid 布局
+  - Grid 布局，是一个基于网格的二维布局系统，目的是用来优化用户界面设计。
+
+```html
+<div class="parent" style="background-color: lightgrey;">
+  <div class="left" style="background-color: lightblue;">
+    <p>left</p>
+  </div>
+  <div class="right" style="background-color: lightgreen;">
+    <p>right</p>
+    <p>right</p>
+  </div>
+</div>
+.parent { overflow: hidden; zoom: 1; } .left { float: left; margin-right: 20px;
+} .right { overflow: hidden; zoom: 1; }
+```
+
+```css
+//html部分同上
+.parent {
+  display: flex;
+}
+.right {
+  margin-left: 20px;
+  flex: 1;
+}
+```
+
+```css
+//html部分同上
+.parent {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-gap: 20px;
+}
+```
+
+#### 三栏布局
+
+中间列自适应宽度，旁边两侧固定宽度。
+
+1. 圣杯布局
+   比较特殊的三栏布局，同样也是两边固定宽度，中间自适应，唯一区别是 dom 结构必须是先写中间列部分，这样实现中间列可以优先加载。
+   **要注意的是，中间栏要在放在文档流前面以优先渲染。**
+
+- 缺点
+
+  - center 部分的最小宽度不能小于 left 部分的宽度，否则会 left 部分掉到下一行
+  - 如果其中一列内容高度拉长(如下图)，其他两列的背景并不会自动填充。(借助等高布局正 padding+负 margin 可解决）。
+
+    ```html
+    <div class="container">
+      <div class="center">
+        测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试
+      </div>
+      <div class="left">left</div>
+      <div class="right">right</div>
+    </div>
+
+    .container { // 导致左右栏也会 跟着走 // 分别给左右栏 position:
+    relative;定位到原本的位置 padding:0 220px;//为左右栏腾出空间 } .left {
+    float: left; width: 200px; height: 400px; background: red; margin-left:
+    -100%; position: relative; left: -220px; } .center { float: left; width:
+    100%; height: 500px; background: yellow; } .right { float: left; width:
+    200px; height: 400px; background: blue; margin-left: -200px; position:
+    relative; right: -220px; }
+    ```
+
+2. 双飞翼布局
+   同样也是三栏布局，在圣杯布局基础上进一步优化，解决了圣杯布局错乱问题，实现了内容与布局的分离。而且任何一栏都可以是最高栏，不会出问题。
+
+- 缺点
+  - 多加一层 dom 树节点，增加渲染树生成的计算量。
+
+```html
+ <article class="container">
+    <div class="center">
+      <div class="inner">双飞翼布局</div>
+    </div>
+    <div class="left"></div>
+    <div class="right"></div>
+  </article>
+
+  .container {
+      //不会引起塌陷
+      min-width: 600px; //确保中间内容可以显示出来，两倍left宽+right宽
+    }
+
+    .left {
+      float: left;
+      width: 200px;
+      height: 400px;
+      background: red;
+      margin-left: -100%;
+    }
+
+    .center {
+      float: left;
+      width: 100%;
+      height: 500px;
+      background: yellow;
+    }
+
+    .center .inner {
+      // 流出左右边栏的宽度
+      margin: 0 200px; //新增部分
+    }
+
+    .right {
+      float: left;
+      width: 200px;
+      height: 400px;
+      background: blue;
+      margin-left: -200px;
+    }
+  </style>
+```
+
+- 两种布局实现方式对比:
+  - 两种布局方式都是把主列放在文档流最前面，使主列优先加载。
+  - 两种布局方式在实现上也有相同之处，都是让三列浮动，然后通过负外边距形成三列布局。
+  - 两种布局方式的不同之处在于如何处理中间主列的位置： 圣杯布局是利用父容器的左、右内边距+两个从列相对定位； 双飞翼布局是把主列嵌套在一个新的父级块中利用主列的左、右外边距进行布局调整
+
+3. 绝对定位法
+
+   ```html
+   <div class="left">Left</div>
+   <div class="main">Main</div>
+   <div class="right">Right</div>
+
+   //简单的进行CSS reset body,html{ height:100%; padding: 0px; margin:0px; }
+   //左右绝对定位 .left,.right{ position: absolute; top:0px; background: red;
+   height:100%; } .left{ left:0; width:100px; } .right{ right:0px; width:200px;
+   } //中间使用margin空出左右元素所占据的空间 .main{ margin:0px 200px 0px 100px;
+   height:100%; background: blue; }
+   ```
+
+````
+- 缺点
+  - 如果中间栏含有最小宽度限制，或是含有宽度的内部元素，当浏览器宽度小到一定程度，会发生层重叠的情况。
+
+4. 浮动
+```html
+//注意元素次序
+<div class="left">Left</div>
+<div class="right">Right</div>
+<div class="main">Main</div>
+
+
+body,html {
+    height:100%;
+    padding: 0;
+    margin: 0
+}
+//左栏左浮动
+.left {
+    background: red;
+    width: 100px;
+    float: left;
+    height: 100%;
+}
+//中间自适应
+.main {
+    background: blue;
+    height: 100%;
+    margin:0px 200px 0px 100px;
+}
+//右栏右浮动
+.right {
+    background: red;
+    width: 200px;
+    float: right;
+    height: 100%;
+}
+````
+
+#### 等高布局
+
+等高布局是指子元素在父元素中高度相等的布局方式。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210929073545.png)
+
+1. 利用正 padding+负 margin
+   可解决圣杯布局的第二点缺点，因为背景是在 padding 区域显示的，设置一个大数值的 padding-bottom，再设置相同数值的负的 margin-bottom，并在所有列外面加上一个容器，并设置 overflow:hidden 把溢出背景切掉。这种可能实现多列等高布局，并且也能实现列与列之间分隔线效果，结构简单，兼容所有浏览器。
+
+   ```css
+   /* 在圣杯布局的布局的基础上 */
+   .center,
+   .left,
+   .right {
+     padding-bottom: 10000px;
+     margin-bottom: -10000px;
+   }
+
+   .container {
+     padding-left: 220px;
+     padding-right: 220px;
+     overflow: hidden;
+   }
+   ```
+
+````
+2. 模仿表格布局
+
+#### 粘连布局
+有一块内容<main>，当<main>的高康足够长的时候，紧跟在<main>后面的元素<footer>会跟在<main>元素的后面。
+当<main>元素比较短的时候(比如小于屏幕的高度),我们期望这个<footer>元素能够“粘连”在屏幕的底部
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210929090420.png)
+```html
+<div id="wrap">
+  <div class="main">
+    main <br />
+    main <br />
+    main <br />
+  </div>
+</div>
+<div id="footer">footer</div>
+
+* {
+    margin: 0;
+    padding: 0;
+  }
+
+  html,
+  body {
+    height: 100%; //高度一层层继承下来
+  }
+
+  #wrap {
+    min-height: 100%;
+    background: pink;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  #wrap .main {
+    padding-bottom: 50px;
+  }
+
+  #footer {
+    height: 50px;
+    line-height: 50px;
+    background: deeppink;
+    text-align: center;
+    margin-top: -50px;
+  }
+
+  .container {
+    padding-left: 220px;
+    padding-right: 220px;
+  }
+
+  .left {
+    float: left;
+    width: 200px;
+    height: 400px;
+    background: red;
+    margin-left: -100%;
+    position: relative;
+    left: -220px;
+  }
+
+  .center {
+    float: left;
+    width: 100%;
+    height: 500px;
+    background: yellow;
+  }
+
+  .right {
+    float: left;
+    width: 200px;
+    height: 400px;
+    background: blue;
+    margin-left: -200px;
+    position: relative;
+    right: -220px;
+  }
+
+  .center,
+  .left,
+  .right {
+    padding-bottom: 10000px;
+    margin-bottom: -10000px;
+  }
+````
+
+- 实现
+  - footer 必须是一个独立的结构，与 wrap 没有任何嵌套关系
+  - wrap 区域的高度通过设置 min-height，变为视口高度
+  - footer 要使用 margin 为负来确定自己的位置
+  - 在 main 区域需要设置 padding-bottom。这也是为了防止负 margin 导致 footer 覆盖任何实际内容。
+
+### 水平垂直居中
+
+#### 定宽高
+
+- 绝对定位和负 magin 值
+  ```html
+  <template>
+    <div id="app">
+      <div class="box">
+        <div class="children-box"></div>
+      </div>
+    </div>
+  </template>
+  <style type="text/css">
+    .box {
+      width: 200px;
+      height: 200px;
+      border: 1px solid red;
+      position: relative;
+    }
+    .children-box {
+      position: absolute;
+      width: 100px;
+      height: 100px;
+      background: yellow;
+      left: 50%;
+      top: 50%;
+      margin-left: -50px;
+      margin-top: -50px;
+    }
+  </style>
+  ```
+- 绝对定位 + transform
+  ```js
+    <template>
+      <div id="app">
+          <div class="box">
+              <div class="children-box"></div>
+          </div>
+      </div>
+    </template>
+    <style type="text/css">
+    .box {
+      width: 200px;
+      height: 200px;
+      border: 1px solid red;
+      position: relative;
+    }
+    .children-box {
+      position: absolute;
+      width: 100px;
+      height: 100px;
+      background: yellow;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+    </style>
+  ```
+- 绝地定位 + margin: auto
+
+  ```html
+  <style>
+    .box1 {
+      width: 500px;
+      height: 500px;
+      background-color: aqua;
+      position: relative;
+    }
+    .box2 {
+      width: 100px;
+      height: 100px;
+      background-color: blanchedalmond;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin: auto;
+    }
+  </style>
+  <body>
+    <div class="box1">
+      <div class="box2"></div>
+    </div>
+  </body>
+  ```
+
+- flex 布局
+  ```html
+  <template>
+    <div id="app">
+      <div class="box">
+        <div class="children-box"></div>
+      </div>
+    </div>
+  </template>
+  <style type="text/css">
+    .box {
+      width: 200px;
+      height: 200px;
+      border: 1px solid red;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .children-box {
+      background: yellow;
+      height: 100px;
+      width: 100px;
+    }
+  </style>
+  ```
+- grid 布局
+  ```html
+  <template>
+    <div id="app">
+      <div class="box">
+        <div class="children-box"></div>
+      </div>
+    </div>
+  </template>
+  <style type="text/css">
+    .box {
+      width: 200px;
+      height: 200px;
+      border: 1px solid red;
+      display: grid;
+    }
+    .children-box {
+      width: 100px;
+      height: 100px;
+      background: yellow;
+      margin: auto;
+    }
+  </style>
+  ```
+- table-cell + vertical-align + inline-block/margin: auto
+  ```html
+  <template>
+    <div id="app">
+      <div class="box">
+        <div class="children-box"></div>
+      </div>
+    </div>
+  </template>
+  <style type="text/css">
+    .box {
+      width: 200px;
+      height: 200px;
+      border: 1px solid red;
+      display: table-cell;
+      text-align: center;
+      vertical-align: middle;
+    }
+    .children-box {
+      width: 100px;
+      height: 100px;
+      background: yellow;
+      display: inline-block; // 可以换成margin: auto;
+    }
+  </style>
+  ```
+
+#### 不定宽高
+
+- 绝对定位 + transform
+
+  ```html
+  <template>
+    <div id="app">
+      <div class="box">
+        <div class="children-box">111111</div>
+      </div>
+    </div>
+  </template>
+  <style type="text/css">
+    .box {
+      width: 200px;
+      height: 200px;
+      border: 1px solid red;
+      position: relative;
+    }
+    .children-box {
+      position: absolute;
+      background: yellow;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+  </style>
+  ```
+
+- table-cell
+  ```html
+  <template>
+    <div id="app">
+      <div class="box">
+        <div class="children-box">111111</div>
+      </div>
+    </div>
+  </template>
+  <style type="text/css">
+    .box {
+      width: 200px;
+      height: 200px;
+      border: 1px solid red;
+      display: table-cell;
+      text-align: center;
+      vertical-align: middle;
+    }
+    .children-box {
+      background: yellow;
+      display: inline-block;
+    }
+  </style>
+  ```
+- flex 布局
+
+  ```html
+  <template>
+    <div id="app">
+      <div class="box">
+        <div class="children-box">11111111</div>
+      </div>
+    </div>
+  </template>
+  <style type="text/css">
+    .box {
+      width: 200px;
+      height: 200px;
+      border: 1px solid red;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .children-box {
+      background: yellow;
+    }
+  </style>
+  ```
+
+- flex + margin:auto
+
+  ```html
+  <template>
+    <div id="app">
+      <div class="box">
+        <div class="children-box">11111111</div>
+      </div>
+    </div>
+  </template>
+  <style type="text/css">
+    .box {
+      width: 200px;
+      height: 200px;
+      border: 1px solid red;
+      display: flex;
+    }
+    .children-box {
+      background: yellow;
+      margin: auto;
+    }
+  </style>
+  ```
+
+- grid
+  ```html
+  <template>
+    <div id="app">
+      <div class="box">
+        <div class="children-box">11111111</div>
+      </div>
+    </div>
+  </template>
+  <style type="text/css">
+    .box {
+      width: 200px;
+      height: 200px;
+      border: 1px solid red;
+      display: grid;
+    }
+    .children-box {
+      background: yellow;
+      align-self: center;
+      justify-self: center;
+    }
+  </style>
+  ```
+- gird+margin:auto
+
+  ```js
+    <template>
+      <div id="app">
+          <div class="box">
+              <div class="children-box">11111111</div>
+          </div>
+      </div>
+    </template>
+    <style type="text/css">
+    .box {
+      width: 200px;
+      height: 200px;
+      border: 1px solid red;
+      display: grid;
+    }
+    .children-box {
+      background: yellow;
+      margin: auto;
+    }
+    </style>
+  ```
+
+- writing-mode 属性布局(不是很了解)
+
+#### 内联元素居中布局
+
+- 水平居中
+  - 行内元素可设置：text-align: center;
+  - flex 布局设置父元素：display: flex; justify-content: center;
+- 垂直居中
+  - 单行文本父元素确认高度：height === line-heigh
+  - 多行文本父元素确认高度：disaply: table-cell; vertical-align: middle;
+
+#### 块级元素居中布局
+
+- 水平居中
+  - 定宽: margin: 0 auto;
+  - 不定宽： 参考上诉例子中不定宽高例子。
+  - 定位
+  - flex
+  - grid
+- 垂直居中
+  - position: absolute 设置 left、top、margin-left、margin-to(定高)；
+  - display: table-cell；
+  - transform: translate(x, y)；
+  - flex(不定高，不定宽)；
+  - grid(不定高，不定宽)，兼容性相对比较差；
+
+### 单行文本溢出，多行文本溢出的代码实现?
+
+#### 单行文本省略
+
+```css
+.ellipsis {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+```
+
+#### 多行文本省略
+
+```css
+.ellipsis {
+  display: -webkit-box; /*重点，不能用block等其他，将对象作为弹性伸缩盒子模型显示*/
+  -webkit-box-orient: vertical; /*从上到下垂直排列子元素（设置伸缩盒子的子元素排列方式）*/
+  -webkit-line-clamp: 3; /*行数，超出三行隐藏且多余的用省略号表示...*/
+  line-clamp: 3;
+  word-break: break-all;
+  overflow: hidden;
+  max-width: 100%;
+}
+```
+
+### px、rpx、em、rem、dpr、vw、wh 的值各是什么意思
+
+- px:像素
+  - css 中的 px 是一个相对（抽象）单位是虚拟像素，因为不同的设备在大小宽高相同时，他们的物理像素大小也可能是不同的，物理像素高的设备单位面积内存放的像素点就高，因此画质看起来就更精细，通常情况下在 pc 端中，css 中的 px 就接近于实际的像素大小，但是在移动设备上，根据不用机型的分辨率大小，css 中的一个 px 可能就会对应不同数量的物理像素点
+- rem: 根据根元素(即 html)的 font-size
+  - rem 和 em 类似都是相对长度单位，但是 rem 只会相对于 html 根元素的字体大小，也就是说如果根元素字体设置为 18px，那么全局内 rem 的值换算都为 1rem = 18px
+  - 有时我们为了换算方便会将根元素的字体大小先设置为 62.5%，然后根据需要进行调整，原因是 62.5%\*16px = 10px，此时也就是 1rem = 10px
+- em: 根据「自身元素」的 font-size
+  - 使用 em 单位的元素如果自身设置了字体大小，那么就相对于自身计算，如果自身没有设置字体大小那么就会继承父元素的字体大小，如果父元素没有设置，就会依次向上寻找（因为字体大小是会被继承的），如果页面中没有设置字体大小，那么就会以浏览器的默认字体大小 16px 为基准
+- vw: viewport width
+- vh: viewport height
+  - vh 指的是视窗高度 vh 类似于一种百分比的单位，他相对于视窗的高度，将视窗的高度分为 100 份，10vh 也就是占用视窗的 10%
+- vm:
+  - vm 是在视口中选取 宽度或者高度最小的那一个，然后想 vw、vh 一样将其分为 100 等份
+- rpx：
+  - rpx 响应式 px 单位
+  - rpx 本质上是和宽度相关的单位，屏幕越宽实际像素值就越大，这是根据屏幕宽度缩放的单位，如果你不想根据屏幕缩放，那么不要使用 rpx
+  - 使用 rpx 单位元素的大小的计算公式为
+    - 750 \* 元素在设计稿中的宽度 / 设计稿基准宽度
+    - 若设计稿宽度为 750px，元素 A 在设计稿上的宽度为 100px，那么元素 A 在 uni-app 里面的宽度应该设为：750 \* 100 / 750，结果为：100rpx
+    - 若设计稿宽度为 640px，元素 A 在设计稿上的宽度为 100px，那么元素 A 在 uni-app 里面的宽度应该设为：750 \* 100 / 640，结果为：117rpx
+  - rpx 本质上是和宽度相关的单位，屏幕越宽实际像素值就越大，这是根据屏幕宽度缩放的单位，如果你不想根据屏幕缩放，那么不要使用 rpx
+  - 如果你的字体使用了 rpx 就需要注意了，你的字体也会跟着屏幕的宽度变化而变化
+  - rpx 不支持切换横竖屏时进行计算大小，因此如果你使用了 rpx，建议锁定屏幕方向
+
+### 伪类与伪元素
+
+- 伪类
+  - 伪类用于当已有元素处于的某个状态时，为其添加对应的样式，这个状态是根据用户行为而动态变化的。比如说，当用户悬停在指定的元素时，我们可以通过:hover 来描述这个元素的状态。虽然它和普通的 css 类相似，可以为已有的元素添加样式，但是它只有处于 dom 树无法描述的状态下才能为元素添加样式，所以将其称为伪类。
+  - 双冒号 (::) 表示伪元素
+- 伪元素
+  - 伪元素用于创建一些不在文档树中的元素，并为其添加样式。比如说，我们可以通过:before 来在一个元素前增加一些文本，并为这些文本添加样式。虽然用户可以看到这些文本，但是这些文本实际上不在文档树中。
+  - 单冒号 (:)表示伪类
+
+### CSS 选择器的优先级
+
+第一优先级：!important 会覆盖页面内任何位置的元素样式 1.内联样式，如 style="color: green"，权值为 1000
+2.ID 选择器，如#app，权值为 0100 3.类、伪类、属性选择器，如.foo, :first-child, div[class="foo"]，权值为 0010 4.标签、伪元素选择器，如 div::first-line，权值为 0001 5.通配符、子类选择器、兄弟选择器，如\*, >, +，权值为 0000 6.继承的样式没有权值
+
+### display:none visibility:hidden opacity:0 区别
+
+- display: none;
+  - DOM 结构：浏览器不会渲染 display 属性为 none 的元素，不占据空间；
+  - 事件监听：无法进行 DOM 事件监听；
+  - 性能：动态改变此属性时会引起重排，性能较差；
+  - 继承：不会被子元素继承，毕竟子类也不会被渲染；
+  - transition：transition 不支持 display。
+- visibility: hidden;
+  - DOM 结构：元素被隐藏，但是会被渲染不会消失，占据空间；
+  - 事件监听：无法进行 DOM 事件监听；
+  - 性 能：动态改变此属性时会引起重绘，性能较高；
+  - 继 承：会被子元素继承，子元素可以通过设置 visibility: visible; 来取消隐藏；
+  - transition：visibility 会立即显示，隐藏时会延时
+- opacity: 0;
+
+  - DOM 结构：透明度为 100%，元素隐藏，占据空间；
+  - 事件监听：可以进行 DOM 事件监听；
+  - 性 能：提升为合成层，不会触发重绘，性能较高；
+  - 继 承：会被子元素继承,且，子元素并不能通过 opacity: 1 来取消隐藏；
+  - transition：opacity 可以延时显示和隐藏
+
+    1.opacity：0，该元素隐藏起来了，但不会改变页面布局，并且，如果该元素已经绑定 一些事件，如 click 事件，那么点击该区域，也能触发点击事件的
+    2.visibility：hidden，该元素隐藏起来了，但不会改变页面布局，但是不会触发该元素已 经绑定的事件 ，隐藏对应元素，在文档布局中仍保留原来的空间（重绘）
+    3.display：none，把元素隐藏起来，并且会改变页面布局，可以理解成在页面中把该元素。 不显示对应的元素，在文档布局中不再分配空间（回流+重绘）
+
+### CSS 标签 meta ？？？？？？？？？
+
+### CSS 画三角形 画半圆
+
+#### 三角形
+
+利用元素的 border 绘制三角形，先来看一下宽高均为 0，border 有宽度
+
+```html
+<style>
+  .triangle {
+    width: 0;
+    height: 0;
+    border: 100px solid transparent;
+    border-bottom: 200px solid #0ff;
+  }
+</style>
+
+<div class="triangle"></div>
+```
+
+#### 梯形
+
+梯形也是基于 border 来绘制的，只不过绘制梯形时，宽高和 border 尺寸相同。
+
+```html
+<style>
+  .trapezoid {
+    width: 50px;
+    height: 50px;
+    background: #ff0;
+    border-top: 50px solid #f00;
+    border-bottom: 50px solid #00f;
+    border-left: 50px solid #0f0;
+    border-right: 50px solid #0ff;
+  }
+</style>
+<div class="trapezoid"></div>
+```
+
+#### 扇形
+
+```html
+<style>
+  .sector1 {
+    border-radius: 100px 0 0;
+    width: 100px;
+    height: 100px;
+    background: #00f;
+  }
+</style>
+<div class="sector1"></div>
+
+<style>
+  .sector2 {
+    border: 100px solid transparent;
+    width: 0;
+    border-radius: 100px;
+    border-top-color: #f00;
+  }
+</style>
+<div class="sector2"></div>
+```
+
+#### 椭圆
+
+border-radius: 水平半径 / 垂直半径;
+
+```html
+<style>
+  .oval {
+    width: 100px;
+    height: 50px;
+    background: #ff0;
+    border-radius: 50px / 25px;
+  }
+</style>
+<div class="oval"></div>
+```
+
+#### 箭头
+
+```html
+<style>
+  .arrow {
+    width: 0;
+    height: 0;
+    border: 50px solid;
+    border-color: transparent #0f0 transparent transparent;
+    position: relative;
+  }
+  .arrow::after {
+    content: "";
+    position: absolute;
+    right: -55px;
+    top: -50px;
+    border: 50px solid;
+    border-color: transparent #fff transparent transparent;
+  }
+</style>
+<div class="arrow"></div>
+```
+
+#### 半圆
+
+```html
+<style>
+  .semicircle {
+    width: 100px;
+    height: 50px;
+    border-radius: 50px 50px 0 0;
+    background-color: rebeccapurple;
+  }
+</style>
+<div class="semicircle"></div>
+```
+
+### CSS 九宫格布局
+
+#### Flex 实现
+
+原理： 使用 flex 弹性布局和 flex-wrap 来设置
+
+```html
+//html代码
+<div class="box">
+  <ul class="box-inner">
+    <li>九宫格1</li>
+    <li>九宫格2</li>
+    <li>九宫格3</li>
+    <li>九宫格4</li>
+    <li>九宫格5</li>
+    <li>九宫格6</li>
+    <li>九宫格7</li>
+    <li>九宫格8</li>
+    <li>九宫格9</li>
+  </ul>
+</div>
+
+// css代码 .box { position: relative; width: 100%; height: 600px; } .box-inner {
+position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex;
+flex-wrap: wrap; } .box-inner > li { overflow: hidden; flex-grow: 1;
+background-color: darkorange; text-align: center; color: #ffffff; width: 33%;
+height: 200px; line-height: 200px; margin: 1px; text-align: center; }
+```
+
+#### Grid 实现
+
+原理：使用 grid 创建网格布局，划分为 3x3 的等分布局。
+
+```html
+//html代码
+<div class="box">
+  <div>九宫格1</div>
+  <div>九宫格2</div>
+  <div>九宫格3</div>
+  <div>九宫格4</div>
+  <div>九宫格5</div>
+  <div>九宫格6</div>
+  <div>九宫格7</div>
+  <div>九宫格8</div>
+  <div>九宫格9</div>
+</div>
+//css代码 .box { display: grid; height: 600px; width: 100%;
+grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); }
+.box > div { width: 98%; margin: 1%; background-color: deeppink; text-align:
+center; line-height: 200px; } .box > div:nth-child(even) { background-color:
+black; color: #fff; }
+```
+
+#### Float 实现
+
+原理：利用 float 布局和 31%的百分比设置宽和高。
+
+```html
+//html代码
+<div class="box">
+  <ul class="box-inner">
+    <li>九宫格1</li>
+    <li>九宫格2</li>
+    <li>九宫格3</li>
+    <li>九宫格4</li>
+    <li>九宫格5</li>
+    <li>九宫格6</li>
+    <li>九宫格7</li>
+    <li>九宫格8</li>
+    <li>九宫格9</li>
+  </ul>
+</div>
+//css代码 .box { position: relative; width: 100%; height: 600px; } .box-inner {
+position: absolute; top: 0; left: 0; width: 100%; height: 100%; } .box-inner >
+li { position: relative; float: left; width: 31%; height: 31%; margin: 1%;
+list-style-type: none; background-color: springgreen; text-align: center;
+line-height: 200px; } .box-inner > li:nth-child(odd) { background-color: silver;
+}
+```
+
+#### Table 实现
+
+原理 1：使用原生 table 表格实现九宫格 缺点：单元之间的间隔使用 border-spacing 实现，不支持百分比，设置后为添加单元四周的间隔。
+
+```html
+//html代码
+<div class="box">
+  <table class="box-inner">
+    <tbody>
+      <tr>
+        <td>九宫格1</td>
+        <td>九宫格2</td>
+        <td>九宫格3</td>
+      </tr>
+      <tr>
+        <td>九宫格4</td>
+        <td>九宫格5</td>
+        <td>九宫格6</td>
+      </tr>
+      <tr>
+        <td>九宫格7</td>
+        <td>九宫格8</td>
+        <td>九宫格9</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+//css代码 .box { position: relative; width: 100%; height: 600px; } .box-inner {
+position: absolute; top: 0; left: 0; width: 100%; height: 100%; margin: 10px;
+border-spacing: 0.57em; font-size: 20px; empty-cells: hide; table-layout: fixed;
+} .box-inner > tbody > tr > td { text-align: center; background-color:
+burlywood; overflow: hidden; }
+```
+
+### CSSOM 建立的过程中，有没有一些全局的 API 是暴露出来可供调用的 ？????????????
+
+### RAF（requestAnimationFrame） 和 RIC（requestIdleCallback） 是什么
+
+#### 页面流畅与 FPS
+
+- 页面是一帧一帧绘制出来的，当每秒绘制的帧数（FPS）达到 60 时，页面是流畅的，小于这个值时，用户会感觉到卡顿。
+
+- 1s 60 帧，所以每一帧分到的时间是 1000/60 ≈ 16 ms。所以我们书写代码时力求不让一帧的工作量超过 16ms。
+
+#### Frame
+
+浏览器每一帧都需要完成哪些工作？
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211013143020.png)
+
+- 一帧内需要完成如下六个步骤的任务：
+  - 处理用户的交互
+  - JS 解析执行
+  - 帧开始。窗口尺寸变更，页面滚去等的处理
+  - requestAnimationFrame
+  - 布局
+  - 绘制
+
+#### requestIdleCallback
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211013143303.png)
+
+- requestIdleCallback：: 会在浏览器空闲时间执行回调，也就是允许开发人员在主事件循环中执行低优先级任务，而不影响一些延迟关键事件。如果有多个回调，会按照先进先出原则执行，但是当传入了 timeout，为了避免超时，有可能会打乱这个顺序。
+
+- 上面六个步骤完成后没超过 16 ms，说明时间有富余(空闲时间多了)，此时就会执行 requestIdleCallback 里注册的任务。
+
+- 从上图也可看出，和 requestAnimationFrame 每一帧必定会执行不同，requestIdleCallback 是捡浏览器空闲来执行任务。
+
+```js
+requestIdleCallback(myNonEssentialWork, { timeout: 2000 });
+​
+// 任务队列
+const tasks = [
+ () => {
+   console.log("第一个任务");
+ },
+ () => {
+   console.log("第二个任务");
+ },
+ () => {
+   console.log("第三个任务");
+ },
+];
+​
+function myNonEssentialWork (deadline) {
+ // 如果帧内有富余的时间，或者超时
+ while ((deadline.timeRemaining() > 0 || deadline.didTimeout) && tasks.length > 0) {
+   work();
+ }
+​
+ if (tasks.length > 0)
+   requestIdleCallback(myNonEssentialWork);
+ }
+​
+function work () {
+ tasks.shift()();
+ console.log('执行任务');
+}
+
+// 超时的情况，其实就是浏览器很忙，没有空闲时间，此时会等待指定的 timeout 那么久再执行，通过入参 dealine 拿到的 didTmieout 会为 true，同时 timeRemaining () 返回的也是 0。超时的情况下如果选择继续执行的话，肯定会出现卡顿的，因为必然会将一帧的时间拉长。
+```
+
+- cancelIdleCallback
+  - 与 setTimeout 类似，返回一个唯一 id，可通过 cancelIdleCallback 来取消任务。
+
+#### requestAnimationFrame
+
+requestAnimationFrame： 告诉浏览器在下次重绘之前执行传入的回调函数(通常是操纵 dom，更新动画的函数)；由于是每帧执行一次，那结果就是每秒的执行次数与浏览器屏幕刷新次数一样，通常是每秒 60 次。
+
+在没有 requestAnimationFrame 方法的时候，执行动画，我们可能使用 setTimeout 或 setInterval 来触发视觉变化；但是这种做法的问题是：回调函数执行的时间是不固定的，可能刚好就在末尾，或者直接就不执行了，经常会引起丢帧而导致页面卡顿。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211013144154.png)
+归根到底发生上面这个问题的原因在于时机，也就是浏览器要知道何时对回调函数进行响应。setTimeout 或 setInterval 是使用定时器来触发回调函数的，而定时器并无法保证能够准确无误的执行，有许多因素会影响它的运行时机，比如说：当有同步代码执行时，会先等同步代码执行完毕，异步队列中没有其他任务，才会轮到自己执行。并且，我们知道每一次重新渲染的最佳时间大约是 16.6 ms，如果定时器的时间间隔过短，就会造成 过度渲染，增加开销；过长又会延迟渲染，使动画不流畅。
+
+requestAnimationFrame 方法不同与 setTimeout 或 setInterval，它是由系统来决定回调函数的执行时机的，会请求浏览器在下一次重新渲染之前执行回调函数。无论设备的刷新率是多少，requestAnimationFrame 的时间间隔都会紧跟屏幕刷新一次所需要的时间；例如某一设备的刷新率是 75 Hz，那这时的时间间隔就是 13.3 ms（1 秒 / 75 次）。需要注意的是这个方法虽然能够保证回调函数在每一帧内只渲染一次，但是如果这一帧有太多任务执行，还是会造成卡顿的；因此它只能保证重新渲染的时间间隔最短是屏幕的刷新时间。
+
+```js
+let offsetTop = 0;
+const div = document.querySelector(".div");
+const run = () => {
+  div.style.transform = `translate3d(0, ${(offsetTop += 10)}px, 0)`;
+  window.requestAnimationFrame(run);
+};
+run();
+```
+
+#### 总结
+
+一些低优先级的任务可使用`requestIdleCallback`等浏览器不忙的时候来执行，同时因为时间有限，它所执行的任务应该尽量是能够量化，细分的微任务（micro task）。
+
+因为它发生在一帧的最后，此时页面布局已经完成，所以不建议在 requestIdleCallback 里再操作 DOM，这样会导致页面再次重绘。DOM 操作建议在 RAF 中进行。同时，操作 DOM 所需要的耗时是不确定的，因为会导致重新计算布局和视图的绘制，所以这类操作不具备可预测性。
+
+Promise 也不建议在这里面进行，因为 Promise 的回调属性 Event loop 中优先级较高的一种微任务，会在 requestIdleCallback 结束时立即执行，不管此时是否还有富余的时间，这样有很大可能会让一帧超过 16 ms。
+
+### 怎样处理 移动端 1px 被 渲染成 2px 问题？
+
+- 局部处理
+  - meta 标签中的 viewport 属性 ，initial-scale 设置为 1
+  - rem 按照设计稿标准走，外加利用 transfrome 的 scale(0.5) 缩小一倍即可；
+- 全局处理
+  - mate 标签中的 viewport 属性 ，initial-scale 设置为 0.5
+  - rem 按照设计稿标准走即可
+
+### 网页视口尺寸
+
+- 屏幕
+  - 屏幕尺寸
+    - 屏幕尺寸是屏幕的宽度和高度：显示器或移动屏幕。window.screen 是保存屏幕尺寸信息的对象。
+      - screen.width：屏幕的宽 、 screen.height：屏幕的高。
+      - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106104805.png)
+  - 可用屏幕尺寸
+    - 可用的屏幕大小由活动屏幕的宽度和高度组成，没有操作系统工具栏。
+    - screen.availWidth：可利用的宽，等于屏幕的宽、screen.availHeight：可利用的高，等于屏幕的高减去 mac 顶部栏或 windows 底部栏。
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106104855.png)
+  - 屏幕距离
+    - screenTop：浏览器窗口左上角到屏幕上边缘的距离。
+    - screenLeft：浏览器窗口左上角到屏幕左边缘的距离。
+    - Firefox 浏览器不支持上述属性，但是可以使用 👇:
+      - screenX：等于 screenLeft。
+      - screenY：等于 screenTop。
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106105729.png)
+- window 窗口
+  - 窗口的外部大小由整个浏览器窗口的宽度和高度组成，包含地址栏，选项卡栏和其他浏览器面板。
+    - window.outerWidth：浏览器窗口的宽、window.outerHeight：浏览器窗口的高。
+    - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106105935.png)
+- 客户区
+  - 元素的客户区大小（client dimension），指的是元素内容及其内边距所占据的空间大小
+  - clientWidth：内容可视区的宽度、clientHeight：内容可视区的高度。
+  - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106110042.png)
+  - 如果有滚动条 clientWidth = 元素宽 + padding（左右） - 滚动条
+  - 如果没有滚动条 clientWidth = 元素宽 + padding（左右）
+  - 获取页面大小:let pageWidth = document.documentElement.clientWidth || document.body.clientWidth（ie7 之前的版本）;
+- 网页大小
+  - 网页大小由呈现的页面内容的宽度和高度组成。
+  - scrollWidth：实际内容的宽度。没有垂直滚动条时与 clientWidth 相同。否则是等于实际内容的宽度 + padding。scrollWidth 也包括 ::before 和 ::after 这样的伪元素。
+  - scrollHeight：实际内容的高度。没有垂直滚动条时与 clientHeight 相同。否则是等于实际内容的高度 + padding。scrollHeight 也包括 ::before 和 ::after 这样的伪元素。
+  - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106110220.png)
+- 滚动距离
+  - scrollLeft：元素最左端和窗口中可见内容的最左端之间的距离。即当前左滚的距离
+  - scrollTop：元素最顶端和窗口中可见内容的最顶端之间的距离。即当前上滚的距离
+  - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106110333.png)
+  - 如果有滚动条 scrollLeft = 隐藏内容宽度 + border
+  - 如果没有滚动条 scrollLeft = 0
+- 偏移量
+  - 偏移量包括元素在屏幕上占用的所有可见的空间。元素的可见大小由其高度、宽度决定，包括所有内边距、滚动条和边框大小（注意，不包括外边距）。
+  - offsetHeight：元素在垂直方向上占用的空间大小，包括元素的高度、（可见的）水平滚动条的高度、上边框高度和下边框高度。
+  - offsetWidth：元素在水平方向上占用的空间大小。包括元素的宽度、（可见的）垂直滚动条的宽度、左边框宽度和右边框宽度。
+  - offsetLeft：当前元素内容区域（包括 border）左边缘到 offsetParent 内容区域（不包括 border）左边缘的距离。
+  - offsetTop：当前元素内容区域（包括 border）顶部到 offsetParent 内容区域（不包括 border）顶部的距离。
+  - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106110734.png)
+  - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106110836.png)
+  - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106111014.png)
+  - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106111112.png)
+  - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106111243.png)
+  - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106111342.png)
+  - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211106111403.png)
+  -
+
+### CSS 优化
+
+- 多个 css 合并，尽量减少 HTTP 请求
+- 将 css 文件放在页面最上面
+- 移除空的 css 规则
+- 避免使用 CSS 表达式
+- 选择器优化嵌套，尽量避免层级过深
+- 充分利用 css 继承属性，减少代码量
+- 抽象提取公共样式，减少代码量
+- 属性值为 0 时，不加单位
+- 属性值为小于 1 的小数时，省略小数点前面的 0
+- css 雪碧图
 
 
