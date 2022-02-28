@@ -5291,4 +5291,972 @@ let fn = () => {
 
 setInterval(throttle(fn, 1000), 10);
 ```
+## 手写代码部分6
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211201222237.png)
 
+- n:数据规模
+- k:“桶”的个数
+- In-place: 占用常数内存，不占用额外内存
+- Out-place: 占用额外内存
+  ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211201222409.png)
+
+### 如何分析一个排序算法
+
+复杂度分析是整个算法学习的精髓。
+
+- 时间复杂度: 一个算法执行所耗费的时间。
+- 空间复杂度: 运行完一个程序所需内存的大小。
+- 分析一个排序算法，要从 `执行效率`、`内存消耗`、`稳定性` 三方面入手。
+
+#### 执行效率
+
+1. 最好情况、最坏情况、平均情况时间复杂度
+   我们在分析排序算法的时间复杂度时，要分别给出最好情况、最坏情况、平均情况下的时间复杂度。 除此之外，你还要说出最好、最坏时间复杂度对应的要排序的原始数据是什么样的。
+2. 时间复杂度的系数、常数 、低阶
+   我们知道，时间复杂度反应的是数据规模 n 很大的时候的一个增长趋势，所以它表示的时候会忽略系数、常数、低阶。
+   在对同一阶时间复杂度的排序算法性能对比的时候，我们就要把系数、常数、低阶也考虑进来。
+3. 比较次数和交换（或移动）次数
+   基于比较的排序算法的执行过程，会涉及两种操作，一种是元素比较大小，另一种是元素交换或移动。所以，如果我们在分析排序算法的执行效率的时候，应该把比较次数和交换（或移动）次数也考虑进去。
+
+#### 内存消耗
+
+也就是看空间复杂度。
+还需要知道如下术语：
+
+- 内排序：所有排序操作都在内存中完成；
+- 外排序：由于数据太大，因此把数据放在磁盘中，而排序通过磁盘和内存的数据传输才能进行；
+- 原地排序：原地排序算法，就是特指空间复杂度是 O(1) 的排序算法。
+
+#### 稳定性
+
+- 稳定：如果待排序的序列中存在值相等的元素，经过排序之后，相等元素之间原有的先后顺序不变。 比如： a 原本在 b 前面，而 a = b，排序之后，a 仍然在 b 的前面；
+- 不稳定：如果待排序的序列中存在值相等的元素，经过排序之后，相等元素之间原有的先后顺序改变。 比如：a 原本在 b 的前面，而 a = b，排序之后， a 在 b 的后面；
+
+### 冒泡排序
+
+#### 算法描述
+
+冒泡排序是一种简单的排序算法。它重复地走访过要排序的数列，一次比较两个元素，如果它们的顺序错误就把它们交换过来。走访数列的工作是重复地进行直到没有再需要交换，也就是说该数列已经排序完成。这个算法的名字由来是因为越小的元素会经由交换慢慢“浮”到数列的顶端。
+
+#### 算法步骤
+
+具体算法描述如下：
+
+- <1>.比较相邻的元素。如果第一个比第二个大，就交换它们两个；
+- <2>.对每一对相邻元素作同样的工作，从开始第一对到结尾的最后一对，这样在最后的元素应该会是最大的数；
+- <3>.针对所有的元素重复以上的步骤，除了最后一个；
+- <4>.重复步骤 1~3，直到排序完成。
+
+#### 特点
+
+- 优点：排序算法的基础，简单实用易于理解。
+- 缺点：比较次数多，效率较低。
+
+#### 实现
+
+```js
+// 冒泡排序（未优化）
+const bubbleSort = (arr) => {
+  console.time("改进前冒泡排序耗时");
+  const length = arr.length;
+  if (length <= 1) return;
+  // i < length - 1 是因为外层只需要 length-1 次就排好了，第 length 次比较是多余的。
+  for (let i = 0; i < length - 1; i++) {
+    // j < length - i - 1 是因为内层的 length-i-1 到 length-1 的位置已经排好了，不需要再比较一次。
+    for (let j = 0; j < length - i - 1; j++) {
+      if (arr[j] > arr[j + 1]) {
+        const temp = arr[j];
+        arr[j] = arr[j + 1];
+        arr[j + 1] = temp;
+      }
+    }
+  }
+  console.log("改进前 arr :", arr);
+  console.timeEnd("改进前冒泡排序耗时");
+};
+
+// 优化：当某次冒泡操作已经没有数据交换时，说明已经达到完全有序，不用再继续执行后续的冒泡操作。
+// 冒泡排序（已优化）
+const bubbleSort2 = (arr) => {
+  console.time("改进后冒泡排序耗时");
+  const length = arr.length;
+  if (length <= 1) return;
+  // i < length - 1 是因为外层只需要 length-1 次就排好了，第 length 次比较是多余的。
+  for (let i = 0; i < length - 1; i++) {
+    let hasChange = false; // 提前退出冒泡循环的标志位
+    // j < length - i - 1 是因为内层的 length-i-1 到 length-1 的位置已经排好了，不需要再比较一次。
+    for (let j = 0; j < length - i - 1; j++) {
+      if (arr[j] > arr[j + 1]) {
+        const temp = arr[j];
+        arr[j] = arr[j + 1];
+        arr[j + 1] = temp;
+        hasChange = true; // 表示有数据交换
+      }
+    }
+
+    if (!hasChange) break; // 如果 false 说明所有元素已经到位，没有数据交换，提前退出
+  }
+  console.log("改进后 arr :", arr);
+  console.timeEnd("改进后冒泡排序耗时");
+};
+
+// 测试
+const arr = [7, 8, 4, 5, 6, 3, 2, 1];
+bubbleSort(arr);
+// 改进前 arr : [1, 2, 3, 4, 5, 6, 7, 8]
+// 改进前冒泡排序耗时: 0.43798828125ms
+
+const arr2 = [7, 8, 4, 5, 6, 3, 2, 1];
+bubbleSort2(arr2);
+// 改进后 arr : [1, 2, 3, 4, 5, 6, 7, 8]
+// 改进后冒泡排序耗时: 0.318115234375ms
+
+// 双向冒泡
+function bubbleSort3(arr3) {
+  var low = 0;
+  var high = arr.length - 1; //设置变量的初始值
+  var tmp, j;
+  console.time("2.改进后冒泡排序耗时");
+  while (low < high) {
+    for (
+      j = low;
+      j < high;
+      ++j //正向冒泡,找到最大者
+    )
+      if (arr[j] > arr[j + 1]) {
+        tmp = arr[j];
+        arr[j] = arr[j + 1];
+        arr[j + 1] = tmp;
+      }
+    --high; //修改high值, 前移一位
+    for (
+      j = high;
+      j > low;
+      --j //反向冒泡,找到最小者
+    )
+      if (arr[j] < arr[j - 1]) {
+        tmp = arr[j];
+        arr[j] = arr[j - 1];
+        arr[j - 1] = tmp;
+      }
+    ++low; //修改low值,后移一位
+  }
+  console.timeEnd("2.改进后冒泡排序耗时");
+  return arr3;
+}
+var arr = [3, 44, 38, 5, 47, 15, 36, 26, 27, 2, 46, 4, 19, 50, 48];
+console.log(bubbleSort3(arr)); //[2, 3, 4, 5, 15, 19, 26, 27, 36, 38, 44, 46, 47, 48, 50]
+```
+
+#### 分析
+
+冒泡的过程只涉及相邻数据的交换操作，只需要常量级的临时空间，所以它的空间复杂度为 O(1)，是一个`原地`排序算法。
+
+在冒泡排序中，只有交换才可以改变两个元素的前后顺序。 为了保证冒泡排序算法的稳定性，当有相邻的两个元素大小相等的时候，我们不做交换，相同大小的数据在排序前后不会改变顺序。 所以冒泡排序是`稳定`的排序算法。
+
+最佳情况：`T(n) = O(n)`，当数据已经是正序时。 最差情况：`T(n) = O(n^2)`，当数据是反序时。 平均情况：`T(n) = O(n^2)`。
+
+### 直接插入排序
+
+#### 算法描述
+
+一般人打扑克牌，整理牌的时候，都是按牌的大小（从小到大或者从大到小）整理牌的，那每摸一张新牌，就扫描自己的牌，把新牌插入到相应的位置。
+
+插入排序的工作原理：通过构建有序序列，对于未排序数据，在已排序序列中从后向前扫描，找到相应位置并插入。
+
+#### 算法步骤
+
+- 从第一个元素开始，该元素可以认为已经被排序；
+- 取出下一个元素，在已经排序的元素序列中从后向前扫描；
+- 如果该元素（已排序）大于新元素，将该元素移到下一位置；
+- 重复步骤 3，直到找到已排序的元素小于或者等于新元素的位置；
+- 将新元素插入到该位置后；
+- 重复步骤 2 ~ 5。
+
+#### 实现
+
+```js
+// 插入排序
+const insertionSort = (array) => {
+  const len = array.length;
+  if (len <= 1) return;
+
+  let preIndex, current;
+  for (let i = 1; i < len; i++) {
+    preIndex = i - 1; //待比较元素的下标
+    current = array[i]; //当前元素
+    while (preIndex >= 0 && array[preIndex] > current) {
+      //前置条件之一: 待比较元素比当前元素大
+      array[preIndex + 1] = array[preIndex]; //将待比较元素后移一位
+      preIndex--; //游标前移一位
+    }
+    if (preIndex + 1 != i) {
+      //避免同一个元素赋值给自身
+      array[preIndex + 1] = current; //将当前元素插入预留空位
+      console.log("array :", array);
+    }
+  }
+  return array;
+};
+
+// 测试
+const array = [5, 4, 3, 2, 1];
+console.log("原始 array :", array);
+insertionSort(array);
+// 原始 array:    [5, 4, 3, 2, 1]
+// array:  		 [4, 5, 3, 2, 1]
+// array:  		 [3, 4, 5, 2, 1]
+// array: 		 [2, 3, 4, 5, 1]
+// array:  		 [1, 2, 3, 4, 5]
+```
+
+#### 分析
+
+插入排序算法的运行并不需要额外的存储空间，所以空间复杂度是 O(1)，所以，这是一个`原地`排序算法。
+
+在插入排序中，对于值相同的元素，我们可以选择将后面出现的元素，插入到前面出现元素的后面，这样就可以保持原有的前后顺序不变，所以插入排序是`稳定`的排序算法。
+
+最佳情况：`T(n) = O(n)`，当数据已经是正序时。 最差情况：`T(n) = O(n^2)`，当数据是反序时。 平均情况：`T(n) = O(n^2)`。
+
+### 拆半插入排序
+
+插入排序也有一种优化算法，叫做拆半插入。
+
+#### 算法描述
+
+折半插入排序是直接插入排序的升级版，鉴于插入排序第一部分为已排好序的数组，我们不必按顺序依次寻找插入点，只需比较它们的中间值与待插入元素的大小即可。
+
+#### 算法步骤
+
+- 取 0 ~ i-1 的中间点 ( m = (i-1) >> 1 )，array[i] 与 array[m] 进行比较，若 array[i] < array[m]，则说明待插入的元素 array[i] 应该处于数组的 0 ~ m 索引之间；反之，则说明它应该处于数组的 m ~ i-1 索引之间。
+- 重复步骤 1，每次缩小一半的查找范围，直至找到插入的位置。
+- 将数组中插入位置之后的元素全部后移一位。
+- 在指定位置插入第 i 个元素。
+- 注：x >> 1 是位运算中的右移运算，表示右移一位，等同于 x 除以 2 再取整，即 x >> 1 == Math.floor(x/2) 。
+
+#### 实现
+
+```js
+// 折半插入排序
+const binaryInsertionSort = (array) => {
+  const len = array.length;
+  if (len <= 1) return;
+
+  let current, i, j, low, high, m;
+  for (i = 1; i < len; i++) {
+    low = 0;
+    high = i - 1;
+    current = array[i];
+
+    while (low <= high) {
+      //步骤 1 & 2 : 折半查找
+      m = (low + high) >> 1; // 注: x>>1 是位运算中的右移运算, 表示右移一位, 等同于 x 除以 2 再取整, 即 x>>1 == Math.floor(x/2) .
+      if (array[i] >= array[m]) {
+        //值相同时, 切换到高半区，保证稳定性
+        low = m + 1; //插入点在高半区
+      } else {
+        high = m - 1; //插入点在低半区
+      }
+    }
+    for (j = i; j > low; j--) {
+      //步骤 3: 插入位置之后的元素全部后移一位
+      array[j] = array[j - 1];
+      console.log("array2 :", JSON.parse(JSON.stringify(array)));
+    }
+    array[low] = current; //步骤 4: 插入该元素
+  }
+  console.log("array2 :", JSON.parse(JSON.stringify(array)));
+  return array;
+};
+
+const array2 = [5, 4, 3, 2, 1];
+console.log("原始 array2:", array2);
+binaryInsertionSort(array2);
+// 原始 array2:  [5, 4, 3, 2, 1]
+// array2 :     [5, 5, 3, 2, 1]
+// array2 :     [4, 5, 5, 2, 1]
+// array2 :     [4, 4, 5, 2, 1]
+// array2 :     [3, 4, 5, 5, 1]
+// array2 :     [3, 4, 4, 5, 1]
+// array2 :     [3, 3, 4, 5, 1]
+// array2 :     [2, 3, 4, 5, 5]
+// array2 :     [2, 3, 4, 4, 5]
+// array2 :     [2, 3, 3, 4, 5]
+// array2 :     [2, 2, 3, 4, 5]
+// array2 :     [1, 2, 3, 4, 5]
+```
+
+注意：和直接插入排序类似，折半插入排序每次交换的是相邻的且值为不同的元素，它并不会改变值相同的元素之间的顺序，因此它是`稳定`的。
+
+### 希尔排序
+
+#### 算法步骤
+
+- 先将整个待排序的记录序列分割成为若干子序列。间隔。
+- 分别进行直接插入排序。
+- 待整个序列中的记录基本有序时，再对全体记录进行依次直接插入排序。
+
+#### 实现
+
+```js
+const shellSort = (arr) => {
+  let len = arr.length,
+    temp,
+    gap = 1;
+  console.time("希尔排序耗时");
+  while (gap < len / 3) {
+    //动态定义间隔序列
+    gap = gap * 3 + 1;
+  }
+  for (gap; gap > 0; gap = Math.floor(gap / 3)) {
+    for (let i = gap; i < len; i++) {
+      temp = arr[i];
+      let j = i - gap;
+      for (; j >= 0 && arr[j] > temp; j -= gap) {
+        arr[j + gap] = arr[j];
+      }
+      arr[j + gap] = temp;
+      console.log("arr  :", arr);
+    }
+  }
+  console.timeEnd("希尔排序耗时");
+  return arr;
+};
+
+// 测试
+const array = [35, 33, 42, 10, 14, 19, 27, 44];
+console.log("原始array:", array);
+const newArr = shellSort(array);
+console.log("newArr:", newArr);
+// 原始 array:   [35, 33, 42, 10, 14, 19, 27, 44]
+// arr      :   [14, 33, 42, 10, 35, 19, 27, 44]
+// arr      :   [14, 19, 42, 10, 35, 33, 27, 44]
+// arr      :   [14, 19, 27, 10, 35, 33, 42, 44]
+// arr      :   [14, 19, 27, 10, 35, 33, 42, 44]
+// arr      :   [14, 19, 27, 10, 35, 33, 42, 44]
+// arr      :   [14, 19, 27, 10, 35, 33, 42, 44]
+// arr      :   [10, 14, 19, 27, 35, 33, 42, 44]
+// arr      :   [10, 14, 19, 27, 35, 33, 42, 44]
+// arr      :   [10, 14, 19, 27, 33, 35, 42, 44]
+// arr      :   [10, 14, 19, 27, 33, 35, 42, 44]
+// arr      :   [10, 14, 19, 27, 33, 35, 42, 44]
+// 希尔排序耗时: 3.592041015625ms
+// newArr:     [10, 14, 19, 27, 33, 35, 42, 44]
+```
+
+#### 分析
+
+希尔排序过程中，只涉及相邻数据的交换操作，只需要常量级的临时空间，空间复杂度为 O(1) 。所以，希尔排序是`原地排序`算法。
+
+我们知道，单次直接插入排序是稳定的，它不会改变相同元素之间的相对顺序，但在多次不同的插入排序过程中，相同的元素可能在各自的插入排序中移动，可能导致相同元素相对顺序发生变化。 因此，希尔排序`不稳定`。
+
+最佳情况：`T(n) = O(n log n)`。 最差情况：`T(n) = O(n log^2 n)`。 平均情况：`T(n) = O(n log^2 n)`。
+
+### 堆排序（Heap Sort）
+
+#### 算法描述
+
+堆其实是一种特殊的树。只要满足这两点，它就是一个堆。
+
+- 堆是一个完全二叉树。 完全二叉树：除了最后一层，其他层的节点个数都是满的，最后一层的节点都靠左排列。
+- 堆中每一个节点的值都必须大于等于（或小于等于）其子树中每个节点的值。 也可以说：堆中每个节点的值都大于等于（或者小于等于）其左右子节点的值。这两种表述是等价的。
+
+对于每个节点的值都`大于等于`子树中每个节点值的堆，我们叫作`大顶堆`。 对于每个节点的值都`小于等于`子树中每个节点值的堆，我们叫作`小顶堆`。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211202210420.png)
+
+#### 算法步骤
+
+- 将初始待排序关键字序列 (R1, R2 .... Rn) 构建成大顶堆，此堆为初始的无序区；
+- 将堆顶元素 R[1] 与最后一个元素 R[n] 交换，此时得到新的无序区 (R1, R2, ..... Rn-1) 和新的有序区 (Rn) ，且满足 R[1, 2 ... n-1] <= R[n]。
+- 由于交换后新的堆顶 R[1] 可能违反堆的性质，因此需要对当前无序区 (R1, R2 ...... Rn-1) 调整为新堆，然后再次将 R[1] 与无序区最后一个元素交换，得到新的无序区 (R1, R2 .... Rn-2) 和新的有序区 (Rn-1, Rn)。不断重复此过程，直到有序区的元素个数为 n - 1，则整个排序过程完成。
+
+#### 实现
+
+```js
+// 堆排序
+const heapSort = (array) => {
+  console.time("堆排序耗时");
+  // 初始化大顶堆，从第一个非叶子结点开始
+  for (let i = Math.floor(array.length / 2 - 1); i >= 0; i--) {
+    heapify(array, i, array.length);
+  }
+  // 排序，每一次 for 循环找出一个当前最大值，数组长度减一
+  for (let i = Math.floor(array.length - 1); i > 0; i--) {
+    // 根节点与最后一个节点交换
+    swap(array, 0, i);
+    // 从根节点开始调整，并且最后一个结点已经为当前最大值，不需要再参与比较，所以第三个参数为 i，即比较到最后一个结点前一个即可
+    heapify(array, 0, i);
+  }
+  console.timeEnd("堆排序耗时");
+  return array;
+};
+
+// 交换两个节点
+const swap = (array, i, j) => {
+  let temp = array[i];
+  array[i] = array[j];
+  array[j] = temp;
+};
+
+// 将 i 结点以下的堆整理为大顶堆，注意这一步实现的基础实际上是：
+// 假设结点 i 以下的子堆已经是一个大顶堆，heapify 函数实现的
+// 功能是实际上是：找到 结点 i 在包括结点 i 的堆中的正确位置。
+// 后面将写一个 for 循环，从第一个非叶子结点开始，对每一个非叶子结点
+// 都执行 heapify 操作，所以就满足了结点 i 以下的子堆已经是一大顶堆
+const heapify = (array, i, length) => {
+  let temp = array[i]; // 当前父节点
+  // j < length 的目的是对结点 i 以下的结点全部做顺序调整
+  for (let j = 2 * i + 1; j < length; j = 2 * j + 1) {
+    temp = array[i]; // 将 array[i] 取出，整个过程相当于找到 array[i] 应处于的位置
+    if (j + 1 < length && array[j] < array[j + 1]) {
+      j++; // 找到两个孩子中较大的一个，再与父节点比较
+    }
+    if (temp < array[j]) {
+      swap(array, i, j); // 如果父节点小于子节点:交换；否则跳出
+      i = j; // 交换后，temp 的下标变为 j
+    } else {
+      break;
+    }
+  }
+};
+
+const array = [4, 6, 8, 5, 9, 1, 2, 5, 3, 2];
+console.log("原始array:", array);
+const newArr = heapSort(array);
+console.log("newArr:", newArr);
+// 原始 array:  [4, 6, 8, 5, 9, 1, 2, 5, 3, 2]
+// 堆排序耗时: 0.15087890625ms
+// newArr:     [1, 2, 2, 3, 4, 5, 5, 6, 8, 9]
+```
+
+#### 分析
+
+整个堆排序的过程，都只需要极个别临时存储空间，所以堆排序是`原地`排序算法。
+
+因为在排序的过程，存在将堆的最后一个节点跟堆顶节点互换的操作，所以就有可能改变值相同数据的原始相对顺序。 所以，堆排序是`不稳定`的排序算法。
+
+堆排序包括建堆和排序两个操作，`建堆过程的时间复杂度是 O(n)，排序过程的时间复杂度是 O(nlogn)`，所以，堆排序整体的时间复杂度是`O(nlogn)`。
+
+最佳情况：`T(n) = O(n log n)`。 最差情况：`T(n) = O(n log n)`。 平均情况：`T(n) = O(n log n)`。
+
+### 选择排序
+
+#### 算法描述
+
+选择排序算法的实现思路有点类似插入排序，也分已排序区间和未排序区间。但是选择排序每次会从未排序区间中找到最小的元素，将其放到已排序区间的末尾。
+
+#### 算法步骤
+
+- 首先在未排序序列中找到最小（大）元素，存放到排序序列的起始位置。
+- 再从剩余未排序元素中继续寻找最小（大）元素，然后放到已排序序列的末尾。
+- 重复第二步，直到所有元素均排序完毕。
+
+#### 实现
+
+```js
+const selectionSort = (array) => {
+  const len = array.length;
+  let minIndex, temp;
+  for (let i = 0; i < len - 1; i++) {
+    minIndex = i;
+    for (let j = i + 1; j < len; j++) {
+      if (array[j] < array[minIndex]) {
+        // 寻找最小的数
+        minIndex = j; // 将最小数的索引保存
+      }
+    }
+    temp = array[i];
+    array[i] = array[minIndex];
+    array[minIndex] = temp;
+    console.log("array: ", array);
+  }
+  return array;
+};
+
+// 测试
+const array = [5, 4, 3, 2, 1];
+console.log("原始array:", array);
+selectionSort(array);
+// 原始 array:  [5, 4, 3, 2, 1]
+// array:  		 [1, 4, 3, 2, 5]
+// array:  		 [1, 2, 3, 4, 5]
+// array: 		 [1, 2, 3, 4, 5]
+// array:  		 [1, 2, 3, 4, 5]
+```
+
+#### 分析
+
+选择排序空间复杂度为`O(1)`，是一种原地`排序`算法。
+
+选择排序每次都要找剩余未排序元素中的最小值，并和前面的元素交换位置，这样破坏了稳定性。所以，选择排序是一种`不稳定`的排序算法。
+
+无论是正序还是逆序，选择排序都会遍历`n^2 / 2`次来排序，所以，最佳、最差和平均的复杂度是一样的。 最佳情况：`T(n) = O(n^2)`。 最差情况：`T(n) = O(n^2)`。 平均情况`：T(n) = O(n^2)`。
+
+### 归并排序（Merge Sort）
+
+#### 算法描述
+
+排序一个数组，我们先把数组从中间分成前后两部分，然后对前后两部分分别排序，再将排好序的两部分合并在一起，这样整个数组就都有序了。
+
+归并排序采用的是分治思想。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211202204945.png)
+
+#### 实现
+
+```js
+const mergeSort = (arr) => {
+  //采用自上而下的递归方法
+  const len = arr.length;
+  if (len < 2) {
+    return arr;
+  }
+  // length >> 1 和 Math.floor(len / 2) 等价
+  let middle = Math.floor(len / 2),
+    left = arr.slice(0, middle),
+    right = arr.slice(middle); // 拆分为两个子数组
+  return merge(mergeSort(left), mergeSort(right));
+};
+
+const merge = (left, right) => {
+  const result = [];
+
+  while (left.length && right.length) {
+    // 注意: 判断的条件是小于或等于，如果只是小于，那么排序将不稳定.
+    if (left[0] <= right[0]) {
+      result.push(left.shift());
+    } else {
+      result.push(right.shift());
+    }
+  }
+
+  while (left.length) result.push(left.shift());
+
+  while (right.length) result.push(right.shift());
+
+  return result;
+};
+
+// 测试
+const arr = [3, 44, 38, 5, 47, 15, 36, 26, 27, 2, 46, 4, 19, 50, 48];
+console.time("归并排序耗时");
+console.log("arr :", mergeSort(arr));
+console.timeEnd("归并排序耗时");
+// arr : [2, 3, 4, 5, 15, 19, 26, 27, 36, 38, 44, 46, 47, 48, 50]
+// 归并排序耗时: 0.739990234375ms
+```
+
+#### 分析
+
+这是因为归并排序的合并函数，在合并两个有序数组为一个有序数组时，需要借助额外的存储空间。
+实际上，尽管每次合并操作都需要申请额外的内存空间，但在合并完成之后，临时开辟的内存空间就被释放掉了。在任意时刻，CPU 只会有一个函数在执行，也就只会有一个临时的内存空间在使用。临时内存空间最大也不会超过 n 个数据的大小，所以`空间复杂度是 O(n)`。
+所以，归并排序`不是原地排序算法`。
+
+merge 方法里面的`left[0] <= right[0]` ，保证了值相同的元素，在合并前后的先后顺序不变。归并排序是`稳定`的排序方法。
+
+从效率上看，归并排序可算是排序算法中的佼佼者。假设数组长度为 n，那么拆分数组共需`logn`步，又每步都是一个普通的合并子数组的过程，时间复杂度为`O(n)`，故其综合时间复杂度为`O(n log n)`。
+
+最佳情况：`T(n) = O(n log n)`。 最差情况：`T(n) = O(n log n)`。 平均情况：`T(n) = O(n log n)`。
+
+### 快速排序 （Quick Sort）
+
+#### 算法描述
+
+快速排序的特点就是快，而且效率高！它是处理大数据最快的排序算法之一。
+
+#### 算法步骤
+
+- 先找到一个基准点（一般指数组的中部），然后数组被该基准点分为两部分，依次与该基准点数据比较，如果比它小，放左边；反之，放右边。
+- 左右分别用一个空数组去存储比较后的数据。
+- 最后递归执行上述操作，直到数组长度 <= 1;
+
+#### 特点
+
+- 特点：快速，常用。
+- 缺点：需要另外声明两个数组，浪费了内存空间资源。
+
+#### 实现
+
+```js
+// 方法一：
+const quickSort1 = (arr) => {
+  if (arr.length <= 1) {
+    return arr;
+  }
+  //取基准点
+  const midIndex = Math.floor(arr.length / 2);
+  //取基准点的值，splice(index,1) 则返回的是含有被删除的元素的数组。
+  const valArr = arr.splice(midIndex, 1);
+  const midIndexVal = valArr[0];
+  const left = []; //存放比基准点小的数组
+  const right = []; //存放比基准点大的数组
+  //遍历数组，进行判断分配
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i] < midIndexVal) {
+      left.push(arr[i]); //比基准点小的放在左边数组
+    } else {
+      right.push(arr[i]); //比基准点大的放在右边数组
+    }
+  }
+  //递归执行以上操作，对左右两个数组进行操作，直到数组长度为 <= 1
+  return quickSort1(left).concat(midIndexVal, quickSort1(right));
+};
+const array2 = [5, 4, 3, 2, 1];
+console.log("quickSort1 ", quickSort1(array2));
+// quickSort1: [1, 2, 3, 4, 5]
+
+// 方法二：
+// 快速排序
+const quickSort = (arr, left, right) => {
+  let len = arr.length,
+    partitionIndex;
+  left = typeof left != "number" ? 0 : left;
+  right = typeof right != "number" ? len - 1 : right;
+
+  if (left < right) {
+    partitionIndex = partition(arr, left, right);
+    quickSort(arr, left, partitionIndex - 1);
+    quickSort(arr, partitionIndex + 1, right);
+  }
+  return arr;
+};
+
+const partition = (arr, left, right) => {
+  //分区操作
+  let pivot = left, //设定基准值（pivot）
+    index = pivot + 1;
+  for (let i = index; i <= right; i++) {
+    if (arr[i] < arr[pivot]) {
+      swap(arr, i, index);
+      index++;
+    }
+  }
+  swap(arr, pivot, index - 1);
+  return index - 1;
+};
+
+const swap = (arr, i, j) => {
+  let temp = arr[i];
+  arr[i] = arr[j];
+  arr[j] = temp;
+};
+
+// 测试
+const array = [5, 4, 3, 2, 1];
+console.log("原始array:", array);
+const newArr = quickSort(array);
+console.log("newArr:", newArr);
+// 原始 array:  [5, 4, 3, 2, 1]
+// newArr:     [1, 4, 3, 2, 5]
+```
+
+#### 分析
+
+因为 partition() 函数进行分区时，不需要很多额外的内存空间，所以快排是`原地`排序算法。
+
+和选择排序相似，快速排序每次交换的元素都有可能不是相邻的，因此它有可能打破原来值为相同的元素之间的顺序。因此，快速排序并不`稳定`。
+
+极端的例子：如果数组中的数据原来已经是有序的了，比如 1，3，5，6，8。如果我们每次选择最后一个元素作为 pivot，那每次分区得到的两个区间都是不均等的。我们需要进行大约 n 次分区操作，才能完成快排的整个过程。每次分区我们平均要扫描大约 n / 2 个元素，这种情况下，快排的时间复杂度就从 `O(nlogn)` 退化成了 `O(n^2)`。
+
+最佳情况：`T(n) = O(n log n)`。 最差情况：`T(n) = O(n2)`。 平均情况：`T(n) = O(n log n)`。
+
+#### 快排和归并的区别
+
+快排和归并用的都是分治思想，递推公式和递归代码也非常相似，那它们的区别在哪里呢 ？
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211202205902.png)
+
+- 归并排序的处理过程是由下而上的，先处理子问题，然后再合并。
+- 而快排正好相反，它的处理过程是由上而下的，先分区，然后再处理子问题。
+- 归并排序虽然是稳定的、时间复杂度为 O(nlogn) 的排序算法，但是它是非原地排序算法。
+- 归并之所以是非原地排序算法，主要原因是合并函数无法在原地执行。
+- 快速排序通过设计巧妙的原地分区函数，可以实现原地排序，解决了归并排序占用太多内存的问题。
+
+### 桶排序（Bucket Sort）
+
+#### 算法描述
+
+桶排序是计数排序的升级版，也采用了分治思想。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211202210832.png)
+
+#### 算法步骤
+
+- 将要排序的数据分到有限数量的几个有序的桶里。
+- 每个桶里的数据再单独进行排序（一般用插入排序或者快速排序）。
+- 桶内排完序之后，再把每个桶里的数据按照顺序依次取出，组成的序列就是有序的了。
+
+桶排序利用了函数的映射关系，高效与否的关键就在于这个映射函数的确定。
+为了使桶排序更加高效，我们需要做到这两点：
+
+- 在额外空间充足的情况下，尽量增大桶的数量。
+- 使用的映射函数能够将输入的 N 个数据均匀的分配到 K 个桶中。
+
+桶排序的核心：就在于怎么把元素平均分配到每个桶里，合理的分配将大大提高排序的效率。
+
+#### 实现
+
+```js
+// 桶排序
+const bucketSort = (array, bucketSize) => {
+  if (array.length === 0) {
+    return array;
+  }
+
+  console.time("桶排序耗时");
+  let i = 0;
+  let minValue = array[0];
+  let maxValue = array[0];
+  for (i = 1; i < array.length; i++) {
+    if (array[i] < minValue) {
+      minValue = array[i]; //输入数据的最小值
+    } else if (array[i] > maxValue) {
+      maxValue = array[i]; //输入数据的最大值
+    }
+  }
+
+  //桶的初始化
+  const DEFAULT_BUCKET_SIZE = 5; //设置桶的默认数量为 5
+  bucketSize = bucketSize || DEFAULT_BUCKET_SIZE;
+  const bucketCount = Math.floor((maxValue - minValue) / bucketSize) + 1;
+  const buckets = new Array(bucketCount);
+  for (i = 0; i < buckets.length; i++) {
+    buckets[i] = [];
+  }
+
+  //利用映射函数将数据分配到各个桶中
+  for (i = 0; i < array.length; i++) {
+    buckets[Math.floor((array[i] - minValue) / bucketSize)].push(array[i]);
+  }
+
+  array.length = 0;
+  for (i = 0; i < buckets.length; i++) {
+    quickSort(buckets[i]); //对每个桶进行排序，这里使用了快速排序
+    for (var j = 0; j < buckets[i].length; j++) {
+      array.push(buckets[i][j]);
+    }
+  }
+  console.timeEnd("桶排序耗时");
+
+  return array;
+};
+
+// 快速排序
+const quickSort = (arr, left, right) => {
+  let len = arr.length,
+    partitionIndex;
+  left = typeof left != "number" ? 0 : left;
+  right = typeof right != "number" ? len - 1 : right;
+
+  if (left < right) {
+    partitionIndex = partition(arr, left, right);
+    quickSort(arr, left, partitionIndex - 1);
+    quickSort(arr, partitionIndex + 1, right);
+  }
+  return arr;
+};
+
+const partition = (arr, left, right) => {
+  //分区操作
+  let pivot = left, //设定基准值（pivot）
+    index = pivot + 1;
+  for (let i = index; i <= right; i++) {
+    if (arr[i] < arr[pivot]) {
+      swap(arr, i, index);
+      index++;
+    }
+  }
+  swap(arr, pivot, index - 1);
+  return index - 1;
+};
+
+const swap = (arr, i, j) => {
+  let temp = arr[i];
+  arr[i] = arr[j];
+  arr[j] = temp;
+};
+
+const array = [4, 6, 8, 5, 9, 1, 2, 5, 3, 2];
+console.log("原始array:", array);
+const newArr = bucketSort(array);
+console.log("newArr:", newArr);
+// 原始 array:  [4, 6, 8, 5, 9, 1, 2, 5, 3, 2]
+// 堆排序耗时:   0.133056640625ms
+// newArr:  	 [1, 2, 2, 3, 4, 5, 5, 6, 8, 9]
+```
+
+#### 分析
+
+因为桶排序的空间复杂度，也即内存消耗为 O(n)，所以`不是原地`排序算法。
+
+取决于每个桶的排序方式，比如：快排就不稳定，归并就稳定。
+
+因为桶内部的排序可以有多种方法，是会对桶排序的时间复杂度产生很重大的影响。所以，桶排序的时间复杂度可以是多种情况的。
+总的来说 最佳情况：当输入的数据可以均匀的分配到每一个桶中。 最差情况：当输入的数据被分配到了同一个桶中。
+以下是桶的内部排序为快速排序的情况：
+如果要排序的数据有 n 个，我们把它们均匀地划分到 m 个桶内，每个桶里就有 k =n / m 个元素。每个桶内部使用快速排序，时间复杂度为 O(k _ logk)。
+m 个桶排序的时间复杂度就是 O(m _ k * logk)，因为 k = n / m，所以整个桶排序的时间复杂度就是 O(n*log(n/m))。
+当桶的个数 m 接近数据个数 n 时，log(n/m) 就是一个非常小的常量，这个时候桶排序的时间复杂度接近 O(n)。
+
+最佳情况：T(n) = O(n)。当输入的数据可以均匀的分配到每一个桶中。
+最差情况：T(n) = O(nlogn)。当输入的数据被分配到了同一个桶中。
+平均情况：T(n) = O(n)。
+
+### 计数排序（Counting Sort）
+
+#### 算法步骤
+
+- 找出待排序的数组中最大和最小的元素。
+- 统计数组中每个值为 i 的元素出现的次数，存入新数组 countArr 的第 i 项。
+- 对所有的计数累加（从 countArr 中的第一个元素开始，每一项和前一项相加）。
+- 反向填充目标数组：将每个元素 i 放在新数组的第 countArr[i] 项，每放一个元素就将 countArr[i] 减去 1 。
+
+#### 使用条件
+
+- 只能用在数据范围不大的场景中，若数据范围 k 比要排序的数据 n 大很多，就不适合用计数排序。
+- 计数排序只能给非负整数排序，其他类型需要在不改变相对大小情况下，转换为非负整数。
+- 比如如果考试成绩精确到小数后一位，就需要将所有分数乘以 10，转换为整数。
+
+#### 实现
+
+```js
+// 方法1
+const countingSort = (array) => {
+  let len = array.length,
+    result = [],
+    countArr = [],
+    min = (max = array[0]);
+  console.time("计数排序耗时");
+  for (let i = 0; i < len; i++) {
+    // 获取最小，最大 值
+    min = min <= array[i] ? min : array[i];
+    max = max >= array[i] ? max : array[i];
+    countArr[array[i]] = countArr[array[i]] ? countArr[array[i]] + 1 : 1;
+  }
+  console.log("countArr :", countArr);
+  // 从最小值 -> 最大值,将计数逐项相加
+  for (let j = min; j < max; j++) {
+    countArr[j + 1] = (countArr[j + 1] || 0) + (countArr[j] || 0);
+  }
+  console.log("countArr 2:", countArr);
+  // countArr 中,下标为 array 数值，数据为 array 数值出现次数；反向填充数据进入 result 数据
+  for (let k = len - 1; k >= 0; k--) {
+    // result[位置] = array 数据
+    result[countArr[array[k]] - 1] = array[k];
+    // 减少 countArr 数组中保存的计数
+    countArr[array[k]]--;
+    // console.log("array[k]:", array[k], 'countArr[array[k]] :', countArr[array[k]],)
+    console.log("result:", result);
+  }
+  console.timeEnd("计数排序耗时");
+  return result;
+};
+
+const array = [2, 2, 3, 8, 7, 1, 2, 2, 2, 7, 3, 9, 8, 2, 1, 4, 2, 4, 6, 9, 2];
+console.log("原始 array: ", array);
+const newArr = countingSort(array);
+console.log("newArr: ", newArr);
+// 原始 array:  [2, 2, 3, 8, 7, 1, 2, 2, 2, 7, 3, 9, 8, 2, 1, 4, 2, 4, 6, 9, 2]
+// 计数排序耗时:   5.6708984375ms
+// newArr:  	 [1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 4, 4, 6, 7, 7, 8, 8, 9, 9]
+
+// 方法2
+const countingSort2 = (arr, maxValue) => {
+  console.time("计数排序耗时");
+  maxValue = maxValue || arr.length;
+  let bucket = new Array(maxValue + 1),
+    sortedIndex = 0;
+  (arrLen = arr.length), (bucketLen = maxValue + 1);
+
+  for (let i = 0; i < arrLen; i++) {
+    if (!bucket[arr[i]]) {
+      bucket[arr[i]] = 0;
+    }
+    bucket[arr[i]]++;
+  }
+
+  for (let j = 0; j < bucketLen; j++) {
+    while (bucket[j] > 0) {
+      arr[sortedIndex++] = j;
+      bucket[j]--;
+    }
+  }
+  console.timeEnd("计数排序耗时");
+  return arr;
+};
+
+const array2 = [2, 2, 3, 8, 7, 1, 2, 2, 2, 7, 3, 9, 8, 2, 1, 4, 2, 4, 6, 9, 2];
+console.log("原始 array2: ", array2);
+const newArr2 = countingSort2(array2, 21);
+console.log("newArr2: ", newArr2);
+// 原始 array:  [2, 2, 3, 8, 7, 1, 2, 2, 2, 7, 3, 9, 8, 2, 1, 4, 2, 4, 6, 9, 2]
+// 计数排序耗时:   0.043212890625ms
+// newArr:  	 [1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 4, 4, 6, 7, 7, 8, 8, 9, 9]
+```
+
+#### 分析
+
+因为计数排序的空间复杂度为 `O(k)`，k 桶的个数，所以`不是原地`排序算法。
+
+计数排序不改变相同元素之间原本相对的顺序，因此它是`稳定`的排序算法。
+
+最佳情况`：T(n) = O(n + k)`最差情况：`T(n) = O(n + k)` 平均情况：`T(n) = O(n + k)` k 是待排序列最大值。
+
+### 基数排序（Radix Sort）
+
+#### 算法步骤
+
+基数排序是一种非比较型整数排序算法，其原理是将整数按位数切割成不同的数字，然后按每个位数分别比较。
+
+#### 使用条件
+
+- 要求数据可以分割独立的位来比较；
+- 位之间由递进关系，如果 a 数据的高位比 b 数据大，那么剩下的地位就不用比较了；
+- 每一位的数据范围不能太大，要可以用线性排序，否则基数排序的时间复杂度无法做到 O(n)。
+
+#### 方案
+
+- MSD：由高位为基底，先按 k1 排序分组，同一组中记录, 关键码 k1 相等，再对各组按 k2 排序分成子组, 之后，对后面的关键码继续这样的排序分组，直到按最次位关键码 kd 对各子组排序后，再将各组连接起来，便得到一个有序序列。MSD 方式适用于位数多的序列。
+- LSD：由低位为基底，先从 kd 开始排序，再对 kd - 1 进行排序，依次重复，直到对 k1 排序后便得到一个有序序列。LSD 方式适用于位数少的序列。
+
+#### 实现
+
+```js
+/**
+ * name: 基数排序
+ * @param  array 待排序数组
+ * @param  max 最大位数
+ */
+const radixSort = (array, max) => {
+  console.time("计数排序耗时");
+  const buckets = [];
+  let unit = 10,
+    base = 1;
+  for (let i = 0; i < max; i++, base *= 10, unit *= 10) {
+    for (let j = 0; j < array.length; j++) {
+      let index = ~~((array[j] % unit) / base); //依次过滤出个位，十位等等数字
+      if (buckets[index] == null) {
+        buckets[index] = []; //初始化桶
+      }
+      buckets[index].push(array[j]); //往不同桶里添加数据
+    }
+    let pos = 0,
+      value;
+    for (let j = 0, length = buckets.length; j < length; j++) {
+      if (buckets[j] != null) {
+        while ((value = buckets[j].shift()) != null) {
+          array[pos++] = value; //将不同桶里数据挨个捞出来，为下一轮高位排序做准备，由于靠近桶底的元素排名靠前，因此从桶底先捞
+        }
+      }
+    }
+  }
+  console.timeEnd("计数排序耗时");
+  return array;
+};
+
+const array = [3, 44, 38, 5, 47, 15, 36, 26, 27, 2, 46, 4, 19, 50, 48];
+console.log("原始array:", array);
+const newArr = radixSort(array, 2);
+console.log("newArr:", newArr);
+// 原始 array:  [3, 44, 38, 5, 47, 15, 36, 26, 27, 2, 46, 4, 19, 50, 48]
+// 堆排序耗时:   0.064208984375ms
+// newArr:  	 [2, 3, 4, 5, 15, 19, 26, 27, 36, 38, 44, 46, 47, 48, 50]
+```

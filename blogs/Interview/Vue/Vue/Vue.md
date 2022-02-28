@@ -10,6 +10,12 @@ categories:
 ### data 为什么是一个函数？
 data之所以是一个函数，是因为一个组件可能会多处调用，而每一次调用就会执行data函数并返回新的数据对象，这样，可以避免多处调用之间的数据污染。
 
+
+因为组件是用来复用的，且 JS 里对象是引用关系，如果组件中 data 是一个对象，那么这样作用域没有隔离，子组件中的 data 属性值会相互影响，如果组件中 data 选项是一个函数，那么每个实例可以维护一份被返回对象的独立的拷贝，组件实例之间的 data 属性值不会互相影响；而 new Vue 的实例，是不会被复用的，因此不存在引用对象的问题。
+
+
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+
 1. 一个组件被复用多次的话，也就会创建多个实例。本质上，这些实例用的都是同一个构造函数。 
 2. 如果 data 是对象的话，对象属于引用类型，会影响到所有的实例。所以为了保证组件不同的实例之间 data 不冲突，data 必须是一个函数。
 ### 响应式原理
@@ -35,6 +41,9 @@ data之所以是一个函数，是因为一个组件可能会多处调用，而�
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211230101621.png)
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211007094007.png)
 ### 响应式原理详细解析
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228154752.png)
+
+
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211229150456.png)
 
 分为三部分：
@@ -286,7 +295,55 @@ Vue.extend = function (extendOptions: Object): Function {
 2. 编译模板，创建 Watcher，并将 Dep.target 标识为当前 Watcher。
 3. 编译模板时，如果使用到了 Data 中的数据，就会触发 Data 的 get 方法，然后调用 Dep.addSub 将 Watcher 搜集起来。
 4. 数据更新时，会触发 Data 的 set 方法，然后调用 Dep.notify 通知所有使用到该 Data 的 Watcher 去更新 DOM。
+
 ### 如何实现数组响应式的？
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228160047.png)
+所以在 Vue 中修改数组的索引和长度是无法监控到的。需要通过以上 7 种变异方法修改数组才会触发数组对应的 watcher 进行更新。
+```js
+// src/obserber/array.js\
+// 先保留数组原型\
+const arrayProto = Array.prototype;\
+// 然后将arrayMethods继承自数组原型\
+// 这里是面向切片编程思想（AOP）--不破坏封装的前提下，动态的扩展功能\
+export const arrayMethods = Object.create(arrayProto);\
+let methodsToPatch = [\
+  "push",\
+  "pop",\
+  "shift",\
+  "unshift",\
+  "splice",\
+  "reverse",\
+  "sort",\
+];\
+methodsToPatch.forEach((method) => {\
+  arrayMethods[method] = function (...args) {\
+    //   这里保留原型方法的执行结果\
+    const result = arrayProto[method].apply(this, args);\
+    // 这句话是关键\
+    // this代表的就是数据本身 比如数据是{a:[1,2,3]} 那么我们使用a.push(4)  this就是a  ob就是a.__ob__ 这个属性就是上段代码增加的 代表的是该数据已经被响应式观察过了指向Observer实例\
+    const ob = this.__ob__;\
+\
+    // 这里的标志就是代表数组有新增操作\
+    let inserted;\
+    switch (method) {\
+      case "push":\
+      case "unshift":\
+        inserted = args;\
+        break;\
+      case "splice":\
+        inserted = args.slice(2);\
+      default:\
+        break;\
+    }\
+    // 如果有新增的元素 inserted是一个数组 调用Observer实例的observeArray对数组每一项进行观测\
+    if (inserted) ob.observeArray(inserted);\
+    // 之后咱们还可以在这里检测到数组改变了之后从而触发视图更新的操作--后续源码会揭晓\
+    return result;\
+  };\
+});
+```
+
+
 **无法检测通过索引改变数组的操作。**
 对于对象而言，每一次的数据变更都会对对象的属性进行一次枚举，一般对象本身的属性数量有限，所以对于遍历枚举等方式产生的性能损耗可以忽略不计，但是对于数组而言呢？数组包含的元素量是可能达到成千上万，假设对于每一次数组元素的更新都触发了枚举/遍历，其带来的性能损耗将与获得的用户体验不成正比，故vue无法检测数组的变动。
 
@@ -453,7 +510,12 @@ function createComputedGetter (key) {
 ```
 1. 当 `name` 值改变时，会触发`set`，然后通知 `computed watcher`，执行 `update` 方法，并将`dirty`设置为`true`。
 2. 再次访问`computed`属性时，如果`dirty`为`false`，则不会执行 `watcher.evaluate` 方法，直接返回之前缓存的值，如果`dirty`为`true`，则重新计算。
+### computed与watch原理
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228184321.png)
 ### computed与watch区别
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228131937.png)
+
+
 通俗来讲，既能用 computed 实现又可以用 watch 监听来实现的功能，推荐用 computed， 重点在于 `computed 的缓存功能` computed 计算属性是用来`声明式`的描述一个值依赖了其它的值，当所依赖的值或者变量 改变时，计算属性也会跟着改变； watch 监听的是已经在 data 中定义的变量，当该变量变化时，会触发 watch 中的方法。
 
 - watch 属性监听 是一个对象，键是需要观察的属性，值是对应回调函数，主要用来监听某些特定数据的变化，从而进行某些具体的业务逻辑操作,监听属性的变化，需要在数据变化时执行异步或开销较大的操作时使用
@@ -1074,6 +1136,8 @@ export default{
     - Vuex
     - $attrs / $listeners
     - $root
+### Vue模板渲染的原理是什么？
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228160736.png)
 ### Vue模版编译原理
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220102102431.png)
 
@@ -1878,6 +1942,10 @@ const template = `<input type="text" v-model="name">`
 #### 生命周期是什么？
 Vue实例从创建到销毁的过程，就是Vue实例的生命周期。这个过程包括数据监听、编译模板、将实例挂载到DOM并在数据变化时更新DOM等。
 #### 生命周期有哪些？
+![](media/16460468952030.jpg)
+
+
+
 生命周期主要包括**创建阶段**、**挂载阶段**、**运行阶段**和**销毁阶段**。每一个阶段包含两个生命周期钩子函数。
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220102092558.png)
 
@@ -1903,6 +1971,10 @@ this.$nextTick(() => {
 })
 ```
 ### nextTick 实现原理
+nextTick 中的回调是在下次 DOM 更新循环结束之后执行的延迟回调。在修改数据之后立即使用这个方法，获取更新后的 DOM。主要思路就是采用微任务优先的方式调用异步方法去执行 nextTick 包装的方法。
+简单的理解是：当数据更新了，在 dom 中渲染后， 自动执行该函数。Vue 实现响应式并不是数据发生变化之后 DOM 立即变化，Vue 是异步执行 DOM 更新的。created 钩子函数进行的 DOM 操作一定要放在Vue.nextTick() 的回调函数中，原因是在函数执行的时候 DOM 其实并未进行任何渲染。常用的场景是在进行获取数据后，需要对新视图进行下一步操作或者其他操作时，发现获取不到 dom。因为赋值操作只完成了数据模型的改变并没有完成视图更新。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228101726.png)
 Vue是异步渲染的。data改变之后，DOM不会立刻去渲染，不会立即就能就能拿到更新后的DOM，来进行操作。$nextTick会在DOM之后被触发，以获取最新的DOM节点。
 
 nextTick 就是创建一个异步任务，那么它自然要等到同步任务执行完成后才执行。
@@ -1934,6 +2006,7 @@ export default {
 </script>
 ```
 #### nextTick 原理分析
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228103440.png)
 在执行 `this.name = '沐华'` 的时候，就会触发 `Watcher` 更新，`watcher` 会把自己放到一个队列。用队列的原因是比如多个数据变更就更新视图多次的话，性能上就不好了，所以对视图更新做一个异步更新的队列，避免重复计算和不必要的DOM操作，在下一轮事件循环的时候刷新队列，并执行已去重的任务(nextTick的回调函数)，更新视图。
 
 然后调用`nextTick()`
@@ -2057,6 +2130,9 @@ export function nextTick (cb?: Function, ctx?: Object) {
 this.$nextTick().then(()=>{ ... })
 ```
 ### Diff算法
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228185920.png)
+
+
 Vue的diff算法是平级比较，不考虑跨级比较的情况。内部采用深度递归的方式+双指针方式比较
 - 先比较两个节点是不是相同节点
 - 相同节点比较属性，复用老节点
@@ -2085,6 +2161,9 @@ Diff算法vdom中国最核心，最关键的部分。
 - 所以采用watcher + Diff算法来检测差异。
 
 ### Diff的key重要性
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228160405.png)
+
 Vue 中使用虚拟 dom 且根据 diff 算法进行新旧 DOM 对比，从而更新真实 dom ，key 是虚拟 DOM 对象的唯一标识, 在 diff 算法中 key 起着极其重要的作用。
 
 key 在 diff 算法中的角色。key 的特殊 attribute 主要用在 Vue 的虚拟 DOM 算法，在新旧 nodes 对比时辨识 VNodes。如果不使用 key，Vue 会使用一种最大限度减少动态元素并且尽可能的尝试就地修改/复用相同类型元素的算法。而使用 key 时，它会基于 key 的变化重新排列元素顺序，并且会移除 key 不存在的元素。
@@ -2110,8 +2189,30 @@ vue中在使用相同标签名元素的过渡切换时，也会使用到key属�
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220210145211.png)
 #### 不能用index做key
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228203214.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228160441.png)
+
 影响性能：当用index作为key的时候，删除节点后面的所有节点都会导致重新渲染，因为index变化了，可以也就变化了。
+### 事件有哪些修饰符？
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228133442.png)
+### 什么是自定义指令？有哪些生命周期？
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228142916.png)
+
+### 什么是动态组件？动态组件的钩子如何执行？
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228151708.png)
+
+### Keep-alive的作用？使用keep-alive的组件如何监控组件切换？
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228152144.png)
+### v-if、v-show、v-html 的原理
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228160618.png)
+
+
 ## Vue3.x
+### Vue 3.0 自定义指令有哪些变化？
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228165406.png)
+
 ### Setup
 setup函数是一个新的组件选项。作为在组件内使用Composition Api的入口点。下面我们分为4个方面来讲解它。
 - 调用时机
@@ -2223,6 +2324,8 @@ export default {
 - 前者无需考虑调用顺序，而后者需要保证hooks的顺序一致
 - 前者reactive + ref 比后者useState,要难理解
 ### 响应式原理以及响应式的变化
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228165248.png)
+
 - defineProperty API 的局限性最大原因是它只能针对单例属性做监听。
 - Vue2.x中的响应式实现正是基于defineProperty中的descriptor，对 data 中的属性做了遍历 + 递归，为每个属性设置了 getter、setter。这也就是为什么 Vue 只能对 data 中预定义过的属性做出响应的原因，在Vue中使用下标的方式直接修改属性的值或者添加一个预先不存在的对象属性是无法做到setter监听的，这是defineProperty的局限性。
 - Proxy API的监听是针对一个对象的，那么对这个对象的所有操作会进入监听操作， 这就完全可以代理所有属性，将会带来很大的性能提升和更优的代码。
@@ -2578,6 +2681,237 @@ export default defineComponent({
 2. 清除副作用：onInvalidate 会作为回调的第三个参数传入
 3. 副作用刷新时机：响应式系统会缓存副作用函数，并异步刷新，避免同一个 tick 中多个状态改变导致的重复调用
 4. 监听器调试：开发模式下可以用 onTrack 和 onTrigger 进行调试
+### nextTick 原理分析 
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228101726.png)
+ 
+- nextTick 是将回调推迟到下一个 DOM 更新周期之后执行。在更改了一些数据以等待 DOM 更新后立即使用它。
+- 都会用 nextTick，也都知道 nextTick 作用是在下次 DOM 更新循环结束之后，执行延迟回调，就可以拿到更新后的 DOM 相关信息
+- 在 vue 中数据发生变化后，dom 的更新是需要一定时间的，而我们在数据更新之后就立即去操作或者获取 dom 的话，其实还是操作和获取的未更新的 dom ，而我们可以调用 nextTick 拿到最新的 dom。
+```js
+import { createApp, nextTick } from "vue"
+
+const app = createApp({
+  setup() {
+    const message = ref("Hello!")
+    const changeMessage = async newMessage => {
+      message.value = newMessage
+      await nextTick()
+      console.log("Now DOM is updated")
+    }
+  },
+})
+```
+#### nextTick 用法
+```js
+ <template>
+     <div ref="test">{{name}}</div>
+     <el-button @click="handleClick">按钮</el-button>
+ </template>
+ <script setup>
+     import { ref, nextTick } from 'vue'
+     const name = ref("沐华")
+     const test = ref(null)
+     async function handleClick(){
+         name.value = '掘金'
+         console.log(test.value.innerText) // 沐华
+         await nextTick()
+         console.log(test.value.innerText) // 掘金
+     }
+     return { name, test, handleClick }
+ </script>
+```
+Vue3 里这一块有大改，不过事件循环的原理还是一样，只是加了几个专门维护队列的方法，以及关联到 effect，不过好在这里源码的代码不多，所以不如直接看源码会更容易理解。
+#### nextTick 源码剖析
+```ts
+const resolvedPromise: Promise<any> = Promise.resolve()
+let currentFlushPromise: Promise<void> | null = null
+
+export function nextTick<T = void>(this: T, fn?: (this: T) => void): Promise<void> {
+  const p = currentFlushPromise || resolvedPromise
+  return fn ? p.then(this ? fn.bind(this) : fn) : p
+}
+```
+可以看出 nextTick 接受一个函数为参数，同时会创建一个微任务。
+
+在我们页面调用 nextTick 的时候，会执行该函数，把我们的参数 fn 赋值给 p.then(fn)，在队列的任务完成后，fn 就执行了。由于加了几个维护队列的方法，所以执行顺序是这样的：
+
+`queueJob` -> `queueFlush` -> `flushJobs` -> `nextTick参数的 fn`
+
+先看一下入口函数`queueJob`是在哪里调用的，看代码
+```js
+// packages/runtime-core/src/renderer.ts - 1555行
+function baseCreateRenderer(){
+  const setupRenderEffect: SetupRenderEffectFn = (...) => {
+    const effect = new ReactiveEffect(
+      componentUpdateFn,
+      () => queueJob(instance.update), // 当作参数传入
+      instance.scope
+    )
+  }
+}
+```
+在 ReactiveEffect 这边接收过来的形参就是 scheduler，最终被用到了下面这里，看过响应式源码的这里就熟悉了，就是派发更新的地方。
+```js
+// packages/reactivity/src/effect.ts - 330行
+export function triggerEffects(
+  ...
+  if (effect.scheduler) {
+    effect.scheduler()
+  } else {
+    effect.run()
+  }
+}
+```
+
+**queueJob()**
+该方法负责维护主任务队列，接受一个函数作为参数，为待入队任务，会将参数 push 到 queue 队列中，有唯一性判断。会在当前宏任务执行结束后，清空队列。
+```js
+const queue: SchedulerJob[] = []
+
+export function queueJob(job: SchedulerJob) {
+  // 主任务队列为空 或者 有正在执行的任务且没有在主任务队列中  && job 不能和当前正在执行任务及后面待执行任务相同
+  if ((!queue.length ||
+      !queue.includes( job, isFlushing && job.allowRecurse ? flushIndex + 1 : flushIndex )
+      ) && job !== currentPreFlushParentJob
+  ) {
+    // 可以入队就添加到主任务队列
+    if (job.id == null) {
+      queue.push(job)
+    } else {
+      // 否则就删除
+      queue.splice(findInsertionIndex(job.id), 0, job)
+    }
+    // 创建微任务
+    queueFlush()
+  }
+}
+```
+**queueFlush()**
+该方法负责尝试创建微任务，等待任务队列执行。
+```js
+let isFlushing = false // 是否正在执行
+let isFlushPending = false // 是否正在等待执行
+const resolvedPromise: Promise<any> = Promise.resolve() // 微任务创建器
+let currentFlushPromise: Promise<void> | null = null // 当前任务
+
+function queueFlush() {
+  // 当前没有微任务
+  if (!isFlushing && !isFlushPending) {
+    // 避免在事件循环周期内多次创建新的微任务
+    isFlushPending = true
+    // 创建微任务，把 flushJobs 推入任务队列等待执行
+    currentFlushPromise = resolvedPromise.then(flushJobs)
+  }
+}
+```
+**flushJobs()**
+该方法负责处理队列任务，主要逻辑如下：
+- 先处理前置任务队列
+- 根据 Id 排队队列
+- 遍历执行队列任务
+- 执行完毕后清空并重置队列
+- 执行后置队列任务
+- 如果还有就递归继续执行
+```js
+function flushJobs(seen?: CountMap) {
+  isFlushPending = false // 是否正在等待执行
+  isFlushing = true // 正在执行
+  if (__DEV__) seen = seen || new Map() // 开发环境下
+  flushPreFlushCbs(seen) // 执行前置任务队列
+  // 根据 id 排序队列，以确保
+  // 1. 从父到子，因为父级总是在子级前面先创建
+  // 2. 如果父组件更新期间卸载了组件，就可以跳过
+  queue.sort((a, b) => getId(a) - getId(b))
+  try {
+    // 遍历主任务队列，批量执行更新任务
+    for (flushIndex = 0; flushIndex < queue.length; flushIndex++) {
+      const job = queue[flushIndex]
+      if (job && job.active !== false) {
+        if (__DEV__ && checkRecursiveUpdates(seen!, job)) {
+          continue
+        }
+        callWithErrorHandling(job, null, ErrorCodes.SCHEDULER)
+      }
+    }
+  } finally {
+    flushIndex = 0 // 队列任务执行完，重置队列索引
+    queue.length = 0 // 清空队列
+    flushPostFlushCbs(seen) // 执行后置队列任务
+    isFlushing = false  // 重置队列执行状态
+    currentFlushPromise = null // 重置当前微任务为 Null
+    // 如果主任务队列、前置和后置任务队列还有没被清空，就继续递归执行
+    if ( queue.length || pendingPreFlushCbs.length || pendingPostFlushCbs.length ) {
+      flushJobs(seen)
+    }
+  }
+}
+```
+**flushPreFlushCbs()**
+该方法负责执行前置任务队列，说明都写在注释里了。
+```js
+export function flushPreFlushCbs( seen?: CountMap, parentJob: SchedulerJob | null = null) {
+  // 如果待处理的队列不为空
+  if (pendingPreFlushCbs.length) {
+    currentPreFlushParentJob = parentJob
+    // 保存队列中去重后的任务为当前活动的队列
+    activePreFlushCbs = [...new Set(pendingPreFlushCbs)]
+    // 清空队列
+    pendingPreFlushCbs.length = 0
+    // 开发环境下
+    if (__DEV__) { seen = seen || new Map() }
+    // 遍历执行队列里的任务
+    for ( preFlushIndex = 0; preFlushIndex < activePreFlushCbs.length; preFlushIndex+ ) {
+      // 开发环境下
+      if ( __DEV__ && checkRecursiveUpdates(seen!, activePreFlushCbs[preFlushIndex])) {
+        continue
+      }
+      activePreFlushCbs[preFlushIndex]()
+    }
+    // 清空当前活动的任务队列
+    activePreFlushCbs = null
+    preFlushIndex = 0
+    currentPreFlushParentJob = null
+    // 递归执行，直到清空前置任务队列，再往下执行异步更新队列任务
+    flushPreFlushCbs(seen, parentJob)
+  }
+}
+```
+**flushPostFlushCbs()**
+该方法负责执行后置任务队列，说明都写在注释里了。
+```js
+let activePostFlushCbs: SchedulerJob[] | null = null
+
+export function flushPostFlushCbs(seen?: CountMap) {
+  // 如果待处理的队列不为空
+  if (pendingPostFlushCbs.length) {
+    // 保存队列中去重后的任务
+    const deduped = [...new Set(pendingPostFlushCbs)]
+    // 清空队列
+    pendingPostFlushCbs.length = 0
+    // 如果当前已经有活动的队列，就添加到执行队列的末尾，并返回
+    if (activePostFlushCbs) {
+      activePostFlushCbs.push(...deduped)
+      return
+    }
+    // 赋值为当前活动队列
+    activePostFlushCbs = deduped
+    // 开发环境下
+    if (__DEV__) seen = seen || new Map()
+    // 排队队列
+    activePostFlushCbs.sort((a, b) => getId(a) - getId(b))
+    // 遍历执行队列里的任务
+    for ( postFlushIndex = 0; postFlushIndex < activePostFlushCbs.length; postFlushIndex++ ) {
+      if ( __DEV__ && checkRecursiveUpdates(seen!, activePostFlushCbs[postFlushIndex])) {
+        continue
+      }
+      activePostFlushCbs[postFlushIndex]()
+    }
+    // 清空当前活动的任务队列
+    activePostFlushCbs = null
+    postFlushIndex = 0
+  }
+}
+```
 ### .sync 和 v-model 的区别(组件v-model支持参数)
 ```vue
 <template>
@@ -2625,6 +2959,7 @@ export default {
 #### v-model 的作用
 双向绑定实现,单向数据流。
 #### .sync 作用
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228132702.png)
 实现父子组件数据之间的双向绑定，与 v-model 类似。区别在于：一个组件上只能有一个 v-model，.sync 修饰符可以有多个。
 ```js
 // 正常父传子：
@@ -3806,6 +4141,7 @@ const _hoisted_1 = { name: "test" }
 这一行代码中的 `const _hoisted_1 =` 由 `genHoists()` 生成，`{ name: "test" }` 由 `genObjectExpression()` 生成。 同理，剩下的两行代码生成过程也是如此，只是最终调用的函数不同。
 
 ### 生命周期
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228165303.png)
 #### 生命周期是什么？
 Vue实例从创建到销毁的过程，就是Vue实例的生命周期。这个过程包括数据监听、编译模板、将实例挂载到DOM并在数据变化时更新DOM等。
 #### 生命周期有哪些？
@@ -3842,6 +4178,27 @@ nextTick 是 Vue 提供的一个全局 API,是在下次 DOM 更新循环结束�
  </script>
 ```
 Vue3 里这一块有大改，不过事件循环的原理还是一样，只是加了几个专门维护队列的方法，以及关联到 effect，不过好在这里源码的代码不多，所以不如直接看源码会更容易理解。
+#### nextTick 原理
+Vue更新DOM是异步。vue.js在视图更新采用的是异步更新策略。相同的watcher对象不会被重复添加。
+
+vue用异步队列的方式来控制DOM更新和nextTick回调先后执行，保证了能在dom更新后在执行回调。
+
+Vue 实现响应式并不是数据发生变化之后 DOM 立即变化，而是按一定的策略进行 DOM 的更新。
+Vue 在修改数据后，视图不会立刻更新，而是等同一事件循环中的所有数据变化完成之后，再统一进行视图更新。
+首先修改数据，这是同步任务。同一事件循环的所有的同步任务都在主线程上执行，形成一个执行栈，此时还未涉及 DOM 。
+然后Vue 开启一个异步队列，并缓冲在此事件循环中发生的所有数据改变。如果同一个 watcher 被多次触发，只会被推入到队列中一次。
+
+
+Vue 在修改数据后，视图不会立刻更新，而是等同一事件循环中的所有数据变化完成之后，再统一进行视图更新
+同一事件循环中的代码执行完毕 -> DOM 更新 -> nextTick callback触发
+
+
+总的来说 nextTick 的实现主要利用了.
+- 利用Promise.resolve().then()将任务推入 Micro Task Queue ，借助引擎的 Event Loop 机制处理队列中的任务
+- 处理异步任务与回调，对于新添加的异步任务也递归的处理完成。这与引擎处理 Task Queue 的逻辑是一致的
+
+如果不考虑一些低版本浏览器的兼容，Promise就可以完全实现 所以vue3的源码直接使用了Promise,使用js引擎本身的任务调用机制实现dom更新后调用。
+    
 #### nextTick 源码剖析
 ```ts
 // nextTick 接受一个函数为参数，同时会创建一个微任务
@@ -4062,6 +4419,8 @@ export default {
 }
 </script>
 ```
+### ref原理
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228192903.png)
 ### Ref
 该方法接收一个参数，可以是单个值，也可以是一个对象，并且都是响应式的数据。当传入一个对象时{}，内部将调用reactive方法进行转换为响应式数据。返回值里面带有.value属性取值，当使用模板渲染的时候可省去.value。
 ```vue
@@ -4095,6 +4454,10 @@ export default {
 }
 </script>
 ```
+### Vue3 toRef、torefs的原理
+内部其实就是一个类，有get value方法，实际上调用get value方法是做了层代理，取得是state.age，然后触发age的getter从而触发track收集依赖啥的。
+### Computed原理
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228193213.png)
 ### Computed
 该方法可以传入一个函数，默认该函数就是getter，不管getter返回值为一个ref响应式数据还是一个普通变量，数据都是只读不能改变。
 ```js
@@ -4282,7 +4645,7 @@ export default {
 }
 </script>
 ```
-### Vue3.0 有哪些新特性
+### Vue3.0 有哪些新特性(更新的功能)
 - **Composition API**
     - Vue2 中 OptionsAPI
         - 相关业务的代码需要遵循 option 的配置写到特定的区域，导致后续维护非常的复杂，代码可复用性也不高。最难受的是敲代码的时候不得不上下反复横跳
@@ -4318,7 +4681,25 @@ export default {
         - 可以平级递归组件
     - Vue3 中，组件的 template 被一层不可见的 Fragment 包裹，支持多个根节点。解决了组件需要被一个唯一根节点包裹的问题，减少了 dom 层级、提升了渲染性能。
     - Vue3中不在要求模版的跟节点必须是只能有一个节点。跟节点和和render函数返回的可以是纯文字、数组、单个节点，如果是数组，会自动转化为 Fragments。
+```js
+// vue2中在template里存在多个根节点会报错
+<template>
+  <header></header>
+  <main></main>
+  <footer></footer>
+</template>
+ 
+// 只能存在一个根节点，需要用一个<div>来包裹着
+<template>
+  <div>
+    <header></header>
+    <main></main>
+    <footer></footer>
+  </div>
+</template>
+```
 - **Suspense**
+  - Vue3 提供 Suspense 组件，允许程序在等待异步组件加载完成前渲染兜底的内容，如 loading ，使用户的体验更平滑。使用它，需在模板中声明，并包括两个命名插槽：default 和 fallback。Suspense 确保加载完异步内容时显示默认插槽，并将 fallback 插槽用作加载状态。
   - 等待嵌套的异步依赖。再把一个嵌套的组件树渲染到页面上之前，先在内存中进行渲染，并记录所有的存在异步依赖的组件。只有所有的异步依赖全部被resolve之后，才会把整个书渲染到dom中。当你的组件中有一个 async的 setup函数，这个组件可以被看作是一个Async Component，只有当这个组件被Resolve之后，再把整个树渲染出来
   - 可以理解为异步组件的爹。用于方便地控制异步组件的一个挂起和完成状态。
   - Suspense 将异步组件包起来，template #default 中展示加载完成的异步组件，template #fallback 中则展示异步组件挂起状态时需要显示的内容。
@@ -4354,7 +4735,7 @@ export default defineComponent({
 })
 </script>
 ```
-- Teleport
+- **Teleport**
     - 对标 React Portal。可以做一些关于响应式的设计，如果屏幕宽度比较宽的时候，加入某些元素，屏幕变窄后移除。
     - 组件任意门，让你的组件可以任意地丢到 html 中的任一个 DOM 下。
     - Teleport，即传送门。`<teleport>` 组件能在不改变组件内部元素父子关系的情况下，将子元素“传送”到其他指定节点下渲染，允许我们控制在 DOM 中哪个父节点下渲染 HTML，而不必求助于全局状态或将其拆分为两个组件。
@@ -4433,7 +4814,7 @@ export default defineComponent({
     - 当数据发生改变的时候，两棵 vdom 的树会进行 diff 比较，找到需要更新的节点再 patch 为实际的 DOM 更新到浏览器上。这个过程在 Vue2 中已经优化到了组件的粒度，通过渲染 Watcher 去准确找到需要更新的组件，将整个组件内的 vdom tree 进行 diff。
     - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211007071032.png)
   - Vue3.0 的
-    - PatchFlag(静态标记)
+    - **PatchFlag(静态标记)**
         - 改进 diff 算法，加快渲染：Vue3.0 在运行时生成PatchFlag，用作节点标记。只有带PatchFlag的node会被真正的追踪，并且无论节点的嵌套层级有多深，动态节点都是直接与 Block 根节点直接绑定的，即当 diff 算法走到根节点时，会直接跳到动态变化的节点，无需遍历静态节点。
         - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220102155304.png)
         - Vue3 重写了 Virtual Dom，以利用模板的静态分析优势去将更新的粒度进一步缩小到动态元素甚至是动态的属性。
@@ -4441,7 +4822,8 @@ export default defineComponent({
         - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211007071416.png)
         - 完全静态的元素已经被提升到 render 函数上面去了，实际会创建 vnode 的就只有一个含有动态文本内容的 p 元素。
         - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220102154903.png)
-    - hoistStatic(静态提升)
+        - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228175349.png)
+    - **hoistStatic(静态提升)**
         - 我们平时在开发过程中写函数的时候，定义一些写死的变量时，都会将变量提升出去定义，Vue 3.0 在这方面也做了同样的优化
         - Vue 3.0中就是启用了静态提升把不需要更新的元素放到外面只创建一次，在渲染的时候直接复用即可。
         - 所有 静态的节点都被提升到render方法之外。这意味着，他们只会在应用启动的时候被创建一次，而后随着每次的渲染被不停的复用。
@@ -4453,6 +4835,7 @@ export default defineComponent({
     - 每个区块内部的节点结构是固定的
     - 每个区块只需要以一个平面数组追踪自身包含的动态节点
 - cacheHandler(事件缓存)
+    - Vue3 的cacheHandler可在第一次渲染后缓存我们的事件。相比于 Vue2 无需每次渲染都传递一个新函数。加一个 click 事件。
     - 默认情况下 @click 事件被认为是动态变量，所以每次更新视图的时候都会追踪它的变化。
     - 但是正常情况下，我们的 @click 事件在视图渲染前和渲染后，都是同一个事件，基本上不需要去追踪它的变化，所以 Vue 3.0 对此作出了相应的优化叫事件监听缓存。
     - 每次重新渲染时如果事件处理器没有变，就会使用缓存中的事件处理而不会重新获取事件处理器。这个节点就可以被看作是一个静态的节点。这种优化更大的作用在于当其作用域组件时，之前每次重新渲染都会导致组件的重新渲染，在通过handler缓存之后，不会导致组件的重新渲染了。
@@ -4466,6 +4849,10 @@ export default defineComponent({
 - StaticNode 静态节点
     - 刚才提到在SSR中静态的节点会被转化为纯字符串。如果在客户端，当静态节点嵌套足够多的时候，VUE编译器也会将VDOM转化为纯字符串的HTML。即 StaticNode。
     - ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220102160355.png)
+- TypeScript支持
+    - Vue3 由 TypeScript 重写，相对于 Vue2 有更好的 TypeScript 支持。
+        - Vue2 Options API 中 option 是个简单对象，而 TypeScript 是一种类型系统，面向对象的语法，不是特别匹配。
+        - Vue2 需要vue-class-component强化vue原生组件，也需要vue-property-decorator增加更多结合Vue特性的装饰器，写法比较繁琐。
 - 更多编译时优化
     - Slot 默认编译为函数
         - 这个让使用插槽的父子组件之间的更新关系不再强耦合
@@ -4475,6 +4862,7 @@ export default defineComponent({
 - 如何更小
     - 最主要的就是充分利用了 Tree-shaking（支持摇树优化）的特性
         - Vue3 一共开放了 113 个 API，可以通过如下方式引用：
+        - Vue3 中针对全局和内部的API进行了重构，并考虑到 tree-shaking 的支持。因此，全局API现在只能作为ES模块构建的命名导出进行访问。
         - tree shaking 以后，进入 bundle 的只有被引入并且真正会被使用的代码块。在 Vue3 中许多渐进式的特性都使用了第二种的写法来进行重写，而且模板本身又是 Tree shaking 友好的。
         - Vue3 最重要的变化之一就是引入了 Tree-Shaking，Tree-Shaking 带来的 bundle 体积更小是显而易见的。
         - 在 2.x 版本中，很多函数都挂载在全局 Vue 对象上，比如 nextTick、nextTick、set 等函数，因此虽然我们可能用不到，但打包时只要引入了 vue 这些全局函数仍然会打包进 bundle 中。
@@ -4522,6 +4910,7 @@ export default defineComponent({
     - 动态节点，还是需要动态的渲染
 - tree-shaking
     - 编译时，根据不同的情况，引入不同的API
+    - 相比 Vue2.x 导入整个 Vue 对象，Vue3.0 支持按需导入，只打包需要的代码。Tree-Shaking 依赖 ES2015 模块语法的静态结构（即 import 和 export），通过编译阶段的静态分析，找到没有引入的模块并打上标记。像我们在项目中如果没有引入 Transition、KeepAlive 等不常用的组件，那么它们对应的代码就不会打包进去。
 ### Diff算法
 ### Vue3 升级了那些重要的功能
 - createApp
@@ -4747,6 +5136,16 @@ export const enum PatchFlags {Ⅰ
 - 模板到render函数，再到vnode，再到渲染和更新
 - vue组件可以用render代替template
 ## Vue通性问题
+### 模板编译、数据绑定、依赖收集、派发更新
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228183851.png)
+
+### Vue 事件绑定原理
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228162804.png)
+### Vue data 中某一个属性的值发生改变后，视图会立即同步执行重新渲染吗？
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228184021.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228162609.png)
+
 ### provide和inject是响应式的吗？
 ```js
 // 祖先组件
@@ -5220,6 +5619,11 @@ MVVM 的优点：
 2. 可重用性。你可以把一些视图逻辑放在一个 Model 里面，让很多 View 重用这段视图逻辑。
 3. 独立开发。开发人员可以专注于业务逻辑和数据的开发(ViewModel)，设计人员可以专注于页面设计。
 4. 可测试。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228123732.png)
+
+MVVM是Model-View-ViewModel的缩写，Model代表数据模型负责业务逻辑和数据封装，View代表UI组件负责界面和显示，ViewModel监听模型数据的改变和控制视图行为，处理用户交互，简单来说就是通过双向数据绑定把View层和Model层连接起来。在MVVM架构下，View和Model没有直接联系，而是通过ViewModel进行交互，我们只关注业务逻辑，不需要手动操作DOM，不需要关注View和Model的同步工作
+
 ### Vue的MVVM 实现原理
 - VM：也就是View-Model，做了两件事达到了数据的双向绑定 一是将【模型】转化成【视图】，即将后端传递的数据转化成所看到的页面。实现的方式是：数据绑定。二是将【视图】转化成【模型】，即将所看到的页面转化成后端的数据。实现的方式是：DOM 事件监听。
 - 思想：实现了 View 和 Model 的自动同步，也就是当 Model 的属性改变时，我们不用再自己手动操作 Dom 元素，来改变 View 的显示，而是改变属性后该属性对应 View 层显示会自动改变（对应Vue数据驱动的思想）
@@ -5260,6 +5664,12 @@ Vue 作为 MVVM 模式的实现库的2种技术。
 **模板引擎**: 如何解析模板。
 **渲染**: Vue如何将监听到的数据变化和解析后的HTML进行渲染。 
 ### Vue虚拟DOM的理解
+![](media/16460489059780.jpg)
+
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228161144.png)
+
+
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220123193138.png)
 
 由于在浏览器中操作 DOM 是很昂贵的。频繁的操作 DOM，会产生一定的性能问题。这就是虚拟 Dom 的产生原因。Vue2 的 Virtual DOM 借鉴了开源库 snabbdom 的实现。Virtual DOM 本质就是用一个原生的 JS 对象去描述一个 DOM 节点，是对真实 DOM 的一层抽象。
@@ -5282,6 +5692,8 @@ DOM 操作非常非常“昂贵”，将 DOM 对比操作放在 JS 层，提高�
   - patch(container, vnode)
   - patch(vnode, newVnode)
 ### 为什么要有虚拟DOM节点，直接操作DOM节点的问题在哪里
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228162848.png)
+
 虚拟 DOM：对复杂的 DOM 结构提供便捷的工具，最小化的进行 DOM 操作。虚拟 DOM 不会进行重绘和回流，在虚拟 DOM 中进行频繁修改，然后一次性比较并修改真实 DOM 中需要修改的部分，最后在真实 DOM 中进行重绘和回流，减少 DOM 节点重绘和回流的损耗。
 
 虚拟 DOM 的重绘和回流效率相当低，虚拟 DOM 有效地降低了大面积的对真实 DOM 进行重绘和回流，因为通过比较差异，只渲染局部。
@@ -5297,7 +5709,15 @@ Vue和React是数据驱动视图，如何有效控制DOM操作
 - 缺点:
   - 无法进行极致优化： 虽然虚拟 DOM + 合理的优化，足以应对绝大部分应用的性能需求，但在一些性能要求极高的应用中虚拟 DOM 无法进行针对性的极致优化。
   - 首次渲染大量 DOM 时，由于多了一层虚拟 DOM 的计算，会比 innerHTML 插入慢。
-### Vue框架有哪些有点和缺点?
+### Vue框架有哪些优点和缺点?
+- 渐进式框架：可以在任何项目中轻易的引入；
+- 轻量级框架：只关注视图层，是一个构建数据的视图集合，大小只有几十 kb ；
+- 简单易学：国人开发，中文文档，不存在语言障碍 ，易于理解和学习；
+- 双向数据绑定：在数据操作方面更为简单；
+- 组件化：很大程度上实现了逻辑的封装和重用，在构建单页面应用方面有着独特的优势；
+- 视图，数据，结构分离：使数据的更改更为简单，不需要进行逻辑代码的修改，只需要操作数据就能完成相关操作；
+
+
 优点：渐进式，组件化，轻量级，虚拟dom，响应式，单页面路由，数据与视图分开。
 缺点：单页面不利于 seo，不支持 IE8 以下，首屏加载时间长。
 ### React 和 Vue 的区别？
@@ -5325,16 +5745,31 @@ Vue：是一个近两年兴起的前端 JS 库，它是一个精简的 MVVM。�
 - 如果异步请求不需要依赖 Dom 推荐在 created 钩子函数中调用异步请求，因为在 created 钩子函数中调用异步请求有以下优点：
     - 能更快获取到服务端数据，减少页面 loading 时间；
     - SSR不支持 beforeMount 、mounted 钩子函数，所以放在 created 中有助于一致性；
-
+s
 
 - mounted 表示整个渲染完成， dom 也加载完成，因此 ajax 请求应该放在 mounted 生命周期中；
 - 本质上 js 是单线程的，并且 ajax 是异步获取数据，是异步加载的一个机制；
 - 如果将其放在 mounted 之前是没有用的，这样做只会让逻辑更加混乱；
 - 原因在于，如果在 mounted 之前放 ajax 请求，那么这个时候 js 还没有渲染完成。且又因为 ajax 请求的数据还是异步的，因此即使是在 mounted 之前也不能加载，也不会有提前加载的效果。
-### 描述组件渲染和更新的过程
+### 组件 渲染/更新 过程
+- 初次渲染过程
+    - 解析模板为render函数（或在开发环境已完成，vue-loader）
+    - 触发响应式，监听data属性getter setter
+    - 执行render函数，生成vnode,patch(ele,vnode)
+- 更新过程
+    - 修改data,触发setter（此前在getter中已被监听）
+    - 重新执行render函数，生成newVnode
+    - patch(vnode,newVnode)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220205115628.png)
+- 异步渲染
+    - $nextTick
+    - 汇总data的修改，一次性更新视图
+    - 减少DOM操作次数，提高性能
+### 组件渲染和组件更新的过程
+
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211203205536.png)
 
-### slot 是干嘛的？
+### Slot 是干嘛的？
 slot 的意思是插槽，Vue 使用 slot 的作用是做内容分发。所谓的内容分发其实就是将父组件的内容放到子组件指定的位置叫做内容分发。所谓的内容分发其实就是将父组件的内容放到子组件指定的位置叫做内容分发。
 
 我们可以理解 slot 为要占出当前的位置，方便我们插入内容。
@@ -5507,136 +5942,10 @@ const asyncModalStudentDetailWithOptions = defineAsyncComponent({
   loadingComponent: LoadingComponent,
 });
 ```
-### 动态组件有什么好处？
-动态组件：是 Vue 中一个特殊的 Html 元素：`<component>`，它拥有一个特殊的 `is` 属性，属性值可以是已注册组件的名称 或 一个组件的选项对象，它是用于不同组件之间进行动态切换的。
-
-Vue 中有个动态组件的概念，它能够帮助开发者更好的实现组件之间的切换，但是动态组件在切换的过程中，组件的实例都是重新创建的，而在面对需求频繁的变化，要频繁的切换组件时，我们就需要保留组件的状态来节约性能。
-
-为了解决组件频繁切换造成性能浪费问题，需要使用到 Vue 中内置组件`<keep-alive>`,使用`<keep-alive></keep-alive>` 包裹动态组件时，会缓存不活动的组件实例,主要用于保留组件状态或避免重新渲染。
-```js
-// 组件的切换方式
-// 方式一: 使用 v-if和v-else
-// 变量flag为true时显示comp-a组件 ,相反则显示comp-b组件
-<comp-a v-if="flag"></comp-a>
-<comp-b v-else></comp-b>
-
-
-
-
-// 方式二:使用内置组件:<component></component>
-// 点击切换登录,注册,退出组件
-<template>
- <div>
-    <a href="#" @click.prevent="comName = 'login'">登录</a>
-    <a href="#" @click.prevent="comName = 'register'">注册</a>
-    <a href="#" @click.prevent="comName = 'logOut'">退出</a>
-    //  <component></component> 来展示对应名称的组件,相当于一个占位符
-    //    :is 属性指定 组件名称
-  <component :is="comName"></component>
-  </div>
-</template>
-
-
-
-
-
-// 方式三 : vue-router
-// 路由规则:
-  {
-    path: '/login',
-    name: 'login',
-    component: () => import('../views/login.vue')
-  },
-  {
-    path: '/register',
-    name: 'register',
-    component: () => import('../views/register.vue')
-  },
-
-  // 需要展示组件的位置:
-   <router-view />
-```
-### 组件 渲染/更新 过程
-- 初次渲染过程
-    - 解析模板为render函数（或在开发环境已完成，vue-loader）
-    - 触发响应式，监听data属性getter setter
-    - 执行render函数，生成vnode,patch(ele,vnode)
-- 更新过程
-    - 修改data,触发setter（此前在getter中已被监听）
-    - 重新执行render函数，生成newVnode
-    - patch(vnode,newVnode)
-![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220205115628.png)
-- 异步渲染
-    - $nextTick
-    - 汇总data的修改，一次性更新视图
-    - 减少DOM操作次数，提高性能
-### Vue初始化页面闪动问题如何解决？
-出现该问题是因为在 Vue 代码尚未被解析之前，尚无法控制页面中 DOM 的显示，所以会看见模板字符串等代码。 
-
-解决方案是，在 `css` 代码中添加`v-cloak`规则，同时在待编译的标签上添加 `v-cloak` 属性
-```vue
-<style>
-  [v-cloak] {
-    display: none;
-  }
-</style>
-<div v-cloak>
-  {{ message }}
-</div>
-
-//或者组件用 template 包裹起来
-<template></template>
-```
-
-### v-if 和 v-show 的区别
-v-show 和 v-if 都是用来显示隐藏元素，v-if还有一个v-else配合使用，两者达到的效果都一样，性能方面去有很大的区别。
-
-- v-show
-  - v-show通过CSS display控制显示和隐藏
-  - 而 v-show 有更高的初始渲染开销。
-  - v-show 不管条件是真还是假，第一次渲染的时候都会编译出来，也就是标签都会添加到 DOM 中。
-  - 之后切换的时候，通过 display: none;样式来显示隐藏元素。可以说只是改变 css 的样式，几乎不会影响什么性能。
-  - 如果需要非常频繁地切换，则使用 v-show 较好；
-
-- v-if
-  - v-if组件真正的渲染和销毁，而不是显示和隐藏
-  - v-if 有更高的切换开销 
-  - 在首次渲染的时候，如果条件为假，什么也不操作，页面当作没有这些元素。
-  - 当条件为真的时候，开始局部编译，动态的向 DOM 元素里面添加元素。当条件从真变为假的时候，开始局部编译（编译会被缓存起来），卸载这些元素，也就是删除。
-  - 如果在运行时条件很少改变，则使用 v-if 较好。
-
-- 频繁切换显示状态用v-show，否则用v-if
-- 性能方面
-  - v-if 绝对是更消耗性能的，因为 v-if 在显示隐藏过程中有 DOM 的添加和删除，v-show 就简单多了，只是操作 css。
-- 闪烁问题
-  - 用 v-if 或者 v-show 就会出现 div 闪现，或者部分闪烁的结果。解决方法：可以在根元素添加 v-cloak 来解决，并且设置它的 css 样式即可。
-```vue
-  <style>
-  /* 在引入的css文件中写入这个*/
-  [v-cloak]{
-    display: none;
-  }
-  </style>
-  <body>
-  <!-- 添加这个v-cloak -->
-  <div id='app' v-cloak>
-    <div v-if="isShow">
-    content
-    </div>
-  </div>
-  </body>
-  <script>
-  new Vue({
-    el: '#app',
-    data () {
-        return {
-            isShow: false
-        }
-    }
-  })
-  </script>
-```
 ### keep-alive实现原理
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228190622.png)
+
+
 - 缓存组件
 - 频繁切换，不需要重复渲染
 `keep-alive` 是 `Vue` 内置的一个组件，可以实现组件缓存，当组件切换时不会对当前组件进行卸载。
@@ -5729,6 +6038,122 @@ export default {
   },
 };
 ```
+### 动态组件有什么好处？
+
+动态组件：是 Vue 中一个特殊的 Html 元素：`<component>`，它拥有一个特殊的 `is` 属性，属性值可以是已注册组件的名称 或 一个组件的选项对象，它是用于不同组件之间进行动态切换的。
+
+Vue 中有个动态组件的概念，它能够帮助开发者更好的实现组件之间的切换，但是动态组件在切换的过程中，组件的实例都是重新创建的，而在面对需求频繁的变化，要频繁的切换组件时，我们就需要保留组件的状态来节约性能。
+
+为了解决组件频繁切换造成性能浪费问题，需要使用到 Vue 中内置组件`<keep-alive>`,使用`<keep-alive></keep-alive>` 包裹动态组件时，会缓存不活动的组件实例,主要用于保留组件状态或避免重新渲染。
+```js
+// 组件的切换方式
+// 方式一: 使用 v-if和v-else
+// 变量flag为true时显示comp-a组件 ,相反则显示comp-b组件
+<comp-a v-if="flag"></comp-a>
+<comp-b v-else></comp-b>
+
+
+
+
+// 方式二:使用内置组件:<component></component>
+// 点击切换登录,注册,退出组件
+<template>
+ <div>
+    <a href="#" @click.prevent="comName = 'login'">登录</a>
+    <a href="#" @click.prevent="comName = 'register'">注册</a>
+    <a href="#" @click.prevent="comName = 'logOut'">退出</a>
+    //  <component></component> 来展示对应名称的组件,相当于一个占位符
+    //    :is 属性指定 组件名称
+  <component :is="comName"></component>
+  </div>
+</template>
+
+
+
+
+
+// 方式三 : vue-router
+// 路由规则:
+  {
+    path: '/login',
+    name: 'login',
+    component: () => import('../views/login.vue')
+  },
+  {
+    path: '/register',
+    name: 'register',
+    component: () => import('../views/register.vue')
+  },
+
+  // 需要展示组件的位置:
+   <router-view />
+```
+### Vue初始化页面闪动问题如何解决？
+出现该问题是因为在 Vue 代码尚未被解析之前，尚无法控制页面中 DOM 的显示，所以会看见模板字符串等代码。 
+
+解决方案是，在 `css` 代码中添加`v-cloak`规则，同时在待编译的标签上添加 `v-cloak` 属性
+```vue
+<style>
+  [v-cloak] {
+    display: none;
+  }
+</style>
+<div v-cloak>
+  {{ message }}
+</div>
+
+//或者组件用 template 包裹起来
+<template></template>
+```
+
+### v-if 和 v-show 的区别
+v-show 和 v-if 都是用来显示隐藏元素，v-if还有一个v-else配合使用，两者达到的效果都一样，性能方面去有很大的区别。
+
+- v-show
+  - v-show通过CSS display控制显示和隐藏
+  - 而 v-show 有更高的初始渲染开销。
+  - v-show 不管条件是真还是假，第一次渲染的时候都会编译出来，也就是标签都会添加到 DOM 中。
+  - 之后切换的时候，通过 display: none;样式来显示隐藏元素。可以说只是改变 css 的样式，几乎不会影响什么性能。
+  - 如果需要非常频繁地切换，则使用 v-show 较好；
+
+- v-if
+  - v-if组件真正的渲染和销毁，而不是显示和隐藏
+  - v-if 有更高的切换开销 
+  - 在首次渲染的时候，如果条件为假，什么也不操作，页面当作没有这些元素。
+  - 当条件为真的时候，开始局部编译，动态的向 DOM 元素里面添加元素。当条件从真变为假的时候，开始局部编译（编译会被缓存起来），卸载这些元素，也就是删除。
+  - 如果在运行时条件很少改变，则使用 v-if 较好。
+
+- 频繁切换显示状态用v-show，否则用v-if
+- 性能方面
+  - v-if 绝对是更消耗性能的，因为 v-if 在显示隐藏过程中有 DOM 的添加和删除，v-show 就简单多了，只是操作 css。
+- 闪烁问题
+  - 用 v-if 或者 v-show 就会出现 div 闪现，或者部分闪烁的结果。解决方法：可以在根元素添加 v-cloak 来解决，并且设置它的 css 样式即可。
+```vue
+  <style>
+  /* 在引入的css文件中写入这个*/
+  [v-cloak]{
+    display: none;
+  }
+  </style>
+  <body>
+  <!-- 添加这个v-cloak -->
+  <div id='app' v-cloak>
+    <div v-if="isShow">
+    content
+    </div>
+  </div>
+  </body>
+  <script>
+  new Vue({
+    el: '#app',
+    data () {
+        return {
+            isShow: false
+        }
+    }
+  })
+  </script>
+```
 ### v-for和v-if不建议用在一起
 #### Vue2.0
 - 当 v-for 和 v-if 处于同一个节点时，v-for 的优先级比 v-if 更高，这意味着 v-if 将分别重复运行于每个 v-for 循环中。如果要遍历的数组很大，而真正要展示的数据很少时，这将造成很大的性能浪费
@@ -5739,6 +6164,7 @@ export default {
 - 缓存，data不变不会重新计算
 - 提高性能
 ### computed和watch有何区别？
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228131937.png)
 - 1.computed是依赖已有的变量来计算一个目标变量，大多数情况都是多个变量凑在一起计算出一个变量，并且computed具有缓存机制，依赖值不变的情况下其会直接读取缓存进行复用，computed不能进行异步操作
 - 2.watch是监听某一个变量的变化，并执行相应的回调函数，通常是一个变量的变化决定多个变量的变化，watch可以进行异步操作
 - 3.简单记就是：一般情况下computed是多对一，watch是一对多
@@ -5781,6 +6207,7 @@ function makeIndexByKey(children) {
 let map = makeIndexByKey(oldCh);
 ```
 ### SSR
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228134023.png)
 #### 什么是 SSR
 SSR 是 Server Side Render 简称，叫服务端渲染。
 #### SSR 原理
@@ -5809,7 +6236,12 @@ SSR 是 Server Side Render 简称，叫服务端渲染。
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211113165452.png)
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211113164555.png)
-### ???minxin
+### SPA
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228125529.png)
+### assets和static的区别
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228133805.png)
+### minxin
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228162637.png)
 - 多个组件有相同的逻辑，抽离出来
 - mixin并不是完美的解决方案，会有一些问题
     - 混入，相同的属性，地方会自动混合合并
@@ -5817,6 +6249,137 @@ SSR 是 Server Side Render 简称，叫服务端渲染。
     - 对个mixin可能会造成命名冲突
     - mixin和组件可能出现多对多的关系，复杂度较高
 - Vue3 提出的Composition API皆在解决这些问题
+### mixin原理和合并策略
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228190757.png)
+
+### Vue的性能优化有哪些
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228134151.png)
+### Vue的首屏加载性能优化有哪些
+#### 长列表性能优化
+1. 不做响应式
+比如会员列表、商品列表之类的，只是纯粹的数据展示，不会有任何动态改变的场景下，就不需要对数据做响应化处理，可以大大提升渲染速度。
+
+比如使用 Object.freeze() 冻结一个对象，MDN的描述是 该方法冻结的对象不能被修改；即不能向这个对象添加新属性，不能删除已有属性，不能修改该对象已有属性的可枚举性、可配置性、可写性，以及不能修改已有属性的值，以及该对象的原型也不能被修改。
+2. 虚拟滚动
+如果是大数据很长的列表，全部渲染的话一次性创建太多 DOM 就会非常卡，这时就可以用虚拟滚动，只渲染少部分(含可视区域)区域的内容，然后滚动的时候，不断替换可视区域的内容，模拟出滚动的效果。
+
+原理是监听滚动事件，动态更新需要显示的 DOM，并计算出在视图中的位移，这也意味着在滚动过程需要实时计算，有一定成本，所以如果数据量不是很大的情况下，用普通的滚动就行。
+#### v-for 遍历避免同时使用 v-if
+在 Vue2 中 v-for 优先级更高，所以编译过程中会把列表元素全部遍历生成虚拟 DOM，再来通过 v-if 判断符合条件的才渲染，就会造成性能的浪费，因为我们希望的是不符合条件的虚拟 DOM都不要生成。
+
+在 Vue3 中 v-if 的优先级更高，就意味着当判断条件是 v-for 遍历的列表中的属性的话，v-if 是拿不到的。
+#### 列表使用唯一 key
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228200315.png)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228200332.png)
+#### 使用 v-show 复用 DOM
+v-show：是渲染组件，然后改变组件的 display 为 block 或 none
+v-if：是渲染或不渲染组件
+所以对于可以频繁改变条件的场景，就使用 v-show 节省性能，特别是 DOM 结构越复杂收益越大
+不过它也有劣势，就是 v-show 在一开始的时候，所有分支内部的组件都会渲染，对应的生命周期钩子函数都会执行，而 v-if 只会加载判断条件命中的组件，所以需要根据不同场景使用合适的指令
+
+原理就是使用 v-if 当条件变化的时候，触发 diff 更新，发现新旧 vnode 不一致，就会移除整个旧的 vnode，再重新创建新的 vnode，然后创建新的 my-components 组件，又会经历组件自身初始化，render，patch 等过程，而 v-show 在条件变化的时候，新旧 vnode 是一致的，就不会执行移除创建等一系列流程。
+#### 变量本地化
+简单说就是把会多次引用的变量保存起来，因为每次访问 this.xx 的时候，由于是响应式对象，所以每次都会触发 getter，然后执行依赖收集的相关代码，如果使用变量次数越多，性能自然就越差
+从需求上说在一个函数里一个变量执行一次依赖收集就够了，可是很多人习惯性的在项目中大量写 this.xx，而忽略了 this.xx 背后做的事，就会导致性能问题了
+
+```js
+<template>
+  <div :style="{ opacity: number / 100 }"> {{ result }}</div>
+</template>
+<script>
+import { someThing } from '@/utils'
+export default {
+  props: ['number'],
+  computed: {
+    base () { return 100 },
+    result () {
+      let base = this.base, number = this.number // 保存起来
+      for (let i = 0; i < 1000; i++) {
+        number += someThing(base) // 避免频繁引用 this.xx
+      }
+      return number
+    }
+  }
+}
+</script>
+```
+#### 子组件分割
+```js
+<template>
+  <div :style="{ opacity: number / 100 }">
+    <div>{{ someThing() }}</div>
+  </div>
+</template>
+<script>
+export default {
+  props:['number'],
+  methods: {
+    someThing () { /* 耗时任务 */ }
+  }
+}
+</script>
+```
+上面这样的代码中，每次父组件传过来的 number 发生变化时，每次都会重新渲染，并且重新执行 someThing 这个耗时任务。所以优化的话一个是用计算属性，因为计算属性自身有缓存计算结果的特性。
+
+
+第二个是拆分成子组件，因为 Vue 的更新是组件粒度的，虽然第次数据变化都会导致父组件的重新渲染，但是子组件却不会重新渲染，因为它的内部没有任何变化，耗时任务自然也就不会重新执行，因此性能更好，优化代码如下。
+```js
+<template>
+  <div>
+    <my-child />
+  </div>
+</template>
+<script>
+export default {
+  components: {
+    MyChild: {
+      methods: {
+        someThing () { /* 耗时任务 */ }
+      },
+      render (h) {
+        return h('div', this.someThing())
+      }
+    }
+  }
+}
+</script>
+```
+
+
+#### 第三方插件按需引入
+比如 Element-UI 这样的第三方组件库可以按需引入避免体积太大，特别是项目不大的情况下，更没有必要完整引入组件库。
+#### 路由懒加载
+我们知道 Vue 是单页应用，所以如果没有用懒加载，就会导致进入首页时需要加载的内容过多，时间过长，就会出现长时间的白屏，很不利于用户体验，SEO 也不友好
+所以可以去用懒加载将页面进行划分，需要的时候才加载对应的页面，以分担首页的加载压力，减少首页加载时间
+####  keep-alive缓存页面
+比如在表单输入页面进入下一步后，再返回上一步到表单页时要保留表单输入的内容、比如在列表页>详情页>列表页，这样来回跳转的场景等
+我们都可以通过内置组件 `<keep-alive></keep-alive>` 来把组件缓存起来，在组件切换的时候不进行卸载，这样当再次返回的时候，就能从缓存中快速渲染，而不是重新渲染，以节省性能
+#### 事件的销毁
+Vue 组件销毁时，会自动解绑它的全部指令及事件监听器，但是仅限于组件本身的事件。
+而对于定时器、 addEventListener 注册的监听器等，就需要在组件销毁的生命周期钩子中手动销毁或解绑，以避免内存泄露。
+```js
+<script>
+export default {
+    created() {
+      this.timer = setInterval(this.refresh, 2000)
+      addEventListener('touchmove', this.touchmove, false)
+    },
+    beforeDestroy() {
+      clearInterval(this.timer)
+      this.timer = null
+      removeEventListener('touchmove', this.touchmove, false)
+    }
+}
+</script>
+```
+#### 图片懒加载
+图片懒加载就是对于有很多图片的页面，为了提高页面加载速度，只加载可视区域内的图片，可视区域外的等到滚动到可视区域后再去加载。
+### 父子组件嵌套时，父组件和子组件生命周期钩子执行顺序是什么？
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228135731.png)
+### 父子组件嵌套时，父组件视图和子组件视图谁先完成渲染？
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228141227.png)
+### keep-alive 中的生命周期哪些
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228141247.png)
 ### 总结
 - 响应式：监听data属性getter setter
 - 模板编译：模板到render函数，再到vnode

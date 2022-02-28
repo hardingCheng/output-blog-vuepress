@@ -7,6 +7,8 @@ categories:
   - VueRouter
 ---
 ## VueRouter
+### Vue-router跳转和location.href有什么区别
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228163821.png)
 ### VueRouter 路由钩子函数
 - 全局守卫
 - 路由守卫
@@ -21,6 +23,7 @@ categories:
 组件内的路由钩子函数：beforeRouteEnter、beforeRouteLeave、beforeRouteUpdate
 ```
 ### VueRouter 的 router 和 route 的区别?
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228163519.png)
 - $route 对象
   - $route 对象表示当前的路由信息，包含了当前 URL 解析得到的信息。包含当前的路径，参数，query 对象等。
   - $route.path 字符串，对应当前路由的路径，总是解析为绝对路径，如"/foo/bar"。
@@ -61,6 +64,20 @@ categories:
   - 利用了 HTML5 History Interface 中新增的 pushState()（客户端） 和 replaceState() 方法。
   - 这两个方法应用于浏览器的历史记录站，在当前已有的 back、forward、go 的基础之上，它们提供了对历史记录进行修改的功能。
   - 这两个方法有个共同的特点：当调用他们修改浏览器历史记录栈后，虽然当前 URL 改变了，但浏览器不会刷新页面，这就为单页应用前端路由“更新视图但不重新请求页面”提供了基础。
+### vue-router的路由模式有几种？
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228163035.png)
+- hash
+    - 原理是onhashchage事件，可以在window对象上监听这个事件
+- history
+    - 利用了HTML5 History Interface 中新增的pushState()和replaceState()方法。
+    - 需要后台配置支持。如果刷新时，服务器没有响应响应的资源，会刷出404
+```js
+window.onhashchange = function(event){
+  console.log(event.oldURL, event.newURL)
+  let hash = location.hash.slice(1)
+}
+```
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228163406.png)
 ### VueRouter 中路由方法 pushState 和 replaceState 能否触发 popSate 事件
 - 不能
 - HTML5 新接口，可以改变网址(存在跨域限制)而不刷新页面，这个强大的特性后来用到了单页面应用
@@ -98,11 +115,13 @@ window.history.replaceState(state, title, targetURL);
 - router.go(n)
   - 这个方法的参数是一个整数，意思是在 history 记录中向前或者后退多少步，类似 window.history.go(n)。
 ### VueRouter 添加参数
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228163900.png)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228163648.png)
 - VueRouter 传递参数
   - 编程式的导航 router.push
     - this.$router.push({ name: 'news', params: { userId: 123 }})
       - 命名路由搭配 params，刷新页面参数会丢失
-    - this.\$router.push({ path: '/news', query: { userId: 123 }});
+    - this.$router.push({ path: '/news', query: { userId: 123 }});
       - 查询参数搭配 query，刷新页面数据不会丢失
   - 声明式的导航 `<router-link>`
     - `<router-link :to="{ name: 'news', params: { userId: 1111}}">click to news page</router-link>`
@@ -114,6 +133,39 @@ query 和 params 的区别：
 
 params 传参只能由 name 引入路由，如果写成 path 页面会显示 undefined 报错。
 query 传参的话可以使用 path 也可以使用 name 引入路由，不过建议使用 path 引入路由。
+```
+### vue-router 传参
+- Params
+    - 只能使用name，不能使用path
+    - 参数不会显示在路径上
+    - 浏览器强制刷新参数会被清空，
+- Query:
+    - 参数会显示在路径上，刷新不会被清空
+    - name 可以使用path路径
+```js
+  // 传递参数
+  this.$router.push({
+    name: Home，
+    params: {
+    	number: 1 ,
+    	code: '999'
+  	}
+  })
+  // 接收参数
+  const p = this.$route.params
+```
+```js
+// 传递参数
+this.$router.push({
+  name: Home，
+  query: {
+  number: 1 ,
+  code: '999'
+}
+                  })
+// 接收参数
+const q = this.$route.query
+
 ```
 ### location.href 和 VueRouter 的区别
 - vue-router 使用 pushState 进行路由更新，静态跳转，页面不会重新加载；location.href 会触发浏览器，页面重新加载一次

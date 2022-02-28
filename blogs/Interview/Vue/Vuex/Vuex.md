@@ -7,12 +7,16 @@ categories:
   - Vuex
 ---
 ## Vuex
+### Vuex 的原理
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228164031.png)
 ### Vuex理解
 - vue 一般是单项数据流，当我们的应用遇到多个组件共享状态时，单向数据流的简洁性很容易被破坏：
     - 多个视图依赖于同一状态、来自不同视图的行为需要变更同一状态。
     - 作用：多个组件共享数据或者是跨组件传递数据
 - vuex 是专门为 vue 提供的全局状态管理系统，用于多个组件中数据共享、数据缓存等。（无法持久化、内部核心原理是通过创造一个全局实例 new Vue）
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211015154102.png)
+### Vuex有哪几种属性
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228164140.png)
 ### Vuex数据流向？
 1. Components 收集用户反馈触发 Actions,Actions 是负责处理从 Vue Components 接收到的用户行为的模块。
    1. 调用其他 action
@@ -20,7 +24,12 @@ categories:
 2. Actions 提交（commit）Mutations，请求修改 State
 3. Mutation 同步修改 State
 4. State 改变后重新渲染（Render）Components
+### Vuex和单纯的全局对象有什么区别？
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228164259.png)
 ### 为什么 Vuex 的 mutation 中不能做异步操作？
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228164819.png)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228164725.png)
+
 Vuex 中所有的状态更新的唯一途径都是 mutation，异步操作通过 Action 来提交 mutation 实现，这样使得我们可以方便地跟踪每一个状态的变化，从而让我们能够实现一些工具帮助我们更好地了解我们的应用。 每个 mutation 执行完成后都会对应到一个新的状态变更，这样 devtools 就可以打个快照存下来，然后就可以实现 time-travel 了。如果 mutation 支持异步操作，就没有办法知道状态是何时更新的，无法很好的进行状态的追踪，给调试带来困难。
 ### Vuex 页面刷新数据丢失怎么解决
 需要做 vuex 数据持久化 一般使用本地存储的方案来保存数据 可以自己设计存储方案 也可以使用第三方插件。
@@ -58,6 +67,8 @@ actions:{
     }
 }
 ```
+### Vuex 和 localStorage 的区别
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228165037.png)
 ### Vuex 是怎么实现的？
 
 install 函数：用来注册插件到 vue 里（说白了就是在 vue 中执行这个函数，并把 vue 当作参数传入此函数，使用 vue 的方法和绑定 store 到各个组件上）
