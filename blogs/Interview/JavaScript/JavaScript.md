@@ -690,7 +690,6 @@ console.log(c); // Uncaught TypeError: Assignment to constant variable
 ### JS 数据类型
 值类型（7 个）：Undefined、Null、Number、String、Boolean、Symbol(ES6)、BigInt(ES10)
 引用类型：Object
-
 - Javascript 中的数据类型包括原始类型和引用类型。其中原始类型包括 null、undefined、boolean、string、symbol、bigInt、number。
   - 基本类型的访问是按值访问的，就是说你可以操作保存在变量中的实际的值。
   - 基本类型的变量是存放在栈区的（栈区指内存里的栈内存）
@@ -1833,6 +1832,8 @@ name = "jack"; //执行阶段处理
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220209110157.png)
 
 ### 闭包
+闭包的两大作用：保存和保护。
+
 只要希望给一个函数，保存一个即可反复使用，又不会被外界污染的专属局部变量时，就用闭包。
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220209120202.png)
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220209120513.png)
@@ -6623,6 +6624,10 @@ Event Loop 即事件循环，是指浏览器或 Node 的一种解决 javaScript 
 2. 当执行栈中任务执行完，再去检查微任务队列里的微任务是否为空，有就执行，如果执行微任务过程中又遇到微任务，就添加到微任务队列末尾继续执行，把微任务全部执行完。
 3. 微任务执行完后，再到任务队列检查宏任务是否为空，有就取出最先进入队列的宏任务压入执行栈中执行其同步代码。
 4. 然后回到第2步执行该宏任务中的微任务，如此反复，直到宏任务也执行完，如此循环。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220302121754.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220302121854.png)
 
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20210926210917.png)
 

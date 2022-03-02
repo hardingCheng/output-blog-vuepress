@@ -1319,6 +1319,7 @@ clear 清除浮动
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220208161211.png)
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220208161230.png)
 #### BFC的规则
+  内部的Box会在垂直方向，一个接一个地放置。
 1. 垂直方向的距离由margin决定， 属于同一个`BFC`的两个相邻的标签外边距会发生重叠。属于同一个BFC的两个相邻块元素在垂直方向上的margin会发生重叠/合并。但水平方向的margin不会（给其中一个元素增加一个父级，然后让他的父级触发BFC）
 2. 左侧BFC渲染区域的margin，必须与右侧BFC渲染区域的margin相衔接，不能出现重叠
 3. BFC的区域不会与浮动元素的box重叠(浮动元素不会覆盖到触发 BFC 元素上)。清除浮动布局，阻止同级元素被浮动元素覆盖。（非浮动元素触发了BFC,阻止元素被浮动元素覆盖原理）
@@ -1701,6 +1702,18 @@ clear 清除浮动
   flexbox：有兼容性，其他的都挺好的；
   表格布局：兼容性好；
   网格布局：有兼容性
+### 清除浮动的方案
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220302142515.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220302142539.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220302142716.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220302142753.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220302142910.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220302142938.png)
 ### 你知道哪些清除浮动的方案？每种方案的有什么优缺点?
 
 - 给外部盒子也添加浮动
@@ -1776,7 +1789,7 @@ clear 清除浮动
   5. `table 布局`，父级通过转换成表格形式，`然后子级设置 vertical-align 实现`。（需要注意的是：vertical-align: middle使用的前提条件是内联元素以及display值为table-cell的元素）。
 
 #### 水平居中
-
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220302101807.png)
 `单行的文本、inline 或 inline-block 元素`
 此类元素需要水平居中，则父级元素必须是块级元素(block level)，且父级元素上需要这样设置样式：
 
@@ -3369,7 +3382,7 @@ body,html {
   - 单冒号 (:)表示伪类
 
 ### CSS 选择器的优先级
-
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220301211530.png)
 第一优先级：!important 会覆盖页面内任何位置的元素样式 1.内联样式，如 style="color: green"，权值为 1000
 2.ID 选择器，如#app，权值为 0100 3.类、伪类、属性选择器，如.foo, :first-child, div[class="foo"]，权值为 0010 4.标签、伪元素选择器，如 div::first-line，权值为 0001 5.通配符、子类选择器、兄弟选择器，如\*, >, +，权值为 0000 6.继承的样式没有权值
 

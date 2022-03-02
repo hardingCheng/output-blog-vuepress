@@ -1971,6 +1971,9 @@ this.$nextTick(() => {
 })
 ```
 ### nextTick 实现原理
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220302133656.png)
+
+
 nextTick 中的回调是在下次 DOM 更新循环结束之后执行的延迟回调。在修改数据之后立即使用这个方法，获取更新后的 DOM。主要思路就是采用微任务优先的方式调用异步方法去执行 nextTick 包装的方法。
 简单的理解是：当数据更新了，在 dom 中渲染后， 自动执行该函数。Vue 实现响应式并不是数据发生变化之后 DOM 立即变化，Vue 是异步执行 DOM 更新的。created 钩子函数进行的 DOM 操作一定要放在Vue.nextTick() 的回调函数中，原因是在函数执行的时候 DOM 其实并未进行任何渲染。常用的场景是在进行获取数据后，需要对新视图进行下一步操作或者其他操作时，发现获取不到 dom。因为赋值操作只完成了数据模型的改变并没有完成视图更新。
 
@@ -4953,6 +4956,11 @@ Block tree 是一个将模版基于动态节点指令切割的嵌套区块，每
 - Vue.js 2.x 中，如果有一个组件传入了slot，那么每次父组件更新的时候，会强制使子组件update，造成性能的浪费。 
 - Vue.js 3.0 优化了slot的生成，使得非动态slot中属性的更新只会触发子组件的更新。 动态slot指的是在slot上面使用v-if，v-for，动态slot名字等会导致slot产生运行时动态变化但是又无法被子组件track的操作。 
 #### diff算法优化
+### Vue3 Diff —— 最长递增子序列
+vue3的diff借鉴于inferno，该算法其中有两个理念。第一个是相同的前置与后置元素的预处理；第二个则是最长递增子序列，此思想与React的diff类似又不尽相同。下面我们来一一介绍。
+#### 前置与后置的预处理
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220301171720.png)
+
 ### Vue3.0是如何变得更快的？（底层，源码）
 ####  diff方法优化
 Vue2.x 中的虚拟dom是进行全量的对比。 Vue3.0 中新增了静态标记（PatchFlag）：在与上次虚拟结点进行对比的时候，值对比带有patch flag的节点，并且可以通过flag 的信息得知当前节点要对比的具体内容化。
@@ -5608,8 +5616,6 @@ Proxy作为新标准将受到浏览器厂商重点持续的性能优化，也就
     - defineProperty 局限性大，只能针对单属性监听，所以在一开始就要全部递归监听。Proxy 对象嵌套属性运行时递归，用到才代理，也不需要维护特别多的依赖关系，性能提升很大，且首次渲染更快
     - defineProperty 会污染原对象，修改时是修改原对象，Proxy 是对原对象进行代理并会返回一个新的代理对象，修改的是代理对象
     - defineProperty 不兼容 IE8，Proxy 不兼容 IE11
-### ？？？？React、Vue2、Vue3的三种Diff算法
-
 ### 简述 MVVM
 什么是 MVVM？
 视图模型双向绑定，是 Model-View-ViewModel 的缩写，也就是把 MVC 中的 Controller 演变成 ViewModel。Model 层代表数据模型，View 代表 UI 组件，ViewModel 是 View 和 Model 层的桥梁，数据会绑定到 ViewModel 层并自动将数据渲染到页面中，视图变化的时候会通知 ViewModel 层更新数据。以前是操作 DOM 结构更新视图，现在是数据驱动视图。
@@ -6384,6 +6390,30 @@ export default {
 - 响应式：监听data属性getter setter
 - 模板编译：模板到render函数，再到vnode
 - vdom：patch(ele,vnode)和patch(vnode,newVnode)
+## React
+### React-Diff
+#### 实现原理
+React的思路是递增法。通过对比新的列表中的节点，在原本的列表中的位置是否是递增，来判断当前节点是否需要移动。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220301170458.png)
+
+在上面的例子中，nextList每个节点在prevList的位置为0 1 2 3。每一项都要比前一项要大，所以不需要移动，这就是react的diff算法的原理。
+#### 找到需要移动的节点
+在上一小节中，我们是通过对比值是否相等，查找的对应位置。但是在vdom中，每一个节点都是一个vNode，我们应该如何进行判断呢？
+
+答案就是key，我们通过对每个节点的key进行赋值，并且让处于同一children数组下的vnode的key都不相同，以此来确定每个节点的唯一性，并进行新旧列表的对比。
+#### 移动节点
+首先我们先明确一点，移动节点所指的节点是DOM节点。vnode.el指向该节点对应的真实DOM节点。patch方法会将更新过后的DOM节点，赋值给新的vnode的el属性。
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220301170939.png)
+#### 添加节点
+我们先来解决第一个问题，找节点还是比较简单的，我们定义一个find变量值为false。如果在旧列表找到了key 相同的vnode，就将find的值改为true。当遍历结束后判断find值，如果为false，说明当前节点为新节点。
+
+找到新节点后，下一步就是插入到哪里了，这里的逻辑其实是和移动节点的逻辑是一样的。我们观察上图可以发现，新的vnode-c是紧跟在vnode-b后面的，并且vnode-b的DOM节点——DOM-B是已经排好序的，所以我们只需要将vnode-c生成的DOM节点插入到DOM-B之后就可以了。
+但是这里有一种特殊情况需要注意，就是新的节点位于新列表的第一个，这时候我们需要找到旧列表第一个节点，将新节点插入到原来第一个节点之前就可以了。
+#### 移除节点
+有增就有减，当旧的节点不在新列表中时，我们就将其对应的DOM节点移除。
+#### 优化与不足
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220301171417.png)
 ## 课程学习
 ### Vue响应式原理准备
 #### 目标
