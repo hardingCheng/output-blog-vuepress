@@ -468,10 +468,58 @@ watch: {
 - Vue的mixin的作用就是抽离公共的业务逻辑，原理类似对象的继承，当组件初始化的时候，会调用mergeOptions方法进行合并，采用策略模式针对不同的属性进行合并。 如果混入的数据和本身组件的数据有冲突，采用本身的数据为准。
 - 缺点：命名冲突、数据来源不清晰
 ### Vue.set方法是如何实现的？
-- vue给对象和数组本身都增加了dep属性
-- 当给对象新增不存在的属性的时候，就会触发对象依赖的watcher去更新
-- 当修改数组索引的时候，就调用数组本身的splice方法去更新数组
+- Vue在初始实例时进行数据绑定，使用了Object.defineProperty()绑定getter和setter,即此时的data中数据进行了双向绑定。那么如果要添加新的属性，便不是响应式。会导致数据变化，页面不变的情况。
+```js
+function set (target: Array<any> | Object, key: any, val: any): any {
+  // 判断当前是否为生产，且是否为空或者是基本数据类型
+  if (process.env.NODE_ENV !== 'production' &&
+    (isUndef(target) || isPrimitive(target))
+  ) {
+    warn(`Cannot set reactive property on undefined, null, or primitive value: ${(target: any)}`)
+  }
+  // 数组
+  // Vue封装过的数组7个方法，push splice等等才会触发页面渲染,这里使用了splice直接触发页面渲染。
+  if (Array.isArray(target) && isValidArrayIndex(key)) {
+    target.length = Math.max(target.length, key)
+    target.splice(key, 1, val)
+    return val
+  }
+  // 对象
+  // 假设key本身就是对象的某个属性，修改既可。例如本身就是data中的属性，修改，会直接触发页面渲染。
+  if (key in target && !(key in Object.prototype)) {
+    target[key] = val
+    return val
+  }
+// 在vue中，如果某个对象存在__ob__属性，那么说明这个对象是响应式的。
+// 如此我们在这里进行__ob__属性的判断是否存在，如果存在，那么说明当前对象是响应式的，修改数据，页面会直接进行渲染。
+ const ob = (target: any).__ob__
+  if (target._isVue || (ob && ob.vmCount)) {
+    process.env.NODE_ENV !== 'production' && warn(
+      'Avoid adding reactive properties to a Vue instance or its root  $data ' +
+      'at runtime - declare it upfront in the data option.'
+    )
+    return val
+  }
+  if (!ob) {
+    target[key] = val
+    return val
+  }
+ // 通过以上的判断之后，可确定数据不是响应式的，即修改值不会渲染页面，所以需要使得其变成响应式的数据。
+   //添加属性依赖
+    defineReactive(ob.value, key, val)
+    //触发当前依赖，即页面重新渲染
+    ob.dep.notify()
+    return val
+ }
+```
 ### Vue.use是干什么的？
+相信很多人在用Vue使用别人的组件时，会用到 Vue.use() 。例如：Vue.use(VueRouter)、Vue.use(MintUI)。但是用 axios时，就不需要用 Vue.use(axios)，就能直接使用。
+
+通过全局方法 Vue.use() 使用插件；我觉得把使用理解成注册更合适一些，首先看下面常见的注册场景。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220303162727.png)
+
+
 Vue.use是用来使用插件的。我们可以在插件中扩展全局组件、指令、原型方法等。 会调用install方法将Vue的构建函数默认传入，在插件中可以使用vue，无需依赖vue库。
 ### watch原理
 `computed`和`watch`内部都是利用了`watcher`，`user watcher`的过程如下：
@@ -2136,13 +2184,17 @@ this.$nextTick().then(()=>{ ... })
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228185920.png)
 
 
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220313164941.png)
+
+
+
+
 Vue的diff算法是平级比较，不考虑跨级比较的情况。内部采用深度递归的方式+双指针方式比较
 - 先比较两个节点是不是相同节点
 - 相同节点比较属性，复用老节点
 - 先比较儿子节点，考虑老节点和新节点儿子的情况
 - 优化比较：头头、尾尾、头尾、尾头
 - 比对查找，进行复用
-
 
 
 
@@ -2177,8 +2229,6 @@ key 在 diff 算法中的角色。key 的特殊 attribute 主要用在 Vue 的�
     - 带key的时候，会基于相同的key来进行排列。（相同的复用）
     - 带key还能触发过渡效果，以及触发组件的生命周期
 - 不带key的速度是更快的。原因有如下：在上述例子中，不带key的省略了销毁和创建dom的开销，只需要替换文本节点就ok了，而带key的却需要进行patch流程，而且需要把能复用的那部分元素找出来，将不能复用的消除，并且重新创建新的dom元素。
-- 
-
 
 
 另外，若不设置key还可能在列表更新时候引发一些隐藏的bug。
@@ -2208,6 +2258,8 @@ vue中在使用相同标签名元素的过渡切换时，也会使用到key属�
 
 ### Keep-alive的作用？使用keep-alive的组件如何监控组件切换？
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228152144.png)
+
+max定义缓存组件上限，超出上限使用LRU的策略置换缓存数据。
 ### v-if、v-show、v-html 的原理
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228160618.png)
 
@@ -4961,6 +5013,567 @@ vue3的diff借鉴于inferno，该算法其中有两个理念。第一个是相�
 #### 前置与后置的预处理
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220301171720.png)
 
+### Vue3 Diff
+- 先比较两个节点是不是相同节点
+- 相同节点比较属性，复用老节点
+- 先比较儿子节点，考虑老节点和新节点儿子的情况
+
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220313165710.png)
+
+
+#### diff 无key子节点
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220313165906.png)
+```js
+const patchUnkeyedChildren = (c1, c2,...res) => {
+    c1 = c1 || EMPTY_ARR
+    c2 = c2 || EMPTY_ARR
+    // 获取新旧子节点的长度
+    const oldLength = c1.length
+    const newLength = c2.length
+    // 1. 取得公共长度。最小长度
+    const commonLength = Math.min(oldLength, newLength)
+    let i
+    // 2. patch公共部分
+    for (i = 0; i < commonLength; i++) { 
+      patch(...)
+    }
+    // 3. 卸载旧节点
+    if (oldLength > newLength) {
+      // remove old
+      unmountChildren(...)
+    } else {
+      // mount new
+      // 4. 否则挂载新的子节点
+      mountChildren(...)
+    }
+  }
+```
+#### diff 有key子节点序列
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220313170034.png)
+```js
+let i = 0
+const l2 = c2.length
+let e1 = c1.length - 1 // prev ending index
+let e2 = l2 - 1 // next ending index
+```
+
+**起始位置节点类型相同**
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220313170149.png)
+```js
+//  i <= 2 && i <= 3
+while (i <= e1 && i <= e2) {
+  const n1 = c1[i]
+  const n2 = c2[i]
+  if (isSameVNodeType(n1, n2)) {
+    // 如果是相同的节点类型，则进行递归patch
+    patch(...)
+  } else {
+    // 否则退出
+    break
+  }
+  i++
+}
+```
+**结束位置节点类型相同**
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220313170252.png)
+```js
+//  i <= 2 && i <= 3
+// 结束后： e1 = 0 e2 =  1
+while (i <= e1 && i <= e2) {
+  const n1 = c1[e1]
+  const n2 = c2[e2]
+  if (isSameVNodeType(n1, n2)) {
+    // 相同的节点类型
+    patch(...)
+  } else {
+    // 否则退出
+    break
+  }
+  e1--
+  e2--
+}
+```
+**相同部分遍历结束，新序列中有新增节点，进行挂载**
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220313170410.png)
+```js
+// 3. common sequence + mount
+// (a b)
+// (a b) c
+// i = 2, e1 = 1, e2 = 2
+// (a b)
+// c (a b)
+// i = 0, e1 = -1, e2 = 0
+if (i > e1) {
+  if (i <= e2) {
+    const nextPos = e2 + 1
+    // nextPos < l2，说明有已经patch过尾部节点，
+    // 否则会获取父节点作为锚点
+    const anchor = nextPos < l2 ? c2[nextPos].el : parentAnchor
+    while (i <= e2) {
+      patch(null, c2[i], anchor, ...others)
+      i++
+    }
+  }
+}
+```
+**相同部分遍历结束，新序列中少节点，进行卸载**
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220313170841.png)
+```js
+// 4. common sequence + unmount
+// (a b) c
+// (a b)
+// i = 2, e1 = 2, e2 = 1
+// a (b c)
+// (b c)
+// i = 0, e1 = 0, e2 = -1
+// 公共序列 卸载旧的
+else if (i > e2) {
+  while (i <= e1) {
+    unmount(c1[i], parentComponent, parentSuspense, true)
+    i++
+  }
+}
+通过代码可以知道，这种情况下，会递增i指针，对旧节点进行卸载。
+```
+**乱序情况**
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220313171032.png)
+
+**乱序的情况 ---- 建立新节点 key 与其下标的映射**
+
+首先，Vue先将新节点数组进行遍历，将它们有key值的节点与其在新节点数组中的下标建立映射，存储在keyToNewIndexMap中，方便在复用时查找：
+
+```js
+const s1 = i // prev starting index
+const s2 = i // next starting index
+
+// 5.1 build key:index map for newChildren
+// 5.1 生成一个key map
+const keyToNewIndexMap = new Map()
+
+// 遍历新节点，乱序的部分，将这些具有key的节点存入map
+for (i = s2; i <= e2; i++) {
+  const nextChild = c2[i]
+  if (nextChild.key != null) {
+    keyToNewIndexMap.set(nextChild.key, i)
+  }
+}
+```
+
+**乱序的情况 ---- 移除新节点队列中不存在的旧节点并更新复用节点**
+
+之后，遍历旧节点数组，通过刚刚建立的Map，如果当前旧节点再新节点数组中已经不存在了，那么说明要移除了。
+
+整个过程比较复杂，因为要预先做处理，为后续是否需要移动节点做准备：
+
+```js
+// 5.2 loop through old children left to be patched and try to patch
+// matching nodes & remove nodes that are no longer present
+// 5.2 遍历旧节点，patch匹配的节点，移除不再在节点
+let j
+
+// 当前处理过的节点数
+let patched = 0
+
+// 需要patch的节点数
+const toBePatched = e2 - s2 + 1
+
+// 是否需要移动节点
+let moved = false
+
+// used to track whether any node has moved
+// 记录节点是否已经移动
+let maxNewIndexSoFar = 0
+
+// works as Map<newIndex, oldIndex>
+// Note that oldIndex is offset by +1
+// and oldIndex = 0 is a special value indicating the new node has
+// no corresponding old node.
+// 注意旧下标的值都会+1，因为0表示没有对应的旧节点
+// used for determining longest stable subsequence
+// 新下标与旧下标的map
+// 这里的新下标以s2位置为0下标，而旧下标为旧下标值 +１
+const newIndexToOldIndexMap = new Array(toBePatched)
+
+// 初始化值为0
+for (i = 0; i < toBePatched; i++) newIndexToOldIndexMap[i] = 0
+```
+
+moved变量则是表示是否有节点需要移动，其判定要基于maxNewIndexSoFar的值。
+
+maxNewIndexSoFar表示当前可复用节点距离s2(即第一个乱序节点的最远距离)。如果有对应可以复用的节点，那么在每次迭代处理节点时，如果当前节点所处位置距离s2距离超过maxNewIndexSoFar，那么maxNewIndexSoFar会更新为当前节点在新队列中的下标；当其小于maxNewIndexSoFar时，就会标记moved = true。
+
+```js
+// 判断是否需要移动当前节点，想象一下，如果每个节点都按序递增，
+// 那么每次都会进入该if语句
+if (newIndex >= maxNewIndexSoFar) {
+  // 当前节点未移动，更新下标
+  maxNewIndexSoFar = newIndex
+
+  // 如果进入该else语句说明有节点之前节点交叉了
+} else {
+  moved = true
+}
+```
+
+想象一下，如果节点在新旧序列中，都是按照相同的顺序递增，那么maxNewIndexSoFar也会一直递增，即每次迭代newIndex >= maxNewIndexSoFar，那么就不需要移动节点；但是如果某次迭代，newIndex < maxNewIndexSoFar，那么说明当前节点由之前靠后的位置移动了现在靠前的位置。
+
+理解了这个道理，现在我们可以正式看看这段代码了。由于要卸载节点，那么本次遍历要以s1 <-> e1之间的节点为基准进行遍历，整体遍历代码如下
+```js
+// 遍历旧节点
+for (i = s1; i <= e1; i++) {
+  // 当前下标的旧节点
+  const prevChild = c1[i]
+
+  // 当前patch的节点数超过新节点中要patch的总数时，执行unmount操作
+  // 直接进行卸载操作，因为多余的节点不需要了
+  if (patched >= toBePatched) {
+    // all new children have been patched so this can only be a removal
+    unmount(prevChild)
+    continue
+  }
+
+  // 尝试寻找是否有对于的新节点
+  let newIndex
+
+  // 旧节点具有key时，获取相同key值节点所处的下标
+  if (prevChild.key != null) {
+    newIndex = keyToNewIndexMap.get(prevChild.key)
+
+    // 没有key时则找相同类型的节点是否存在
+  } else {
+    // key-less node, try to locate a key-less node of the same type
+    // 当前查找范围为新节点中需要patch的节点之间
+    for (j = s2; j <= e2; j++) {
+      if (
+        // 0表示对应下标下当前还未有节点(注意当前是以s2为0下标基准)
+        // 这里确认当前新下标位置未有对应的旧下标，防止是已在map中的节点
+
+        newIndexToOldIndexMap[j - s2] === 0 &&
+        isSameVNodeType(prevChild, c2[j])
+      ) {
+        newIndex = j
+        break
+      }
+    }
+  }
+
+  // 没找到对应节点时说明该节点已经不存在了，直接进行unmount
+  if (newIndex === undefined) {
+    unmount(prevChild)
+
+    // 找到时进行位置移动操作，并patch
+  } else {
+    // 将旧节点位置下标+1后存入，新节点以s2为起点，即0坐标
+    newIndexToOldIndexMap[newIndex - s2] = i + 1
+
+    // 判断是否需要移动当前节点，想象一下，如果每个节点都按序递增，
+    // 那么每次都会进入该if语句
+    if (newIndex >= maxNewIndexSoFar) {
+      // 当前节点未移动，更新下标
+      maxNewIndexSoFar = newIndex
+
+      // 如果进入该else语句说明有节点之前节点交叉了
+    } else {
+      moved = true
+    }
+
+    // patch该节点
+    patch(prevChild, c2[newIndex])
+    patched++
+  }
+}
+```
+首先当当前可复用的节点复用时，会使patched值+1，当复用的节点超过乱序的新节点长度时，那么其余的节点肯定是要卸载的节点(因为新节点序列都处理完毕了)：
+
+```js
+if (patched >= toBePatched) {
+    // all new children have been patched so this can only be a removal
+    unmount(prevChild)
+    continue
+  }
+```
+
+之后，Vue尝试寻找一下当前旧节点是否被复用，即它被移动到了新节点序列的其他位置。首先如果当前节点有key值，那么其会尝试直接从刚刚的keyToNewIndexMap中查找；如果没有找到，那么其会遍历当前所有的新节点序列，依次对比是否与当前节点相同，在复合同类型节点时对其进行复用。
+
+```js
+// 尝试寻找是否有对于的新节点
+let newIndex
+
+// 旧节点具有 key 时，获取相同 key 值节点所处的下标
+if (prevChild.key != null) {
+  newIndex = keyToNewIndexMap.get(prevChild.key)
+
+  // 没有key时则找相同类型的节点是否存在
+} else {
+  // key-less node, try to locate a key-less node of the same type
+  // 当前查找范围为新节点中需要 patch 的节点之间
+  for (j = s2; j <= e2; j++) {
+    if (
+      // 0 表示对应下标下当前还未有节点(注意当前是以 s2 为 0 下标基准)
+      // 这里确认当前新下标位置未有对应的旧下标，防止是已在 map 中的节点
+      newIndexToOldIndexMap[j - s2] === 0 &&
+      isSameVNodeType(prevChild, c2[j])
+    ) {
+      newIndex = j
+      break
+    }
+  }
+}
+```
+在直接通过类型查找复用节点时，其存在一个newIndexToOldIndexMap[j - s2] === 0条件，它表示当前新节点下标未有对应的旧节点(0表示没有，在之后的代码中，如果查找到对应的newIndex，其会存入newIndexToOldIndexMap中)。这样可以防止新旧节点被重复复用或已被处理再次被处理。
+
+到此，对于旧节点的newIndex是否被查找到就会出现两种情况了：
+- 没有，说明当前节点已删除了，移除该DOM节点
+- 有，复用，更新节点属性
+```js
+// 没找到对应节点时说明该节点已经不存在了，直接进行unmount
+if (newIndex === undefined) {
+  unmount(prevChild)
+
+  // 找到时进行位置移动操作，并patch
+} else {
+  // 将旧节点位置下标+1后存入，新节点以s2为起点，即0坐标
+  newIndexToOldIndexMap[newIndex - s2] = i + 1
+
+  // 判断是否需要移动当前节点，想象一下，如果每个节点都按序递增，
+  // 那么每次都会进入该if语句
+  if (newIndex >= maxNewIndexSoFar) {
+    // 当前节点未移动，更新下标
+    maxNewIndexSoFar = newIndex
+
+    // 如果进入该else语句说明有节点之前节点交叉了
+  } else {
+    moved = true
+  }
+
+  // patch该节点
+  patch(prevChild, c2[newIndex])
+  patched++
+}
+```
+在复用的情况下，有我们刚刚提到的计算节点交叉(是否需要移动)的场景：
+```js
+// 判断是否需要移动当前节点，想象一下，如果每个节点都按序递增，
+// 那么每次都会进入该if语句
+if (newIndex >= maxNewIndexSoFar) {
+  // 当前节点未移动，更新下标
+  maxNewIndexSoFar = newIndex
+
+  // 如果进入该else语句说明有节点之前节点交叉了
+} else {
+  moved = true
+}
+```
+**乱序的情况 ---- 处理新增节点与移动的节点**
+到此为止，就只有新增节点与移动节点的情况没有处理了。
+
+首先其会需要移动节点时(moved = true)根据刚刚创建的newIndexToOldIndexMap生成一个最长递增的新节点序列increasingNewIndexSequence。
+
+```js
+// 5.3 move and mount
+// 5.3 移动与mount
+// generate longest stable subsequence only when nodes have moved
+// 有节点需要移动，生成长期稳定的子序列，仅对移动过的节点处理
+const increasingNewIndexSequence = moved
+  ? // 获取最长递增子序列的下标数组
+    getSequence(newIndexToOldIndexMap)
+  : EMPTY_ARR
+```
+那么这个序列的作用是什么？它就是用来辅助移动节点，而且是在最小次数下移动节点。由于newIndexToOldIndexMap是根据新旧节点之间的映射创建的，其下标天然代表乱序的新节点数组的顺序，而且其对应下标中存储的元素也代表该新节点复用的旧节点的下标，那么这里我们就可以看到两个序列：
+
+- 新节点下标组成的序列(递增的，因为我们以它为基准创建的数组)
+- newIndexToOldIndexMap中旧节点下标组成的序列，可能递增也可能乱序
+
+此时倘若旧节点下标组成的序列也呈现递增趋势，那么我们便可以操作那些非递增的节点来达到变更为新节点序列的目的。并且这个递增的序列越长，那么我们要操作(移动)的节点就越少。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220313205640.png)
+
+此时其newIndexToOldIndexMap为：
+```js
+newIndexToOldIndexMap = [4, 2, 3, 0]
+
+// 该数组返回的是对应的元素在newIndexToOldIndexMap的下标
+// 而并非实际的旧节点下标
+increasingNewIndexSequence = [1, 2]
+```
+
+可以看到2、3节点与新节点的下标的递增关系保持一致，其最长递增子序列(increasingNewIndexSequence)为[1, 2]，此时我们只需要操作4/0两个节点即可。
+
+increasingNewIndexSequence返回的结果为对应的元素在 newIndexToOldIndexMap的下标而并非实际的旧节点下标。
+
+```js
+// 获取递增序列的尾坐标
+j = increasingNewIndexSequence.length - 1
+
+// looping backwards so that we can use last patched node as anchor
+// 向后循环，这样我们可以用上一个patch过了的节点做锚点
+for (i = toBePatched - 1; i >= 0; i--) {
+  // 当前要处理的新节点下标及其节点
+  const nextIndex = s2 + i
+  const nextChild = c2[nextIndex]
+
+  // 获取其后一个节点，如果没有则获取其父节点
+  const anchor = nextIndex + 1 < l2 ? c2[nextIndex + 1].el : parentAnchor
+
+  // 如果当前新旧节点Map中未找到当前位置新节点的旧节点信息，
+  // 说明是新增节点
+  if (newIndexToOldIndexMap[i] === 0) {
+    // mount new
+    patch(null, nextChild)
+
+    // moved说明有节点需要移动，通过塑造一个递增序列，处于递增序列的节点就可以
+    // 不进行移动，只移动其余节点，这样就减少了节点的移动
+  } else if (moved) {
+    // 如果存在以下情况则移动：
+    // 1. 没有稳定的子序列
+    // 2. 当前节点不在这个稳定的子序列中
+    // move if:
+    // There is no stable subsequence (e.g. a reverse)
+    // OR current node is not among the stable sequence
+    if (j < 0 || i !== increasingNewIndexSequence[j]) {
+      move(nextChild, container, anchor)
+    } else {
+      j--
+    }
+  }
+}
+```
+本次遍历以新节点的乱序序列(s2 <-> e2)为基准，逆向进行遍历。逆向的原因是因为其在新增节点或更新节点时，可以以后面已经操作过的节点为锚点进行更新(想象一下Node.insertBefore()/Node.appendChild()的参数)。
+
+每次遍历会出现三种情况：
+- 当前节点未有对应的旧节点下标，则说明是新增节点
+- 该节点需要移动，进行移动
+- 该节点与旧节点序列都保持递增顺序，直接跳过即可(实际反应在代码里面就是没做任何处理)
+
+情况2与3在完整的迭代中是互斥的，两者不会同时出现在整个迭代流程中。
+
+第一种情况，比较简单，这里就不解释了：
+```js
+// 如果当前新旧节点Map中未找到当前位置新节点的旧节点信息，
+// 说明是新增节点
+if (newIndexToOldIndexMap[i] === 0) {
+  // mount new
+  patch(null, nextChild)
+}
+```
+第二种情况要判定moved = true，它的原理之前我们已经解释过了。这里我们要关注的是它的函数体。根据我们刚刚对递增子序列的理解，那么其应该会在以下情况移动或不移动节点：
+- 当前节点处于最长递增子序列中 —— 跳过
+- 当前节点不存在最长递增子序列中 —— 移动
+    - 递增序列已经没有需要跳过的节点了但任存在节点需要更新(实际和不存在的情况一样)
+    - 当前节点不存在最长递增子序列
+```js
+// 如果存在以下情况则移动：
+// 1. 没有稳定的子序列(实际和情况2一致，反序时会返回任意一个节点作为最长序列)
+// 2. 当前节点不在这个稳定的子序列中
+// move if:
+// There is no stable subsequence (e.g. a reverse)
+// OR current node is not among the stable sequence
+if (j < 0 || i !== increasingNewIndexSequence[j]) {
+  // 将当前节点移动到锚点节点前或容器节点最后(没有锚点时)
+  move(nextChild, container, anchor)
+} else {
+  j--
+}
+```
+那么在第一次更新中，发现h节点不在newIndexToOldIndexMap中，那么按新增节点进行处理，将其插入到新f节点前:
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220313205640.png)
+
+在第二次更新中，发现d节点存在于单调增序列中，所以本次更新可以跳过：
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220313210345.png)
+
+同理c节点也一样，这里就不放图了，处理完c节点后此时为这样：
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220313210440.png)
+
+此时e节点可复用，则将其移动到新c节点前即可。
+
+到此为止，上图的diff就结束了。
+
+对于第三种情况，由于复用的节点在前后都保持了递增的关系，所以此时我们不需要再重复对节点进行处理，所以遇到复用的节点时直接跳过即可：
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220313210533.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220313175053.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220313175136.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220313175244.png)
+
+#### 总结
+通过上面的学习分析，可以知道，Vue3 的diff算法，会首先进行收尾相同节点的patch处理，结束后，会挂载新增节点，卸载旧节点。
+
+如果子序列的情况较为复杂，比如出现乱序的情况，则会首先找出可复用的节点，并通过可复用节点的位置映射构建一个最大递增子序列，通过最大递增子序列来对节点进行mount & move。以提高diff效率，实现节点复用的最大可能性。
+
+#### 那什么是最大递增子序列？
+- 子序列是由数组派生而来的序列，删除（或不删除）数组中的元素而不改变其余元素的顺序。
+- 而递增子序列，是数组派生的子序列，各元素之间保持逐个递增的关系。
+- 数组[3, 6, 2, 7] 是数组 [0, 3, 1, 6, 2, 2, 7] 的最长严格递增子序列。
+- 数组[2, 3, 7, 101] 是数组 [10 , 9, 2, 5, 3, 7, 101, 18]的最大递增子序列。
+- 数组[0, 1, 2, 3] 是数组 [0, 1, 0, 3, 2, 3]的最大递增子序列。
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220313174643.png)
+已上图为例，在未处理的乱序节点中，存在新增节点N、I、需要卸载的节点G，及可复用节点C、D、E、F。
+
+节点CDE在新旧子序列中相对位置没有变换，如果想要通过最小变动实现节点复用，我们可以将找出F节点变化前后的下标位置，在新的子序列C节点之前插入F节点即可。
+
+最大递增子序列的作用就是通过新旧节点变化前后的映射，创建一个递增数组，这样就可以知道哪些节点在变化前后相对位置没有发生变化，哪些节点需要进行移动。
+
+Vue3中的递增子序列的不同在于，它保存的是可复用节点在 newIndexToOldIndexMap的下标。而并不是newIndexToOldIndexMap中的元素。
+```js
+// 5.3 move and mount
+// generate longest stable subsequence only when nodes have moved
+// 移动节点 挂载节点
+// 仅当节点被移动后 生成最长递增子序列
+// 经过上面操作后，newIndexToOldIndexMap = [5, 4, 3, 0]
+// 得到 increasingNewIndexSequence = [2]
+const increasingNewIndexSequence = moved
+  ? getSequence(newIndexToOldIndexMap)
+  : EMPTY_ARR
+// j = 0
+j = increasingNewIndexSequence.length - 1
+// looping backwards so that we can use last patched node as anchor
+// 从后向前遍历 以便于可以用最新的被patch的节点作为锚点
+// i = 3
+for (i = toBePatched - 1; i >= 0; i--) {
+  // 5 4 3 2
+  const nextIndex = s2 + i
+  // 节点 h  c  d  e 
+  const nextChild = c2[nextIndex]
+  // 获取锚点
+  const anchor =
+    nextIndex + 1 < l2 ? c2[nextIndex + 1].el : parentAnchor
+  // [5, 4, 3, 0] 节点h会被patch，其实是mount
+  //  c  d  e 会被移动
+  if (newIndexToOldIndexMap[i] === 0) {
+    // mount new
+    // 挂载新的
+    patch(
+      null,
+      nextChild,
+      container,
+      anchor,
+      ...
+    )
+  } else if (moved) {
+    // move if:
+    // There is no stable subsequence (e.g. a reverse)
+    // OR current node is not among the stable sequence
+    // 如果没有最长递增子序列或者 当前节点不在递增子序列中间
+    // 则移动节点
+    // 
+    if (j < 0 || i !== increasingNewIndexSequence[j]) {
+      move(nextChild, container, anchor, MoveType.REORDER)
+    } else {
+      j--
+    }
+  }
+}
+
+```
+
 ### Vue3.0是如何变得更快的？（底层，源码）
 ####  diff方法优化
 Vue2.x 中的虚拟dom是进行全量的对比。 Vue3.0 中新增了静态标记（PatchFlag）：在与上次虚拟结点进行对比的时候，值对比带有patch flag的节点，并且可以通过flag 的信息得知当前节点要对比的具体内容化。
@@ -5147,8 +5760,11 @@ export const enum PatchFlags {Ⅰ
 ### 模板编译、数据绑定、依赖收集、派发更新
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228183851.png)
 
-### Vue 事件绑定原理
+### Vue （v-on）事件绑定原理
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228162804.png)
+
+#### v-on指令可以同时监听多个函数吗？
+可以的，v-on的事件监听类似于DOM原生api添加事件监听addEventListenter。可以用键对值得形式。事件类型：事件名 如果绑定多个相同事件，直接用逗号分割就行。
 ### Vue data 中某一个属性的值发生改变后，视图会立即同步执行重新渲染吗？
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220228184021.png)
 
@@ -5737,6 +6353,12 @@ Vue和React是数据驱动视图，如何有效控制DOM操作
   - 2.数据变化，React 手动(setState)，Vue 自动(初始化已响应式处理，Object.defineProperty，Proxy)
   - 3.React 单向绑定，Vue 双向绑定
   - 4.React 的 Redux，Vue 的 Vuex
+
+  
+react整体是函数式的思想，把组件设计成纯组件，状态和逻辑通过参数传入，所以在react中，是单项数据流。react在setState之后会重新走向渲染的流程，入股shouldComponentUpdate返回的是true，就继续渲染。如果返回false就不会重新渲染。
+
+vue的思想是响应式的，基于是数据可变的，通过每一个属性建议wacher来监听，当属性变化的时候响应式的更新对应的虚拟DOM
+
 ### jQuery 和 Vue 的区别？
 jQuery：这个曾经是最流行的 Web 前端 JS 库，即使是现在依然有很多人在使用，可是现在无论是国内还是国外它的使用率正在渐渐的被其他 JS 框架所代替，随着浏览器厂商对 HTML5 规范统一遵循以及 ECMA6 在浏览器端的支持实现，相信 jQuery 的使用率会越来越低。
 
@@ -6391,6 +7013,7 @@ export default {
 - 模板编译：模板到render函数，再到vnode
 - vdom：patch(ele,vnode)和patch(vnode,newVnode)
 ## React
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220313165734.png)
 ### React-Diff
 #### 实现原理
 React的思路是递增法。通过对比新的列表中的节点，在原本的列表中的位置是否是递增，来判断当前节点是否需要移动。

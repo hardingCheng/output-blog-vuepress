@@ -149,6 +149,31 @@ categories:
   -->
 ```
 ## CSS
+### offset系列、scroll系列、client系列
+#### offset系列
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220303202425.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220303202440.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220303201836.png)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220303202118.png)
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220303202204.png)
+
+#### scroll系列
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220303202546.png)
+
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220303202611.png)
+
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220303201926.png)
+#### client系列：可视区域
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220303202502.png)
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220303202530.png)
+
+
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220303201959.png)
 ### float 在什么时候不生效？
 1. display：none
 设置成 display：none 了之后，float 失效这一点自然不用说。因为此时元素已经不在 dom 树里了，float 当然起不了作用。
@@ -186,7 +211,7 @@ div {
 ```
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211129215847.png)
 ### DIV 拖拽？
-
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220313112928.png)
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211122221738.png)
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20211122221809.png)
 
@@ -919,6 +944,12 @@ min-width 和 max-width 分别限制了元素的最小宽度和最大宽度，�
 3. 核心区别在于，是否创造了“新的元素”
 
 ### CSS 动画属性有哪些?
+```md
+1、transform用于做平移、缩放、旋转、倾斜等效果
+2、transition用于做简单的动画过渡效果、无法对动画效果和关键帧等进行控制
+3、animation可以用于做复杂的动画效果、可以设置动画的关键帧,产生暂停、变速等效果
+4、transition能通过js或者hover等方式被动触发,animation可以主动触发
+```
 
 transition、animation 和 transform 是 CSS3 中三个制作动画的重要属性。
 
@@ -1493,215 +1524,370 @@ clear 清除浮动
 - 原理: 右边元素overflow:hidden后，形成BFC渲染区域。左边的float元素就不能进入右边范围了。
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220208164319.png)
 ### 页面布局
-1. 三栏布局
-   - 浮动
-   ```html
-    <style>
-           html, * {
-               padding: 0;
-               margin: 0;
-           }
-           .layout article div {
-               min-height:100px;
-           }
-           .layout.float .left {
-               float: left;
-               width: 300px;
-               background: red;
-           }
-           .layout.float .right {
-               float: right;
-               width: 300px;
-               background: blue;
-           }
-           .layout.layout .center {
-               background: yellow;
-           }
-       </style>
-   
-    <section class="layout float">
-           <article class="left-right-center">
-               <div class="left"></div>
-               <div class="right"></div>
-               <div class="center">
-                   <h1>浮动解决方案</h1>
-               </div>
-           </article>
-       </section>
-   ```
-   **优点：** 兼容性比较好；把清除浮动和周边元素的关系处理好的话。
-   **缺点： **清除浮动，浮动以后脱离文档流，处理不好会带来很多问题。
-   
-   
-   - 绝对定位
-   ```html
-   <style>
-           html *{
-               padding: 0;
-               margin: 0;
-           }
-           .layout article div{
-               min-height: 100px;
-           }
-           .layout.absolute .left-center-right>div{
-             position: absolute;
-           }
-           .layout.absolute .left{
-             left:0;
-             width: 300px;
-             background: red;
-           }
-           .layout.absolute .center{
-             left: 300px;
-             right: 300px;
-             background: yellow;
-           }
-           .layout.absolute .right{
-             right:0;
-             width: 300px;
-             background: blue;
-           }
+#### 三栏布局
+中间列自适应宽度，旁边两侧固定宽度。
+- 浮动
+```html
+<style>
+       html, * {
+           padding: 0;
+           margin: 0;
+       }
+       .layout article div {
+           min-height:100px;
+       }
+       .layout.float .left {
+           float: left;
+           width: 300px;
+           background: red;
+       }
+       .layout.float .right {
+           float: right;
+           width: 300px;
+           background: blue;
+       }
+       .layout.layout .center {
+           background: yellow;
+       }
    </style>
-   <section class="layout absolute">
-           <article class="left-center-right">
-               <div class="left"></div>
-               <div class="center">
-                 <h2>绝对定位解决方案</h2>
-               </div>
-               <div class="right"></div>
-             </article>
-    </section>
-   ```
-   **优点：** 快捷，配合js使用不容易出问题。
-   **缺点：** 布局已经脱离文档流了，就意味下面所有子元素也必须脱离文档流，导致了这个方案的可使用性比较差。
-
-
-
-   - flex布局
-   ```html
-    <style>
-           .layout.flexbox{
-             margin-top: 110px;
-           }
-           .layout.flexbox .left-center-right{
-             display: flex;
-           }
-           .layout.flexbox .left{
-             width: 300px;
-             background: red;
-           }
-           .layout.flexbox .center{
-             flex:1;
-             background: yellow;
-           }
-           .layout.flexbox .right{
-             width: 300px;
-             background: blue;
-           }
-   </style>
-   <section class="layout flexbox">
-         <h1>三栏布局</h1>
-         <article class="left-center-right">
-           <div class="left"></div>
-           <div class="center">
-             <h2>flexbox解决方案</h2>
-           </div>
-           <div class="right"></div>
-         </article>
-       </section>
-   ```
-   **优点：** 解决了上面两个方案的不足
-   **缺点：** IE8及以下不支持 flex
-
-
-
-   - table布局
-   ```html
-         <style>
-           .layout.table .left-center-right{
-             width:100%;
-             height: 100px;
-             display: table;
-           }
-           .layout.table .left-center-right>div{
-             display: table-cell;
-           }
-           .layout.table .left{
-             width: 300px;
-             background: red;
-           }
-           .layout.table .center{
-             background: yellow;
-           }
-           .layout.table .right{
-             width: 300px;
-             background: blue;
-           }
-         </style>
-   <section class="layout table">
-         <h1>三栏布局</h1>
-         <article class="left-center-right">
-           <div class="left"></div>
-           <div class="center">
-             <h2>表格布局解决方案</h2>
-           </div>
-           <div class="right"></div>
-         </article>
-       </section>
-   ```
-   **优点：** 轻易的做到，表格兼容性非常好，flex解决不了的（IE8不支持flex），想实现同样效果可以用表格。
-   **缺点：** 历史的诟病以外，其中某一个单元格的高度超出了的时候，两侧的单元格也是要调整高度的；有时候的场景是不需要同时增高的。
-
-
-
-   - grid布局
-   ```html
-      <style>
-           /*网格布局有行有列*/
-           .layout.grid .left-center-right{
-             width:100%;
-             display: grid;
-             grid-template-rows: 100px;
-             grid-template-columns: 300px auto 300px;
-           }
-           .layout.grid .left-center-right>div{
    
-           }
-           .layout.grid .left{
-             width: 300px;
-             background: red;
-           }
-           .layout.grid .center{
-             background: yellow;
-           }
-           .layout.grid .right{
+<section class="layout float">
+       <article class="left-right-center">
+           <div class="left"></div>
+           <div class="right"></div>
+           <div class="center">
+               <h1>浮动解决方案</h1>
+           </div>
+       </article>
+   </section>
+```
+**优点：** 兼容性比较好；把清除浮动和周边元素的关系处理好的话。
+**缺点：** 清除浮动，浮动以后脱离文档流，处理不好会带来很多问题。
    
-             background: blue;
-           }
-         </style>
-   <section class="layout grid">
-         <h1>三栏布局</h1>
-         <article class="left-center-right">
+- 绝对定位
+```html
+<style>
+       html *{
+           padding: 0;
+           margin: 0;
+       }
+       .layout article div{
+           min-height: 100px;
+       }
+       .layout.absolute .left-center-right>div{
+         position: absolute;
+       }
+       .layout.absolute .left{
+         left:0;
+         width: 300px;
+         background: red;
+       }
+       .layout.absolute .center{
+         left: 300px;
+         right: 300px;
+         background: yellow;
+       }
+       .layout.absolute .right{
+         right:0;
+         width: 300px;
+         background: blue;
+       }
+</style>
+<section class="layout absolute">
+       <article class="left-center-right">
            <div class="left"></div>
            <div class="center">
-             <h2>网格布局解决方案</h2>
+             <h2>绝对定位解决方案</h2>
            </div>
            <div class="right"></div>
          </article>
-       </section>
-   ```
-   **优点：** 可以做很多复杂的布局，代码量也简化很多，是未来的趋势；
-   **缺点：** 兼容性问题，各种浏览器及旧版本支持不是很好。
-2. **上面都是确定高度已知。高度不已知的情况下。**
-- flex
-- table
-3. **总结：**
+</section>
+```
+**优点：** 快捷，配合js使用不容易出问题。
+**缺点：** 布局已经脱离文档流了，就意味下面所有子元素也必须脱离文档流，导致了这个方案的可使用性比较差。
+
+- flex布局
+```html
+<style>
+       .layout.flexbox{
+         margin-top: 110px;
+       }
+       .layout.flexbox .left-center-right{
+         display: flex;
+       }
+       .layout.flexbox .left{
+         width: 300px;
+         background: red;
+       }
+       .layout.flexbox .center{
+         flex:1;
+         background: yellow;
+       }
+       .layout.flexbox .right{
+         width: 300px;
+         background: blue;
+       }
+</style>
+<section class="layout flexbox">
+     <h1>三栏布局</h1>
+     <article class="left-center-right">
+       <div class="left"></div>
+       <div class="center">
+         <h2>flexbox解决方案</h2>
+       </div>
+       <div class="right"></div>
+     </article>
+   </section>
+```
+**优点：** 解决了上面两个方案的不足
+**缺点：** IE8及以下不支持 flex
+
+- table布局
+```html
+     <style>
+       .layout.table .left-center-right{
+         width:100%;
+         height: 100px;
+         display: table;
+       }
+       .layout.table .left-center-right>div{
+         display: table-cell;
+       }
+       .layout.table .left{
+         width: 300px;
+         background: red;
+       }
+       .layout.table .center{
+         background: yellow;
+       }
+       .layout.table .right{
+         width: 300px;
+         background: blue;
+       }
+     </style>
+<section class="layout table">
+     <h1>三栏布局</h1>
+     <article class="left-center-right">
+       <div class="left"></div>
+       <div class="center">
+         <h2>表格布局解决方案</h2>
+       </div>
+       <div class="right"></div>
+     </article>
+   </section>
+```
+**优点：** 轻易的做到，表格兼容性非常好，flex解决不了的（IE8不支持flex），想实现同样效果可以用表格。
+**缺点：** 历史的诟病以外，其中某一个单元格的高度超出了的时候，两侧的单元格也是要调整高度的；有时候的场景是不需要同时增高的。
+
+- grid布局
+```html
+  <style>
+       /*网格布局有行有列*/
+       .layout.grid .left-center-right{
+         width:100%;
+         display: grid;
+         grid-template-rows: 100px;
+         grid-template-columns: 300px auto 300px;
+       }
+       .layout.grid .left-center-right>div{
+   
+       }
+       .layout.grid .left{
+         width: 300px;
+         background: red;
+       }
+       .layout.grid .center{
+         background: yellow;
+       }
+       .layout.grid .right{
+   
+         background: blue;
+       }
+     </style>
+<section class="layout grid">
+     <h1>三栏布局</h1>
+     <article class="left-center-right">
+       <div class="left"></div>
+       <div class="center">
+         <h2>网格布局解决方案</h2>
+       </div>
+       <div class="right"></div>
+     </article>
+   </section>
+```
+**优点：** 可以做很多复杂的布局，代码量也简化很多，是未来的趋势；
+**缺点：** 兼容性问题，各种浏览器及旧版本支持不是很好。
+
+**总结：**
 - 各方案优缺点
   float：需要清除浮动，但是兼容性好；
   绝对定位：快捷，已理解，但是绝对定位脱离了文档流，可用性差；
   flexbox：有兼容性，其他的都挺好的；
   表格布局：兼容性好；
   网格布局：有兼容性
+#### 单列布局
+![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220304193429.png)
+- header,content和footer等宽的单列布局
+    - 先通过对header,content,footer统一设置width：1000px;或者max-width：1000px(这两者的区别是当屏幕小于1000px时，前者会出现滚动条，后者则不会，显示出实际宽度);然后设置margin:auto实现居中即可得到。
+- header与footer等宽,content略窄的单列布局
+    - header、footer的内容宽度不设置，块级元素充满整个屏幕，但header、content和footer的内容区设置同一个width，并通过margin:auto实现居中。
+#### 两列自适应布局
+两列自适应布局是指一列由内容撑开，另一列撑满剩余宽度的布局方式。
+1. **float+overflow:hidden**
+
+如果是普通的两列布局，**浮动+普通元素的margin**便可以实现，但如果是自适应的两列布局，利用**float+overflow:hidden**便可以实现，这种办法主要通过overflow触发BFC,而BFC不会重叠浮动元素。由于设置overflow:hidden并不会触发IE6-浏览器的haslayout属性，所以需要设置zoom:1来兼容IE6-浏览器。
+```html
+<div class="parent" style="background-color: lightgrey;">
+    <div class="left" style="background-color: lightblue;">
+        <p>left</p>
+    </div>
+    <div class="right"  style="background-color: lightgreen;">
+        <p>right</p>
+        <p>right</p>
+    </div>        
+</div>
+
+
+.parent {
+  overflow: hidden;
+  zoom: 1;
+}
+.left {
+  float: left;
+  margin-right: 20px;
+}
+.right {
+  overflow: hidden;
+  zoom: 1;
+}
+```
+2. **Flex布局**
+Flex布局，也叫弹性盒子布局，区区简单几行代码就可以实现各种页面的的布局。
+```html
+<div class="parent" style="background-color: lightgrey;">
+    <div class="left" style="background-color: lightblue;">
+        <p>left</p>
+    </div>
+    <div class="right"  style="background-color: lightgreen;">
+        <p>right</p>
+        <p>right</p>
+    </div>        
+</div>
+
+//html部分同上
+.parent {
+  display:flex;
+}  
+.right {
+  margin-left:20px; 
+  flex:1;
+}
+```
+3. **Grid布局**
+Grid布局，是一个基于网格的二维布局系统，目的是用来优化用户界面设计。
+```html
+<div class="parent" style="background-color: lightgrey;">
+    <div class="left" style="background-color: lightblue;">
+        <p>left</p>
+    </div>
+    <div class="right"  style="background-color: lightgreen;">
+        <p>right</p>
+        <p>right</p>
+    </div>        
+</div>
+
+//html部分同上
+.parent {
+  display:grid;
+  grid-template-columns:auto 1fr;
+  grid-gap:20px
+}
+```
+#### 等高布局
+两列为例子，左边和右边的列高度相等；
+```html
+<div class="parent">
+  <div class="left">
+    <p>left</p>
+  </div>
+  <div class="right">
+    <p>right</p>
+    <p>right</p>
+  </div>
+</div>
+```
+- table
+    - table 的特性为每列等宽，每行等高可以用于解决此需求
+```html
+<style>
+  .parent {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+  }
+  .left {
+    display: table-cell;
+    width: 100px;
+  }
+  .right {
+    display: table-cell
+    /*宽度为剩余宽度*/
+  }
+</style>
+```
+- flex
+    - 设置flex布局之后，在侧轴上的排列方式默认为stretch，也就是未设置高度时，默认占满了整个容器的高；
+```html
+<style>
+  .parent {
+    display: flex;
+  }
+  .left {
+    width: 100px;
+    margin-left: 20px;
+  }
+  .right {
+    flex: 1;
+  }
+</style>
+//注意这里实际上使用了 align-items: stretch，flex 默认的 align-items 的值为 stretch
+```
+- float
+    - 此方法为伪等高（只有背景显示高度相等），左右真实的高度其实不相等，可用控制台查看。
+```html
+<style>
+  .parent {
+    overflow: hidden;
+  }
+  .left,.right {
+    padding-bottom: 9999px;
+    margin-bottom: -9999px;
+  }
+  .left {
+    float: left;
+    width: 100px;
+    margin-right: 20px;
+  }
+  .right {
+    overflow: hidden;
+  }
+</style>
+```
+#### 多列的等高布局
+每一列的div 标签中的内容所占高度不同，而且没有明确的给 div 一个高度，而且也不知道这个内容会占多高；
+
+```css
+.container {
+    overflow: hidden;
+}
+
+div.item {
+	// 相当于把每列的高度再加10000px
+    padding-bottom: 10000px;
+    // 又把每列div在文档流中所加的10000px减少了，这样后面紧跟元素就会紧跟着上来。
+	margin-bottom: -10000px;
+}
+``` 
 ### 清除浮动的方案
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220302142515.png)
 
@@ -1735,7 +1921,7 @@ clear 清除浮动
 
 ```css
 .clearfloat:after{
-  display:bloc;
+  display:blocK;
   clear:both;
   content:"";
   visibility:hidden;
@@ -2890,9 +3076,6 @@ body,html {
    }
    ```
 
-````
-2. 模仿表格布局
-
 #### 粘连布局
 有一块内容<main>，当<main>的高康足够长的时候，紧跟在<main>后面的元素<footer>会跟在<main>元素的后面。
 当<main>元素比较短的时候(比如小于屏幕的高度),我们期望这个<footer>元素能够“粘连”在屏幕的底部
@@ -2974,7 +3157,7 @@ body,html {
     padding-bottom: 10000px;
     margin-bottom: -10000px;
   }
-````
+```
 
 - 实现
   - footer 必须是一个独立的结构，与 wrap 没有任何嵌套关系
@@ -3384,7 +3567,10 @@ body,html {
 ### CSS 选择器的优先级
 ![](https://output66.oss-cn-beijing.aliyuncs.com/img/20220301211530.png)
 第一优先级：!important 会覆盖页面内任何位置的元素样式 1.内联样式，如 style="color: green"，权值为 1000
-2.ID 选择器，如#app，权值为 0100 3.类、伪类、属性选择器，如.foo, :first-child, div[class="foo"]，权值为 0010 4.标签、伪元素选择器，如 div::first-line，权值为 0001 5.通配符、子类选择器、兄弟选择器，如\*, >, +，权值为 0000 6.继承的样式没有权值
+2.ID 选择器，如#app，权值为 0100 
+3.类、伪类、属性选择器，如.foo, :first-child, div[class="foo"]，权值为 0010 
+4.标签、伪元素选择器，如 div::first-line，权值为 0001 
+5.通配符、子类选择器、兄弟选择器，如\*, >, +，权值为 0000 6.继承的样式没有权值
 
 ### display:none visibility:hidden opacity:0 区别
 
